@@ -9,8 +9,7 @@ import { HeaderComponent } from './modules/core/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
 import { ScenarioComponent } from './modules/scenario/scenario.component';
 import { PlastronComponent } from './modules/plastron/plastron.component';
-import { SceneComponent } from './scene/scene.component';
-import { EditeurGrapheNodalComponent } from './editeur-graphe-nodal/editeur-graphe-nodal.component';
+import { SceneComponent } from './modules/plastron/editeur/scene/scene.component';
 
 @NgModule({
   declarations: [
@@ -20,8 +19,7 @@ import { EditeurGrapheNodalComponent } from './editeur-graphe-nodal/editeur-grap
     AccueilComponent,
     ScenarioComponent,
     PlastronComponent,
-    SceneComponent,
-    EditeurGrapheNodalComponent
+    SceneComponent
   ],
   imports: [
     BrowserModule,
