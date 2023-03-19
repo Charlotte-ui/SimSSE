@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Scenario } from '../core/models/scenario';
 
 @Component({
   selector: 'app-scenario',
@@ -7,9 +9,20 @@ import { Component, OnInit } from '@angular/core';
 })
 export class ScenarioComponent implements OnInit {
 
-  constructor() { }
+  scenario!: Scenario ;
+
+
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.route.data.subscribe(
+      (response) => {
+        this.scenario = response['data'];
+      },
+      (error:any) => {
+        console.log(error);
+      }
+    );
   }
 
 }
