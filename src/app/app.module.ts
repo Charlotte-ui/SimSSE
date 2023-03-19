@@ -6,11 +6,12 @@ import { environment } from '../environments/environment';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { FirebaseService } from './modules/core/services/firebase.service';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 
 import {MatCardModule} from '@angular/material/card'; 
 import {MatListModule} from '@angular/material/list'; 
+import { ReactiveFormsModule } from '@angular/forms';
+import {MatInputModule} from '@angular/material/input'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -45,7 +46,9 @@ import { ListBoxElementComponent } from './modules/shared/list-box/list-box-elem
     provideAuth(() => getAuth()),
     provideFirestore(() => getFirestore()),
     MatCardModule,
-    MatListModule
+    MatListModule,
+    ReactiveFormsModule,
+    MatInputModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase }],
   bootstrap: [AppComponent]

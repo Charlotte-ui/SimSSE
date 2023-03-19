@@ -107,5 +107,12 @@ getCollectionById<T extends Collection>(collection:string): Observable<T[]> {
   }
 
 
+  public connexion(pseudo:string,password:string):Promise<firebase.auth.UserCredential>{
+    return firebase.auth().signInWithEmailAndPassword(pseudo+"@mail.fr",password);
+  }
+
+
+
+
 
 }
