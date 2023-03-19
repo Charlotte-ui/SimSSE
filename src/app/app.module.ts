@@ -15,7 +15,7 @@ import {MatListModule} from '@angular/material/list';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ConnexionComponent } from './modules/connexion/connexion.component';
+import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
 import { ScenarioComponent } from './modules/scenario/scenario.component';
