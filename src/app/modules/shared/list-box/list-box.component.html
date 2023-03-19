@@ -1,0 +1,15 @@
+
+<mat-card>
+    <mat-card-header>
+      <mat-card-title>{{titre}}</mat-card-title>
+      <mat-card-subtitle>{{sousTitre}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <mat-list>
+            <mat-list-item *ngFor="let element of elements">
+                <app-list-box-element [titre]="element.titre" [description]="element.description"></app-list-box-element>
+                <mat-divider></mat-divider>
+            </mat-list-item>
+        </mat-list>
+    </mat-card-content>
+</mat-card>

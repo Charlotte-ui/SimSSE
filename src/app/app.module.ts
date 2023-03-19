@@ -1,6 +1,17 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
+import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
+import { environment } from '../environments/environment';
+import { provideAuth,getAuth } from '@angular/fire/auth';
+import { provideFirestore,getFirestore } from '@angular/fire/firestore';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { FirebaseService } from './modules/core/services/firebase.service';
+import { FIREBASE_OPTIONS } from '@angular/fire/compat';
+
+import {MatCardModule} from '@angular/material/card'; 
+import {MatListModule} from '@angular/material/list'; 
+
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -10,6 +21,8 @@ import { AccueilComponent } from './modules/accueil/accueil.component';
 import { ScenarioComponent } from './modules/scenario/scenario.component';
 import { PlastronComponent } from './modules/plastron/plastron.component';
 import { SceneComponent } from './modules/plastron/editeur/scene/scene.component';
+import { ListBoxComponent } from './modules/shared/list-box/list-box.component';
+import { ListBoxElementComponent } from './modules/shared/list-box/list-box-element/list-box-element.component';
 
 @NgModule({
   declarations: [
@@ -19,14 +32,22 @@ import { SceneComponent } from './modules/plastron/editeur/scene/scene.component
     AccueilComponent,
     ScenarioComponent,
     PlastronComponent,
-    SceneComponent
+    SceneComponent,
+    ListBoxComponent,
+    ListBoxElementComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    AngularFirestoreModule,
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore()),
+    MatCardModule,
+    MatListModule
   ],
-  providers: [],
+  providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
