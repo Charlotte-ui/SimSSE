@@ -3,6 +3,8 @@ import { FormBuilder } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Groupe } from '../core/models/groupe';
 import { Scenario } from '../core/models/scenario';
+import { Scenario } from '../core/models/plastron';
+
 import { FirebaseService } from '../core/services/firebase.service';
 import { ScenarioService } from '../core/services/scenario.service';
 
@@ -15,6 +17,7 @@ export class ScenarioComponent implements OnInit {
 
   scenario!: Scenario ;
   groupes!: Groupe[];
+  plastrons! Plastron[];
 
   displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU'];
   dataSourceGroup = groupes;
@@ -32,10 +35,26 @@ export class ScenarioComponent implements OnInit {
          this.scenarioFormGroup = this.form.group(this.scenario);
 
         this.scenarioService.getScenarioGroupes(this.scenario.id).subscribe(
-          (groupes) => {
-            this.groupes = groupes;
+          (response) => {
+            this.groupes = response['data'];
             this.dataSourceGroup = this.groupes;
             
+            this.plastrons = [];
+            
+            this.groupes.forEach(function(groupe){
+                   
+              this.scenarioService.getGroupePlastrons(groupe.id).subscribe(
+                (response) => {
+                  this.plastrons = this.plastrons.concat(response['data']);
+                }
+              );
+              
+            }
+                                 
+            this.completePlastrons();
+                                 
+                                 
+            });
           }
         );
 
@@ -45,5 +64,11 @@ export class ScenarioComponent implements OnInit {
       }
     );
   }
+  
+  
+  public addGroup(){}
+  public deleteGroup(){}
+  
+  public completePlastrons(){}
 
 }
