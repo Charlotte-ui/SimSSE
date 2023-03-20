@@ -37,3 +37,46 @@
     <input matInput formControlName="psy">
   </mat-form-field>
 </form>
+
+
+
+<div>
+  <button mat-raised-button (click)="addGroup()">
+    Ajouter un groupe
+  </button>
+  <button
+      mat-raised-button
+      [disabled]="!dataSourceGroup.length"
+      (click)="removeGroup()">
+    Supprimer un groupe
+  </button>
+</div>
+
+<table mat-table [dataSource]="dataSourceGroup" class="mat-elevation-z8 demo-table">
+  <!-- Scene Column -->
+  <ng-container matColumnDef="scene">
+    <th mat-header-cell *matHeaderCellDef>Scène</th>
+    <td mat-cell *matCellDef="let element">{{element.scene}}</td>
+  </ng-container>
+
+  <!-- UR Column -->
+  <ng-container matColumnDef="UR">
+    <th mat-header-cell *matHeaderCellDef>UR</th>
+    <td mat-cell *matCellDef="let element">{{element.UR}}</td>
+  </ng-container>
+
+  <!-- UA Column -->
+  <ng-container matColumnDef="UA">
+    <th mat-header-cell *matHeaderCellDef>UA</th>
+    <td mat-cell *matCellDef="let element">{{UA.weight}}</td>
+  </ng-container>
+
+  <!-- EU Column -->
+  <ng-container matColumnDef="EU">
+    <th mat-header-cell *matHeaderCellDef>EU</th>
+    <td mat-cell *matCellDef="let element">{{EU.symbol}}</td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumnsGroup"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumnsGroup;"></tr>
+</table>
