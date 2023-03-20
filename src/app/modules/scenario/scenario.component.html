@@ -1,1 +1,39 @@
 <p>scenario works!</p>
+
+
+<form [formGroup]="scenarioFormGroup">
+  <mat-form-field>
+    <mat-label>Titre</mat-label>
+    <input matInput formControlName="titre" >
+  </mat-form-field>
+
+  <mat-form-field>
+    <mat-label>Description</mat-label>
+    <textarea matInput formControlName="description"></textarea>
+  </mat-form-field>
+  
+  <mat-form-field>
+    <mat-label>Impliqués</mat-label>
+    <input matInput formControlName="impliques">
+  </mat-form-field>
+  
+    <mat-form-field>
+    <mat-label>UR</mat-label>
+    <input matInput formControlName="UR">
+  </mat-form-field>
+  
+    <mat-form-field>
+    <mat-label>EU</mat-label>
+    <input matInput formControlName="EU">
+  </mat-form-field>
+  
+    <mat-form-field>
+    <mat-label>UA</mat-label>
+    <input matInput formControlName="UA">
+  </mat-form-field>
+  
+    <mat-form-field>
+    <mat-label>Psy</mat-label>
+    <input matInput formControlName="psy">
+  </mat-form-field>
+</form>
