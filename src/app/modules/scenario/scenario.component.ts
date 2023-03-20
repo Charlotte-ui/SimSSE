@@ -16,6 +16,9 @@ export class ScenarioComponent implements OnInit {
   scenario!: Scenario ;
   groupes!: Groupe[];
 
+  displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU'];
+  dataSourceGroup = groupes;
+
   scenarioFormGroup = this.form.group(this.scenario);
 
 
@@ -29,8 +32,11 @@ export class ScenarioComponent implements OnInit {
          this.scenarioFormGroup = this.form.group(this.scenario);
 
         this.scenarioService.getScenarioGroupes(this.scenario.id).subscribe(
-          (groupes) =>
-            (this.groupes = groupes)
+          (groupes) => {
+            this.groupes = groupes;
+            this.dataSourceGroup = this.groupes;
+            
+          }
         );
 
       },
