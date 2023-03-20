@@ -25,6 +25,8 @@ export class ScenarioComponent implements OnInit {
     this.route.data.subscribe(
       (response) => {
         this.scenario = response['data'];
+        
+         this.scenarioFormGroup = this.form.group(this.scenario);
 
         this.scenarioService.getScenarioGroupes(this.scenario.id).subscribe(
           (groupes) =>
