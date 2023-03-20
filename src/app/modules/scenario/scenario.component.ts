@@ -20,7 +20,10 @@ export class ScenarioComponent implements OnInit {
   plastrons! Plastron[];
 
   displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU'];
+  displayedColumnsPlastron: string[] = ['modele', 'triage', 'description', 'profil','groupe','statut'];
+
   dataSourceGroup = groupes;
+  dataSourcePlastron = plastrons;
 
   scenarioFormGroup = this.form.group(this.scenario);
 
@@ -69,6 +72,8 @@ export class ScenarioComponent implements OnInit {
   public addGroup(){}
   public deleteGroup(){}
   
-  public completePlastrons(){}
+  public completePlastrons(){
+    this.dataSourcePlastron = this.plastrons;
+  }
 
 }
