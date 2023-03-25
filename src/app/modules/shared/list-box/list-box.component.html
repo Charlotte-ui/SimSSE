@@ -6,10 +6,13 @@
     </mat-card-header>
     <mat-card-content>
         <mat-list>
-            <mat-list-item *ngFor="let element of elements">
-                <app-list-box-element [titre]="element.titre" [description]="element.description"></app-list-box-element>
+            <ng-container  *ngFor="let element of elements">
+                <mat-list-item (click)="goToElement(element.id)">
+                    <app-list-box-element [titre]="element.titre" [description]="element.description"></app-list-box-element>
+                </mat-list-item>
                 <mat-divider></mat-divider>
-            </mat-list-item>
+            </ng-container >
+            
         </mat-list>
     </mat-card-content>
 </mat-card>

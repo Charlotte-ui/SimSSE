@@ -11,20 +11,34 @@ import { FirebaseService } from '../core/services/firebase.service';
 @Injectable({
   providedIn: 'root'
 })
-export class ScenarioResolver implements Resolve<Scenario| undefined> {
+export class ScenarioResolver implements Resolve<Scenario> {
  
-  constructor(public firebaseService: FirebaseService) {}
+  constructor(public firebaseService: FirebaseService,private router: Router) {}
+
+
   
-  public resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<Scenario> {
-    return new Promise<Scenario| undefined>((resolve, reject) => {
-      const scenarioId = route.paramMap.get('id');
-      if (scenarioId) this.firebaseService
+  public resolve(route: ActivatedRouteSnapshot): Observable<Scenario> {
+    console.log('Called Get Product in resolver...', route);
+    const scenarioId = route.paramMap.get('id');
+    console.log(scenarioId)
+    return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",scenarioId).pipe();
+/*     return new Promise<Scenario| undefined>((resolve, reject) => {
+      
+      
+       this.firebaseService
       .getElementInCollectionByIds<Scenario>("Scenario",scenarioId)
-      .subscribe((scenario) => {
+      .subscribe((scenario:Scenario) => {
+        console.log("here")
+
         scenario!.id = scenarioId;
-        resolve(scenario);
+        console.log("scenario")
+
+        console.log(scenario)
+        resolve(scenario as Scenario);
       });
 
-    });
+    }); */
+
+    
   }
 }
