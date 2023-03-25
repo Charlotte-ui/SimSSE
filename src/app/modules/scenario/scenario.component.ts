@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Groupe } from '../core/models/groupe';
 import { Scenario } from '../core/models/scenario';
 import { Plastron } from '../core/models/plastron';
@@ -22,15 +22,22 @@ export class ScenarioComponent implements OnInit {
   displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU'];
   displayedColumnsPlastron: string[] = ['modele', 'triage', 'description', 'profil','groupe','statut'];
 
-  dataSourceGroup = this.groupes;
-  dataSourcePlastron = this.plastrons;
+  dataSourceGroup = [];
+  dataSourcePlastron = [];
 
-  scenarioFormGroup = this.form.group(this.scenario);
+  scenarioFormGroup;
 
 
-  constructor(private route: ActivatedRoute,private form: FormBuilder,public scenarioService:ScenarioService) { }
+  constructor(private route: ActivatedRoute,
+    private form: FormBuilder,
+    public scenarioService:ScenarioService,
+    private router: Router) { 
+
+      console.log("rtgert")
+    }
 
   ngOnInit(): void {
+    console.log("ggrt")
 
     this.route.data.subscribe(
       (response) => {

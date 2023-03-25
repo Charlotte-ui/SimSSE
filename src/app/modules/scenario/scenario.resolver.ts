@@ -8,23 +8,16 @@ import { Observable, of } from 'rxjs';
 import { Scenario } from '../core/models/scenario';
 import { FirebaseService } from '../core/services/firebase.service';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class ScenarioResolver implements Resolve<Scenario> {
  
   constructor(public firebaseService: FirebaseService,private router: Router) {}
 
 
   
-  public resolve(route: ActivatedRouteSnapshot): Observable<Scenario> {
-    console.log('Called Get Product in resolver...', route);
+  public resolve(route: ActivatedRouteSnapshot): Promise<Scenario> {
     const scenarioId = route.paramMap.get('id');
-    console.log(scenarioId)
-    return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",scenarioId).pipe();
-/*     return new Promise<Scenario| undefined>((resolve, reject) => {
-      
-      
+    return new Promise<Scenario| undefined>((resolve, reject) => {
        this.firebaseService
       .getElementInCollectionByIds<Scenario>("Scenario",scenarioId)
       .subscribe((scenario:Scenario) => {
@@ -37,7 +30,7 @@ export class ScenarioResolver implements Resolve<Scenario> {
         resolve(scenario as Scenario);
       });
 
-    }); */
+    }); 
 
     
   }
