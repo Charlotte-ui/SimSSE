@@ -18,6 +18,9 @@ import { MatTableModule } from '@angular/material/table'
 import {MatToolbarModule} from '@angular/material/toolbar'; 
 import {MatIconModule} from '@angular/material/icon'; 
 import {MatDividerModule} from '@angular/material/divider'; 
+import {MatSelectModule} from '@angular/material/select'; 
+import {MatTabsModule} from '@angular/material/tabs'; 
+import {MatGridListModule} from '@angular/material/grid-list'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -31,6 +34,11 @@ import { SceneComponent } from './modules/plastron/editeur/scene/scene.component
 import { ListBoxComponent } from './modules/shared/list-box/list-box.component';
 import { ListBoxElementComponent } from './modules/shared/list-box/list-box-element/list-box-element.component';
 import { ScenarioResolver } from './modules/scenario/scenario.resolver';
+import { EditeurComponent } from './modules/plastron/editeur/editeur.component';
+import { ProfilComponent } from './modules/plastron/profil/profil.component';
+import { BarreOutilsComponent } from './modules/plastron/editeur/barre-outils/barre-outils.component';
+import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspecteur.component';
+
 
 @NgModule({
   declarations: [
@@ -42,7 +50,11 @@ import { ScenarioResolver } from './modules/scenario/scenario.resolver';
     PlastronComponent,
     SceneComponent,
     ListBoxComponent,
-    ListBoxElementComponent
+    ListBoxElementComponent,
+    EditeurComponent,
+    ProfilComponent,
+    BarreOutilsComponent,
+    InspecteurComponent
   ],
   imports: [
     BrowserModule,
@@ -59,7 +71,10 @@ import { ScenarioResolver } from './modules/scenario/scenario.resolver';
     MatTableModule,
     MatToolbarModule,
     MatIconModule,
-    MatDividerModule
+    MatDividerModule,
+    MatSelectModule,
+    MatTabsModule,
+    MatGridListModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]

@@ -8,7 +8,9 @@ import { Observable, of } from 'rxjs';
 import { Scenario } from '../core/models/scenario';
 import { FirebaseService } from '../core/services/firebase.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class ScenarioResolver implements Resolve<Scenario> {
  
   constructor(public firebaseService: FirebaseService,private router: Router) {}
