@@ -21,6 +21,10 @@ import {MatDividerModule} from '@angular/material/divider';
 import {MatSelectModule} from '@angular/material/select'; 
 import {MatTabsModule} from '@angular/material/tabs'; 
 import {MatGridListModule} from '@angular/material/grid-list'; 
+import { NgxEchartsModule } from 'ngx-echarts';
+import {MatDialogModule} from '@angular/material/dialog'; 
+import {MatFormFieldModule} from '@angular/material/form-field'; 
+import { FormsModule } from '@angular/forms';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -38,6 +42,9 @@ import { EditeurComponent } from './modules/plastron/editeur/editeur.component';
 import { ProfilComponent } from './modules/plastron/profil/profil.component';
 import { BarreOutilsComponent } from './modules/plastron/editeur/barre-outils/barre-outils.component';
 import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspecteur.component';
+import { EditeurGrapheNodalComponent } from './modules/plastron/editeur/editeur-graphe-nodal/editeur-graphe-nodal.component';
+import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
+
 
 
 @NgModule({
@@ -54,7 +61,9 @@ import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspe
     EditeurComponent,
     ProfilComponent,
     BarreOutilsComponent,
-    InspecteurComponent
+    InspecteurComponent,
+    EditeurGrapheNodalComponent,
+    NodeDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -74,7 +83,18 @@ import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspe
     MatDividerModule,
     MatSelectModule,
     MatTabsModule,
-    MatGridListModule
+    MatGridListModule,
+    NgxEchartsModule.forRoot({
+      /**
+       * This will import all modules from echarts.
+       * If you only need custom modules,
+       * please refer to [Custom Build] section.
+       */
+      echarts: () => import('echarts'), // or import('./path-to-my-custom-echarts')
+    }),
+    MatDialogModule,
+    MatFormFieldModule,
+    FormsModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]

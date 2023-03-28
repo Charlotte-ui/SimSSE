@@ -1,0 +1,22 @@
+<h1 mat-dialog-title>Modifier le noeud</h1>
+
+<div mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Nom du noeud</mat-label>
+    <input matInput [(ngModel)]="data.name">
+  </mat-form-field>
+</div>
+
+<div mat-dialog-content>
+    <mat-form-field appearance="fill">
+      <mat-label>Pente </mat-label>
+      <input matInput [(ngModel)]="data.pente">
+    </mat-form-field>
+  </div>
+
+
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button [mat-dialog-close]="data.name" cdkFocusInitial>Ok</button>
+</div>
