@@ -1,22 +1,42 @@
 <h1 mat-dialog-title>Modifier le noeud</h1>
 
+<mat-dialog-content [formGroup]="form">
+
 <div mat-dialog-content>
   <mat-form-field appearance="fill">
-    <mat-label>Nom du noeud</mat-label>
-    <input matInput [(ngModel)]="data.name">
+    <mat-label>Nom</mat-label>
+    <input matInput formControlName="name">
   </mat-form-field>
 </div>
 
-<div mat-dialog-content>
+<div *ngIf="data.type == 'trend'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Cible </mat-label>
+    <input matInput formControlName="cible">
+  </mat-form-field>
+</div>
+
+
+<div *ngIf="data.type == 'trend'" mat-dialog-content>
     <mat-form-field appearance="fill">
       <mat-label>Pente </mat-label>
-      <input matInput [(ngModel)]="data.pente">
+      <input matInput formControlName="pente">
     </mat-form-field>
-  </div>
+</div>
 
+
+<div *ngIf="data.type == 'event'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Evénement </mat-label>
+    <input matInput formControlName="event">
+  </mat-form-field>
+</div>
 
 
 <div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">No Thanks</button>
-  <button mat-button [mat-dialog-close]="data.name" cdkFocusInitial>Ok</button>
+  <button mat-button (click)="onNoClick()">Annuler</button>
+  <button mat-button (click)="save()">Enregistrer les modifications</button>
+  <button mat-button >Supprimer</button>
 </div>
+
+</mat-dialog-content>
