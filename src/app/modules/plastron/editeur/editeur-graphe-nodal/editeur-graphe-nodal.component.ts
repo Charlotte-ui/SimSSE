@@ -128,11 +128,17 @@ export class EditeurGrapheNodalComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
       console.log(result);
-      this.nodes[nodeId] = result;
-      this.graphData[nodeId].name = result.name;
-      //this.animal = result;
 
-      console.log(this.initialChartOption)
+      if (result == "delete"){
+        this.nodes.splice(nodeId, 1); 
+        this.graphData.splice(nodeId, 1); 
+        console.log(this.nodes)
+      }
+      else {
+        this.nodes[nodeId] = result;
+        this.graphData[nodeId].name = result.name;
+        console.log(this.initialChartOption)
+      }
 
       this.updateChart();
     });
