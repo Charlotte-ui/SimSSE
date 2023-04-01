@@ -3,7 +3,9 @@
         colspan="1"
         rowspan="2"
         [style.background]='"lightblue"'>
-      <app-barre-outils></app-barre-outils>
+
+      <app-barre-outils (newNode)="addNode($event)"></app-barre-outils>
+
     </mat-grid-tile>
     <mat-grid-tile
     colspan="3"

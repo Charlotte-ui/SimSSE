@@ -16,60 +16,30 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
   mergeOptions = {};
 
-  @Input() nodes!:  (Event | Trend)[];
-  @Input() links!:  Link[];
+  _nodes!:  (Event | Trend)[];
+  get nodes():  (Event | Trend)[] {
+    return this._nodes;
+}
+@Input() set nodes(value:(Event | Trend)[] ) {
+    this._nodes = value;
+    console.log(value)
+    this.initGraphData();
+}
 
+_links!:  Link[];
+get links():  Link[] {
+  return this._links;
+}
+@Input() set links(value:Link[] ) {
+  this._links = value;
+  console.log("links")
+  console.log(value)
+  this.initGraphLink();
+}
 
-  graphData = [
-    {
-      name: 'Tendance 1',
-      x: 300,
-      y: 300,
-    },
-    {
-      name: 'Tendance 2',
-      x: 800,
-      y: 300
-    },
-    {
-      name: 'Event 1',
-      x: 550,
-      y: 100
-    },
-  ]
+  graphData = []
 
-  graphLink =  [
-    {
-      source: 0,
-      target: 1,
-      symbolSize: [5, 20],
-      label: {
-        show: true
-      },
-      lineStyle: {
-        width: 5,
-        curveness: 0.2
-      }
-    },
-    {
-      source: 'Node 2',
-      target: 'Node 1',
-      label: {
-        show: true
-      },
-      lineStyle: {
-        curveness: 0.2
-      }
-    },
-    {
-      source: 'Node 1',
-      target: 'Node 3'
-    },
-    {
-      source: 'Node 2',
-      target: 'Node 3'
-    }
-  ]
+  graphLink =  []
 
   initialChartOption: EChartsOption = {
     title: {
@@ -81,34 +51,63 @@ export class EditeurGrapheNodalComponent implements OnInit {
     series: [
       {
         type: 'graph',
-        layout: 'none',
-        symbolSize: 50,
+        layout: 'force',
+       // symbolSize: 10,   
+        symbolSize: [20, 1],
         roam: true,
         label: {
           show: true
         },
+        symbol: 'roundRect',
         edgeSymbol: ['circle', 'arrow'],
-        edgeSymbolSize: [4, 10],
+        edgeSymbolSize: [1, 1],
         edgeLabel: {
-          fontSize: 20
+          fontSize: 10
         },
         data: this.graphData,
         // links: [],
         links: this.graphLink,
+        categories: [{name:'event'},{name:'trend'}],
         lineStyle: {
           opacity: 0.9,
           width: 2,
           curveness: 0
+        },
+        force: {
+          repulsion: 100
         }
       }
     ]
   };
 
-
-
   constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
+  }
+
+  initGraphData(){
+    this.graphData = new Array(this.nodes.length);
+
+    this.nodes.forEach(node => {
+      console.log(node)
+      this.graphData[node.id] = {name:node.name,x:node.x,y:node.y,category:node.type}
+    });
+
+    this.updateChart();
+  }
+
+  initGraphLink(){
+    this.graphLink = new Array(this.links.length);
+
+    this.links.forEach(link => {
+      console.log("link")
+
+      console.log(link)
+      this.graphLink[link.id] = {source:Number(link.source),target:Number(link.target)}
+      console.log(this.graphLink[link.id])
+    });
+
+    this.updateChart();
   }
 
   onChartInit(ec) {
@@ -117,57 +116,84 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
   onChartClick(event:any): void {
 
-    let nodeId = event.dataIndex;
+      let index = event.dataIndex;
+      let elements;
+      let graphElements;
 
-    console.log(event)
-
-    const dialogRef = this.dialog.open(NodeDialogComponent, {
-      data: this.nodes[nodeId],
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      console.log(result);
-
-      if (result == "delete"){
-        this.nodes.splice(nodeId, 1); 
-        this.graphData.splice(nodeId, 1); 
-        console.log(this.nodes)
+      if (event.dataType = "edge"){
+        elements = this.links;
+        graphElements = this.graphLink;
       }
       else {
-        this.nodes[nodeId] = result;
-        this.graphData[nodeId].name = result.name;
-        console.log(this.initialChartOption)
+        elements = this.nodes;
+        graphElements = this.graphData;      
       }
 
-      this.updateChart();
-    });
+      console.log(event)
+  
+      const dialogRef = this.dialog.open(NodeDialogComponent, 
+        {data: [elements[index],this.nodes]});
+  
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+        console.log(result);
+
+        if (result == "delete"){
+          elements.splice(index, 1); 
+          graphElements.splice(index, 1); 
+          console.log(elements)
+        }
+        else if (result){
+          elements[index] = result;
+          if (event.dataType = "edge"){
+            graphElements[index].source = Number(result.source);
+            graphElements[index].target = Number(result.target);
+          }
+          else{
+            graphElements[index].name = result.name;
+          }
+          console.log(this.initialChartOption)
+        }
+  
+        this.updateChart();
+      });
+    
+
+    
   }
 
   updateChart(){
+
+    console.log("updateChart")
+    console.log(this.graphData)
 
 
     let series = [
       {
         type: 'graph',
         layout: 'none',
-        symbolSize: 50,
+        symbol: 'roundRect',
+        symbolSize: [140, 75],
         roam: true,
         label: {
           show: true
         },
         edgeSymbol: ['circle', 'arrow'],
-        edgeSymbolSize: [4, 10],
+        edgeSymbolSize: [10, 10],
         edgeLabel: {
           fontSize: 20
         },
         data: this.graphData,
         // links: [],
         links: this.graphLink,
+        categories: [{name:'event'},{name:'trend'}],
         lineStyle: {
-          opacity: 0.9,
-          width: 2,
-          curveness: 0
+          opacity: 1,
+          width: 1,
+          curveness: 0.5
+        },
+        force: {
+          repulsion: 100
         }
       }
     ]

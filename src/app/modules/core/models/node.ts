@@ -18,6 +18,7 @@ export interface Event extends Node{
 }
 
 export interface Link extends Collection{
-    source: string,
-    target: string
+    type: string;
+    source: number,
+    target: number
 }

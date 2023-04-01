@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'app-barre-outils',
@@ -7,9 +7,17 @@ import { Component, OnInit } from '@angular/core';
 })
 export class BarreOutilsComponent implements OnInit {
 
+  @Output() newNode = new EventEmitter<string>();
+
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  onClick(node:string){
+    this.newNode.emit(node);
+
   }
 
 }

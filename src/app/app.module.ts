@@ -25,6 +25,7 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import {MatDialogModule} from '@angular/material/dialog'; 
 import {MatFormFieldModule} from '@angular/material/form-field'; 
 import { FormsModule } from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -94,7 +95,8 @@ import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-n
     }),
     MatDialogModule,
     MatFormFieldModule,
-    FormsModule
+    FormsModule,
+    MatButtonModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
