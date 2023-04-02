@@ -44,6 +44,7 @@ export class NodeDialogComponent {
     delete() {
       this.dialogRef.close("delete");
     }
+
 }
 
 

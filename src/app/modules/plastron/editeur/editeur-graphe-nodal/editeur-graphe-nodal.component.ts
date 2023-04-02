@@ -1,9 +1,10 @@
-import { Component, OnInit, Inject, Input } from '@angular/core';
+import { Component, OnInit, Inject, Input, OnDestroy } from '@angular/core';
 import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
-import { EChartsOption } from 'echarts';
+import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NodeDialogComponent } from './node-dialog/node-dialog.component';
 import { Trend,Event, Link } from 'src/app/modules/core/models/node';
+import * as echarts from 'echarts/types/dist/echarts';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',
@@ -11,9 +12,7 @@ import { Trend,Event, Link } from 'src/app/modules/core/models/node';
   styleUrls: ['./editeur-graphe-nodal.component.less']
 })
 export class EditeurGrapheNodalComponent implements OnInit {
-
   echartsInstance ;
-
   mergeOptions = {};
 
   _nodes!:  (Event | Trend)[];
@@ -111,7 +110,7 @@ get links():  Link[] {
   }
 
   onChartInit(ec) {
-    this.echartsInstance = ec;
+    this.echartsInstance = ec
   }
 
   onChartClick(event:any): void {
@@ -171,9 +170,10 @@ get links():  Link[] {
     let series = [
       {
         type: 'graph',
-        layout: 'none',
+        layout: 'force',
+        draggable: true,
         symbol: 'roundRect',
-        symbolSize: [140, 75],
+        symbolSize: [70, 30],
         roam: true,
         label: {
           show: true
@@ -190,10 +190,14 @@ get links():  Link[] {
         lineStyle: {
           opacity: 1,
           width: 1,
-          curveness: 0.5
+          curveness: 0.3
         },
         force: {
-          repulsion: 100
+          repulsion: 100,
+          gravity: 0.1,
+          edgeLength: 100,
+          friction: 0.015,
+          layoutAnimation: true
         }
       }
     ]
@@ -202,13 +206,19 @@ get links():  Link[] {
       series: series
     };
 
-    // Applying my dynamic data here
-
-
-    //this.echartsInstance.
-
-    //this.chartOption.
+   
   }
+
+  
+
+
+
+
+
+
+
+
+
 
   }
 
