@@ -114,12 +114,13 @@ get links():  Link[] {
   }
 
   onChartClick(event:any): void {
+    console.log(event)
 
       let index = event.dataIndex;
       let elements;
       let graphElements;
 
-      if (event.dataType = "edge"){
+      if (!event.data.hasOwnProperty('category')){ // = if data is Link
         elements = this.links;
         graphElements = this.graphLink;
       }
@@ -128,7 +129,7 @@ get links():  Link[] {
         graphElements = this.graphData;      
       }
 
-      console.log(event)
+      console.log(elements)
   
       const dialogRef = this.dialog.open(NodeDialogComponent, 
         {data: [elements[index],this.nodes]});
