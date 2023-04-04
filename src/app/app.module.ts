@@ -1,6 +1,10 @@
 import { NgModule } from '@angular/core';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
@@ -8,7 +12,6 @@ import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
-
 
 import {MatCardModule} from '@angular/material/card'; 
 import {MatListModule} from '@angular/material/list'; 
@@ -26,10 +29,10 @@ import {MatDialogModule} from '@angular/material/dialog';
 import {MatFormFieldModule} from '@angular/material/form-field'; 
 import { FormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button'; 
+import {MatExpansionModule} from '@angular/material/expansion'; 
+import {CdkAccordionModule} from '@angular/cdk/accordion'; 
+import { ColorPickerModule } from 'ngx-color-picker';
 
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
@@ -46,8 +49,8 @@ import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspe
 import { EditeurGrapheNodalComponent } from './modules/plastron/editeur/editeur-graphe-nodal/editeur-graphe-nodal.component';
 import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger-dialog/trigger-dialog.component';
-
-
+import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
+//import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
   declarations: [
@@ -66,7 +69,8 @@ import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger
     InspecteurComponent,
     EditeurGrapheNodalComponent,
     NodeDialogComponent,
-    TriggerDialogComponent
+    TriggerDialogComponent,
+    VariableControllerComponent
   ],
   imports: [
     BrowserModule,
@@ -98,7 +102,11 @@ import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger
     MatDialogModule,
     MatFormFieldModule,
     FormsModule,
-    MatButtonModule
+    MatButtonModule,
+    NgbModule,
+    MatExpansionModule,
+    CdkAccordionModule,
+    ColorPickerModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]

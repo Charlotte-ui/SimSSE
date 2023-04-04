@@ -1,27 +1,20 @@
 <mat-grid-list cols="5" >
-    <mat-grid-tile
-        colspan="1"
-        rowspan="2"
-        [style.background]='"lightblue"'>
-          <app-barre-outils (newNode)="addNode($event)"></app-barre-outils>
-    </mat-grid-tile>
-    <mat-grid-tile
-      colspan="3"
-      rowspan="1"
-      [style.background]='"lightgreen"'>
-        <app-scene [events]="events" [links]="links" [targetVariable]="targetVariable" [nodes]="data"  ></app-scene>
-    </mat-grid-tile>
-    <mat-grid-tile
-      colspan="1"
-      rowspan="2"
-      [style.background]='"lightpink"'>
-        <app-inspecteur></app-inspecteur>
-    </mat-grid-tile>
-    <mat-grid-tile
-      colspan="3"
-      rowspan="1"
-      [style.background]='"lightgreen"'>
-        <app-editeur-graphe-nodal [nodes]="data" [links]="links" (newNodes)="updateNodes($event)"></app-editeur-graphe-nodal>
-    </mat-grid-tile>
-  </mat-grid-list>
-  
+
+  <div class="container">
+    <div class="row">
+      <div class="col-1" id="barre-outils">
+        <app-barre-outils (newNode)="addNode($event)"></app-barre-outils>
+      </div>
+      <div class="col-10">
+        <div class="row">
+          <app-scene [events]="events" [links]="links" [targetVariable]="targetVariable" [nodes]="data"  ></app-scene>
+        </div>
+        <div class="row">
+          <app-editeur-graphe-nodal [nodes]="data" [links]="links" (newNodes)="updateNodes($event)"></app-editeur-graphe-nodal>
+        </div>
+      </div>
+      <div class="col-1" id="inspecteur">
+        <app-inspecteur [variables]="targetVariable" (newVariables)="updateVariables($event)"></app-inspecteur>
+      </div>
+    </div>
+  </div>

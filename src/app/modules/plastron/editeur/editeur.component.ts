@@ -48,7 +48,6 @@ start:Event = {
   event:'start'
 }
 
-
 link1:Link = {
   id:"0",
   source: 3,
@@ -80,7 +79,6 @@ link4:Link = {
   type:"link",
   start:true
 }
-
 
   SpO2:VariablePhysio = {
     id:"0",
@@ -183,6 +181,13 @@ link4:Link = {
     console.log("updateNodes")
     console.log(event)
     this.data = [...event];
+
+  }
+
+  updateVariables(event){
+    console.log("updateVariables")
+    console.log(event)
+    this.targetVariable = [...event];
 
   }
 
