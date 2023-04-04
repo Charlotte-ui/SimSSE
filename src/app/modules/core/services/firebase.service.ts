@@ -59,6 +59,8 @@ getCollectionById<T extends Collection>(collection:string): Observable<T[]> {
    * @returns 
    */
   getElementInCollectionByIds<T extends Collection>(collection:string,elementId:string): Observable<T| undefined> {
+    console.log(collection)
+    console.log(elementId)
     return this.db.doc<T>(`${collection}/${elementId}`).valueChanges();
   }
 

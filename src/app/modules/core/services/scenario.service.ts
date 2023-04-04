@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { FirebaseService } from './firebase.service';
 import { Scenario } from '../models/scenario';
 import { Groupe } from '../models/groupe';
+import { Plastron } from '../models/plastron';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,11 @@ getScenarioById(id:string): Observable<Scenario|undefined> {
 getScenarioGroupes(id:string): Observable<Groupe[]|undefined> {
   return this.firebaseService.getElementInCollectionByMatchingChamp<Groupe>("Groupe","scenario",id);
 }
+
+getGroupePlastrons(id:string): Observable<Plastron[]|undefined> {
+  return this.firebaseService.getElementInCollectionByMatchingChamp<Plastron>("Plastron","groupe",id);
+}
+
 
 
 }

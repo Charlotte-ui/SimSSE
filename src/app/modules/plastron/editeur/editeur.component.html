@@ -1,1 +1,27 @@
-<p>editeur works!</p>
+<mat-grid-list cols="5" >
+    <mat-grid-tile
+        colspan="1"
+        rowspan="2"
+        [style.background]='"lightblue"'>
+          <app-barre-outils (newNode)="addNode($event)"></app-barre-outils>
+    </mat-grid-tile>
+    <mat-grid-tile
+      colspan="3"
+      rowspan="1"
+      [style.background]='"lightgreen"'>
+        <app-scene [events]="events" [links]="links" [targetVariable]="targetVariable" [nodes]="data"  ></app-scene>
+    </mat-grid-tile>
+    <mat-grid-tile
+      colspan="1"
+      rowspan="2"
+      [style.background]='"lightpink"'>
+        <app-inspecteur></app-inspecteur>
+    </mat-grid-tile>
+    <mat-grid-tile
+      colspan="3"
+      rowspan="1"
+      [style.background]='"lightgreen"'>
+        <app-editeur-graphe-nodal [nodes]="data" [links]="links" (newNodes)="updateNodes($event)"></app-editeur-graphe-nodal>
+    </mat-grid-tile>
+  </mat-grid-list>
+  

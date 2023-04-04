@@ -2,11 +2,11 @@ import { Listable } from './listable';
 
 
 export interface Scenario extends Listable{
-    impliques:string;
-    psy:string;
     UA:number;
+    impliques:number;
+    psy:number;
     UR:number;
-    EU:number;
+    EU:number; 
 
 
 }

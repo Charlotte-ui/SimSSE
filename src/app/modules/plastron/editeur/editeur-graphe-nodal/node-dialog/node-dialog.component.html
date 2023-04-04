@@ -1,0 +1,63 @@
+<h1 mat-dialog-title>Modifier le noeud</h1>
+
+<mat-dialog-content [formGroup]="form">
+
+<div *ngIf="node.type != 'link'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Nom</mat-label>
+    <input matInput formControlName="name">
+  </mat-form-field>
+</div>
+
+<div *ngIf="node.type == 'trend'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Cible </mat-label>
+    <input matInput formControlName="cible">
+  </mat-form-field>
+</div>
+
+
+<div *ngIf="node.type == 'trend'" mat-dialog-content>
+    <mat-form-field appearance="fill">
+      <mat-label>Pente </mat-label>
+      <input matInput type="number" formControlName="pente">
+    </mat-form-field>
+</div>
+
+
+<div *ngIf="node.type == 'event'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Evénement </mat-label>
+    <input matInput formControlName="event">
+  </mat-form-field>
+</div>
+
+<div *ngIf="node.type == 'link'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Source</mat-label>
+    <mat-select formControlName="source">
+      <mat-option *ngFor="let node of nodes" [value]="node.id">
+        {{node.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div *ngIf="node.type == 'link'" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Cible</mat-label>
+    <mat-select formControlName="target">
+      <mat-option *ngFor="let node of nodes" [value]="node.id">
+        {{node.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Annuler</button>
+  <button mat-button (click)="save()">Enregistrer les modifications</button>
+  <button mat-button (click)="delete()">Supprimer</button>
+</div>
+
+</mat-dialog-content>
