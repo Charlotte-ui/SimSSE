@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Trend,Event,Node, Link } from '../../core/models/node';
+import { TypeVariable, VariablePhysio } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 
 @Component({
@@ -11,7 +12,7 @@ import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dia
 export class EditeurComponent implements OnInit {
 
  trend1:Trend = {
-  id:"0",
+  id:"1",
   name: 'Tendance 1',
   x: 300,
   y: 300,
@@ -21,7 +22,7 @@ export class EditeurComponent implements OnInit {
 }
 
 trend2:Trend = {
-  id:"1",
+  id:"2",
   name: 'Tendance 2',
   x: 800,
   y: 300,
@@ -30,26 +31,79 @@ trend2:Trend = {
   pente:1
 }
 event:Event = {
-  id:"2",
-  name: 'Event 1',
+  id:"3",
+  name: 'Oxygéno.',
   x: 550,
   y: 100,
   type:'event',
   event:'oxygénothérapie'
 }
 
-link1:Link = {
+start:Event = {
   id:"0",
-  source: 0,
-  target: 1,
-  type:"link"
+  name: 'Start',
+  x: 0,
+  y: 0,
+  type:'event',
+  event:'start'
 }
 
 
+link1:Link = {
+  id:"0",
+  source: 3,
+  target: 1,
+  type:"link",
+  start:false
+}
 
-  data = [this.trend1,this.trend2,this.event]
+link2:Link = {
+  id:"1",
+  source: 3,
+  target: 2,
+  type:"link",
+  start:false
+}
 
-  links=[this.link1]
+link3:Link = {
+  id:"2",
+  source: 0,
+  target: 1,
+  type:"link",
+  start:true
+}
+
+link4:Link = {
+  id:"3",
+  source: 0,
+  target: 2,
+  type:"link",
+  start:true
+}
+
+
+  SpO2:VariablePhysio = {
+    id:"0",
+    type:TypeVariable.SpO2,
+    cible:98,
+    rand:1
+  }
+
+  FR:VariablePhysio = {
+    id:"1",
+    type:TypeVariable.FR,
+    cible:16,
+    rand:1
+  }
+  targetVariable = [this.SpO2,this.FR]
+
+
+
+  data = [this.trend1,this.trend2,this.event,this.start]
+
+  links=[this.link1,this.link2,this.link3,this.link4]
+
+  events = [[0,0],[50,3]]
 
   constructor(public dialog: MatDialog) { }
 
@@ -104,7 +158,7 @@ link1:Link = {
   createLink(){
 
     let index = this.links.length;
-    let link:Link = {id:index.toString(),source:undefined,target:undefined,type:"link"};
+    let link:Link = {id:index.toString(),source:undefined,target:undefined,type:"link",start:false};
 
     const dialogRef = this.dialog.open(NodeDialogComponent, {
       data: [link,this.data],

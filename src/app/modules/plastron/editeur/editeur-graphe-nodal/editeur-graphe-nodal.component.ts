@@ -21,7 +21,6 @@ export class EditeurGrapheNodalComponent implements OnInit {
 }
 @Input() set nodes(value:(Event | Trend)[] ) {
     this._nodes = value;
-    console.log(value)
     this.initGraphData();
 }
 
@@ -31,8 +30,6 @@ get links():  Link[] {
 }
 @Input() set links(value:Link[] ) {
   this._links = value;
-  console.log("links")
-  console.log(value)
   this.initGraphLink();
 }
 
@@ -47,36 +44,7 @@ get links():  Link[] {
     tooltip: {},
     animationDurationUpdate: 1500,
     animationEasingUpdate: 'quinticInOut',
-    series: [
-      {
-        type: 'graph',
-        layout: 'force',
-       // symbolSize: 10,   
-        symbolSize: [20, 1],
-        roam: true,
-        label: {
-          show: true
-        },
-        symbol: 'roundRect',
-        edgeSymbol: ['circle', 'arrow'],
-        edgeSymbolSize: [1, 1],
-        edgeLabel: {
-          fontSize: 10
-        },
-        data: this.graphData,
-        // links: [],
-        links: this.graphLink,
-        categories: [{name:'event'},{name:'trend'}],
-        lineStyle: {
-          opacity: 0.9,
-          width: 2,
-          curveness: 0
-        },
-        force: {
-          repulsion: 100
-        }
-      }
-    ]
+    series: []
   };
 
   constructor(public dialog: MatDialog) { }
@@ -88,7 +56,6 @@ get links():  Link[] {
     this.graphData = new Array(this.nodes.length);
 
     this.nodes.forEach(node => {
-      console.log(node)
       this.graphData[node.id] = {name:node.name,x:node.x,y:node.y,category:node.type}
     });
 
@@ -99,11 +66,7 @@ get links():  Link[] {
     this.graphLink = new Array(this.links.length);
 
     this.links.forEach(link => {
-      console.log("link")
-
-      console.log(link)
       this.graphLink[link.id] = {source:Number(link.source),target:Number(link.target)}
-      console.log(this.graphLink[link.id])
     });
 
     this.updateChart();
@@ -114,7 +77,6 @@ get links():  Link[] {
   }
 
   onChartClick(event:any): void {
-    console.log(event)
 
       let index = event.dataIndex;
       let elements;
@@ -129,19 +91,16 @@ get links():  Link[] {
         graphElements = this.graphData;      
       }
 
-      console.log(elements)
-  
+
+      
       const dialogRef = this.dialog.open(NodeDialogComponent, 
         {data: [elements[index],this.nodes]});
   
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
-        console.log(result);
 
         if (result == "delete"){
           elements.splice(index, 1); 
           graphElements.splice(index, 1); 
-          console.log(elements)
         }
         else if (result){
           elements[index] = result;
@@ -152,7 +111,6 @@ get links():  Link[] {
           else{
             graphElements[index].name = result.name;
           }
-          console.log(this.initialChartOption)
         }
   
         this.updateChart();
@@ -163,9 +121,6 @@ get links():  Link[] {
   }
 
   updateChart(){
-
-    console.log("updateChart")
-    console.log(this.graphData)
 
 
     let series = [

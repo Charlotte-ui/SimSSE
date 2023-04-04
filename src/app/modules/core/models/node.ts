@@ -20,5 +20,6 @@ export interface Event extends Node{
 export interface Link extends Collection{
     type: string;
     source: number,
-    target: number
+    target: number,
+    start:boolean
 }
