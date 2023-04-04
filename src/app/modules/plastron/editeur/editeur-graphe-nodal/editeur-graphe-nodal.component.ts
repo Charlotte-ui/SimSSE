@@ -41,9 +41,6 @@ get links():  Link[] {
   graphLink =  []
 
   initialChartOption: EChartsOption = {
-    title: {
-      text: 'Basic Graph'
-    },
     tooltip: {},
     animationDurationUpdate: 1500,
     animationEasingUpdate: 'quinticInOut',
