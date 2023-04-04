@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="col-1" id="inspecteur">
-        <app-inspecteur></app-inspecteur>
+        <app-inspecteur [variables]="targetVariable" (newVariables)="updateVariables($event)"></app-inspecteur>
       </div>
     </div>
   </div>

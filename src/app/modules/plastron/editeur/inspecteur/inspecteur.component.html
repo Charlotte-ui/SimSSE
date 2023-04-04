@@ -1,1 +1,4 @@
-<p>inspecteur works!</p>
+
+    <app-variable-controller *ngFor="let variable of variables" [variable]="variable" (newVariable)="setNewVariable(variable,$event)"></app-variable-controller>
+
+

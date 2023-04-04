@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
 
 @Component({
   selector: 'app-inspecteur',
@@ -7,9 +8,18 @@ import { Component, OnInit } from '@angular/core';
 })
 export class InspecteurComponent implements OnInit {
 
+  @Input() variables:VariablePhysio[];
+  @Output() newVariables = new EventEmitter<VariablePhysio[]>();
+
   constructor() { }
 
   ngOnInit(): void {
+  }
+
+  setNewVariable(oldVar:VariablePhysio,newVar:VariablePhysio){
+    const index = this.variables.indexOf(oldVar);
+    if (index > -1) this.variables[index] = newVar;
+    this.newVariables.emit(this.variables);
   }
 
 }

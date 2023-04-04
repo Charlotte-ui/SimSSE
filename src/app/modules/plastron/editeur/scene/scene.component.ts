@@ -18,7 +18,10 @@ get targetVariable():  VariablePhysio[] {
 }
 
 @Input() set targetVariable(value:VariablePhysio[] ) {
-    this._targetVariable = value;}
+    this._targetVariable = value;
+    if (this.nodes) this.initGraphData();
+
+}
 
 _links!:  Link[];
 get links():  Link[] {
