@@ -19,6 +19,8 @@ get targetVariable():  VariablePhysio[] {
 
 @Input() set targetVariable(value:VariablePhysio[] ) {
     this._targetVariable = value;
+  //  console.log("set targetVariable");
+  //  console.log(value);
     if (this.nodes) this.initGraphData();
 
 }
@@ -36,8 +38,8 @@ get nodes():  (Event | Trend)[] {
   return this._nodes;
 }
 @Input() set nodes(value:(Event | Trend)[] ) {
-  console.log("set nodes in scene")
-  console.log(value)
+ // console.log("set nodes in scene")
+ // console.log(value)
 
   this._nodes = value;
   this.initGraphData();
@@ -92,16 +94,21 @@ get nodes():  (Event | Trend)[] {
 
   initGraphData(){
 
-    this.graphData = {
-      SpO2: [],
-      FR: []
+    if (this.targetVariable && this.nodes && this.links){
+      this.graphData = {
+        SpO2: [],
+        FR: []
+      }
+  
+      this.targetVariable.forEach(variable => {
+        this.graphData[variable.type]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.type)
+      });
+  
+      this.updateChart();
+
     }
 
-    this.targetVariable.forEach(variable => {
-      this.graphData[variable.type]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.type)
-    });
 
-    this.updateChart();
   }
   
   calculCurve(size:number,target:number,rand:number,variable:TypeVariable){
@@ -173,8 +180,8 @@ get nodes():  (Event | Trend)[] {
 
   updateChart(){
 
-    console.log("updateChart")
-    console.log(this.graphData['SpO2'])
+   // console.log("updateChart")
+   // console.log(this.graphData['SpO2'])
 
     let markLineData = []
 
@@ -218,14 +225,14 @@ get nodes():  (Event | Trend)[] {
       series: series
     };
     
-    console.log( this.mergeOptions );
+    //console.log( this.mergeOptions );
    
   }
 
 
   onChartClick(event:any): void {
 
-    console.log(event)
+    //console.log(event)
 
     let index = event.dataIndex;
     let elements;
@@ -248,7 +255,7 @@ get nodes():  (Event | Trend)[] {
       }
       else if (result){
 
-        console.log(result)
+      //  console.log(result)
 
         let event = this.getEventAtTime(result.coord);
         event[0] = Number(result.xAxis)

@@ -1,7 +1,7 @@
 <app-header></app-header>
 <mat-tab-group>
     <mat-tab label="Modèle">
-        <app-editeur></app-editeur>
+        <app-editeur [targetVariable]="targetVariable" [links]="links" [data]="data"></app-editeur>
     </mat-tab>
     <mat-tab label="Profil">
         <app-profil></app-profil>
