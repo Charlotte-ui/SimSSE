@@ -62,7 +62,43 @@ export class PlastronComponent implements OnInit {
       rand:1
     }
 
-    this.targetVariable = [SpO2,FR];
+    let RC:VariablePhysio = {
+      id:"2",
+      type:TypeVariable.RC,
+      cible:80,
+      rand:1
+    }
+
+    let HemoCue:VariablePhysio = {
+      id:"3",
+      type:TypeVariable.HemoCue,
+      cible:36,
+      rand:1
+    }
+
+    let PAD:VariablePhysio = {
+      id:"4",
+      type:TypeVariable.PAD,
+      cible:80,
+      rand:1
+    }
+
+    let PAS:VariablePhysio = {
+      id:"5",
+      type:TypeVariable.PAS,
+      cible:130,
+      rand:1
+    }
+
+    let Temp:VariablePhysio = {
+      id:"6",
+      type:TypeVariable.Temp,
+      cible:130,
+      rand:1
+    }
+
+
+    this.targetVariable = [SpO2,FR,RC,HemoCue,Temp,PAD,PAS];
 
 
   }

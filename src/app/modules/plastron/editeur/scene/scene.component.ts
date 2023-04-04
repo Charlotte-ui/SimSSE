@@ -19,8 +19,8 @@ get targetVariable():  VariablePhysio[] {
 
 @Input() set targetVariable(value:VariablePhysio[] ) {
     this._targetVariable = value;
-  //  console.log("set targetVariable");
-  //  console.log(value);
+    console.log("set targetVariable");
+    console.log(value);
     if (this.nodes) this.initGraphData();
 
 }
@@ -51,7 +51,7 @@ get nodes():  (Event | Trend)[] {
 
   echartsInstance ;
 
-  variablePhysio = ['SpO2', 'FR','trigger']
+  variablePhysio = ['SpO2', 'FR','RC','HemoCue','Temp','PAD','PAS','trigger']
   graphData = {}
 
   mergeOptions = {};
@@ -97,7 +97,13 @@ get nodes():  (Event | Trend)[] {
     if (this.targetVariable && this.nodes && this.links){
       this.graphData = {
         SpO2: [],
-        FR: []
+        FR: [],
+        RC: [],
+        HemoCue: [],
+        Temp: [],
+        PAD: [],
+        PAS: [],
+
       }
   
       this.targetVariable.forEach(variable => {
@@ -112,7 +118,6 @@ get nodes():  (Event | Trend)[] {
   }
   
   calculCurve(size:number,target:number,rand:number,variable:TypeVariable){
- //   console.log("calculCurve")
     let curve = [];
     let trend = 0; 
     for(let i=0;i<size;i++){
@@ -197,7 +202,7 @@ get nodes():  (Event | Trend)[] {
     });
 
     let series = [
-      {
+/*       {
         name: 'SpO2',
         type: 'line',
         stack: 'x',
@@ -206,20 +211,32 @@ get nodes():  (Event | Trend)[] {
       {
         name: 'FR',
         type: 'line',
-        stack: 'Total',
-        data: this.graphData['FR']
-      },
-      {
-        name: 'trigger',
-        type: 'line',
         stack: 'x',
-        data: [[50,0]],
-        markLine: {
-          data: markLineData
-        }
-      },
+        data: this.graphData['FR']
+      }, */
       
     ]
+ 
+    this.targetVariable.forEach(variable => {
+      let serie = {
+        name:variable.type,
+        type:'line',
+   //     stack: 'x',
+        data: this.graphData[variable.type]
+      }
+      series.push(serie);
+      
+    }); 
+
+    series.push({
+      name: 'trigger',
+      type: 'line',
+    //  stack: 'x',
+      data: [[50,0]],
+      markLine: {
+        data: markLineData
+      }
+    })
 
     this.mergeOptions = {
       series: series
