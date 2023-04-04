@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Trend,Event,Node, Link } from '../../core/models/node';
 import { TypeVariable, VariablePhysio } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { Target } from '@angular/compiler';
 
 @Component({
   selector: 'app-editeur',
@@ -11,95 +12,15 @@ import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dia
 })
 export class EditeurComponent implements OnInit {
 
- trend1:Trend = {
-  id:"1",
-  name: 'chute sat',
-  x: 300,
-  y: 300,
-  type:'trend',
-  cible:'SpO2',
-  pente:-1
-}
-
-trend2:Trend = {
-  id:"2",
-  name: 'acc respi',
-  x: 800,
-  y: 300,
-  type:'trend',
-  cible:'FR',
-  pente:1
-}
-event:Event = {
-  id:"3",
-  name: 'Oxygéno.',
-  x: 550,
-  y: 100,
-  type:'event',
-  event:'oxygénothérapie'
-}
-
-start:Event = {
-  id:"0",
-  name: 'Start',
-  x: 0,
-  y: 0,
-  type:'event',
-  event:'start'
-}
-
-link1:Link = {
-  id:"0",
-  source: 3,
-  target: 1,
-  type:"link",
-  start:false
-}
-
-link2:Link = {
-  id:"1",
-  source: 3,
-  target: 2,
-  type:"link",
-  start:false
-}
-
-link3:Link = {
-  id:"2",
-  source: 0,
-  target: 1,
-  type:"link",
-  start:true
-}
-
-link4:Link = {
-  id:"3",
-  source: 0,
-  target: 2,
-  type:"link",
-  start:true
-}
-
-  SpO2:VariablePhysio = {
-    id:"0",
-    type:TypeVariable.SpO2,
-    cible:98,
-    rand:1
-  }
-
-  FR:VariablePhysio = {
-    id:"1",
-    type:TypeVariable.FR,
-    cible:16,
-    rand:1
-  }
-
-  targetVariable = [this.SpO2,this.FR]
 
 
-  data = [this.start,this.trend1,this.trend2,this.event]
 
-  links=[this.link1,this.link2,this.link3,this.link4]
+  @Input() targetVariable:VariablePhysio[];
+  @Input() data:(Event|Trend)[];
+  @Input() links:Link[];
+
+  
+
 
   events = [[0,0],[50,3]]
 

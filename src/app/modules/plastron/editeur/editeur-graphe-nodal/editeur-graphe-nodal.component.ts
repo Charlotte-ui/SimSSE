@@ -20,8 +20,10 @@ export class EditeurGrapheNodalComponent implements OnInit {
     return this._nodes;
 }
 @Input() set nodes(value:(Event | Trend)[] ) {
+  if (value!=undefined){
     this._nodes = value;
     this.initGraphData();
+  }
 }
 
 @Output() newNodes = new EventEmitter<(Event | Trend)[]>();
@@ -32,8 +34,10 @@ get links():  Link[] {
   return this._links;
 }
 @Input() set links(value:Link[] ) {
-  this._links = value;
-  this.initGraphLink();
+  if (value!=undefined){
+    this._links = value;
+    this.initGraphLink();
+  }
 }
 
   graphData = []
@@ -66,10 +70,29 @@ get links():  Link[] {
     this.graphLink = new Array(this.links.length);
 
     this.links.forEach(link => {
-      this.graphLink[link.id] = {source:Number(link.source),target:Number(link.target)}
+      this.graphLink[link.id] = {
+        source:Number(link.source),
+        target:Number(link.target),
+        lineStyle: {
+          color: link.start?"#2E933C":"#DE1A1A",
+        }
+      }
     });
 
     this.updateChart();
+
+/*     {
+      source: 0,
+      target: 1,
+      symbolSize: [5, 20],
+      label: {
+        show: true
+      },
+      lineStyle: {
+        color: 5,
+      }
+    } */
+  
   }
 
   onChartInit(ec) {

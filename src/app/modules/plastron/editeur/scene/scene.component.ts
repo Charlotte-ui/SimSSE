@@ -19,6 +19,8 @@ get targetVariable():  VariablePhysio[] {
 
 @Input() set targetVariable(value:VariablePhysio[] ) {
     this._targetVariable = value;
+    console.log("set targetVariable");
+    console.log(value);
     if (this.nodes) this.initGraphData();
 
 }
@@ -36,8 +38,8 @@ get nodes():  (Event | Trend)[] {
   return this._nodes;
 }
 @Input() set nodes(value:(Event | Trend)[] ) {
-  console.log("set nodes in scene")
-  console.log(value)
+ // console.log("set nodes in scene")
+ // console.log(value)
 
   this._nodes = value;
   this.initGraphData();
@@ -49,7 +51,7 @@ get nodes():  (Event | Trend)[] {
 
   echartsInstance ;
 
-  variablePhysio = ['SpO2', 'FR','trigger']
+  variablePhysio = ['SpO2', 'FR','RC','HemoCue','Temp','PAD','PAS','trigger']
   graphData = {}
 
   mergeOptions = {};
@@ -92,20 +94,30 @@ get nodes():  (Event | Trend)[] {
 
   initGraphData(){
 
-    this.graphData = {
-      SpO2: [],
-      FR: []
+    if (this.targetVariable && this.nodes && this.links){
+      this.graphData = {
+        SpO2: [],
+        FR: [],
+        RC: [],
+        HemoCue: [],
+        Temp: [],
+        PAD: [],
+        PAS: [],
+
+      }
+  
+      this.targetVariable.forEach(variable => {
+        this.graphData[variable.type]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.type)
+      });
+  
+      this.updateChart();
+
     }
 
-    this.targetVariable.forEach(variable => {
-      this.graphData[variable.type]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.type)
-    });
 
-    this.updateChart();
   }
   
   calculCurve(size:number,target:number,rand:number,variable:TypeVariable){
- //   console.log("calculCurve")
     let curve = [];
     let trend = 0; 
     for(let i=0;i<size;i++){
@@ -173,8 +185,8 @@ get nodes():  (Event | Trend)[] {
 
   updateChart(){
 
-    console.log("updateChart")
-    console.log(this.graphData['SpO2'])
+   // console.log("updateChart")
+   // console.log(this.graphData['SpO2'])
 
     let markLineData = []
 
@@ -190,7 +202,7 @@ get nodes():  (Event | Trend)[] {
     });
 
     let series = [
-      {
+/*       {
         name: 'SpO2',
         type: 'line',
         stack: 'x',
@@ -199,33 +211,45 @@ get nodes():  (Event | Trend)[] {
       {
         name: 'FR',
         type: 'line',
-        stack: 'Total',
-        data: this.graphData['FR']
-      },
-      {
-        name: 'trigger',
-        type: 'line',
         stack: 'x',
-        data: [[50,0]],
-        markLine: {
-          data: markLineData
-        }
-      },
+        data: this.graphData['FR']
+      }, */
       
     ]
+ 
+    this.targetVariable.forEach(variable => {
+      let serie = {
+        name:variable.type,
+        type:'line',
+   //     stack: 'x',
+        data: this.graphData[variable.type]
+      }
+      series.push(serie);
+      
+    }); 
+
+    series.push({
+      name: 'trigger',
+      type: 'line',
+    //  stack: 'x',
+      data: [[50,0]],
+      markLine: {
+        data: markLineData
+      }
+    })
 
     this.mergeOptions = {
       series: series
     };
     
-    console.log( this.mergeOptions );
+    //console.log( this.mergeOptions );
    
   }
 
 
   onChartClick(event:any): void {
 
-    console.log(event)
+    //console.log(event)
 
     let index = event.dataIndex;
     let elements;
@@ -248,7 +272,7 @@ get nodes():  (Event | Trend)[] {
       }
       else if (result){
 
-        console.log(result)
+      //  console.log(result)
 
         let event = this.getEventAtTime(result.coord);
         event[0] = Number(result.xAxis)
