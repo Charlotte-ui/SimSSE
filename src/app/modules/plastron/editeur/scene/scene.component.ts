@@ -3,7 +3,6 @@ import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import { Link, Trend, Event } from 'src/app/modules/core/models/node';
 import { TypeVariable, VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
-import { NodeDialogComponent } from '../editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 
 @Component({
@@ -13,15 +12,13 @@ import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.componen
 })
 export class SceneComponent implements OnInit {
 
+_targetVariable!:  VariablePhysio[];
+get targetVariable():  VariablePhysio[] {
+  return this._targetVariable;
+}
 
-  _targetVariable!:  VariablePhysio[];
-  get targetVariable():  VariablePhysio[] {
-    return this._targetVariable;
-}
 @Input() set targetVariable(value:VariablePhysio[] ) {
-    this._targetVariable = value;
-    this.initGraphData();
-}
+    this._targetVariable = value;}
 
 _links!:  Link[];
 get links():  Link[] {
@@ -36,19 +33,20 @@ get nodes():  (Event | Trend)[] {
   return this._nodes;
 }
 @Input() set nodes(value:(Event | Trend)[] ) {
+  console.log("set nodes in scene")
+  console.log(value)
+
   this._nodes = value;
   this.initGraphData();
 }
 
-  @Input() duration:number=100;
-  @Input() events:number[][]; //  time id
+@Input() duration:number=100;
+@Input() events:number[][]; //  time id
 
 
   echartsInstance ;
 
-
-
-  variablePhysio = ['SpO2', 'FR']
+  variablePhysio = ['SpO2', 'FR','trigger']
   graphData = {}
 
   mergeOptions = {};
@@ -82,7 +80,7 @@ get nodes():  (Event | Trend)[] {
   constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.updateChart()
+    //this.updateChart()
   }
 
   onChartInit(ec) {
@@ -104,23 +102,23 @@ get nodes():  (Event | Trend)[] {
   }
   
   calculCurve(size:number,target:number,rand:number,variable:TypeVariable){
-    console.log("calculCurve")
+ //   console.log("calculCurve")
     let curve = [];
     let trend = 0; 
     for(let i=0;i<size;i++){
       let event = this.getEventAtTime(i)
       if (event != undefined){
-        let nodeTriggers = this.getTrendsFromEvent(event);
+        let nodeTriggers = this.getTrendsFromEvent(event[1]);
         this.nodes.forEach(node => {
           if (node.type == "trend" && (node as Trend).cible == variable ){
             nodeTriggers.forEach(nodeTrigger => {
               if (nodeTrigger[0] == node.id){
-                console.log("node is trigger")
-                console.log(node)
+            //    console.log("node is trigger")
+            //    console.log(node)
                 if(nodeTrigger[1]) trend = (node as Trend).pente;
                 else trend = 0;
-                console.log("trend")
-                console.log(trend)
+             //   console.log("trend")
+            //    console.log(trend)
               }
             });           
           }      
@@ -129,34 +127,34 @@ get nodes():  (Event | Trend)[] {
       
       let prevValue = target ;
       if (i>0) prevValue = curve[i-1][1]
-      console.log("prevValue")
+/*       console.log("prevValue")
       console.log(prevValue)
       console.log("trend")
-      console.log(trend)
+      console.log(trend) */
 
       curve.push([i,prevValue + this.gaussianRandom(0,rand) + trend])
     }
     return curve;
   }
 
-  getEventAtTime(time:number):number|undefined{
-    console.log("get event at time "+time);
+  getEventAtTime(time:number):number[]|undefined{
+  //  console.log("get event at time "+time);
     let result = undefined;
     this.events.forEach(event => {
-      if (event[0] == time) result= event[1];
+      if (event[0] == time) result= event;
     });
-    console.log(result);
+ //   console.log(result);
 
     return result;
   }
 
   getTrendsFromEvent(event:number):any[]{
-    console.log("get Trends From Event "+event)
+  //  console.log("get Trends From Event "+event)
     let trends = [];
     this.links.forEach(link => {
       if(event == link.source) trends.push([link.target,link.start]);
     });
-    console.log(trends)
+  //  console.log(trends)
     return trends;
   }
 
@@ -188,13 +186,11 @@ get nodes():  (Event | Trend)[] {
 
     });
 
-
-
     let series = [
       {
         name: 'SpO2',
         type: 'line',
-        stack: 'Total',
+        stack: 'x',
         data: this.graphData['SpO2']
       },
       {
@@ -202,12 +198,11 @@ get nodes():  (Event | Trend)[] {
         type: 'line',
         stack: 'Total',
         data: this.graphData['FR']
-      }
-      ,
+      },
       {
         name: 'trigger',
         type: 'line',
-        stack: 'Total',
+        stack: 'x',
         data: [[50,0]],
         markLine: {
           data: markLineData
@@ -237,24 +232,35 @@ get nodes():  (Event | Trend)[] {
      
    
     const dialogRef = this.dialog.open(TriggerDialogComponent, 
-      {data: [event]});
+      {data: [event.data]});
 
     dialogRef.afterClosed().subscribe(result => {
 
       if (result == "delete"){
-        elements.splice(index, 1); 
-        graphElements.splice(index, 1); 
+        let event = this.getEventAtTime(result.coord);
+
+        const index = this.events.indexOf(event);
+        if (index > -1) this.events.splice(index, 1);
+        
       }
       else if (result){
+
+        console.log(result)
+
+        let event = this.getEventAtTime(result.coord);
+        event[0] = Number(result.xAxis)
+
         
       }
 
-      this.updateChart();
+      this.initGraphData();
     });
-  
+
+
+  }
+
 
   
-}
 
 
 

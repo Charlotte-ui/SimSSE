@@ -13,7 +13,7 @@ export class EditeurComponent implements OnInit {
 
  trend1:Trend = {
   id:"1",
-  name: 'Tendance 1',
+  name: 'chute sat',
   x: 300,
   y: 300,
   type:'trend',
@@ -23,7 +23,7 @@ export class EditeurComponent implements OnInit {
 
 trend2:Trend = {
   id:"2",
-  name: 'Tendance 2',
+  name: 'acc respi',
   x: 800,
   y: 300,
   type:'trend',
@@ -95,11 +95,11 @@ link4:Link = {
     cible:16,
     rand:1
   }
+
   targetVariable = [this.SpO2,this.FR]
 
 
-
-  data = [this.trend1,this.trend2,this.event,this.start]
+  data = [this.start,this.trend1,this.trend2,this.event]
 
   links=[this.link1,this.link2,this.link3,this.link4]
 
@@ -177,6 +177,13 @@ link4:Link = {
       }
 
     });
+  }
+
+  updateNodes(event){
+    console.log("updateNodes")
+    console.log(event)
+    this.data = [...event];
+
   }
 
 }

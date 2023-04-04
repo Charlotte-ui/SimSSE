@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Inject, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
 import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
@@ -23,6 +23,9 @@ export class EditeurGrapheNodalComponent implements OnInit {
     this._nodes = value;
     this.initGraphData();
 }
+
+@Output() newNodes = new EventEmitter<(Event | Trend)[]>();
+
 
 _links!:  Link[];
 get links():  Link[] {
@@ -90,8 +93,6 @@ get links():  Link[] {
         elements = this.nodes;
         graphElements = this.graphData;      
       }
-
-
       
       const dialogRef = this.dialog.open(NodeDialogComponent, 
         {data: [elements[index],this.nodes]});
@@ -114,6 +115,7 @@ get links():  Link[] {
         }
   
         this.updateChart();
+        this.newNodes.emit(this.nodes);
       });
     
 

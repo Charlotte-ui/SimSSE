@@ -1,1 +1,25 @@
-<p>trigger-dialog works!</p>
+<h1 mat-dialog-title>Modifier le trigger</h1>
+
+<mat-dialog-content *ngIf="data" [formGroup]="form">
+
+    <div mat-dialog-content>
+        <mat-form-field appearance="fill">
+          <mat-label>Nom </mat-label>
+          <input matInput formControlName="name" readonly>
+        </mat-form-field>
+      </div>
+
+<div mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Temps </mat-label>
+    <input matInput formControlName="xAxis">
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Annuler</button>
+  <button mat-button (click)="save()">Enregistrer les modifications</button>
+  <button mat-button (click)="delete()">Supprimer</button>
+</div>
+
+</mat-dialog-content>
