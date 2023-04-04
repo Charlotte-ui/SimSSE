@@ -1,7 +1,10 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import { Link, Trend, Event } from 'src/app/modules/core/models/node';
 import { TypeVariable, VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
+import { NodeDialogComponent } from '../editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 
 @Component({
   selector: 'app-scene',
@@ -76,7 +79,7 @@ get nodes():  (Event | Trend)[] {
 
 
 
-  constructor() { }
+  constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
     this.updateChart()
@@ -158,13 +161,34 @@ get nodes():  (Event | Trend)[] {
   }
 
 
-
+  getNodeByID(id:string):Event | Trend{
+    let result = undefined;
+    this.nodes.forEach(node => {
+      if(node.id == id) result= node;
+    });
+    return result;
+  }
 
 
   updateChart(){
 
     console.log("updateChart")
     console.log(this.graphData['SpO2'])
+
+    let markLineData = []
+
+    this.events.forEach(event => { // time id
+      let markline = [];
+      let node = this.getNodeByID(event[1].toString())
+
+      markline.push({name:node.name, xAxis: event[0], yAxis: 0})
+      markline.push({name:"end", xAxis: event[0], yAxis: 100})
+
+      markLineData.push(markline);
+
+    });
+
+
 
     let series = [
       {
@@ -186,10 +210,7 @@ get nodes():  (Event | Trend)[] {
         stack: 'Total',
         data: [[50,0]],
         markLine: {
-          data: [   [
-            {name: 'Oxygéno.', xAxis: 50, yAxis: 0},
-            {name: 'end', xAxis: 50, yAxis: 100},
-          ]   ]
+          data: markLineData
         }
       },
       
@@ -202,6 +223,42 @@ get nodes():  (Event | Trend)[] {
     console.log( this.mergeOptions );
    
   }
+
+
+  onChartClick(event:any): void {
+
+    console.log(event)
+
+    let index = event.dataIndex;
+    let elements;
+    let graphElements;
+
+    if (event.componentType!= "markLine") return;
+     
+   
+    const dialogRef = this.dialog.open(TriggerDialogComponent, 
+      {data: [event]});
+
+    dialogRef.afterClosed().subscribe(result => {
+
+      if (result == "delete"){
+        elements.splice(index, 1); 
+        graphElements.splice(index, 1); 
+      }
+      else if (result){
+        
+      }
+
+      this.updateChart();
+    });
+  
+
+  
+}
+
+
+
+
 
   // Standard Normal variate using Box-Muller transform.
   private gaussianRandom(mean=0, stdev=1) {

@@ -45,6 +45,7 @@ import { BarreOutilsComponent } from './modules/plastron/editeur/barre-outils/ba
 import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspecteur.component';
 import { EditeurGrapheNodalComponent } from './modules/plastron/editeur/editeur-graphe-nodal/editeur-graphe-nodal.component';
 import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 
 
 
@@ -64,7 +65,8 @@ import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-n
     BarreOutilsComponent,
     InspecteurComponent,
     EditeurGrapheNodalComponent,
-    NodeDialogComponent
+    NodeDialogComponent,
+    TriggerDialogComponent
   ],
   imports: [
     BrowserModule,
