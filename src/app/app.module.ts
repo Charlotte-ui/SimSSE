@@ -31,7 +31,6 @@ import { FormsModule } from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button'; 
 import {MatExpansionModule} from '@angular/material/expansion'; 
 import {CdkAccordionModule} from '@angular/cdk/accordion'; 
-import { ColorPickerModule } from 'ngx-color-picker';
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -106,7 +105,6 @@ import { VariableControllerComponent } from './modules/plastron/editeur/inspecte
     NgbModule,
     MatExpansionModule,
     CdkAccordionModule,
-    ColorPickerModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
