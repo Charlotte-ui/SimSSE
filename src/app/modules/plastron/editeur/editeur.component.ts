@@ -77,7 +77,7 @@ export class EditeurComponent implements OnInit {
   createLink(){
 
     let index = this.links.length;
-    let link:Link = {id:index.toString(),source:undefined,target:undefined,type:"link",start:false};
+    let link:Link = {id:index.toString(),source:undefined,target:undefined,type:"link",start:true};
 
     const dialogRef = this.dialog.open(NodeDialogComponent, {
       data: [link,this.data],
