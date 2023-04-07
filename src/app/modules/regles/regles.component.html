@@ -1,0 +1,46 @@
+<app-header></app-header>
+
+<table *ngIf="dataSourceVariables" mat-table [dataSource]="dataSourceVariables" class="mat-elevation-z8 demo-table">
+    <!-- Modele Column -->
+    <ng-container matColumnDef="modele">
+      <th mat-header-cell *matHeaderCellDef>Variables</th>
+      <td mat-cell *matCellDef="let element">
+        {{element.type}}
+      </td>
+    </ng-container>
+  
+    <!-- Triage Column -->
+    <ng-container matColumnDef="triage">
+      <th mat-header-cell *matHeaderCellDef>Couleur</th>
+      <td mat-cell *matCellDef="let element">{{element.color}}</td>
+    </ng-container>
+  
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+      <th mat-header-cell *matHeaderCellDef>Min</th>
+      <td mat-cell *matCellDef="let element">
+        <div class="description">
+          {{element.min}}
+        </div>
+      </td>
+    </ng-container>
+
+    <!-- Description Column -->
+    <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Max</th>
+        <td mat-cell *matCellDef="let element">
+            <div class="description">
+            {{element.max}}
+            </div>
+        </td>
+        </ng-container>
+  
+    <!-- Profil Column -->
+    <ng-container matColumnDef="profil">
+      <th mat-header-cell *matHeaderCellDef>Ecart-type</th>
+      <td mat-cell *matCellDef="let element">{{element.rand}}</td>
+    </ng-container>
+    
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsVariables"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnsVariables;"></tr>
+  </table>

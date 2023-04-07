@@ -50,6 +50,7 @@ import { EditeurGrapheNodalComponent } from './modules/plastron/editeur/editeur-
 import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger-dialog/trigger-dialog.component';
 import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
+import { ReglesComponent } from './modules/regles/regles.component';
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -70,7 +71,8 @@ import { VariableControllerComponent } from './modules/plastron/editeur/inspecte
     EditeurGrapheNodalComponent,
     NodeDialogComponent,
     TriggerDialogComponent,
-    VariableControllerComponent
+    VariableControllerComponent,
+    ReglesComponent
   ],
   imports: [
     BrowserModule,
