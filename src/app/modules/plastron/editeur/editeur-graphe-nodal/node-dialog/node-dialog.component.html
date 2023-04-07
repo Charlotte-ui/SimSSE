@@ -54,15 +54,13 @@
   </mat-form-field>
 </div>
   
-  <div *ngIf="node.type == 'link'" mat-dialog-content>
-  <mat-form-field appearance="fill">
+<div *ngIf="node.type == 'link'" mat-dialog-content>
     <mat-label>Effet</mat-label>
       <mat-radio-group formControlName="start" aria-label="Select an option">
-        <mat-radio-button value="true">Start</mat-radio-button>
-        <mat-radio-button value="false">Stop</mat-radio-button>
+        <mat-radio-button [value]="true">Start</mat-radio-button>
+        <mat-radio-button [value]="false">Stop</mat-radio-button>
       </mat-radio-group>
-  </mat-form-field>
-</div>
+</div> 
 
 <div mat-dialog-actions>
   <button mat-button (click)="onNoClick()">Annuler</button>

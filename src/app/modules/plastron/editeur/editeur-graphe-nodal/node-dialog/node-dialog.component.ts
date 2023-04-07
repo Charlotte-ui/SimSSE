@@ -27,8 +27,8 @@ export class NodeDialogComponent {
 
       if (this.node.type == "link"){
         let link = this.node as Link;
-        this.form.controls['target'].setValue(link.target.toString());
-        this.form.controls['source'].setValue(link.source.toString());
+        if (link.target) this.form.controls['target'].setValue(link.target.toString());
+        if (link.source) this.form.controls['source'].setValue(link.source.toString());
       }
 
   }
