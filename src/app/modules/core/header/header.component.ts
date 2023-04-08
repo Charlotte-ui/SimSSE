@@ -17,4 +17,8 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(['/regles/']);
   }
 
+  goToAccueil(){
+    this.router.navigate(['/accueil/']);
+  }
+
 }
