@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { VariablePhysio } from '../core/models/variablePhysio';
+import { RegleService } from '../core/services/regle.service';
 
 @Component({
   selector: 'app-regles',
@@ -6,8 +8,19 @@ import { Component } from '@angular/core';
   styleUrls: ['./regles.component.less']
 })
 export class ReglesComponent {
+  
+  variables!: VariablePhysio[];
 
-  dataSourceVariables;
-  displayedColumnsVariables;
+  constructor(public regleService:RegleService){}
+
+  ngOnInit(): void {
+    this.regleService.getVariables().subscribe(
+      (response) => {
+        this.variables = response;
+      }
+    ); 
+  }
+
+
 
 }
