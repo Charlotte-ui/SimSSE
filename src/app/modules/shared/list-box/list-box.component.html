@@ -1,18 +1,24 @@
 
 <mat-card>
     <mat-card-header>
-      <mat-card-title>{{titre}}</mat-card-title>
+      <mat-card-title>{{titre}}
+        <button mat-mini-fab (click)="addElement()">
+          <mat-icon>add</mat-icon>
+        </button>
+
+      </mat-card-title>
       <mat-card-subtitle>{{sousTitre}}</mat-card-subtitle>
+
     </mat-card-header>
     <mat-card-content>
         <mat-list>
             <ng-container  *ngFor="let element of elements">
                 <mat-list-item (click)="goToElement(element.id)">
-                    <app-list-box-element [titre]="element.titre" [description]="element.description"></app-list-box-element>
+                    <app-list-box-element [element]="element" ></app-list-box-element>
                 </mat-list-item>
                 <mat-divider></mat-divider>
             </ng-container >
-            
+
         </mat-list>
     </mat-card-content>
 </mat-card>

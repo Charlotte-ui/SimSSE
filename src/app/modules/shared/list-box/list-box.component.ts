@@ -32,7 +32,7 @@ export class ListBoxComponent {
     this.elements = [];
 
 
-  
+
 
   }
 
@@ -40,7 +40,11 @@ export class ListBoxComponent {
 
     console.log(elementId)
     this.router.navigate(['/'+this._type.toLowerCase()+"/"+elementId]);
-   
+
+
+  }
+
+  addElement(){
 
   }
 

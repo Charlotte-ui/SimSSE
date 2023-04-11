@@ -1,4 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { List } from 'echarts';
+import { Listable } from 'src/app/modules/core/models/listable';
 
 @Component({
   selector: 'app-list-box-element',
@@ -7,8 +9,22 @@ import { Component, Input } from '@angular/core';
 })
 export class ListBoxElementComponent {
 
-  
-  @Input() titre!: string;
-  @Input() description!: string;
+  _element!:Listable;
+  get element():  Listable{
+    return this._element;
+  }
+  @Input() set element(value:Listable){
+    this._element = value;
+    console.log(value)
+  }
+
+
+  removeElement(){
+
+  }
+
+  editElement(){
+
+  }
 
 }

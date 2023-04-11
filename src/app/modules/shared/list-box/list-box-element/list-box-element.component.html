@@ -1,9 +1,34 @@
-<div class="box">
-    <div>Image</div>
-    <div>
-        <div class="texte">
-            <div>{{titre}}</div>
-            <div>{{description}}</div>
+<div *ngIf="element" class="container">
+  <div class="row">
+
+    <div *ngIf="element['triage']" class="col-2 triage">
+      <div *ngIf="element['triage']=='UA'" id="UA">UA</div>
+      <div *ngIf="element['triage']=='UR'" id="UR">UR</div>
+      <div *ngIf="element['triage']=='EU'" id="EU">EU</div>
+    </div>
+
+    <div *ngIf="element['image']" class="col-2 image">
+      <img src="/assets/images/11.jpg"/>
+    </div>
+
+    <div class="col-9 texte">
+        <h2>{{element.titre}}</h2>
+        <div id="description">
+          <textarea disabled [value]="element.description"></textarea>
         </div>
     </div>
+    <div class="col-1 buttons">
+        <button
+          mat-mini-fab
+          (click)="editElement()">
+          <mat-icon>edit</mat-icon>
+        </button>
+
+        <button
+          mat-mini-fab
+          (click)="removeElement()">
+          <mat-icon>delete</mat-icon>
+        </button>
+    </div>
   </div>
+</div>
