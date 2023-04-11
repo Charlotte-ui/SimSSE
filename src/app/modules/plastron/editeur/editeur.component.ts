@@ -26,53 +26,67 @@ export class EditeurComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  addNode(nodeType:string){
-
-    if (nodeType == "link"){
-      return this.createLink();
-    }
-
-
-    console.log(nodeType)
-    let newNode:Trend|Event ;
-
+  addElement(element:string){
     let indice = this.data.length ;
     let x = Math.floor(Math.random() * 800);
     let y = Math.floor(Math.random() * 800);
 
-    if (nodeType == "trend"){
-      newNode = {
-        id:indice.toString(),
-        name: 'Tendance '+indice,
-        x: x,
-        y: y,
-        type:'trend',
-        cible:'SpO2',
-        pente:-1
-      } as Trend
+    switch (element){
+      case 'link':
+        return this.createLink();
+      case 'event':
+        let event = {
+          id:indice.toString(),
+          name: 'Event '+indice,
+          x: x,
+          y: y,
+          type:'event',
+          event:'oxygénothérapie'
+        } as Event
+        return this.createNode(event);
+      case 'trend':
+        let trend = {
+          id:indice.toString(),
+          name: 'Tendance '+indice,
+          x: x,
+          y: y,
+          type:'trend',
+          cible:'SpO2',
+          pente:-1
+        } as Trend
+        return this.createNode(trend);
+      case 'group':
+        return this.createGroup();
     }
-    else {
-      newNode = {
-        id:indice.toString(),
-        name: 'Event '+indice,
-        x: x,
-        y: y,
-        type:'event',
-        event:'oxygénothérapie'
-      } as Event    
-    }
-
-    this.data.push(newNode)
-    this.data = [...this.data] // force change detection by forcing the value reference update
-
-    console.log(newNode);
+  }
 
 
+
+  createNode(newNode:Trend|Event){
+
+    const dialogRef = this.dialog.open(NodeDialogComponent, {
+      data: [newNode,this.data],
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      console.log(result);
+
+      if (result == "delete"){
+
+      }
+      else if (result){
+        this.data.push(newNode)
+        this.data = [...this.data] // force change detection by forcing the value reference update
+        console.log(newNode);
+
+      }
+
+    });
   }
 
 
   createLink(){
-
     let index = this.links.length;
     let link:Link = {id:index.toString(),source:undefined,target:undefined,type:"link",start:true};
 
@@ -85,7 +99,7 @@ export class EditeurComponent implements OnInit {
       console.log(result);
 
       if (result == "delete"){
-    
+
       }
       else if (result){
         this.links.push(result);
@@ -93,6 +107,10 @@ export class EditeurComponent implements OnInit {
       }
 
     });
+  }
+
+  createGroup(){
+
   }
 
   updateNodes(event){
