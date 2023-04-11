@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import { Link, Trend, Event } from 'src/app/modules/core/models/node';
-import { TypeVariable, VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
+import {  VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 
 @Component({
@@ -107,7 +107,7 @@ get nodes():  (Event | Trend)[] {
       }
   
       this.targetVariable.forEach(variable => {
-        this.graphData[variable.type]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.type)
+        this.graphData[variable.nom]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.nom)
       });
   
       this.updateChart();
@@ -117,7 +117,7 @@ get nodes():  (Event | Trend)[] {
 
   }
   
-  calculCurve(size:number,target:number,rand:number,variable:TypeVariable){
+  calculCurve(size:number,target:number,rand:number,variable:string){
     let curve = [];
     let trend = 0; 
     for(let i=0;i<size;i++){
@@ -219,10 +219,10 @@ get nodes():  (Event | Trend)[] {
  
     this.targetVariable.forEach(variable => {
       let serie = {
-        name:variable.type,
+        name:variable.nom,
         type:'line',
    //     stack: 'x',
-        data: this.graphData[variable.type]
+        data: this.graphData[variable.nom]
       }
       series.push(serie);
       
