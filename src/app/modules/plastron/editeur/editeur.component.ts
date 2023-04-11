@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Trend,Event,Node, Link } from '../../core/models/node';
-import { TypeVariable, VariablePhysio } from '../../core/models/variablePhysio';
+import {  VariablePhysio } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
 
@@ -18,9 +18,6 @@ export class EditeurComponent implements OnInit {
   @Input() targetVariable:VariablePhysio[];
   @Input() data:(Event|Trend)[];
   @Input() links:Link[];
-
-
-
 
   events = [[0,0],[50,3]]
 

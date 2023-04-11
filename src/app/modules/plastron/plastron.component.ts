@@ -5,8 +5,9 @@ import { ModeleService } from '../core/services/modele.service';
 import { Model } from 'echarts';
 import { Modele } from '../core/models/modele';
 import { ProfilService } from '../core/services/profil.service';
-import { TypeVariable, VariablePhysio } from '../core/models/variablePhysio';
+import {  VariablePhysio } from '../core/models/variablePhysio';
 import { Link, Event, Trend } from '../core/models/node';
+import { RegleService } from '../core/services/regle.service';
 
 @Component({
   selector: 'app-plastron',
@@ -22,7 +23,10 @@ export class PlastronComponent implements OnInit {
   data:(Event|Trend)[];
   links:Link[];
 
-  constructor(private route: ActivatedRoute, private modelService:ModeleService, private profilService:ProfilService) { }
+  constructor(private route: ActivatedRoute, 
+              private modelService:ModeleService, 
+              private profilService:ProfilService,
+              public regleService:RegleService) { }
 
   ngOnInit(): void {
     this.route.data.subscribe(
@@ -48,57 +52,15 @@ export class PlastronComponent implements OnInit {
   }
 
   initTargetVariables(){
-    let SpO2:VariablePhysio = {
-      id:"0",
-      type:TypeVariable.SpO2,
-      cible:98,
-      rand:1
-    }
-  
-    let FR:VariablePhysio = {
-      id:"1",
-      type:TypeVariable.FR,
-      cible:16,
-      rand:1
-    }
 
-    let RC:VariablePhysio = {
-      id:"2",
-      type:TypeVariable.RC,
-      cible:80,
-      rand:1
-    }
-
-    let HemoCue:VariablePhysio = {
-      id:"3",
-      type:TypeVariable.HemoCue,
-      cible:36,
-      rand:1
-    }
-
-    let PAD:VariablePhysio = {
-      id:"4",
-      type:TypeVariable.PAD,
-      cible:80,
-      rand:1
-    }
-
-    let PAS:VariablePhysio = {
-      id:"5",
-      type:TypeVariable.PAS,
-      cible:130,
-      rand:1
-    }
-
-    let Temp:VariablePhysio = {
-      id:"6",
-      type:TypeVariable.Temp,
-      cible:130,
-      rand:1
-    }
+    this.regleService.getVariables().subscribe(
+      (response) => {
+        this.targetVariable = response;
+      }
+    ); 
 
 
-    this.targetVariable = [SpO2,FR,RC,HemoCue,Temp,PAD,PAS];
+    
 
 
   }
