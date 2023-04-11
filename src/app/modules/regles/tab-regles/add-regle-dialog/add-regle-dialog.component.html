@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Ajouter une règle</h1>
+
+<mat-dialog-content [formGroup]="form">
+
+<div *ngFor="let champ of champs" mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>{{champ}}</mat-label>
+    <input matInput [formControlName]="champ" [type]="getType(champ)">
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Annuler</button>
+  <button mat-button (click)="save()">Enregistrer les modifications</button>
+</div>
+
+</mat-dialog-content>

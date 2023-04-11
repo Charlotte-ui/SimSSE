@@ -13,24 +13,24 @@ import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 
-import {MatCardModule} from '@angular/material/card'; 
-import {MatListModule} from '@angular/material/list'; 
+import {MatCardModule} from '@angular/material/card';
+import {MatListModule} from '@angular/material/list';
 import { ReactiveFormsModule } from '@angular/forms';
-import {MatInputModule} from '@angular/material/input'; 
-import { MatTableModule } from '@angular/material/table'  
-import {MatToolbarModule} from '@angular/material/toolbar'; 
-import {MatIconModule} from '@angular/material/icon'; 
-import {MatDividerModule} from '@angular/material/divider'; 
-import {MatSelectModule} from '@angular/material/select'; 
-import {MatTabsModule} from '@angular/material/tabs'; 
-import {MatGridListModule} from '@angular/material/grid-list'; 
+import {MatInputModule} from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table'
+import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatIconModule} from '@angular/material/icon';
+import {MatDividerModule} from '@angular/material/divider';
+import {MatSelectModule} from '@angular/material/select';
+import {MatTabsModule} from '@angular/material/tabs';
+import {MatGridListModule} from '@angular/material/grid-list';
 import { NgxEchartsModule } from 'ngx-echarts';
-import {MatDialogModule} from '@angular/material/dialog'; 
-import {MatFormFieldModule} from '@angular/material/form-field'; 
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
-import {MatButtonModule} from '@angular/material/button'; 
-import {MatExpansionModule} from '@angular/material/expansion'; 
-import {CdkAccordionModule} from '@angular/cdk/accordion'; 
+import {MatButtonModule} from '@angular/material/button';
+import {MatExpansionModule} from '@angular/material/expansion';
+import {CdkAccordionModule} from '@angular/cdk/accordion';
 import {MatRadioModule} from '@angular/material/radio';
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
@@ -52,6 +52,8 @@ import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger
 import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
 import { ReglesComponent } from './modules/regles/regles.component';
 import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.component';
+import { AddRegleDialogComponent } from './modules/regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
+import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -74,7 +76,9 @@ import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.compo
     TriggerDialogComponent,
     VariableControllerComponent,
     ReglesComponent,
-    TabReglesComponent
+    TabReglesComponent,
+    AddRegleDialogComponent,
+    ConfirmDeleteDialogComponent
   ],
   imports: [
     BrowserModule,
