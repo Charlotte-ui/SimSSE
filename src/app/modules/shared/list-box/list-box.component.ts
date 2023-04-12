@@ -1,9 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Listable } from '../../core/models/listable';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AddRegleDialogComponent } from '../../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-list-box',
@@ -33,7 +34,6 @@ export class ListBoxComponent<T extends Listable> {
   };
 
 
-  ;
 
   constructor(private router: Router,public firebaseService:FirebaseService,public dialog: MatDialog) {
 
@@ -70,6 +70,14 @@ export class ListBoxComponent<T extends Listable> {
 
     });
 
+  }
+
+  drop(event:CdkDragDrop<T[]>){
+    console.log("origin");
+
+    console.log(event);
+
+    moveItemInArray(this.elements,event.previousIndex,event.previousIndex);
   }
 
 

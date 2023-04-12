@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder ,FormGroup} from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Groupe } from '../core/models/groupe';
@@ -8,10 +8,13 @@ import { FirebaseService } from '../core/services/firebase.service';
 import { ScenarioService } from '../core/services/scenario.service';
 import { take } from 'rxjs';
 import { ModeleService } from '../core/services/modele.service';
-import { Triage } from '../core/models/modele';
+import { Modele, Triage } from '../core/models/modele';
 import { MatDialog } from '@angular/material/dialog';
 import { AddRegleDialogComponent } from '../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { ConfirmDeleteDialogComponent } from '../core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { animate, state, style, transition, trigger } from '@angular/animations';
+import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { MatTable } from '@angular/material/table';
 
 interface tableElementPlastron{
   modele:string;
@@ -26,7 +29,14 @@ interface tableElementPlastron{
 @Component({
   selector: 'app-scenario',
   templateUrl: './scenario.component.html',
-  styleUrls: ['./scenario.component.less']
+  styleUrls: ['./scenario.component.less'],
+  animations:[
+    trigger('descriptionExpand',[
+      state('collapsed',style({height:'0px',minHeight:'0'})),
+      state('expanded',style({height:'*'})),
+      transition('expanded <=> collapsed',animate('225ms cubic-bezier(0.4,0.0,0.2,1)')),
+    ])
+  ]
 })
 
 export class ScenarioComponent implements OnInit {
@@ -39,7 +49,7 @@ export class ScenarioComponent implements OnInit {
 
   keysGroup: string[] = ['UR', 'UA', 'EU','psy','impliques'];
   displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU','psy','impliques','edit','delete'];
-  displayedColumnsPlastron: string[] = ['modele', 'triage', 'description', 'profil','groupe','statut'];
+  displayedColumnsPlastron: string[] = ['modele', 'triage', 'profil','groupe','statut', 'description'];
 
 
   dataSourceGroup = [];
@@ -50,6 +60,9 @@ export class ScenarioComponent implements OnInit {
   totalPlastron:number=0;
   totalParticipant:number=0;
 
+  expandedElement!:tableElementPlastron|null;
+
+  @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
 
   constructor(private route: ActivatedRoute,
     private form: FormBuilder,
@@ -241,5 +254,23 @@ export class ScenarioComponent implements OnInit {
     });
     return res;
   }
+
+  drop(event: CdkDragDrop<string, any, any[]>) {
+    console.log("drop");
+    console.log(event)
+    let index = event.currentIndex;
+    let modele = event.previousContainer.data[event.previousIndex];
+    console.log(modele)
+
+   this.dataSourcePlastron[index].modele = modele.titre;
+
+    //const previousIndex = this.dataSource.findIndex((d) => d === event.item.data);
+
+    //moveItemInArray(this.dataSource, previousIndex, event.currentIndex);
+    //this.table.renderRows();
+
+  }
+
+
 
 }

@@ -15,3 +15,26 @@ mat-list-item{
 mat-card-content{
   padding: 0;
 }
+
+.cdk-drag-preview{
+  box-sizing: border-box;
+  border-radius: 4px;
+
+}
+
+.cdk-drag-placeholder{
+  opacity:0;
+  height: 0px!important;
+}
+
+
+
+.cdk-drag-animating{
+  transition: transform 250ms cubic-bezier(0,0,0.2,1);
+
+}
+
+.box:not(.cdk-drag-placeholder){
+  transition: transform 250ms cubic-bezier(0,0,0.2,1);
+
+}

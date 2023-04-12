@@ -32,6 +32,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {CdkAccordionModule} from '@angular/cdk/accordion';
 import {MatRadioModule} from '@angular/material/radio';
+import {DragDropModule} from '@angular/cdk/drag-drop';
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -54,6 +55,7 @@ import { ReglesComponent } from './modules/regles/regles.component';
 import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.component';
 import { AddRegleDialogComponent } from './modules/regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { TriageComponent } from './modules/shared/triage/triage.component';
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -78,7 +80,8 @@ import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dial
     ReglesComponent,
     TabReglesComponent,
     AddRegleDialogComponent,
-    ConfirmDeleteDialogComponent
+    ConfirmDeleteDialogComponent,
+    TriageComponent
   ],
   imports: [
     BrowserModule,
@@ -114,7 +117,8 @@ import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dial
     NgbModule,
     MatExpansionModule,
     CdkAccordionModule,
-    MatRadioModule
+    MatRadioModule,
+    DragDropModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
