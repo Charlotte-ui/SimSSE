@@ -12,8 +12,7 @@ export class AddRegleDialogComponent<T> {
   form: FormGroup;
   champs;
 
-  numbers = ["rand","min","max","cible"];
-
+  numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA"];
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<AddRegleDialogComponent<T>>,
     @Inject(MAT_DIALOG_DATA) public data: T) {}

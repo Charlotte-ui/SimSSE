@@ -13,8 +13,8 @@
     <mat-card-content>
         <mat-list>
             <ng-container  *ngFor="let element of elements">
-                <mat-list-item (click)="goToElement(element.id)">
-                    <app-list-box-element [element]="element" ></app-list-box-element>
+                <mat-list-item >
+                    <app-list-box-element [element]="element" [type]="_type" ></app-list-box-element>
                 </mat-list-item>
                 <mat-divider></mat-divider>
             </ng-container >

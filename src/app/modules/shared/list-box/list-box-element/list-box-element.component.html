@@ -1,14 +1,14 @@
 <div *ngIf="element" class="container">
   <div class="row">
 
-    <div *ngIf="element['triage']" class="col-2 triage">
-      <div *ngIf="element['triage']=='UA'" id="UA">UA</div>
-      <div *ngIf="element['triage']=='UR'" id="UR">UR</div>
-      <div *ngIf="element['triage']=='EU'" id="EU">EU</div>
+    <div *ngIf="element['triage']" class="col-2 image">
+      <div *ngIf="element['triage']=='UA'" class="triage" id="UA">UA</div>
+      <div *ngIf="element['triage']=='UR'" class="triage" id="UR">UR</div>
+      <div *ngIf="element['triage']=='EU'" class="triage" id="EU">EU</div>
     </div>
 
     <div *ngIf="element['image']" class="col-2 image">
-      <img src="/assets/images/11.jpg"/>
+      <img src='{{ "assets/images/" + element["image"] + ".jpg" }}'/>
     </div>
 
     <div class="col-9 texte">
@@ -20,7 +20,7 @@
     <div class="col-1 buttons">
         <button
           mat-mini-fab
-          (click)="editElement()">
+          (click)="goToElement(element.id)">
           <mat-icon>edit</mat-icon>
         </button>
 
