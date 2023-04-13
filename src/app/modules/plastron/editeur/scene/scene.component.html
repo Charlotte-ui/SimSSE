@@ -1,1 +1,8 @@
+
+<div class="button-container">
+  <button mat-icon-button color="primary" (click)="addTrigger()">
+    <mat-icon >offline_bolt</mat-icon>
+  </button>
+</div>
+
 <div echarts [options]="initialChartOption" [merge]="mergeOptions" class="demo-chart" (chartInit)="onChartInit($event)" (chartClick)="onChartClick($event)"></div>

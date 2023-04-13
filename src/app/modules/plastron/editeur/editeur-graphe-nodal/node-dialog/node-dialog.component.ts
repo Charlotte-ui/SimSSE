@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { Trend,Event, Link } from 'src/app/modules/core/models/node';
+import { Node,Trend,Event, Link } from 'src/app/modules/core/models/node';
 
 
 @Component({
@@ -11,14 +11,18 @@ import { Trend,Event, Link } from 'src/app/modules/core/models/node';
 })
 
 
-export class NodeDialogComponent {
+export class NodeDialogComponent<T extends Node|Link> {
 
   form: FormGroup;
   nodes:(Trend|Event)[];
-  node:Trend|Event|Link;
+  node:T|Link;
+  champs;
 
-  constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: [(Trend|Event|Link),(Trend|Event)[]] ) {}
+  numbers = ["x","y","pente"];
+
+
+  constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent<T>>,
+    @Inject(MAT_DIALOG_DATA) public data: [(T|Link),(Trend|Event)[]] ) {}
 
     ngOnInit() {
       this.nodes = this.data[1];
@@ -30,9 +34,19 @@ export class NodeDialogComponent {
         if (link.target) this.form.controls['target'].setValue(link.target.toString());
         if (link.source) this.form.controls['source'].setValue(link.source.toString());
       }
+      else this.setChamp();
 
   }
-  
+
+  setChamp(){
+    this.champs=Object.keys(this.node) as Array<keyof T>;
+    let index = this.champs.indexOf("id", 0);
+    if (index > -1) this.champs.splice(index, 1);
+    index=-1;
+    index = this.champs.indexOf("type", 0);
+    if (index > -1) this.champs.splice(index, 1);
+  }
+
     onNoClick(): void {
       this.dialogRef.close();
     }
@@ -44,6 +58,12 @@ export class NodeDialogComponent {
     delete() {
       this.dialogRef.close("delete");
     }
+
+    public getType(champ:string){
+      if (this.numbers.includes(champ)) return "number"
+      if (champ == "couleur") return "color"
+       return "text";
+      }
 
 }
 

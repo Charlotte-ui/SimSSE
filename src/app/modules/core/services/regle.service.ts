@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { VariablePhysio } from '../models/variablePhysio';
 import { Observable, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
+import { Trend,Event,Node, Link } from '../../core/models/node';
+
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +22,7 @@ export class RegleService {
       max:100,
       couleur:""
     }
-  
+
     let FR:VariablePhysio = {
       id:"1",
       nom:"FR",
@@ -86,5 +88,41 @@ export class RegleService {
 
     return of(variables);
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
-}
+  }
+
+  getEvents(): Observable<Event[]> {
+    let oxy:Event = {
+      name: "oxygénothérapie",
+      event: "oxygénothérapie",
+      x: 0,
+      y: 0,
+      type: "event",
+      id:"0"
+    }
+
+    let garrot:Event = {
+      name: "garrot",
+      event: "garrot",
+      x: 0,
+      y: 0,
+      type: "event",
+      id:"1"
+    }
+
+    let pls:Event = {
+      name: "pls",
+      event: "pls",
+      x: 0,
+      y: 0,
+      type: "event",
+      id:"2"
+    }
+
+
+
+    let events = [oxy,garrot,pls];
+
+    return of(events);
+    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
+  }
 }

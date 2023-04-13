@@ -12,10 +12,15 @@ import { ReglesComponent } from './modules/regles/regles.component';
 const routes: Routes = [
 {path: '', redirectTo: '/connexion', pathMatch: 'full'},
 {path: 'connexion', component: ConnexionComponent},
-{path: 'accueil', component: AccueilComponent,canActivate: [AuthGuard]},
-{path: 'regles', component: ReglesComponent,canActivate: [AuthGuard]},
-{path: 'plastron/:id', component: PlastronComponent,resolve: { data: PlastronResolver },canActivate: [AuthGuard]},
-{path: 'scenario/:id', component: ScenarioComponent,resolve: { data: ScenarioResolver },canActivate: [AuthGuard]}];
+{path: 'accueil', component: AccueilComponent},
+{path: 'regles', component: ReglesComponent},
+{path: 'plastron/:id', component: PlastronComponent,resolve: { data: PlastronResolver }},
+{path: 'scenario/:id', component: ScenarioComponent,resolve: { data: ScenarioResolver }},
+//{path: 'accueil', component: AccueilComponent,canActivate: [AuthGuard]},
+//{path: 'regles', component: ReglesComponent,canActivate: [AuthGuard]},
+//{path: 'plastron/:id', component: PlastronComponent,resolve: { data: PlastronResolver },canActivate: [AuthGuard]},
+//{path: 'scenario/:id', component: ScenarioComponent,resolve: { data: ScenarioResolver },canActivate: [AuthGuard]}
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

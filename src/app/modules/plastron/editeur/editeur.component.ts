@@ -4,6 +4,7 @@ import { Trend,Event,Node, Link } from '../../core/models/node';
 import {  VariablePhysio } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
+import { RegleService } from '../../core/services/regle.service';
 
 @Component({
   selector: 'app-editeur',
@@ -19,11 +20,20 @@ export class EditeurComponent implements OnInit {
   @Input() data:(Event|Trend)[];
   @Input() links:Link[];
 
-  events = [[0,0],[50,3]]
 
-  constructor(public dialog: MatDialog) { }
+  triggeredEvents = [[0,0],[50,3]]
+
+  events!:Event[];
+
+  constructor(public dialog: MatDialog, public reglesService:RegleService) { }
 
   ngOnInit(): void {
+
+    this.reglesService.getEvents().subscribe(
+      (response) => {
+        this.events = response;
+      }
+    );
   }
 
   addElement(element:string){
