@@ -7,7 +7,7 @@ import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 })
 export class BarreOutilsComponent implements OnInit {
 
-  @Output() newNode = new EventEmitter<string>();
+  @Output() newElement = new EventEmitter<string>();
 
 
   constructor() { }
@@ -15,8 +15,9 @@ export class BarreOutilsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onClick(node:string){
-    this.newNode.emit(node);
+  onClick(element:string){
+
+    this.newElement.emit(element);
 
   }
 

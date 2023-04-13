@@ -1,8 +1,8 @@
 import { Collection } from "../services/firebase.service";
 
 export interface Groupe extends Collection{
-    impliques:string;
-    psy:string;
+    impliques:number;
+    psy:number;
     UA:number;
     UR:number;
     EU:number;

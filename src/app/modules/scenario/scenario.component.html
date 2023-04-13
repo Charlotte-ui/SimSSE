@@ -1,194 +1,269 @@
 <app-header></app-header>
 <mat-card>
-<form *ngIf="scenarioFormGroup" [formGroup]="scenarioFormGroup">
-  <div class="container">
-  <mat-form-field>
-    <mat-label>Titre</mat-label>
-    <h1>
-    <input matInput formControlName="titre" >
-    </h1>
-  </mat-form-field>
-  </div>
+  <mat-card-header>
+    <mat-card-title>Informations générales sur le scénario</mat-card-title>
+  </mat-card-header>
+  <form *ngIf="scenarioFormGroup" [formGroup]="scenarioFormGroup">
+    <div class="container">
+    <mat-form-field>
+      <mat-label>Titre</mat-label>
+      <h1>
+      <input matInput formControlName="titre" >
+      </h1>
+    </mat-form-field>
+    </div>
 
-  <div class="container">
-  <mat-form-field>
-    <mat-label>Description</mat-label>
-    <textarea matInput formControlName="description"></textarea>
-  </mat-form-field>
-  </div>
+    <div class="container">
+    <mat-form-field>
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+    </div>
 
-  <div class="container">
-  <mat-form-field>
-    <mat-label>Impliqués</mat-label>
-    
-    <input matInput formControlName="impliques">
-  </mat-form-field>
-  
+    <div class="container">
     <mat-form-field>
-    <mat-label>UR</mat-label>
-    <input matInput formControlName="UR">
-  </mat-form-field>
-  
-    <mat-form-field>
-    <mat-label>EU</mat-label>
-    <input matInput formControlName="EU">
-  </mat-form-field>
-  
-    <mat-form-field>
-    <mat-label>UA</mat-label>
-    <input matInput formControlName="UA">
-  </mat-form-field>
-  
-    <mat-form-field>
-    <mat-label>Psy</mat-label>
-    <input matInput formControlName="psy">
-  </mat-form-field>
-  
-  </div>
-  <div class="container">
-    <button mat-raised-button (click)="onSubmit()">Enregistrer les modifications</button>
-  </div>
-</form>
+      <mat-label>Impliqués</mat-label>
+
+      <input matInput type="number" formControlName="impliques">
+    </mat-form-field>
+
+      <mat-form-field>
+      <mat-label>UR</mat-label>
+      <input matInput type="number" formControlName="UR">
+    </mat-form-field>
+
+      <mat-form-field>
+      <mat-label>EU</mat-label>
+      <input matInput type="number" formControlName="EU">
+    </mat-form-field>
+
+      <mat-form-field>
+      <mat-label>UA</mat-label>
+      <input matInput type="number" formControlName="UA">
+    </mat-form-field>
+
+      <mat-form-field>
+      <mat-label>Psy</mat-label>
+      <input matInput type="number" formControlName="psy">
+    </mat-form-field>
+    </div>
+    <div class="container align-items-center">
+      <div class="col-1"><h2>Total</h2></div>
+
+
+      <mat-form-field>
+        <mat-label>Participants plastrons</mat-label>
+        <input matInput type="number" disabled [value]="totalParticipant">
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Plastrons numériques</mat-label>
+        <input matInput type="number" disabled [value]="totalPlastron">
+      </mat-form-field>
+
+    </div>
+
+
+    <div class="container">
+      <button mat-raised-button (click)="onSubmit()">Enregistrer les modifications</button>
+    </div>
+  </form>
 </mat-card>
 <div *ngIf="dataSourceGroup">
 
+
+
+
+<!-- Groupes -->
+
 <mat-card>
-<div class="container">
-  <button mat-raised-button (click)="addGroup()">
-    Ajouter un groupe
-  </button>
+  <mat-card-header>
+    <div class="container">
+      <mat-card-title>Groupes et scènes</mat-card-title>
+      <button mat-mini-fab (click)="addGroup()">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </mat-card-header>
 
-</div>
-<div class="container">
-<table  mat-table [dataSource]="dataSourceGroup" class="mat-elevation-z8 demo-table">
-  <!-- Scene Column -->
-  <ng-container matColumnDef="scene">
-    <th mat-header-cell *matHeaderCellDef>Scène</th>
-    <td mat-cell *matCellDef="let element">{{element.scene}}</td>
-  </ng-container>
+  <div class="container">
+  <table  mat-table [dataSource]="dataSourceGroup" class="mat-elevation-z8 demo-table">
+    <!-- Scene Column -->
+    <ng-container matColumnDef="scene">
+      <th mat-header-cell *matHeaderCellDef>Scène</th>
+      <td mat-cell *matCellDef="let element">{{element.scene}}</td>
+      <td mat-footer-cell *matFooterCellDef>Total</td>
+    </ng-container>
 
-  <!-- UR Column -->
-  <ng-container matColumnDef="UR">
-    <th mat-header-cell *matHeaderCellDef>UR</th>
-    <td mat-cell *matCellDef="let element">{{element.UR}}</td>
-  </ng-container>
+    <!-- Keys Column -->
+    <ng-container *ngFor="let key of keysGroup" [matColumnDef]="key">
+      <th mat-header-cell *matHeaderCellDef>{{key}}</th>
+      <td mat-cell *matCellDef="let element">{{element[key]}}</td>
+      <td mat-footer-cell *matFooterCellDef [ngClass]="getTotal(key) == scenario[key] ? 'ok' : 'noOk'" >{{getTotal(key)}}</td>
+    </ng-container>
 
-  <!-- UA Column -->
-  <ng-container matColumnDef="UA">
-    <th mat-header-cell *matHeaderCellDef>UA</th>
-    <td mat-cell *matCellDef="let element">{{element.UA}}</td>
-  </ng-container>
+    <!-- edit Column -->
+    <ng-container matColumnDef="edit">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let element; let i = index">
+        <button
+          mat-mini-fab
+          (click)="editGroup(i)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        </td>
+      <td mat-footer-cell *matFooterCellDef></td>
 
-  <!-- EU Column -->
-  <ng-container matColumnDef="EU">
-    <th mat-header-cell *matHeaderCellDef>EU</th>
-    <td mat-cell *matCellDef="let element">{{element.EU}}</td>
-  </ng-container>
+    </ng-container>
 
     <!-- delete Column -->
     <ng-container matColumnDef="delete">
       <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element">
+      <td mat-cell *matCellDef="let element; let i = index">
         <button
           mat-mini-fab
-          [disabled]="!dataSourceGroup.length"
-          (click)="removeGroup(element.id)">
+          [disabled]="dataSourceGroup.length<2"
+          (click)="removeGroup(i)">
           <mat-icon>delete</mat-icon>
         </button>
         </td>
+        <td mat-footer-cell *matFooterCellDef></td>
+
     </ng-container>
 
   <tr mat-header-row *matHeaderRowDef="displayedColumnsGroup"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumnsGroup;"></tr>
+  <tr mat-footer-row *matFooterRowDef="displayedColumnsGroup"></tr>
 </table>
 </div>
 </mat-card>
 
+<!-- Plastrons et modèles -->
 
-
-<div class="plastron">
-
-  <div class="left">
 <mat-card>
-  <div class="container tab">
-    <div class="titre">
-    <h1>Plastrons</h1>
-  </div>
-  
-<table *ngIf="dataSourcePlastron" mat-table [dataSource]="dataSourcePlastron" class="mat-elevation-z8 demo-table">
-  <!-- Modele Column -->
-  <ng-container matColumnDef="modele">
-    <th mat-header-cell *matHeaderCellDef>Modèle</th>
-    <td mat-cell *matCellDef="let element">
-      <button mat-button (click)="goToPlastron(element.id)">{{element.modele}}</button>
-      
-    
-    </td>
-  </ng-container>
+  <mat-card-header>
+    <div class="container">
+      <mat-card-title>Plastrons et modèles</mat-card-title>
+    </div>
+  </mat-card-header>
 
-  <!-- Triage Column -->
-  <ng-container matColumnDef="triage">
-    <th mat-header-cell *matHeaderCellDef>Triage</th>
-    <td mat-cell *matCellDef="let element">{{element.triage}}</td>
-  </ng-container>
+  <!-- Plastrons  -->
 
-  <!-- Description Column -->
-  <ng-container matColumnDef="description">
-    <th mat-header-cell *matHeaderCellDef>Description</th>
-    <td mat-cell *matCellDef="let element">
-      <div class="description">
-        {{element.description}}
+
+  <div class="container">
+    <div class="row" cdkDropListGroup>
+      <div class="col-7 plastron">
+
+        <mat-card>
+          <mat-card-header>
+            <div class="container">
+              <mat-card-title>Plastrons</mat-card-title>
+            </div>
+          </mat-card-header>
+
+          <table mat-table  #table
+          *ngIf="dataSourcePlastron"
+          [dataSource]="dataSourcePlastron"
+          multiTemplateDataRows
+          cdkDropList
+          (cdkDropListDropped)="drop($event)"
+          cdkDropListData="dataSourcePlastron"
+          cdkDropListDisabled="true" >
+            <!-- Modele Column -->
+            <ng-container matColumnDef="modele">
+              <th mat-header-cell *matHeaderCellDef>Modèle</th>
+              <td mat-cell *matCellDef="let element">
+                <button mat-button (click)="goToPlastron(element.id)">{{element.modele}}</button>
+
+
+              </td>
+            </ng-container>
+
+            <!-- Triage Column -->
+            <ng-container matColumnDef="triage">
+              <th mat-header-cell *matHeaderCellDef>Triage</th>
+              <td mat-cell *matCellDef="let element">
+                <app-triage [triage]="element.triage" ></app-triage>
+              </td>
+            </ng-container>
+
+            <!-- Profil Column -->
+            <ng-container matColumnDef="profil">
+              <th mat-header-cell *matHeaderCellDef>Profil</th>
+              <td mat-cell *matCellDef="let element">{{element.profil}}</td>
+            </ng-container>
+
+            <!-- Group Column -->
+            <ng-container matColumnDef="groupe">
+              <th mat-header-cell *matHeaderCellDef>Groupe</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-form-field appearance="fill">
+                  <mat-label>Groupe</mat-label>
+                  <mat-select [(value)]="element.groupe">
+                    <mat-option *ngFor="let groupe of groupes" [value]="groupe.scene">
+                      {{groupe.scene}}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </td>
+            </ng-container>
+
+            <!-- Statut Column -->
+            <ng-container matColumnDef="statut">
+              <th mat-header-cell *matHeaderCellDef>Statut</th>
+              <td mat-cell *matCellDef="let element">
+                <mat-form-field appearance="fill">
+                  <mat-label>Statut</mat-label>
+                  <mat-select [(value)]="element.statut">
+                    <mat-option value="En cours">En cours</mat-option>
+                    <mat-option value="A faire">A faire</mat-option>
+                    <mat-option value="Terminé">Terminé</mat-option>
+
+                  </mat-select>
+                </mat-form-field>
+              </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+              <th mat-header-cell *matHeaderCellDef>Description</th>
+              <td mat-cell *matCellDef="let element" >
+                <button mat-icon-button aria-label="expand row" (click) = "(expandedElement = expandedElement === element ? null : element) ; $event.stopPropagation()">
+                  <mat-icon *ngIf="expandedElement !== element">keyboard_arrow_down</mat-icon>
+                  <mat-icon *ngIf="expandedElement === element">keyboard_arrow_up</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+             <!-- expanded Description Column -->
+             <ng-container matColumnDef="expandedDescription">
+              <td mat-cell *matCellDef="let element" [attr.colspan]="displayedColumnsPlastron.length">
+                <div class="description" [@descriptionExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
+                  <div>
+                    {{element.description}}
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumnsPlastron"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumnsPlastron;"
+            cdkDrag
+            [cdkDragData]="row"
+            [class.expandedDescription]="expandedElement === row"
+            (click)="expandedElement = expandedElement === row ? null : row"
+            class="box">
+            </tr>
+            <tr mat-row *matRowDef="let row; columns: ['expandedDescription']" class="description-row"></tr>
+          </table>
+        </mat-card>
       </div>
-    </td>
-  </ng-container>
 
-  <!-- Profil Column -->
-  <ng-container matColumnDef="profil">
-    <th mat-header-cell *matHeaderCellDef>Profil</th>
-    <td mat-cell *matCellDef="let element">{{element.profil}}</td>
-  </ng-container>
-  
-  <!-- Group Column -->
-  <ng-container matColumnDef="groupe">
-    <th mat-header-cell *matHeaderCellDef>Groupe</th>
-    <td mat-cell *matCellDef="let element">
-      <mat-form-field appearance="fill">
-        <mat-label>Groupe</mat-label>
-        <mat-select [(value)]="element.groupe">
-          <mat-option *ngFor="let groupe of groupes" [value]="groupe.scene">
-            {{groupe.scene}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </td>
-  </ng-container>
-  
-  <!-- Statut Column -->
-  <ng-container matColumnDef="statut">
-    <th mat-header-cell *matHeaderCellDef>Statut</th>
-    <td mat-cell *matCellDef="let element">
-      <mat-form-field appearance="fill">
-        <mat-label>Statut</mat-label>
-        <mat-select [(value)]="element.statut">
-          <mat-option value="En cours">En cours</mat-option>
-          <mat-option value="A faire">A faire</mat-option>
-          <mat-option value="Terminé">Terminé</mat-option>
-          
-        </mat-select>
-      </mat-form-field>
-    </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumnsPlastron"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumnsPlastron;"></tr>
-</table>
-</div>
+      <div class="col-5 modele">
+        <app-list-box titre="Modèles" type="Modele" ></app-list-box>
+      </div>
+    </div>
+  </div>
 </mat-card>
-</div>
-
-<div class="right">
-<app-list-box titre="Plastrons" type="Plastron"></app-list-box>
-</div>
-</div>
-</div>
+  </div>
 

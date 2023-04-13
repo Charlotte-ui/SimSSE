@@ -10,6 +10,9 @@ import { Router } from '@angular/router';
 })
 export class ConnexionComponent implements OnInit {
 
+  rows = [1,2,3,4];
+  cols = [1,2,3,4];
+
 
   loginFormGroup = this.form.group({
     pseudo: ['', [Validators.required]],
@@ -27,7 +30,7 @@ export class ConnexionComponent implements OnInit {
 
     const pseudo = this.loginFormGroup.get('pseudo')?.value as string;
     const password = this.loginFormGroup.get('password')?.value as string;
-        
+
 
     this.firebaseService.connexion(pseudo,password).then((success) => {
       console.log("succes");
@@ -38,6 +41,6 @@ export class ConnexionComponent implements OnInit {
     })
 
   }
-  
+
 
 }
