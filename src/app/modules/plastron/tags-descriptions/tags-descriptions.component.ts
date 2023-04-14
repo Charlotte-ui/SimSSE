@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Modele } from '../../core/models/modele';
 import { ModeleService } from '../../core/services/modele.service';
@@ -6,6 +6,8 @@ import {MatChipInputEvent} from '@angular/material/chips';
 import {ENTER, COMMA} from '@angular/cdk/keycodes';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Observable, map, startWith } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { AddRegleDialogComponent } from '../../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 
 @Component({
   selector: 'app-tags-descriptions',
@@ -41,18 +43,35 @@ export class TagsDescriptionsComponent {
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
+  @Output() newModele = new EventEmitter<Modele>();
 
 
 
-
-  constructor(private fb: FormBuilder,public modelService:ModeleService) {
+  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog) {
     this.filteredTags = this.tagCtrl.valueChanges.pipe(
       startWith(null),
       map((tag: string | null) => tag ? this._filter(tag) : this.allTags.slice()));
   }
 
-  save(){
-   // this.modelService.up(this.form.value);
+  saveAsNewModel(){
+    let newModel = structuredClone(this.modele);
+    newModel.titre="";
+    delete newModel.id;
+    delete newModel.gabarit;
+
+    const dialogRef = this.dialog.open(AddRegleDialogComponent,
+      {data: newModel});
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result)
+
+      if (result == undefined) return;
+
+      this.modelService.createNewModel(result,true);
+      this.newModele.emit(result);
+
+    });
+
 
   }
 
