@@ -1,10 +1,12 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Trend,Event,Node, Link } from '../../core/models/node';
+import { Trend,Event,Node, Link, Graph } from '../../core/models/node';
 import {  VariablePhysio, VariablePhysioInstance } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
+import { NodeService } from '../../core/services/node.service';
+import { GraphDialogComponent } from './graph-dialog/graph-dialog.component';
 
 @Component({
   selector: 'app-editeur',
@@ -25,7 +27,10 @@ export class EditeurComponent implements OnInit {
 
   events!:Event[];
 
-  constructor(public dialog: MatDialog, public reglesService:RegleService) { }
+  graphs!:Graph[];
+
+
+  constructor(public dialog: MatDialog, public reglesService:RegleService, public nodeService:NodeService) { }
 
   ngOnInit(): void {
 
@@ -34,6 +39,13 @@ export class EditeurComponent implements OnInit {
         this.events = response as Event[];
       }
     );
+
+    this.nodeService.getGraphGabarit().subscribe(
+      (response) => {
+        this.graphs = response;
+      }
+    );
+
   }
 
   addElement(element:string){
@@ -120,6 +132,26 @@ export class EditeurComponent implements OnInit {
   }
 
   createGroup(){
+    const dialogRef = this.dialog.open(GraphDialogComponent, {
+      data: this.graphs,
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+      console.log(result);
+
+      if (result == "delete"){
+
+      }
+      else if (result){
+        this.data.push(result)
+        this.data = [...this.data] // TODO force change detection by forcing the value reference update
+        console.log(result);
+
+      }
+
+    });
+
 
   }
 
