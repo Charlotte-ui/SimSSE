@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Trend,Event,Node, Link } from '../../core/models/node';
-import {  VariablePhysio } from '../../core/models/variablePhysio';
+import {  VariablePhysio, VariablePhysioInstance } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
@@ -16,7 +16,7 @@ export class EditeurComponent implements OnInit {
 
 
 
-  @Input() targetVariable:VariablePhysio[];
+  @Input() targetVariable:VariablePhysioInstance[];
   @Input() data:(Event|Trend)[];
   @Input() links:Link[];
 
@@ -29,9 +29,9 @@ export class EditeurComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.reglesService.getEvents().subscribe(
+    this.reglesService.getEventGabarit().subscribe(
       (response) => {
-        this.events = response;
+        this.events = response as Event[];
       }
     );
   }

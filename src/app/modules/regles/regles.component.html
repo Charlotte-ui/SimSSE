@@ -1,7 +1,19 @@
 <app-header></app-header>
 
 <div class="container">
-<app-tab-regles [elements]="variables" titre="Variables" description="bla bla bla"></app-tab-regles>
 
-<app-tab-regles [elements]="variables" titre="Variables" description="bla bla bla"></app-tab-regles>
+  <div class="row">
+    <div class="col-6">
+      <app-tab-regles [elements]="variablesDetails" titre="Variables" (newElement)="addVariable($event)" description="bla bla bla"></app-tab-regles>
+    </div>
+    <div class="col-6">
+      <app-tab-regles [elements]="events" titre="Événements" (newElement)="addEvent($event)" description="bla bla bla"></app-tab-regles>
+    </div>
+  </div>
+  <div class="row">
+    <app-tab-regles [elements]="moyennesAge" titre="Moyenne par âge" (newElement)="addEvent($event)" description="bla bla bla"></app-tab-regles>
+  </div>
+  <div class="row">
+    <app-tab-regles [elements]="moyennesSexe" titre="Moyenne par sexe" (newElement)="addEvent($event)" description="bla bla bla"></app-tab-regles>
+  </div>
 </div>

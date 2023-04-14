@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import { Link, Trend, Event } from 'src/app/modules/core/models/node';
-import {  VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
+import {  VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 
 @Component({
@@ -14,11 +14,11 @@ export class SceneComponent implements OnInit {
 
   // Inputs
 
-  _targetVariable!:  VariablePhysio[];
-  get targetVariable():  VariablePhysio[] {
+  _targetVariable!:  VariablePhysioInstance[];
+  get targetVariable():  VariablePhysioInstance[] {
     return this._targetVariable;
   }
-  @Input() set targetVariable(value:VariablePhysio[] ) {
+  @Input() set targetVariable(value:VariablePhysioInstance[] ) {
     if (value){ // if value isnt undefined
       this._targetVariable = value;
       console.log("set targetVariable");
@@ -285,7 +285,7 @@ export class SceneComponent implements OnInit {
    * @param variable
    * @returns
    */
-  private calculCurve(size:number,variable:VariablePhysio){
+  private calculCurve(size:number,variable:VariablePhysioInstance){
     let curve = [];
     let trend = 0;
     variable["currentMax"] = 0;

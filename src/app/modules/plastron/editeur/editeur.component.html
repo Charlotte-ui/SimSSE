@@ -5,7 +5,7 @@
       <div class="col-1" id="barre-outils">
         <app-barre-outils (newElement)="addElement($event)"></app-barre-outils>
       </div>
-      <div class="col-10">
+      <div class="col-9">
         <div class="row">
           <app-scene [targetVariable]="targetVariable" [triggeredEvents]="triggeredEvents" [links]="links"  [nodes]="data"  ></app-scene>
         </div>
@@ -13,7 +13,7 @@
           <app-editeur-graphe-nodal [nodes]="data" [links]="links" (newNodes)="updateNodes($event)"></app-editeur-graphe-nodal>
         </div>
       </div>
-      <div class="col-1" id="inspecteur">
+      <div class="col-2" id="inspecteur">
         <app-inspecteur [variables]="targetVariable" (newVariables)="updateVariables($event)"></app-inspecteur>
       </div>
     </div>

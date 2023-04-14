@@ -5,7 +5,7 @@ import { ModeleService } from '../core/services/modele.service';
 import { Model } from 'echarts';
 import { Modele } from '../core/models/modele';
 import { ProfilService } from '../core/services/profil.service';
-import {  VariablePhysio } from '../core/models/variablePhysio';
+import {  VariablePhysio, VariablePhysioInstance } from '../core/models/variablePhysio';
 import { Link, Event, Trend } from '../core/models/node';
 import { RegleService } from '../core/services/regle.service';
 import { Profil } from '../core/models/profil';
@@ -21,7 +21,7 @@ export class PlastronComponent implements OnInit {
   plastron!:Plastron;
   modele!:Modele;
   profil!:Profil;
-  targetVariable!:VariablePhysio[];
+  targetVariable!:VariablePhysioInstance[];
   data:(Event|Trend)[];
   links:Link[];
 
@@ -56,7 +56,7 @@ export class PlastronComponent implements OnInit {
 
   initTargetVariables(){
 
-    this.regleService.getVariables().subscribe(
+    this.plastronService.getVariablesCibles(this.plastron).subscribe(
       (response) => {
         this.targetVariable = response;
       }
