@@ -35,6 +35,8 @@ import {MatExpansionModule} from '@angular/material/expansion';
 import {CdkAccordionModule} from '@angular/cdk/accordion';
 import {MatRadioModule} from '@angular/material/radio';
 import {DragDropModule} from '@angular/cdk/drag-drop';
+import {MatChipsModule} from '@angular/material/chips';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -58,6 +60,7 @@ import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.compo
 import { AddRegleDialogComponent } from './modules/regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
 import { TriageComponent } from './modules/shared/triage/triage.component';
+import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -83,7 +86,8 @@ import { TriageComponent } from './modules/shared/triage/triage.component';
     TabReglesComponent,
     AddRegleDialogComponent,
     ConfirmDeleteDialogComponent,
-    TriageComponent
+    TriageComponent,
+    TagsDescriptionsComponent
   ],
   imports: [
     BrowserModule,
@@ -120,7 +124,9 @@ import { TriageComponent } from './modules/shared/triage/triage.component';
     MatExpansionModule,
     CdkAccordionModule,
     MatRadioModule,
-    DragDropModule
+    DragDropModule,
+    MatChipsModule,
+    MatAutocompleteModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]

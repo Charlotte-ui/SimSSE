@@ -1,10 +1,13 @@
 <app-header></app-header>
 <mat-tab-group>
-    <mat-tab label="Modèle">
-        <app-editeur [targetVariable]="targetVariable" [links]="links" [data]="data"></app-editeur>
+    <mat-tab label="Modèle - cas clinique">
+      <app-editeur [targetVariable]="targetVariable" [links]="links" [data]="data"></app-editeur>
+    </mat-tab>
+    <mat-tab label="Modèle - tags et descriptions">
+      <app-tags-descriptions [modele]="modele" ></app-tags-descriptions>
     </mat-tab>
     <mat-tab label="Profil">
         <app-profil [profil]="profil"></app-profil>
     </mat-tab>
-    <mat-tab label="Third"> Content 3 </mat-tab>
+
 </mat-tab-group>
