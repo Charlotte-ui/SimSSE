@@ -8,6 +8,7 @@ import { ProfilService } from '../core/services/profil.service';
 import {  VariablePhysio } from '../core/models/variablePhysio';
 import { Link, Event, Trend } from '../core/models/node';
 import { RegleService } from '../core/services/regle.service';
+import { Profil } from '../core/models/profil';
 
 @Component({
   selector: 'app-plastron',
@@ -18,13 +19,13 @@ export class PlastronComponent implements OnInit {
 
   plastron!:Plastron;
   modele!:Modele;
-  profil!:any;
+  profil!:Profil;
   targetVariable!:VariablePhysio[];
   data:(Event|Trend)[];
   links:Link[];
 
-  constructor(private route: ActivatedRoute, 
-              private modelService:ModeleService, 
+  constructor(private route: ActivatedRoute,
+              private modelService:ModeleService,
               private profilService:ProfilService,
               public regleService:RegleService) { }
 
@@ -35,17 +36,17 @@ export class PlastronComponent implements OnInit {
 
         this.modelService.getModeleById(this.plastron.modele).subscribe(
           (response) => {
-            this.modele = response;   
-            this.initGragh();                                      
+            this.modele = response;
+            this.initGragh();
           }
-        ); 
+        );
 
         this.profilService.getProfilById(this.plastron.profil).subscribe(
           (response) => {
-            this.profil = response;   
-            this.initTargetVariables();                                      
+            this.profil = response;
+            this.initTargetVariables();
           }
-        ); 
+        );
 
       }
     );
@@ -57,10 +58,10 @@ export class PlastronComponent implements OnInit {
       (response) => {
         this.targetVariable = response;
       }
-    ); 
+    );
 
 
-    
+
 
 
   }
@@ -75,7 +76,7 @@ export class PlastronComponent implements OnInit {
       cible:'SpO2',
       pente:-1
     }
-    
+
     let trend2:Trend = {
       id:"2",
       name: 'acc respi',
@@ -93,7 +94,7 @@ export class PlastronComponent implements OnInit {
       type:'event',
       event:'oxygénothérapie'
     }
-    
+
     let start:Event = {
       id:"0",
       name: 'Start',
@@ -102,7 +103,7 @@ export class PlastronComponent implements OnInit {
       type:'event',
       event:'start'
     }
-    
+
     let link1:Link = {
       id:"0",
       source: 3,
@@ -110,7 +111,7 @@ export class PlastronComponent implements OnInit {
       type:"link",
       start:false
     }
-    
+
     let link2:Link = {
       id:"1",
       source: 3,
@@ -118,7 +119,7 @@ export class PlastronComponent implements OnInit {
       type:"link",
       start:false
     }
-    
+
     let link3:Link = {
       id:"2",
       source: 0,
@@ -126,7 +127,7 @@ export class PlastronComponent implements OnInit {
       type:"link",
       start:true
     }
-    
+
     let link4:Link = {
       id:"3",
       source: 0,
