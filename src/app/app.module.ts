@@ -63,6 +63,7 @@ import { TriageComponent } from './modules/shared/triage/triage.component';
 import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
 import { TagsComponent } from './modules/shared/tags/tags.component';
+import { CarteComponent } from './modules/scenario/carte/carte.component';
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -91,7 +92,8 @@ import { TagsComponent } from './modules/shared/tags/tags.component';
     TriageComponent,
     TagsDescriptionsComponent,
     GraphDialogComponent,
-    TagsComponent
+    TagsComponent,
+    CarteComponent
   ],
   imports: [
     BrowserModule,
