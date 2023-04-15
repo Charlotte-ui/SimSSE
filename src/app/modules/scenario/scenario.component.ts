@@ -62,6 +62,9 @@ export class ScenarioComponent implements OnInit {
 
   expandedElement!:tableElementPlastron|null;
 
+  allTags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  tags = ['Lemon', 'Lime' , 'Apple' ];
+
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
 
   constructor(private route: ActivatedRoute,

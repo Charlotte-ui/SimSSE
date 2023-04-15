@@ -62,6 +62,7 @@ import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dial
 import { TriageComponent } from './modules/shared/triage/triage.component';
 import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
+import { TagsComponent } from './modules/shared/tags/tags.component';
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -89,7 +90,8 @@ import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/gr
     ConfirmDeleteDialogComponent,
     TriageComponent,
     TagsDescriptionsComponent,
-    GraphDialogComponent
+    GraphDialogComponent,
+    TagsComponent
   ],
   imports: [
     BrowserModule,

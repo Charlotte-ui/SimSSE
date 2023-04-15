@@ -24,34 +24,16 @@ export class TagsDescriptionsComponent {
     if(value){
       console.log(value)
       this._modele = value;
-
       this.form = this.fb.group(value);
     }
   }
 
-  // Enter, comma
-  separatorKeysCodes = [ENTER, COMMA];
-
-  tags = [
-    'Lemon', 'Lime' , 'Apple'
-  ];
-  allTags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
-
-  filteredTags: Observable<string[]>;
-  tagCtrl = new FormControl();
-
-  @ViewChild('auto') matAutocomplete: MatAutocomplete;
-  @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
-
   @Output() newModele = new EventEmitter<Modele>();
 
+  allTags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  tags = ['Lemon', 'Lime' , 'Apple' ];
 
-
-  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog) {
-    this.filteredTags = this.tagCtrl.valueChanges.pipe(
-      startWith(null),
-      map((tag: string | null) => tag ? this._filter(tag) : this.allTags.slice()));
-  }
+  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog) {}
 
   saveAsNewModel(){
     let newModel = structuredClone(this.modele);
@@ -74,42 +56,6 @@ export class TagsDescriptionsComponent {
 
 
   }
-
-  addTag(event: MatChipInputEvent): void {
-    let input = event.input;
-    let value = event.value;
-
-    // Add our fruit
-    if ((value || '').trim()) {
-      this.tags.push(value);
-    }
-
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
-  }
-
-  removeTag(index: number): void {
-
-    if (index >= 0) {
-      this.tags.splice(index, 1);
-    }
-  }
-
-  selected(event: MatAutocompleteSelectedEvent): void {
-    this.tags.push(event.option.viewValue);
-    this.tagInput.nativeElement.value = '';
-  }
-
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
-
-    return this.allTags.filter(tag => tag.toLowerCase().indexOf(filterValue) === 0);
-  }
-
-
-
 
 
 }
