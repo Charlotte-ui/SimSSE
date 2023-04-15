@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-
-import { FirebaseService } from './firebase.service';
-import { Modele } from '../models/modele';
-import { Trend,Event,Link } from '../models/node';
+import { Trend,Event, Link, Graph } from '../models/node';
+import { of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ModeleService {
+export class NodeService {
 
-  getGraph(modele: Modele) {
+
+  constructor() { }
+
+  getGraphGabarit() {
     let trend1:Trend = {
       id:"1",
       name: 'chute sat',
@@ -80,19 +80,17 @@ export class ModeleService {
       start:true
     }
 
-    return [[start,trend1,trend2,event],[link1,link2,link3,link4]]
+    let graph:Graph = {
+      gabarit:true,
+      links:[link1,link2,link3,link4],
+      nodes:[start,trend1,trend2,event],
+      name:"detresse respiratoire",
+      x:100,
+      y:100,
+      id:"0",
+      type:"graph"
+    }
 
-  }
-
-  constructor(public firebaseService:FirebaseService) { }
-
-
-
-  getModeleById(id:string): Observable<Modele|undefined> {
-    return this.firebaseService.getElementInCollectionByIds<Modele>("Modele",id);
-  }
-
-  createNewModel(modele:Modele,gabarit:boolean){
-    // TODOD
+    return of ([graph])
   }
 }

@@ -10,6 +10,7 @@ export enum Triage {
 
 export interface Modele extends Listable{
     triage:Triage;
- 
-    
+    gabarit:boolean;
+
+
 }

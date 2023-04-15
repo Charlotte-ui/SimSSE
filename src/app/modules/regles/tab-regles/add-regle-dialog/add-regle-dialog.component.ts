@@ -19,6 +19,8 @@ export class AddRegleDialogComponent<T> {
 
     ngOnInit() {
       this.element = this.data;
+      console.log("this element")
+      console.log(this.element)
 
       this.form = this.fb.group(this.element);
       this.champs=Object.keys(this.element) as Array<keyof T>;

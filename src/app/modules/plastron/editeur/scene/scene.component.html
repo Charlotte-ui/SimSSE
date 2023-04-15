@@ -5,4 +5,4 @@
   </button>
 </div>
 
-<div echarts [options]="initialChartOption" [merge]="mergeOptions" class="demo-chart" (chartInit)="onChartInit($event)" (chartClick)="onChartClick($event)"></div>
+<div *ngIf="initialChartOption" echarts [options]="initialChartOption" [merge]="mergeOptions" class="demo-chart" (chartInit)="onChartInit($event)" (chartClick)="onChartClick($event)" (chartLegendSelectChanged)="onChartLegendSelectChanged($event)"></div>

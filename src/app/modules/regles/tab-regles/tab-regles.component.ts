@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AddRegleDialogComponent } from './add-regle-dialog/add-regle-dialog.component';
 import { VariablePhysio } from '../../core/models/variablePhysio';
@@ -10,6 +10,11 @@ import { ConfirmDeleteDialogComponent } from '../../core/confirm-delete-dialog/c
   styleUrls: ['./tab-regles.component.less']
 })
 
+/* interface Moyenne {
+  0:boolean;
+  age:number;
+}
+ */
 
 export class TabReglesComponent <T>{
 
@@ -40,6 +45,7 @@ export class TabReglesComponent <T>{
 
 @Input() titre:string;
 @Input() description:string;
+@Output() newElement = new EventEmitter<T>();
 
   constructor(public dialog: MatDialog){
 
@@ -59,13 +65,16 @@ export class TabReglesComponent <T>{
 
   }
 
-  editElement(id:number){
-
-    this.openDialog(this.elements[id],id);
+  editElement(element:T){
+    let id  = this.elements.indexOf(element);
+    this.openDialog(element,id);
 
   }
 
   openDialog(element:T,id:number){
+    console.log("openDialog")
+
+    console.log(element)
     const dialogRef = this.dialog.open(AddRegleDialogComponent,
       {data: element});
 
@@ -79,7 +88,11 @@ export class TabReglesComponent <T>{
 
       console.log(this.dataSource)
 
-      this.dataSource = [... this.dataSource]
+      this.dataSource = [... this.dataSource] // TODO : delete when bdd ok
+      this.newElement.emit(result);
+
+
+
 
 
     });
@@ -105,7 +118,7 @@ export class TabReglesComponent <T>{
   }
 
   isColor(column:string){
-    console.log("isColor "+column)
+   //S console.log("isColor "+column)
     if (column == "couleur") return true;
     return false;
   }
