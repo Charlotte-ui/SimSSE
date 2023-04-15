@@ -1,0 +1,19 @@
+
+<mat-dialog-content [formGroup]="form">
+
+<div mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Choix du groupe</mat-label>
+    <mat-select formControlName="graph">
+      <mat-option *ngFor="let graph of graphs" [value]="graph">
+        {{graph.name}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">Annuler</button>
+  <button mat-button (click)="save()">Créer le groupe</button>
+</div>
+</mat-dialog-content>

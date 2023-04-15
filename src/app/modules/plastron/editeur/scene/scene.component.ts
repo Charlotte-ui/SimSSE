@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import { Link, Trend, Event } from 'src/app/modules/core/models/node';
-import {  VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
+import {  VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 
 @Component({
@@ -12,57 +12,50 @@ import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.componen
 })
 export class SceneComponent implements OnInit {
 
-_targetVariable!:  VariablePhysio[];
-get targetVariable():  VariablePhysio[] {
-  return this._targetVariable;
-}
-@Input() set targetVariable(value:VariablePhysio[] ) {
-    this._targetVariable = value;
-    console.log("set targetVariable");
-    console.log(value);
-    if (this.nodes) this.initGraphData();
-}
+  // Inputs
 
-_links!:  Link[];
-get links():  Link[] {
-  return this._links;
-}
-@Input() set links(value:Link[] ) {
-  this._links = value;
-}
+  _targetVariable!:  VariablePhysioInstance[];
+  get targetVariable():  VariablePhysioInstance[] {
+    return this._targetVariable;
+  }
+  @Input() set targetVariable(value:VariablePhysioInstance[] ) {
+    if (value){ // if value isnt undefined
+      this._targetVariable = value;
+      console.log("set targetVariable");
+      console.log(value);
+      if(this.legend.length < value.length) this.initLegend() ; // if there is new variables to show, changed the legend
+      if (this.nodes) this.initGraphData();
+    }
+  }
 
-_nodes!:  (Event | Trend)[];
-get nodes():  (Event | Trend)[] {
-  return this._nodes;
-}
+  _links!:  Link[];
+  get links():  Link[] {
+    return this._links;
+  }
+  @Input() set links(value:Link[] ) {
+    this._links = value;
+  }
 
-@Input() set nodes(value:(Event | Trend)[] ) {
- // console.log("set nodes in scene")
- // console.log(value)
+  _nodes!:  (Event | Trend)[];
+  get nodes():  (Event | Trend)[] {
+    return this._nodes;
+  }
 
- if (value){ // if value isnt undefined
-  this._nodes = value;
+  @Input() set nodes(value:(Event | Trend)[] ) {
+    if (value){ // if value isnt undefined
+      this._nodes = value;
+      this.events=[];
+      this.nodes.forEach((node,i) => {
+        if ('event' in node) this.events.push([node,i]); // if the node is an event
+      });
+      this.initGraphData();
+    }
+  }
 
-  this.events=[];
-
-  this.nodes.forEach((node,i) => {
-    // if the node is an event
-    if ('event' in node) this.events.push([node,i]);
-
-  });
-
-  console.log("events")
-  console.log(this.events)
-
-  this.initGraphData();
-
- }
+  @Input() duration:number=100;
+  @Input() triggeredEvents:number[][]; //  time id
 
 
-}
-
-@Input() duration:number=100;
-@Input() triggeredEvents:number[][]; //  time id
 
   /**
    * all events is the nodes and theirs ids
@@ -70,161 +63,89 @@ get nodes():  (Event | Trend)[] {
   events:(Event|number)[][];
 
 
-
-  variablePhysio = ['SpO2', 'FR','RC','HemoCue','Temp','PAD','PAS','trigger']
-
-
   // Echart Graph Variables
+  legend:string[] =[];
   echartsInstance ;
   graphData = {};
   mergeOptions = {};
   markLineData = [];
-  markLineY = 100 ; // size of the makLine, = the biggest curve value
-
-  initialChartOption: EChartsOption = {
-    tooltip: {trigger: 'axis'},
-    legend: {
-      data: this.variablePhysio
-    },
-    toolbox: {
-      feature: {
-        saveAsImage: {}
-      }
-    },
-    xAxis: {
-      type: 'value',
-      boundaryGap: false,
-      min: 0,
-      max: this.duration,
-    },
-    yAxis: {
-      type: 'value'
-    },
-    animationDurationUpdate: 1500,
-    animationEasingUpdate: 'quinticInOut',
-    series: []
-  };
+  markLineY:number = 100; // the max of the curves displayed
+  initialChartOption!: EChartsOption ;
 
 
 
   constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
-    //this.updateChart()
+    //this.intitChartOption()
   }
 
   onChartInit(ec) {
     this.echartsInstance = ec
   }
 
+
+  // chart initialisations
+
+  initLegend(){
+    this.legend = ['trigger'];
+    this.targetVariable.forEach(variable => {
+      this.legend.push(variable.nom)
+      variable["currentMax"] = 0 // the maximum value of the curve, used to set the height of the triggers
+    });
+    this.intitChartOption();
+  }
+
+  intitChartOption(){
+    this.initialChartOption = {
+      tooltip: {trigger: 'axis'},
+      legend: {
+        data: this.legend
+      },
+      toolbox: {
+        feature: {
+          saveAsImage: {}
+        }
+      },
+      xAxis: {
+        type: 'value',
+        boundaryGap: false,
+        min: 0,
+        max: this.duration,
+      },
+      yAxis: {
+        type: 'value'
+      },
+      animationDurationUpdate: 1500,
+      animationEasingUpdate: 'quinticInOut',
+      series: []
+    };
+  }
+
   initGraphData(){
-
     if (this.targetVariable && this.nodes && this.links){
-      this.graphData = {
-        SpO2: [],
-        FR: [],
-        RC: [],
-        HemoCue: [],
-        Temp: [],
-        PAD: [],
-        PAS: [],
-      }
-
+      let variableSelected = {} // at init, all the variables are selected
+      this.graphData = {}
       this.targetVariable.forEach(variable => {
-        this.graphData[variable.nom]=this.calculCurve(this.duration,variable.cible,variable.rand,variable.nom)
+        this.graphData[variable.nom]=this.calculCurve(this.duration,variable)
+        variableSelected[variable.nom] = true;
       });
-
-      this.updateMarklineData()
-
+      this.updateMarklineData(variableSelected)
       this.updateChart();
-
     }
-
-
   }
 
-  /**
-   * generate the data
-   * @param size
-   * @param target
-   * @param rand
-   * @param variable
-   * @returns
-   */
-  calculCurve(size:number,target:number,rand:number,variable:string){
-    let curve = [];
-    let trend = 0;
-    this.markLineY = 100;
-    for(let i=0;i<size;i++){
-      let event = this.getEventAtTime(i)
-      if (event != undefined){
-        let nodeTriggers = this.getTrendsFromEvent(event[1]);
-        this.nodes.forEach(node => {
-          if (node.type == "trend" && (node as Trend).cible == variable ){
-            nodeTriggers.forEach(nodeTrigger => {
-              if (nodeTrigger[0] == node.id){
-            //    console.log("node is trigger")
-            //    console.log(node)
-                if(nodeTrigger[1]) trend = (node as Trend).pente;
-                else trend = 0;
-             //   console.log("trend")
-            //    console.log(trend)
-              }
-            });
-          }
-        });
-      }
-
-      let prevValue = target ;
-      if (i>0) prevValue = curve[i-1][1]
-/*       console.log("prevValue")
-      console.log(prevValue)
-      console.log("trend")
-      console.log(trend) */
-
-      // update the size of the markline
-      if (this.markLineY<prevValue) this.markLineY = prevValue; // TODO change because data doesnt change when curve disapeared
-
-      curve.push([i,prevValue + this.gaussianRandom(0,rand) + trend])
-    }
-    return curve;
-  }
-
-  getEventAtTime(time:number):number[]|undefined{
-  //  console.log("get event at time "+time);
-    let result = undefined;
-    this.triggeredEvents.forEach(event => {
-      if (event[0] == time) result= event;
-    });
- //   console.log(result);
-
-    return result;
-  }
-
-  getTrendsFromEvent(event:number):any[]{
-  //  console.log("get Trends From Event "+event)
-    let trends = [];
-    this.links.forEach(link => {
-      if(event == link.source) trends.push([link.target,link.start]);
-    });
-  //  console.log(trends)
-    return trends;
-  }
-
-
-  getNodeByID(id:string):Event | Trend{
-    let result = undefined;
-    this.nodes.forEach(node => {
-      if(node.id == id) result= node;
-    });
-    return result;
-  }
-
+  // chart updates
 
   /**
    * update the graph data of the triggers (markline)
    */
-  updateMarklineData(){
+  updateMarklineData(selected){
+
+    this.markLineY = 0;
+    this.targetVariable.forEach(variable => {
+      if (selected[variable.nom] && variable["currentMax"]>this.markLineY) this.markLineY = variable["currentMax"];
+    });
 
     this.markLineData = []
 
@@ -240,7 +161,6 @@ get nodes():  (Event | Trend)[] {
     });
 
   }
-
 
   updateChart(){
 
@@ -276,7 +196,7 @@ get nodes():  (Event | Trend)[] {
 
   }
 
-
+  // event handlers
   onChartClick(event:any): void {
 
     console.log(event)
@@ -297,10 +217,16 @@ get nodes():  (Event | Trend)[] {
 
   }
 
+  onChartLegendSelectChanged(event:any): void {
+    console.log(event);
+
+
+    this.updateMarklineData(event.selected);
+    this.updateChart();
+
+  }
+
   addTrigger(){
-
-    console.log("addTrigger")
-
     let newTrigger = {
       name:"",
       xAxis: 0,
@@ -311,12 +237,8 @@ get nodes():  (Event | Trend)[] {
     }
 
     this.openTriggerDialog(newTrigger,false);
-
-
-
-
-
   }
+
 
   /**
    * open the trigger dialog
@@ -353,17 +275,76 @@ get nodes():  (Event | Trend)[] {
       }
       this.initGraphData();
     });
+  }
 
+  // tools
 
+  /**
+   * generate the data
+   * @param size
+   * @param variable
+   * @returns
+   */
+  private calculCurve(size:number,variable:VariablePhysioInstance){
+    let curve = [];
+    let trend = 0;
+    variable["currentMax"] = 0;
+    let prevValue = variable.cible ;
+    for(let i=0;i<size;i++){
+      let event = this.getEventAtTime(i)
+      if (event != undefined){
+        let nodeTriggers = this.getTrendsFromEvent(event[1]);
+        this.nodes.forEach(node => {
+          if (node.type == "trend" && (node as Trend).cible == variable.nom ){
+            nodeTriggers.forEach(nodeTrigger => {
+              if (nodeTrigger[0] == node.id){
+            //    console.log("node is trigger")
+            //    console.log(node)
+                if(nodeTrigger[1]) trend = (node as Trend).pente;
+                else trend = 0;
+             //   console.log("trend")
+            //    console.log(trend)
+              }
+            });
+          }
+        });
+      }
 
-}
+      if (i>0) prevValue = curve[i-1][1]
 
+      let newValue = prevValue + this.gaussianRandom(0,variable.rand) + trend;
+      if (newValue>variable.max) newValue = variable.max;
+      if (newValue<variable.min) newValue = variable.min;
+      if (variable["currentMax"]<newValue) variable["currentMax"] = newValue;
 
+      curve.push([i,newValue])
+    }
+    return curve;
+  }
 
+  private getEventAtTime(time:number):number[]|undefined{
+    let result = undefined;
+    this.triggeredEvents.forEach(event => {
+      if (event[0] == time) result= event;
+    });
+    return result;
+  }
 
+  private getTrendsFromEvent(event:number):any[]{
+    let trends = [];
+    this.links.forEach(link => {
+      if(event == link.source) trends.push([link.target,link.start]);
+    });
+    return trends;
+  }
 
-
-
+  private getNodeByID(id:string):Event | Trend{
+    let result = undefined;
+    this.nodes.forEach(node => {
+      if(node.id == id) result= node;
+    });
+    return result;
+  }
 
   // Standard Normal variate using Box-Muller transform.
   private gaussianRandom(mean=0, stdev=1) {

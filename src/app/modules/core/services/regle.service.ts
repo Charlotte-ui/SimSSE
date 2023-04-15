@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { VariablePhysio } from '../models/variablePhysio';
+import { VariablePhysio, VariablePhysioGabarit } from '../models/variablePhysio';
 import { Observable, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
 import { Trend,Event,Node, Link } from '../../core/models/node';
@@ -12,75 +12,96 @@ export class RegleService {
 
   constructor(firebaseService:FirebaseService) {}
 
-  getVariables(): Observable<VariablePhysio[]> {
-    let SpO2:VariablePhysio = {
+  getVariableGarbarit(): Observable<VariablePhysioGabarit[]> {
+    let SpO2:VariablePhysioGabarit = {
       id:"0",
       nom:"SpO2",
-      cible:98,
       rand:1,
       min:0,
       max:100,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
-    let FR:VariablePhysio = {
+    let FR:VariablePhysioGabarit = {
       id:"1",
       nom:"FR",
-      cible:16,
       rand:1,
       min:0,
       max:100,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
-    let FC:VariablePhysio = {
+    let FC:VariablePhysioGabarit = {
       id:"2",
-      nom:"RC",
-      cible:80,
+      nom:"FC",
       rand:1,
       min:0,
       max:100,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
-    let HemoCue:VariablePhysio = {
+    let HemoCue:VariablePhysioGabarit = {
       id:"3",
       nom:"HemoCue",
-      cible:36,
       rand:1,
       min:0,
       max:100,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
-    let PAD:VariablePhysio = {
+    let PAD:VariablePhysioGabarit = {
       id:"4",
       nom:"PAD",
-      cible:80,
       rand:1,
       min:0,
       max:100,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
-    let PAS:VariablePhysio = {
+    let PAS:VariablePhysioGabarit = {
       id:"5",
       nom:"PAS",
-      cible:130,
       rand:1,
       min:0,
       max:200,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
-    let Temp:VariablePhysio = {
+    let Temp:VariablePhysioGabarit = {
       id:"6",
       nom:"Temp",
-      cible:27,
       rand:1,
       min:0,
       max:100,
-      couleur:""
+      couleur:"",
+      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
+      moyennesSexe:[95,95],
+      sdAge:1,
+      sdSexe:1
     }
 
 
@@ -90,39 +111,34 @@ export class RegleService {
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
 
-  getEvents(): Observable<Event[]> {
-    let oxy:Event = {
-      name: "oxygénothérapie",
+
+
+  getEventGabarit(): Observable<Partial<Event>[]> {
+    let oxy:Partial<Event> = {
       event: "oxygénothérapie",
-      x: 0,
-      y: 0,
-      type: "event",
-      id:"0"
     }
 
-    let garrot:Event = {
-      name: "garrot",
+    let garrot:Partial<Event> = {
       event: "garrot",
-      x: 0,
-      y: 0,
-      type: "event",
-      id:"1"
     }
 
-    let pls:Event = {
-      name: "pls",
-      event: "pls",
-      x: 0,
-      y: 0,
+    let pls:Partial<Event> = {
       type: "event",
-      id:"2"
     }
-
-
 
     let events = [oxy,garrot,pls];
 
     return of(events);
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
+
+  createVariable(variable:VariablePhysio){
+
+  }
+
+  createEvent(event:Event){
+
+  }
+
+
 }

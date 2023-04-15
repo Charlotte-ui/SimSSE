@@ -12,7 +12,7 @@ export interface Trend extends Node{
     cible: string;
     pente: number;
 }
-  
+
 export interface Event extends Node{
     event: string;
 }
@@ -22,4 +22,11 @@ export interface Link extends Collection{
     source: number,
     target: number,
     start:boolean
+}
+
+export interface Graph extends Node{
+  nodes: Node[];
+  links: Link[];
+  gabarit:boolean;
+
 }

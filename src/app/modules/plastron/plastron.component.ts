@@ -5,9 +5,11 @@ import { ModeleService } from '../core/services/modele.service';
 import { Model } from 'echarts';
 import { Modele } from '../core/models/modele';
 import { ProfilService } from '../core/services/profil.service';
-import {  VariablePhysio } from '../core/models/variablePhysio';
+import {  VariablePhysio, VariablePhysioInstance } from '../core/models/variablePhysio';
 import { Link, Event, Trend } from '../core/models/node';
 import { RegleService } from '../core/services/regle.service';
+import { Profil } from '../core/models/profil';
+import { PlastronService } from '../core/services/plastron.service';
 
 @Component({
   selector: 'app-plastron',
@@ -18,15 +20,16 @@ export class PlastronComponent implements OnInit {
 
   plastron!:Plastron;
   modele!:Modele;
-  profil!:any;
-  targetVariable!:VariablePhysio[];
+  profil!:Profil;
+  targetVariable!:VariablePhysioInstance[];
   data:(Event|Trend)[];
   links:Link[];
 
-  constructor(private route: ActivatedRoute, 
-              private modelService:ModeleService, 
+  constructor(private route: ActivatedRoute,
+              private modelService:ModeleService,
               private profilService:ProfilService,
-              public regleService:RegleService) { }
+              public regleService:RegleService,
+              public plastronService:PlastronService) { }
 
   ngOnInit(): void {
     this.route.data.subscribe(
@@ -35,17 +38,17 @@ export class PlastronComponent implements OnInit {
 
         this.modelService.getModeleById(this.plastron.modele).subscribe(
           (response) => {
-            this.modele = response;   
-            this.initGragh();                                      
+            this.modele = response;
+            this.initGragh();
           }
-        ); 
+        );
 
         this.profilService.getProfilById(this.plastron.profil).subscribe(
           (response) => {
-            this.profil = response;   
-            this.initTargetVariables();                                      
+            this.profil = response;
+            this.initTargetVariables();
           }
-        ); 
+        );
 
       }
     );
@@ -53,93 +56,21 @@ export class PlastronComponent implements OnInit {
 
   initTargetVariables(){
 
-    this.regleService.getVariables().subscribe(
+    this.plastronService.getVariablesCibles(this.plastron).subscribe(
       (response) => {
         this.targetVariable = response;
       }
-    ); 
-
-
-    
-
-
+    );
   }
 
   initGragh(){
-    let trend1:Trend = {
-      id:"1",
-      name: 'chute sat',
-      x: 300,
-      y: 300,
-      type:'trend',
-      cible:'SpO2',
-      pente:-1
-    }
-    
-    let trend2:Trend = {
-      id:"2",
-      name: 'acc respi',
-      x: 500,
-      y: 100,
-      type:'trend',
-      cible:'FR',
-      pente:1
-    }
-    let event:Event = {
-      id:"3",
-      name: 'Oxygéno.',
-      x: 550,
-      y: 100,
-      type:'event',
-      event:'oxygénothérapie'
-    }
-    
-    let start:Event = {
-      id:"0",
-      name: 'Start',
-      x: 0,
-      y: 0,
-      type:'event',
-      event:'start'
-    }
-    
-    let link1:Link = {
-      id:"0",
-      source: 3,
-      target: 1,
-      type:"link",
-      start:false
-    }
-    
-    let link2:Link = {
-      id:"1",
-      source: 3,
-      target: 2,
-      type:"link",
-      start:false
-    }
-    
-    let link3:Link = {
-      id:"2",
-      source: 0,
-      target: 1,
-      type:"link",
-      start:true
-    }
-    
-    let link4:Link = {
-      id:"3",
-      source: 0,
-      target: 2,
-      type:"link",
-      start:true
-    }
+    let graph = this.modelService.getGraph(this.modele);
+    this.data = graph[0] as (Event | Trend)[]
+    this.links  = graph[1] as Link[]
+  }
 
-    this.data = [start,trend1,trend2,event]
-    this.links=[link1,link2,link3,link4]
-
-
-
+  changeModeleRef(newModele){
+    this.plastronService.changeModelRef(this.plastron,newModele);
   }
 
 }
