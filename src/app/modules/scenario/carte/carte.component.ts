@@ -4,13 +4,21 @@ import { EChartsOption, util } from 'echarts';
 import 'echarts/extension/bmap/bmap';
 
 const SymbolSize = 20;
-const Data = [
-  [15, 0],
-  [50, 10],
+const groupe = [
   [56.5, 20],
   [46.5, 30],
   [22.1, 40],
 ];
+
+const PRV = [
+  [15, 0],
+];
+
+const PMA= [
+  [50, 10],
+];
+
+const Data = groupe.concat(PRV,PMA);
 
 @Component({
   selector: 'app-carte',
@@ -18,8 +26,10 @@ const Data = [
   styleUrls: ['./carte.component.less']
 })
 export class CarteComponent implements OnDestroy{
+
   updatePosition: () => void;
   options: EChartsOption = {
+    legend: {data:['group','PMA','PRV']},
     tooltip: {
       triggerOn: 'none',
       formatter: (params) =>
@@ -38,22 +48,57 @@ export class CarteComponent implements OnDestroy{
     },
     series: [
       { // groupe
+        name:'group',
         id: 'group',
         type: 'scatter',
         symbolSize: SymbolSize,
-        data: Data,
-        symbol: 'pin'
+        data: Data.slice(0, groupe.length),
+        symbol: 'pin',
+        itemStyle: {
+          borderColor: '#555',
+          color: '#37A2DA',
+          
+        },
+      //  label:"b",
       },
-      { // groupe
+      { // PRV
+        name:'PRV',
         id: 's',
-        type: 'effectScatter',
+        type: 'scatter',
         symbolSize: SymbolSize,
-        data: Data,
-        symbol: 'diamond'
+        data: Data.slice(groupe.length,groupe.length+1),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: '#e06343',
+        },
+      },
+      { // PMA
+        name:'PMA',
+        id: 't',
+        type: 'scatter',
+        symbolSize: SymbolSize,
+        data: Data.slice(groupe.length+1,groupe.length+2),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: '#FC7D02',
+        },
       }
     ],
   };
-  constructor() { }
+  constructor() { 
+
+    console.log("group");
+    console.log(Data.slice(0, groupe.length));
+
+    console.log("PRV");
+    console.log(Data.slice(groupe.length,groupe.length+1));
+
+    console.log("PMA");
+    console.log(Data.slice(groupe.length+1,groupe.length+2));
+
+  }
 
   ngOnDestroy() {
     if (this.updatePosition) {
@@ -68,13 +113,43 @@ export class CarteComponent implements OnDestroy{
       // Update data
       myChart.setOption({
         series: [
-          {
+          { // groupe
+            name:'group',
             id: 'group',
-            data: Data,
+            type: 'scatter',
+            symbolSize: SymbolSize,
+            data: Data.slice(0, groupe.length),
+            symbol: 'pin',
+            itemStyle: {
+              borderColor: '#555',
+              color: '#37A2DA',
+              
+            },
+          //  label:"b",
           },
-          {
+          { // PRV
+            name:'PRV',
             id: 's',
-            data: Data,
+            type: 'scatter',
+            symbolSize: SymbolSize,
+            data: Data.slice(groupe.length,groupe.length+1),
+            symbol: 'diamond',
+            itemStyle: {
+              borderColor: '#555',
+              color: '#e06343',
+            },
+          },
+          { // PMA
+            name:'PMA',
+            id: 't',
+            type: 'scatter',
+            symbolSize: SymbolSize,
+            data: Data.slice(groupe.length+1,groupe.length+2),
+            symbol: 'diamond',
+            itemStyle: {
+              borderColor: '#555',
+              color: '#FC7D02',
+            },
           }
         ],
       });
