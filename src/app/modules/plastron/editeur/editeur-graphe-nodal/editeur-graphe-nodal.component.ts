@@ -3,8 +3,10 @@ import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NodeDialogComponent } from './node-dialog/node-dialog.component';
-import { Trend,Event, Link } from 'src/app/modules/core/models/node';
+import { Trend,Event, Link, Graph } from 'src/app/modules/core/models/node';
 import * as echarts from 'echarts/types/dist/echarts';
+import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
+import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',
@@ -26,7 +28,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
   }
 }
 
-@Output() newNodes = new EventEmitter<(Event | Trend)[]>();
+@Output() updateNode = new EventEmitter<(Event | Trend)[]>();
 
 
 _links!:  Link[];
@@ -92,7 +94,7 @@ get links():  Link[] {
         color: 5,
       }
     } */
-  
+
   }
 
   onChartInit(ec) {
@@ -111,17 +113,26 @@ get links():  Link[] {
       }
       else {
         elements = this.nodes;
-        graphElements = this.graphData;      
+        graphElements = this.graphData;
       }
-      
-      const dialogRef = this.dialog.open(NodeDialogComponent, 
-        {data: [elements[index],this.nodes]});
-  
+
+      let dialogRef;
+
+
+      if(event.data.category == 'graph')  {
+        console.log("open graph dialog");
+        let graph = elements[index] as Graph;
+        console.log(graph);
+
+        dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
+      }
+      else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [elements[index],this.nodes]});
+
       dialogRef.afterClosed().subscribe(result => {
 
         if (result == "delete"){
-          elements.splice(index, 1); 
-          graphElements.splice(index, 1); 
+          elements.splice(index, 1);
+          graphElements.splice(index, 1);
         }
         else if (result){
           elements[index] = result;
@@ -133,13 +144,13 @@ get links():  Link[] {
             graphElements[index].name = result.name;
           }
         }
-  
-        this.updateChart();
-        this.newNodes.emit(this.nodes);
-      });
-    
 
-    
+        this.updateChart();
+        this.updateNode.emit(this.nodes);
+      });
+
+
+
   }
 
   updateChart(){
@@ -162,9 +173,8 @@ get links():  Link[] {
           fontSize: 20
         },
         data: this.graphData,
-        // links: [],
         links: this.graphLink,
-        categories: [{name:'event'},{name:'trend'}],
+        categories: [{name:'event'},{name:'trend'},{name:'graph'}],
         lineStyle: {
           opacity: 1,
           width: 1,
@@ -184,10 +194,10 @@ get links():  Link[] {
       series: series
     };
 
-   
+
   }
 
-  
+
 
 
 

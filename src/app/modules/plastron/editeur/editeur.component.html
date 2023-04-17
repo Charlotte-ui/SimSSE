@@ -10,7 +10,7 @@
           <app-scene [targetVariable]="targetVariable" [triggeredEvents]="triggeredEvents" [links]="links"  [nodes]="data"  ></app-scene>
         </div>
         <div class="row">
-          <app-editeur-graphe-nodal [nodes]="data" [links]="links" (newNodes)="updateNodes($event)"></app-editeur-graphe-nodal>
+          <app-editeur-graphe-nodal [nodes]="data" [links]="links" (updateNode)="updateNodes($event)"></app-editeur-graphe-nodal>
         </div>
       </div>
       <div class="col-2" id="inspecteur">

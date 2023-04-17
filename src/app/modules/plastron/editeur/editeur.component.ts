@@ -144,9 +144,17 @@ export class EditeurComponent implements OnInit {
 
       }
       else if (result){
-        this.data.push(result)
+
+        let graph = result.graph;
+        graph.id = this.data.length;
+        graph.gabarit = false;
+
+
+        this.data.push(result.graph)
+
+        console.log(this.data)
         this.data = [...this.data] // TODO force change detection by forcing the value reference update
-        console.log(result);
+        console.log(result.graph);
 
       }
 
