@@ -1,9 +1,9 @@
-import { Component, OnInit, Inject, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Inject, Input, OnDestroy, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NodeDialogComponent } from './node-dialog/node-dialog.component';
-import { Trend,Event, Link, Graph } from 'src/app/modules/core/models/node';
+import { Trend,Event, Link, Graph ,Node} from 'src/app/modules/core/models/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
@@ -48,10 +48,32 @@ get links():  Link[] {
 
   initialChartOption: EChartsOption = {
     tooltip: {},
+    grid:{
+      show:false,
+      right:'0',
+      bottom:'0',
+      top:'0',
+      left:'0',
+    },
+    xAxis: {
+      show:false,
+      min: 0,
+      max: 100,
+      type: 'value',
+    },
+    yAxis: {
+      show:false,
+      min: 0,
+      max: 100,
+      type: 'value',
+    },
     animationDurationUpdate: 1500,
     animationEasingUpdate: 'quinticInOut',
     series: []
   };
+
+  @ViewChild('graphScene') graphScene: ElementRef;
+
 
   constructor(public dialog: MatDialog) { }
 
@@ -62,7 +84,14 @@ get links():  Link[] {
     this.graphData = new Array(this.nodes.length);
 
     this.nodes.forEach(node => {
-      this.graphData[node.id] = {name:node.name,x:node.x,y:node.y,category:node.type}
+
+      let draggable = (node.name=='Start')?false:true;
+      this.graphData[node.id] = {name:node.name,
+        category:node.type,
+        draggable: draggable,
+        layout: 'none',
+        value:[node.x,node.y]
+      }
     });
 
     this.updateChart();
@@ -101,7 +130,29 @@ get links():  Link[] {
     this.echartsInstance = ec
   }
 
+  updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
+    //updateNodeCoordonate
+    console.log(this.graphScene)
+    let width = this.graphScene.nativeElement.clientWidth
+    let height = this.graphScene.nativeElement.clientHeight
+
+
+    let newX = offsetX/width*100;
+    let newY = (height-offsetY)/height*100; // passage de coordonnees matricielles à graphiques
+
+
+    node.x  = newX;
+    node.y  = newY;
+
+  }
+
   onChartClick(event:any): void {
+
+
+
+
+    console.log(event);
+
 
       let index = event.dataIndex;
       let elements;
@@ -114,6 +165,8 @@ get links():  Link[] {
       else {
         elements = this.nodes;
         graphElements = this.graphData;
+        // update the coordinate ; if not is reset to start coordinates
+        this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,elements[index])
       }
 
       let dialogRef;
@@ -159,8 +212,8 @@ get links():  Link[] {
     let series = [
       {
         type: 'graph',
-        layout: 'force',
-        draggable: true,
+        layout:'none',
+        coordinateSystem:'cartesian2d',
         symbol: 'roundRect',
         symbolSize: [70, 30],
         roam: true,
@@ -174,18 +227,11 @@ get links():  Link[] {
         },
         data: this.graphData,
         links: this.graphLink,
-        categories: [{name:'event'},{name:'trend'},{name:'graph'}],
+        categories: [{name:'event'},{name:'trend'},{name:'graph'},{name:'start'}],
         lineStyle: {
           opacity: 1,
           width: 1,
           curveness: 0.3
-        },
-        force: {
-          repulsion: 100,
-          gravity: 0.1,
-          edgeLength: 100,
-          friction: 0.015,
-          layoutAnimation: true
         }
       }
     ]

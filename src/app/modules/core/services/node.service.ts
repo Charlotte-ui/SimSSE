@@ -85,8 +85,8 @@ export class NodeService {
       links:[link1,link2,link3,link4],
       nodes:[start,trend1,trend2,event],
       name:"detresse respiratoire",
-      x:100,
-      y:100,
+      x:50,
+      y:50,
       id:"0",
       type:"graph"
     }
