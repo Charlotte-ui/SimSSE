@@ -17,18 +17,18 @@ export class EditeurGrapheNodalComponent implements OnInit {
   echartsInstance ;
   mergeOptions = {};
 
-  _nodes!:  (Event | Trend)[];
-  get nodes():  (Event | Trend)[] {
+  _nodes!:  Node[];
+  get nodes():  Node[] {
     return this._nodes;
 }
-@Input() set nodes(value:(Event | Trend)[] ) {
+@Input() set nodes(value:Node[] ) {
   if (value!=undefined){
     this._nodes = value;
     this.initGraphData();
   }
 }
 
-@Output() updateNode = new EventEmitter<(Event | Trend)[]>();
+@Output() updateNode = new EventEmitter<Node[]>();
 
 
 _links!:  Link[];
@@ -130,80 +130,67 @@ get links():  Link[] {
     this.echartsInstance = ec
   }
 
-  updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
-    //updateNodeCoordonate
-    console.log(this.graphScene)
-    let width = this.graphScene.nativeElement.clientWidth
-    let height = this.graphScene.nativeElement.clientHeight
 
 
-    let newX = offsetX/width*100;
-    let newY = (height-offsetY)/height*100; // passage de coordonnees matricielles à graphiques
+  onChartClick(event:any): void {
+    if (event.dataType == "node") return this.onNodeClick(event);
+    if (event.dataType == "edge") return this.onEdgeClick(event);
+  }
+
+  onNodeClick(event:any){
+    let index = event.dataIndex;
+    let node = this.nodes[index];
+
+    // update the coordinate ; if not is reset to start coordinates
+    this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,node)
+
+    let dialogRef;
+
+    if(event.data.category == 'graph')  {
+      let graph = node as Graph;
+      dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
+    }
+    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes]});
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        if (result == "delete"){
+          this.nodes.splice(index, 1);
+          this.graphData.splice(index, 1);
+        }
+        else  {
+          this.nodes[index] = result;
+          this.graphData[index].name = result.name;
+        }
+        this.updateChart();
+        this.updateNode.emit(this.nodes);
+      }
 
 
-    node.x  = newX;
-    node.y  = newY;
+    });
 
   }
 
-  onChartClick(event:any): void {
+  onEdgeClick(event:any){
+    let index = event.dataIndex;
+    let link = this.links[index];
+    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes]});
 
-
-
-
-    console.log(event);
-
-
-      let index = event.dataIndex;
-      let elements;
-      let graphElements;
-
-      if (!event.data.hasOwnProperty('category')){ // = if data is Link
-        elements = this.links;
-        graphElements = this.graphLink;
-      }
-      else {
-        elements = this.nodes;
-        graphElements = this.graphData;
-        // update the coordinate ; if not is reset to start coordinates
-        this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,elements[index])
-      }
-
-      let dialogRef;
-
-
-      if(event.data.category == 'graph')  {
-        console.log("open graph dialog");
-        let graph = elements[index] as Graph;
-        console.log(graph);
-
-        dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
-      }
-      else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [elements[index],this.nodes]});
-
-      dialogRef.afterClosed().subscribe(result => {
-
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
         if (result == "delete"){
-          elements.splice(index, 1);
-          graphElements.splice(index, 1);
+          this.links.splice(index, 1);
+          this.graphLink.splice(index, 1);
         }
-        else if (result){
-          elements[index] = result;
-          if (event.dataType = "edge"){
-            graphElements[index].source = Number(result.source);
-            graphElements[index].target = Number(result.target);
-          }
-          else{
-            graphElements[index].name = result.name;
-          }
+        else  {
+          this.links[index] = result;
+          this.graphLink[index].source = Number(result.source);
+          this.graphLink[index].target = Number(result.target);
         }
-
         this.updateChart();
         this.updateNode.emit(this.nodes);
-      });
-
-
-
+      }
+    });
   }
 
   updateChart(){
@@ -241,6 +228,18 @@ get links():  Link[] {
     };
 
 
+  }
+
+  updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
+    //updateNodeCoordonate
+    let width = this.graphScene.nativeElement.clientWidth
+    let height = this.graphScene.nativeElement.clientHeight
+
+    let newX = offsetX/width*100;
+    let newY = (height-offsetY)/height*100; // passage de coordonnees matricielles à graphiques
+
+    node.x  = newX;
+    node.y  = newY;
   }
 
 

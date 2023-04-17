@@ -19,6 +19,7 @@ export class NodeDialogComponent<T extends Node|Link> {
   champs;
 
   numbers = ["x","y","pente"];
+  hidden = ["x","y"];
 
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent<T>>,
@@ -63,7 +64,12 @@ export class NodeDialogComponent<T extends Node|Link> {
       if (this.numbers.includes(champ)) return "number"
       if (champ == "couleur") return "color"
        return "text";
-      }
+    }
+
+    public isHidden(champ:string){
+      if (this.hidden.includes(champ)) return true;
+      return false;
+    }
 
 }
 
