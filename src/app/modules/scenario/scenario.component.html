@@ -20,6 +20,8 @@
     </mat-form-field>
     </div>
 
+    <app-tags [allTags]="allTags"  [tags]="tags" class="container"></app-tags>
+
     <div class="container">
     <mat-form-field>
       <mat-label>Impliqués</mat-label>
@@ -87,55 +89,63 @@
   </mat-card-header>
 
   <div class="container">
-  <table  mat-table [dataSource]="dataSourceGroup" class="mat-elevation-z8 demo-table">
-    <!-- Scene Column -->
-    <ng-container matColumnDef="scene">
-      <th mat-header-cell *matHeaderCellDef>Scène</th>
-      <td mat-cell *matCellDef="let element">{{element.scene}}</td>
-      <td mat-footer-cell *matFooterCellDef>Total</td>
-    </ng-container>
+    <div class="row">
+      <div class="col-6">
+    <table  mat-table [dataSource]="dataSourceGroup" class="mat-elevation-z8 demo-table">
+      <!-- Scene Column -->
+      <ng-container matColumnDef="scene">
+        <th mat-header-cell *matHeaderCellDef>Scène</th>
+        <td mat-cell *matCellDef="let element">{{element.scene}}</td>
+        <td mat-footer-cell *matFooterCellDef>Total</td>
+      </ng-container>
 
-    <!-- Keys Column -->
-    <ng-container *ngFor="let key of keysGroup" [matColumnDef]="key">
-      <th mat-header-cell *matHeaderCellDef>{{key}}</th>
-      <td mat-cell *matCellDef="let element">{{element[key]}}</td>
-      <td mat-footer-cell *matFooterCellDef [ngClass]="getTotal(key) == scenario[key] ? 'ok' : 'noOk'" >{{getTotal(key)}}</td>
-    </ng-container>
+      <!-- Keys Column -->
+      <ng-container *ngFor="let key of keysGroup" [matColumnDef]="key">
+        <th mat-header-cell *matHeaderCellDef>{{key}}</th>
+        <td mat-cell *matCellDef="let element">{{element[key]}}</td>
+        <td mat-footer-cell *matFooterCellDef [ngClass]="getTotal(key) == scenario[key] ? 'ok' : 'noOk'" >{{getTotal(key)}}</td>
+      </ng-container>
 
-    <!-- edit Column -->
-    <ng-container matColumnDef="edit">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element; let i = index">
-        <button
-          mat-mini-fab
-          (click)="editGroup(i)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        </td>
-      <td mat-footer-cell *matFooterCellDef></td>
-
-    </ng-container>
-
-    <!-- delete Column -->
-    <ng-container matColumnDef="delete">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let element; let i = index">
-        <button
-          mat-mini-fab
-          [disabled]="dataSourceGroup.length<2"
-          (click)="removeGroup(i)">
-          <mat-icon>delete</mat-icon>
-        </button>
-        </td>
+      <!-- edit Column -->
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element; let i = index">
+          <button
+            mat-mini-fab
+            (click)="editGroup(i)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          </td>
         <td mat-footer-cell *matFooterCellDef></td>
 
-    </ng-container>
+      </ng-container>
 
-  <tr mat-header-row *matHeaderRowDef="displayedColumnsGroup"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumnsGroup;"></tr>
-  <tr mat-footer-row *matFooterRowDef="displayedColumnsGroup"></tr>
-</table>
-</div>
+      <!-- delete Column -->
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element; let i = index">
+          <button
+            mat-mini-fab
+            [disabled]="dataSourceGroup.length<2"
+            (click)="removeGroup(i)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          </td>
+          <td mat-footer-cell *matFooterCellDef></td>
+
+      </ng-container>
+      
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumnsGroup"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumnsGroup;"></tr>
+    <tr mat-footer-row *matFooterRowDef="displayedColumnsGroup"></tr>
+  </table>
+      </div>
+      <div class="col-6">
+        <app-carte></app-carte>
+      </div>
+    </div>
+  </div>
 </mat-card>
 
 <!-- Plastrons et modèles -->
