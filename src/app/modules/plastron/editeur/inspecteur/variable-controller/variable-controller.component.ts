@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { Trend } from 'src/app/modules/core/models/node';
 import { VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
 
 @Component({
@@ -14,6 +15,7 @@ export class VariableControllerComponent implements OnInit{
   color = "blue"
   form: FormGroup;
   _variable:VariablePhysio;
+  _tendances :Trend[];
 
 
 get variable():  VariablePhysio {
@@ -24,6 +26,14 @@ get variable():  VariablePhysio {
     this._variable = value;
     this.form = this.fb.group(value);
 
+  }
+
+  get tendances():  Trend[]  {
+    return this._tendances;
+  }
+
+  @Input() set tendances(value:Trend[] ) {
+    this._tendances = value;
   }
 
 @Output() newVariable = new EventEmitter<VariablePhysio>();

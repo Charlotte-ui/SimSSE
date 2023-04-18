@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Trend } from 'src/app/modules/core/models/node';
 import { VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
 
 @Component({
@@ -9,7 +10,9 @@ import { VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
 export class InspecteurComponent implements OnInit {
 
   @Input() variables:VariablePhysio[];
-  @Output() newVariables = new EventEmitter<VariablePhysio[]>();
+  @Input() trends:Trend[];
+
+  @Output() updateVariable = new EventEmitter<(VariablePhysio|number)[]>();
 
   constructor() { }
 
@@ -19,7 +22,18 @@ export class InspecteurComponent implements OnInit {
   setNewVariable(oldVar:VariablePhysio,newVar:VariablePhysio){
     const index = this.variables.indexOf(oldVar);
     if (index > -1) this.variables[index] = newVar;
-    this.newVariables.emit(this.variables);
+    this.updateVariable.emit([newVar,index]);
+  }
+
+  getTrendByCible(name:string):Trend[]{
+    let res = [];
+
+    this.trends.forEach(trend => {
+      if (trend.cible == name) res.push(trend);
+    });
+
+    return res;
+
   }
 
 }

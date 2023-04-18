@@ -1,59 +1,46 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
-import { Link, Trend, Event } from 'src/app/modules/core/models/node';
+import { Link, Trend, Event,Node } from 'src/app/modules/core/models/node';
 import {  VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
+
+export interface Curve{
+  nom:string,
+  values: number [][], // x,y
+  currentMax:number,
+}
 
 @Component({
   selector: 'app-scene',
   templateUrl: './scene.component.html',
   styleUrls: ['./scene.component.less']
 })
+
+
+
 export class SceneComponent implements OnInit {
 
   // Inputs
+  @Input() duration:number;
+  @Input() nodes:Node[];
+  @Input() triggeredEvents:number[][]; //  time id
 
-  _targetVariable!:  VariablePhysioInstance[];
-  get targetVariable():  VariablePhysioInstance[] {
-    return this._targetVariable;
+  _curves!:  Curve[];
+  get curves():  Curve[] {
+    return this._curves;
   }
-  @Input() set targetVariable(value:VariablePhysioInstance[] ) {
+  @Input() set curves(value:Curve[] ) {
     if (value){ // if value isnt undefined
-      this._targetVariable = value;
-      console.log("set targetVariable");
+      this._curves = value;
+      console.log("set curves");
       console.log(value);
       if(this.legend.length < value.length) this.initLegend() ; // if there is new variables to show, changed the legend
-      if (this.nodes) this.initGraphData();
-    }
-  }
-
-  _links!:  Link[];
-  get links():  Link[] {
-    return this._links;
-  }
-  @Input() set links(value:Link[] ) {
-    this._links = value;
-  }
-
-  _nodes!:  (Event | Trend)[];
-  get nodes():  (Event | Trend)[] {
-    return this._nodes;
-  }
-
-  @Input() set nodes(value:(Event | Trend)[] ) {
-    if (value){ // if value isnt undefined
-      this._nodes = value;
-      this.events=[];
-      this.nodes.forEach((node,i) => {
-        if ('event' in node) this.events.push([node,i]); // if the node is an event
-      });
       this.initGraphData();
     }
   }
 
-  @Input() duration:number=100;
-  @Input() triggeredEvents:number[][]; //  time id
+  @Output() updateTrigger = new EventEmitter<number[][]>();
 
 
 
@@ -65,14 +52,13 @@ export class SceneComponent implements OnInit {
 
   // Echart Graph Variables
   legend:string[] =[];
+  variableSelected;
   echartsInstance ;
   graphData = {};
   mergeOptions = {};
   markLineData = [];
   markLineY:number = 100; // the max of the curves displayed
   initialChartOption!: EChartsOption ;
-
-
 
   constructor(public dialog: MatDialog) { }
 
@@ -89,9 +75,13 @@ export class SceneComponent implements OnInit {
 
   initLegend(){
     this.legend = ['trigger'];
-    this.targetVariable.forEach(variable => {
-      this.legend.push(variable.nom)
-      variable["currentMax"] = 0 // the maximum value of the curve, used to set the height of the triggers
+    this.variableSelected = {} // at init, all the variables are selected
+
+    this.curves.forEach(curve => {
+      this.legend.push(curve.nom)
+      this.variableSelected[curve.nom] = true;
+
+     // curve.currentMax = 0 // the maximum value of the curve, used to set the height of the triggers
     });
     this.intitChartOption();
   }
@@ -123,16 +113,12 @@ export class SceneComponent implements OnInit {
   }
 
   initGraphData(){
-    if (this.targetVariable && this.nodes && this.links){
-      let variableSelected = {} // at init, all the variables are selected
-      this.graphData = {}
-      this.targetVariable.forEach(variable => {
-        this.graphData[variable.nom]=this.calculCurve(this.duration,variable)
-        variableSelected[variable.nom] = true;
-      });
-      this.updateMarklineData(variableSelected)
-      this.updateChart();
-    }
+    this.graphData = {}
+    this.curves.forEach(curve => {
+      this.graphData[curve.nom]=curve.values;
+    });
+    this.updateMarklineData()
+    this.updateChart();
   }
 
   // chart updates
@@ -140,11 +126,10 @@ export class SceneComponent implements OnInit {
   /**
    * update the graph data of the triggers (markline)
    */
-  updateMarklineData(selected){
-
+  updateMarklineData(){
     this.markLineY = 0;
-    this.targetVariable.forEach(variable => {
-      if (selected[variable.nom] && variable["currentMax"]>this.markLineY) this.markLineY = variable["currentMax"];
+    this.curves.forEach(curve => {
+      if (this.variableSelected[curve.nom] && curve.currentMax>this.markLineY) this.markLineY = curve.currentMax;
     });
 
     this.markLineData = []
@@ -166,12 +151,12 @@ export class SceneComponent implements OnInit {
 
     let series = []
 
-    this.targetVariable.forEach(variable => {
+    this.curves.forEach(curve => {
       let serie = {
-        name:variable.nom,
+        name:curve.nom,
         type:'line',
    //     stack: 'x',
-        data: this.graphData[variable.nom]
+        data: this.graphData[curve.nom]
       }
       series.push(serie);
 
@@ -219,9 +204,8 @@ export class SceneComponent implements OnInit {
 
   onChartLegendSelectChanged(event:any): void {
     console.log(event);
-
-
-    this.updateMarklineData(event.selected);
+    this.variableSelected = event.selected;
+    this.updateMarklineData();
     this.updateChart();
 
   }
@@ -259,8 +243,6 @@ export class SceneComponent implements OnInit {
         if (index > -1) this.triggeredEvents.splice(index, 1);
 
       }
-      if (result == "add"){
-      }
       else if (result){
 
         console.log(result)
@@ -271,56 +253,17 @@ export class SceneComponent implements OnInit {
         else {
           let event = [Number(result.xAxis),result.eventId]
           this.triggeredEvents.push(event);
+         //
         }
+
+        this.updateTrigger.emit(this.triggeredEvents);
+
       }
       this.initGraphData();
     });
   }
 
   // tools
-
-  /**
-   * generate the data
-   * @param size
-   * @param variable
-   * @returns
-   */
-  private calculCurve(size:number,variable:VariablePhysioInstance){
-    let curve = [];
-    let trend = 0;
-    variable["currentMax"] = 0;
-    let prevValue = variable.cible ;
-    for(let i=0;i<size;i++){
-      let event = this.getEventAtTime(i)
-      if (event != undefined){
-        let nodeTriggers = this.getTrendsFromEvent(event[1]);
-        this.nodes.forEach(node => {
-          if (node.type == "trend" && (node as Trend).cible == variable.nom ){
-            nodeTriggers.forEach(nodeTrigger => {
-              if (nodeTrigger[0] == node.id){
-            //    console.log("node is trigger")
-            //    console.log(node)
-                if(nodeTrigger[1]) trend = (node as Trend).pente;
-                else trend = 0;
-             //   console.log("trend")
-            //    console.log(trend)
-              }
-            });
-          }
-        });
-      }
-
-      if (i>0) prevValue = curve[i-1][1]
-
-      let newValue = prevValue + this.gaussianRandom(0,variable.rand) + trend;
-      if (newValue>variable.max) newValue = variable.max;
-      if (newValue<variable.min) newValue = variable.min;
-      if (variable["currentMax"]<newValue) variable["currentMax"] = newValue;
-
-      curve.push([i,newValue])
-    }
-    return curve;
-  }
 
   private getEventAtTime(time:number):number[]|undefined{
     let result = undefined;
@@ -330,13 +273,6 @@ export class SceneComponent implements OnInit {
     return result;
   }
 
-  private getTrendsFromEvent(event:number):any[]{
-    let trends = [];
-    this.links.forEach(link => {
-      if(event == link.source) trends.push([link.target,link.start]);
-    });
-    return trends;
-  }
 
   private getNodeByID(id:string):Event | Trend{
     let result = undefined;
@@ -346,14 +282,6 @@ export class SceneComponent implements OnInit {
     return result;
   }
 
-  // Standard Normal variate using Box-Muller transform.
-  private gaussianRandom(mean=0, stdev=1) {
-    let u = 1 - Math.random(); // Converting [0,1) to (0,1]
-    let v = Math.random();
-    let z = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
-    // Transform to the desired mean and standard deviation:
-    return z * stdev + mean;
-  }
 
 
 }

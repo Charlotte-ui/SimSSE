@@ -5,6 +5,7 @@ import { FirebaseService } from './firebase.service';
 import { Plastron } from '../models/plastron';
 import { Modele } from '../models/modele';
 import { VariablePhysioInstance } from '../models/variablePhysio';
+import { Scenario } from '../models/scenario';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:16
     }
 
     let FC:VariablePhysioInstance = {
@@ -40,7 +41,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:80
     }
 
     let HemoCue:VariablePhysioInstance = {
@@ -50,7 +51,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:36
     }
 
     let PAD:VariablePhysioInstance = {
@@ -60,7 +61,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:80
     }
 
     let PAS:VariablePhysioInstance = {
@@ -70,7 +71,7 @@ export class PlastronService {
       min:0,
       max:200,
       couleur:"",
-      cible:98
+      cible:130
     }
 
     let Temp:VariablePhysioInstance = {
@@ -80,7 +81,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:27
     }
 
 
@@ -91,6 +92,13 @@ export class PlastronService {
 
   changeModelRef(plastron: Plastron, newModele: Modele) {
     throw new Error('Method not implemented.');
+  }
+
+  getScenario(plastron: Plastron): Observable<Scenario> {
+
+    let scenario={titre:"Incendie à la clinique des Chaumes"} as Scenario;
+
+    return of(scenario);
   }
 
   constructor() { }

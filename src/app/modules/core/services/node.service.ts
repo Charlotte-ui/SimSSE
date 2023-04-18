@@ -14,38 +14,52 @@ export class NodeService {
     let trend1:Trend = {
       id:"1",
       name: 'chute sat',
-      x: 300,
-      y: 300,
+      x: 30,
+      y: 80,
       type:'trend',
       cible:'SpO2',
-      pente:-1
+      pente:-1,
+      state:false
     }
 
     let trend2:Trend = {
       id:"2",
       name: 'acc respi',
-      x: 500,
-      y: 100,
+      x: 15,
+      y: 60,
       type:'trend',
       cible:'FR',
-      pente:1
+      pente:1,
+      state:false
     }
     let event:Event = {
       id:"3",
       name: 'Oxygéno.',
-      x: 550,
-      y: 100,
+      x: 40,
+      y: 50,
       type:'event',
-      event:'oxygénothérapie'
+      event:'oxygénothérapie',
+      state:false
     }
 
     let start:Event = {
       id:"0",
       name: 'Start',
-      x: 0,
-      y: 0,
-      type:'event',
-      event:'start'
+      x: 5,
+      y: 95,
+      type:'start',
+      event:'start',
+      state:false
+    }
+
+    let end:Event = {
+      id:"4",
+      name: 'End',
+      x: 95,
+      y: 95,
+      type:'start',
+      event:'end',
+      state:false
     }
 
     let link1:Link = {
@@ -80,15 +94,24 @@ export class NodeService {
       start:true
     }
 
+    let link5:Link = {
+      id:"4",
+      source: 3,
+      target: 4,
+      type:"link",
+      start:true
+    }
+
     let graph:Graph = {
       gabarit:true,
-      links:[link1,link2,link3,link4],
-      nodes:[start,trend1,trend2,event],
+      links:[link1,link2,link3,link4,link5],
+      nodes:[start,trend1,trend2,event,end],
       name:"detresse respiratoire",
-      x:100,
-      y:100,
+      x:50,
+      y:50,
       id:"0",
-      type:"graph"
+      type:"graph",
+      state:false
     }
 
     return of ([graph])

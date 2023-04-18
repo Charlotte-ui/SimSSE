@@ -2,7 +2,20 @@
     <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
       <mat-icon>menu</mat-icon>
     </button>
-    <span (click)="goToAccueil()">SimSSE Editeur</span>
+    <button mat-button>
+      <span (click)="goToAccueil()">SimSSE Editeur</span>
+    </button>
+
+    <button *ngIf="scenario" mat-button>
+      <span (click)="goToScenario()">{{scenario}}</span>
+    </button>
+    <span *ngIf="plastron"> <mat-icon id="arrow">arrow_forward_ios</mat-icon> </span>
+    <button *ngIf="plastron" mat-button>
+      <span >{{plastron}}</span>
+    </button>
+    <button *ngIf="plastron" mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+      <mat-icon>save</mat-icon>
+    </button>
     <span class="example-spacer"></span>
     <button mat-icon-button (click)="goToRules()">
       <mat-icon>assignment</mat-icon>
@@ -11,4 +24,3 @@
       <mat-icon>share</mat-icon>
     </button>
   </mat-toolbar>
-  
