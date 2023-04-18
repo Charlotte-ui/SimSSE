@@ -18,7 +18,8 @@ export class ModeleService {
       y: 80,
       type:'trend',
       cible:'SpO2',
-      pente:-1
+      pente:-1,
+      state:false
     }
 
     let trend2:Trend = {
@@ -28,7 +29,8 @@ export class ModeleService {
       y: 60,
       type:'trend',
       cible:'FR',
-      pente:1
+      pente:1,
+      state:false
     }
     let event:Event = {
       id:"3",
@@ -36,7 +38,8 @@ export class ModeleService {
       x: 40,
       y: 50,
       type:'event',
-      event:'oxygénothérapie'
+      event:'oxygénothérapie',
+      state:false
     }
 
     let start:Event = {
@@ -45,7 +48,8 @@ export class ModeleService {
       x: 5,
       y: 95,
       type:'start',
-      event:'start'
+      event:'start',
+      state:false
     }
 
     let link1:Link = {

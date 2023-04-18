@@ -30,7 +30,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:16
     }
 
     let FC:VariablePhysioInstance = {
@@ -40,7 +40,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:80
     }
 
     let HemoCue:VariablePhysioInstance = {
@@ -50,7 +50,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:36
     }
 
     let PAD:VariablePhysioInstance = {
@@ -60,7 +60,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:80
     }
 
     let PAS:VariablePhysioInstance = {
@@ -70,7 +70,7 @@ export class PlastronService {
       min:0,
       max:200,
       couleur:"",
-      cible:98
+      cible:130
     }
 
     let Temp:VariablePhysioInstance = {
@@ -80,7 +80,7 @@ export class PlastronService {
       min:0,
       max:100,
       couleur:"",
-      cible:98
+      cible:27
     }
 
 

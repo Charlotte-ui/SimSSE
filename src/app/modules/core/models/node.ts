@@ -5,6 +5,7 @@ export interface Node extends Collection{
     x: number;
     y: number;
     type: string;
+    state: boolean; // activate or not activate
 }
 
 

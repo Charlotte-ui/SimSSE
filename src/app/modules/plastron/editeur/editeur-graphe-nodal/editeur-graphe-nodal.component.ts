@@ -29,6 +29,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
 }
 
 @Output() updateNode = new EventEmitter<Node[]>();
+@Output() updateLink = new EventEmitter<Link[]>();
 
 
 _links!:  Link[];
@@ -80,6 +81,8 @@ get links():  Link[] {
   ngOnInit(): void {
   }
 
+  //initialisateurs
+
   initGraphData(){
     this.graphData = new Array(this.nodes.length);
 
@@ -110,6 +113,7 @@ get links():  Link[] {
       }
     });
 
+
     this.updateChart();
 
 /*     {
@@ -126,75 +130,10 @@ get links():  Link[] {
 
   }
 
-  onChartInit(ec) {
-    this.echartsInstance = ec
-  }
 
-
-
-  onChartClick(event:any): void {
-    if (event.dataType == "node") return this.onNodeClick(event);
-    if (event.dataType == "edge") return this.onEdgeClick(event);
-  }
-
-  onNodeClick(event:any){
-    let index = event.dataIndex;
-    let node = this.nodes[index];
-
-    // update the coordinate ; if not is reset to start coordinates
-    this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,node)
-
-    let dialogRef;
-
-    if(event.data.category == 'graph')  {
-      let graph = node as Graph;
-      dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
-    }
-    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes]});
-
-    dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        if (result == "delete"){
-          this.nodes.splice(index, 1);
-          this.graphData.splice(index, 1);
-        }
-        else  {
-          this.nodes[index] = result;
-          this.graphData[index].name = result.name;
-        }
-        this.updateChart();
-        this.updateNode.emit(this.nodes);
-      }
-
-
-    });
-
-  }
-
-  onEdgeClick(event:any){
-    let index = event.dataIndex;
-    let link = this.links[index];
-    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes]});
-
-    dialogRef.afterClosed().subscribe(result => {
-      if(result){
-        if (result == "delete"){
-          this.links.splice(index, 1);
-          this.graphLink.splice(index, 1);
-        }
-        else  {
-          this.links[index] = result;
-          this.graphLink[index].source = Number(result.source);
-          this.graphLink[index].target = Number(result.target);
-        }
-        this.updateChart();
-        this.updateNode.emit(this.nodes);
-      }
-    });
-  }
+  //updateurs
 
   updateChart(){
-
 
     let series = [
       {
@@ -230,8 +169,10 @@ get links():  Link[] {
 
   }
 
+
   updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
-    //updateNodeCoordonate
+
+
     let width = this.graphScene.nativeElement.clientWidth
     let height = this.graphScene.nativeElement.clientHeight
 
@@ -241,6 +182,92 @@ get links():  Link[] {
     node.x  = newX;
     node.y  = newY;
   }
+
+  //event handlers
+
+  onChartInit(ec) {
+    this.echartsInstance = ec
+  }
+
+  onChartClick(event:any): void {
+    if (event.dataType == "node") return this.onNodeClick(event);
+    if (event.dataType == "edge") return this.onEdgeClick(event);
+  }
+
+  onNodeClick(event:any){
+    console.log("onNodeClick")
+    console.log(event)
+
+    let index = event.dataIndex;
+    let node = this.nodes[index];
+
+    // update the coordinate ; if not is reset to start coordinates
+    this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,node)
+
+    let dialogRef;
+
+    if(event.data.category == 'graph')  {
+      let graph = node as Graph;
+      dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
+    }
+    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes]});
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        if (result == "delete"){
+          this.nodes.splice(index, 1);
+          this.graphData.splice(index, 1);
+        }
+        else  {
+          result.x = node.x;
+          result.y = node.y;
+          this.nodes[index] = result;
+
+          this.graphData[index].name = result.name;
+        }
+
+        this.updateChart();
+        this.updateNode.emit([result,index]);
+      }
+
+
+    });
+
+  }
+
+  onEdgeClick(event:any){
+    let index = event.dataIndex;
+    let link = this.links[index];
+    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes]});
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        if (result == "delete"){
+          this.links.splice(index, 1);
+          this.graphLink.splice(index, 1);
+        }
+        else  {
+          this.links[index] = result;
+          this.graphLink[index]= {
+            source:Number(result.source),
+            target:Number(result.target),
+            lineStyle: {
+              color: result.start?"#2E933C":"#DE1A1A",
+            }
+            //TODO debbug color
+          }
+          console.log("this.graphLink[index]");
+          console.log(this.links[index]);
+
+          console.log(this.graphLink[index]);
+        }
+        this.updateChart();
+        this.updateLink.emit([result,index]);
+      }
+    });
+  }
+
+
 
 
 

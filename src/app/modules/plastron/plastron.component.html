@@ -1,7 +1,7 @@
 <app-header></app-header>
 <mat-tab-group>
     <mat-tab label="Modèle - cas clinique">
-      <app-editeur [targetVariable]="targetVariable" [links]="links" [data]="data"></app-editeur>
+      <app-editeur [targetVariable]="targetVariable" [links]="links" [nodes]="data"></app-editeur>
     </mat-tab>
     <mat-tab label="Modèle - tags et descriptions">
       <app-tags-descriptions [modele]="modele" (newModel)="changeModeleRef($event)"></app-tags-descriptions>

@@ -7,14 +7,14 @@
       </div>
       <div class="col-9">
         <div class="row">
-          <app-scene [targetVariable]="targetVariable" [triggeredEvents]="triggeredEvents" [links]="links"  [nodes]="data"  ></app-scene>
+          <app-scene [curves]="curves" [triggeredEvents]="triggeredEvents" [duration]="duration"  [nodes]="nodes" (updateTrigger)="updateTriggers($event)"></app-scene>
         </div>
         <div class="row">
-          <app-editeur-graphe-nodal [nodes]="data" [links]="links" (updateNode)="updateNodes($event)"></app-editeur-graphe-nodal>
+          <app-editeur-graphe-nodal [nodes]="nodes" [links]="links" (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
         </div>
       </div>
       <div class="col-2" id="inspecteur">
-        <app-inspecteur [variables]="targetVariable" (newVariables)="updateVariables($event)"></app-inspecteur>
+        <app-inspecteur [variables]="targetVariable" [trends]="trends" (updateVariable)="updateVariables($event)"></app-inspecteur>
       </div>
     </div>
   </div>

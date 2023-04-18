@@ -1,4 +1,9 @@
 
-    <app-variable-controller *ngFor="let variable of variables" [variable]="variable" (newVariable)="setNewVariable(variable,$event)"></app-variable-controller>
-
+<ng-container *ngIf="trends">
+  <app-variable-controller *ngFor="let variable of variables"
+                        [variable]="variable"
+                        [tendances]="getTrendByCible(variable.nom)"
+                        (newVariable)="setNewVariable(variable,$event)">
+  </app-variable-controller>
+</ng-container>
 
