@@ -102,6 +102,9 @@ export class SceneComponent implements OnInit {
         boundaryGap: false,
         min: 0,
         max: this.duration,
+        /* axisLabel: {
+          formatter: '{value} cm'
+        }, */
       },
       yAxis: {
         type: 'value'

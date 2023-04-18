@@ -5,13 +5,13 @@ import 'echarts/extension/bmap/bmap';
 
 const SymbolSize = 20;
 const groupe = [
-  [56.5, 20],
-  [46.5, 30],
-  [22.1, 40],
+  [56.5, 20, "1"],
+  [46.5, 30, "2"],
+  [22.1, 40, "3"],
 ];
 
 const PRV = [
-  [15, 0],
+  [15, 15],
 ];
 
 const PMA= [
@@ -35,13 +35,21 @@ export class CarteComponent implements OnDestroy{
       formatter: (params) =>
         'X: ' + params.data[0].toFixed(2) + '<br>Y: ' + params.data[1].toFixed(2),
     },
-    grid: {},
+    grid:{
+      show:false,
+      right:'0',
+      bottom:'0',
+      top:'0',
+      left:'0',
+    },
     xAxis: {
+      show:false,
       min: 0,
       max: 100,
       type: 'value',
     },
     yAxis: {
+      show:false,
       min: 0,
       max: 100,
       type: 'value',
@@ -50,10 +58,16 @@ export class CarteComponent implements OnDestroy{
       { // groupe
         name:'group',
         id: 'group',
+        label: {
+          show: true,
+          formatter: function(d) {
+            return d.data[2];
+          }
+        },
         type: 'scatter',
         symbolSize: SymbolSize,
         data: Data.slice(0, groupe.length),
-        symbol: 'pin',
+        symbol: 'circle',
         itemStyle: {
           borderColor: '#555',
           color: '#37A2DA',
@@ -119,12 +133,18 @@ export class CarteComponent implements OnDestroy{
             type: 'scatter',
             symbolSize: SymbolSize,
             data: Data.slice(0, groupe.length),
-            symbol: 'pin',
+            symbol: 'circle',
             itemStyle: {
               borderColor: '#555',
               color: '#37A2DA',
               
             },
+            label: {
+              show: true,
+              formatter: function(d) {
+                return d.data[2];
+              }
+            }
           //  label:"b",
           },
           { // PRV
@@ -191,7 +211,7 @@ export class CarteComponent implements OnDestroy{
               cy: 0,
               r: SymbolSize / 2,
             },
-            invisible: false,
+            invisible: true,
             draggable: true,
             ondrag: util.curry<(dataIndex: any) => void, number>(onPointDragging, dataIndex),
             onmousemove: util.curry<(dataIndex: any) => void, number>(showTooltip, dataIndex),
