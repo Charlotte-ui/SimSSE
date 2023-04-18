@@ -64,6 +64,8 @@ import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
 import { TagsComponent } from './modules/shared/tags/tags.component';
 import { CarteComponent } from './modules/scenario/carte/carte.component';
+import { GraphEditeurDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/graph-editeur-dialog/graph-editeur-dialog.component';
+
 //import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
@@ -93,7 +95,8 @@ import { CarteComponent } from './modules/scenario/carte/carte.component';
     TagsDescriptionsComponent,
     GraphDialogComponent,
     TagsComponent,
-    CarteComponent
+    CarteComponent,
+    GraphEditeurDialogComponent
   ],
   imports: [
     BrowserModule,

@@ -1,48 +1,58 @@
 <mat-expansion-panel [expanded]="panelOpenState"
                     (opened)="panelOpenState = true"
                     (closed)="panelOpenState = false">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        {{variable.nom}}
-      </mat-panel-title>
-      <mat-panel-description>
- <!--        <button (click)="isOpened = !isOpened"
-        #overlayOrigin="cdkOverlayOrigin"
-        cdkOverlayOrigin>
-        Open Color Picker
-  </button>
-  
-  <popup [overlayOrigin]="overlayOrigin"
-          (close)="isOpened = false"
-          (open)="isOpened = true">
-        <span
-          [(colorPicker)]="color"
-          [style.background]="color"
-          [cpToggle]="true"
-          [cpDialogDisplay]="'inline'">
-        </span>
-  </popup> 
-  <input [(colorPicker)]="color" [style.background]="color"/>
--->
-<mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="color_lens"></mat-icon>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      {{variable.nom}}
+    </mat-panel-title>
+    <mat-panel-description>
+      <!--        <button (click)="isOpened = !isOpened"
+          #overlayOrigin="cdkOverlayOrigin"
+          cdkOverlayOrigin>
+          Open Color Picker
+      </button>
 
-    <div *ngIf="variable" [formGroup]="form">
+      <popup [overlayOrigin]="overlayOrigin"
+            (close)="isOpened = false"
+            (open)="isOpened = true">
+          <span
+            [(colorPicker)]="color"
+            [style.background]="color"
+            [cpToggle]="true"
+            [cpDialogDisplay]="'inline'">
+          </span>
+      </popup>
+      <input [(colorPicker)]="color" [style.background]="color"/>
+      -->
+      <mat-icon aria-hidden="false" aria-label="Example home icon" fontIcon="color_lens"></mat-icon>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+  <div *ngIf="variable" [formGroup]="form">
 
-      <div mat-dialog-content>
-          <mat-form-field appearance="fill">
-            <mat-label>Cible </mat-label>
-            <input matInput type="number" formControlName="cible" (input)="changeValues()" >
-          </mat-form-field>
-        </div>
-  
-  <div mat-dialog-content>
-    <mat-form-field appearance="fill">
-      <mat-label>Ecart-type </mat-label>
-      <input matInput type="number" formControlName="rand" (input)="changeValues()">
-    </mat-form-field>
+    <div mat-dialog-content>
+      <mat-form-field appearance="fill">
+          <mat-label>Cible </mat-label>
+          <input matInput type="number" formControlName="cible" (input)="changeValues()" >
+      </mat-form-field>
+    </div>
+
+    <div mat-dialog-content>
+      <mat-form-field appearance="fill">
+        <mat-label>Ecart-type </mat-label>
+        <input matInput type="number" formControlName="rand" (input)="changeValues()">
+      </mat-form-field>
+    </div>
+
   </div>
-  
-</div>
+
+    <mat-label>Tendances</mat-label>
+    <div>
+      <mat-chip *ngFor="let tendance of tendances; index as i">
+        {{tendance.name}}
+      </mat-chip>
+    </div>
+
+
+
+
 </mat-expansion-panel>

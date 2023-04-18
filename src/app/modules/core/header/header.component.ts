@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -7,6 +7,10 @@ import { Router } from '@angular/router';
   styleUrls: ['./header.component.less']
 })
 export class HeaderComponent implements OnInit {
+
+  @Input() scenario: string;
+  @Input() plastron: string;
+
 
   constructor(private router: Router) { }
 
@@ -19,6 +23,10 @@ export class HeaderComponent implements OnInit {
 
   goToAccueil(){
     this.router.navigate(['/accueil/']);
+  }
+
+  goToScenario(){
+
   }
 
 }

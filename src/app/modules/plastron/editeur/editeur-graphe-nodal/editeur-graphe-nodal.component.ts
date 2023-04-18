@@ -1,10 +1,12 @@
-import { Component, OnInit, Inject, Input, OnDestroy, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Inject, Input, OnDestroy, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NodeDialogComponent } from './node-dialog/node-dialog.component';
-import { Trend,Event, Link } from 'src/app/modules/core/models/node';
+import { Trend,Event, Link, Graph ,Node} from 'src/app/modules/core/models/node';
 import * as echarts from 'echarts/types/dist/echarts';
+import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
+import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',
@@ -15,18 +17,19 @@ export class EditeurGrapheNodalComponent implements OnInit {
   echartsInstance ;
   mergeOptions = {};
 
-  _nodes!:  (Event | Trend)[];
-  get nodes():  (Event | Trend)[] {
+  _nodes!:  Node[];
+  get nodes():  Node[] {
     return this._nodes;
 }
-@Input() set nodes(value:(Event | Trend)[] ) {
+@Input() set nodes(value:Node[] ) {
   if (value!=undefined){
     this._nodes = value;
     this.initGraphData();
   }
 }
 
-@Output() newNodes = new EventEmitter<(Event | Trend)[]>();
+@Output() updateNode = new EventEmitter<Node[]>();
+@Output() updateLink = new EventEmitter<Link[]>();
 
 
 _links!:  Link[];
@@ -46,21 +49,52 @@ get links():  Link[] {
 
   initialChartOption: EChartsOption = {
     tooltip: {},
+    grid:{
+      show:false,
+      right:'0',
+      bottom:'0',
+      top:'0',
+      left:'0',
+    },
+    xAxis: {
+      show:false,
+      min: 0,
+      max: 100,
+      type: 'value',
+    },
+    yAxis: {
+      show:false,
+      min: 0,
+      max: 100,
+      type: 'value',
+    },
     animationDurationUpdate: 1500,
     animationEasingUpdate: 'quinticInOut',
     series: []
   };
+
+  @ViewChild('graphScene') graphScene: ElementRef;
+
 
   constructor(public dialog: MatDialog) { }
 
   ngOnInit(): void {
   }
 
+  //initialisateurs
+
   initGraphData(){
     this.graphData = new Array(this.nodes.length);
 
     this.nodes.forEach(node => {
-      this.graphData[node.id] = {name:node.name,x:node.x,y:node.y,category:node.type}
+
+      let draggable = (node.name=='Start')?false:true;
+      this.graphData[node.id] = {name:node.name,
+        category:node.type,
+        draggable: draggable,
+        layout: 'none',
+        value:[node.x,node.y]
+      }
     });
 
     this.updateChart();
@@ -79,6 +113,7 @@ get links():  Link[] {
       }
     });
 
+
     this.updateChart();
 
 /*     {
@@ -92,64 +127,19 @@ get links():  Link[] {
         color: 5,
       }
     } */
-  
+
   }
 
-  onChartInit(ec) {
-    this.echartsInstance = ec
-  }
 
-  onChartClick(event:any): void {
-
-      let index = event.dataIndex;
-      let elements;
-      let graphElements;
-
-      if (!event.data.hasOwnProperty('category')){ // = if data is Link
-        elements = this.links;
-        graphElements = this.graphLink;
-      }
-      else {
-        elements = this.nodes;
-        graphElements = this.graphData;      
-      }
-      
-      const dialogRef = this.dialog.open(NodeDialogComponent, 
-        {data: [elements[index],this.nodes]});
-  
-      dialogRef.afterClosed().subscribe(result => {
-
-        if (result == "delete"){
-          elements.splice(index, 1); 
-          graphElements.splice(index, 1); 
-        }
-        else if (result){
-          elements[index] = result;
-          if (event.dataType = "edge"){
-            graphElements[index].source = Number(result.source);
-            graphElements[index].target = Number(result.target);
-          }
-          else{
-            graphElements[index].name = result.name;
-          }
-        }
-  
-        this.updateChart();
-        this.newNodes.emit(this.nodes);
-      });
-    
-
-    
-  }
+  //updateurs
 
   updateChart(){
-
 
     let series = [
       {
         type: 'graph',
-        layout: 'force',
-        draggable: true,
+        layout:'none',
+        coordinateSystem:'cartesian2d',
         symbol: 'roundRect',
         symbolSize: [70, 30],
         roam: true,
@@ -162,20 +152,12 @@ get links():  Link[] {
           fontSize: 20
         },
         data: this.graphData,
-        // links: [],
         links: this.graphLink,
-        categories: [{name:'event'},{name:'trend'}],
+        categories: [{name:'event'},{name:'trend'},{name:'graph'},{name:'start'}],
         lineStyle: {
           opacity: 1,
           width: 1,
           curveness: 0.3
-        },
-        force: {
-          repulsion: 100,
-          gravity: 0.1,
-          edgeLength: 100,
-          friction: 0.015,
-          layoutAnimation: true
         }
       }
     ]
@@ -184,10 +166,110 @@ get links():  Link[] {
       series: series
     };
 
-   
+
   }
 
-  
+
+  updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
+
+
+    let width = this.graphScene.nativeElement.clientWidth
+    let height = this.graphScene.nativeElement.clientHeight
+
+    let newX = offsetX/width*100;
+    let newY = (height-offsetY)/height*100; // passage de coordonnees matricielles à graphiques
+
+    node.x  = newX;
+    node.y  = newY;
+  }
+
+  //event handlers
+
+  onChartInit(ec) {
+    this.echartsInstance = ec
+  }
+
+  onChartClick(event:any): void {
+    if (event.dataType == "node") return this.onNodeClick(event);
+    if (event.dataType == "edge") return this.onEdgeClick(event);
+  }
+
+  onNodeClick(event:any){
+    console.log("onNodeClick")
+    console.log(event)
+
+    let index = event.dataIndex;
+    let node = this.nodes[index];
+
+    // update the coordinate ; if not is reset to start coordinates
+    this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,node)
+
+    let dialogRef;
+
+    if(event.data.category == 'graph')  {
+      let graph = node as Graph;
+      dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
+    }
+    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes]});
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        if (result == "delete"){
+          this.nodes.splice(index, 1);
+          this.graphData.splice(index, 1);
+        }
+        else  {
+          result.x = node.x;
+          result.y = node.y;
+          this.nodes[index] = result;
+
+          this.graphData[index].name = result.name;
+        }
+
+        this.updateChart();
+        this.updateNode.emit([result,index]);
+      }
+
+
+    });
+
+  }
+
+  onEdgeClick(event:any){
+    let index = event.dataIndex;
+    let link = this.links[index];
+    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes]});
+
+    dialogRef.afterClosed().subscribe(result => {
+      if(result){
+        if (result == "delete"){
+          this.links.splice(index, 1);
+          this.graphLink.splice(index, 1);
+        }
+        else  {
+          this.links[index] = result;
+          this.graphLink[index]= {
+            source:Number(result.source),
+            target:Number(result.target),
+            lineStyle: {
+              color: result.start?"#2E933C":"#DE1A1A",
+            }
+            //TODO debbug color
+          }
+          console.log("this.graphLink[index]");
+          console.log(this.links[index]);
+
+          console.log(this.graphLink[index]);
+        }
+        this.updateChart();
+        this.updateLink.emit([result,index]);
+      }
+    });
+  }
+
+
+
+
 
 
 

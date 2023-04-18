@@ -2,12 +2,15 @@
 
 <mat-dialog-content [formGroup]="form">
 
-  <div *ngFor="let champ of champs" mat-dialog-content>
-    <mat-form-field appearance="fill">
-      <mat-label>{{champ}}</mat-label>
-      <input matInput [formControlName]="champ" [type]="getType(champ)">
-    </mat-form-field>
-  </div>
+  <ng-container *ngFor="let champ of champs">
+
+    <div *ngIf="!isHidden(champ)"   mat-dialog-content>
+      <mat-form-field appearance="fill">
+        <mat-label>{{champ}}</mat-label>
+        <input matInput [formControlName]="champ" [type]="getType(champ)">
+      </mat-form-field>
+    </div>
+  </ng-container>
 
 
 <div *ngIf="node.type == 'link'" mat-dialog-content>

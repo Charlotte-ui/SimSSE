@@ -1,0 +1,6 @@
+
+<h1 mat-dialog-title>{{nom}}</h1>
+
+<mat-dialog-content>
+  <app-editeur-graphe-nodal class="dialog" [nodes]="dataGraph" [links]="linksGraph" (updateNode)="updateNodes($event)"></app-editeur-graphe-nodal>
+</mat-dialog-content>

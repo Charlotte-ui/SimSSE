@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Plastron } from '../core/models/plastron';
 import { ModeleService } from '../core/services/modele.service';
@@ -10,6 +10,7 @@ import { Link, Event, Trend } from '../core/models/node';
 import { RegleService } from '../core/services/regle.service';
 import { Profil } from '../core/models/profil';
 import { PlastronService } from '../core/services/plastron.service';
+import { Scenario } from '../core/models/scenario';
 
 @Component({
   selector: 'app-plastron',
@@ -24,6 +25,7 @@ export class PlastronComponent implements OnInit {
   targetVariable!:VariablePhysioInstance[];
   data:(Event|Trend)[];
   links:Link[];
+  scenario:Scenario;
 
   constructor(private route: ActivatedRoute,
               private modelService:ModeleService,
@@ -49,6 +51,18 @@ export class PlastronComponent implements OnInit {
             this.initTargetVariables();
           }
         );
+
+        this.plastronService.getScenario(this.plastron).subscribe(
+          (response) => {
+            console.log("scenario")
+
+            this.scenario = response;
+            console.log(this.scenario)
+
+          }
+        );
+
+
 
       }
     );

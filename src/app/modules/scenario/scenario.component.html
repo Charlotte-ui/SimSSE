@@ -1,4 +1,4 @@
-<app-header></app-header>
+<app-header [scenario]="scenario.titre"></app-header>
 <mat-card>
   <mat-card-header>
     <mat-card-title>Informations générales sur le scénario</mat-card-title>
@@ -134,7 +134,7 @@
           <td mat-footer-cell *matFooterCellDef></td>
 
       </ng-container>
-      
+
 
     <tr mat-header-row *matHeaderRowDef="displayedColumnsGroup"></tr>
     <tr mat-row *matRowDef="let row; columns: displayedColumnsGroup;"></tr>

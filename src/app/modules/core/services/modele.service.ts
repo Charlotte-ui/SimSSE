@@ -14,38 +14,42 @@ export class ModeleService {
     let trend1:Trend = {
       id:"1",
       name: 'chute sat',
-      x: 300,
-      y: 300,
+      x: 30,
+      y: 80,
       type:'trend',
       cible:'SpO2',
-      pente:-1
+      pente:-1,
+      state:false
     }
 
     let trend2:Trend = {
       id:"2",
       name: 'acc respi',
-      x: 500,
-      y: 100,
+      x: 15,
+      y: 60,
       type:'trend',
       cible:'FR',
-      pente:1
+      pente:1,
+      state:false
     }
     let event:Event = {
       id:"3",
       name: 'Oxygéno.',
-      x: 550,
-      y: 100,
+      x: 40,
+      y: 50,
       type:'event',
-      event:'oxygénothérapie'
+      event:'oxygénothérapie',
+      state:false
     }
 
     let start:Event = {
       id:"0",
       name: 'Start',
-      x: 0,
-      y: 0,
-      type:'event',
-      event:'start'
+      x: 5,
+      y: 95,
+      type:'start',
+      event:'start',
+      state:false
     }
 
     let link1:Link = {
