@@ -186,6 +186,7 @@ export class ScenarioComponent implements OnInit {
         this.dataSourcePlastron[index].description = response.description;
         this.dataSourcePlastron[index].triage = response.triage;
         this.dataSourcePlastron[index].statut = Statut.Doing;
+        this.dataSourcePlastron[index].id = reponse.id;
         // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
         if(index == this.plastrons.length-1) this.updateDataSourceTriage(index)
 
@@ -208,7 +209,7 @@ export class ScenarioComponent implements OnInit {
     let EU = 0; // on compte le nombre de plastrons déjà réalisés dans chaque catégorie
 
     this.dataSourcePlastron.forEach((plastron,index) => {
-      this.dataSourcePlastron[index].id = index+1;
+      
 
       if(index<=indexStart){ // pour les plastrons déjà complétés, on compte
         switch(plastron.triage){
