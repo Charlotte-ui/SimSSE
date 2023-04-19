@@ -4,13 +4,21 @@ import { EChartsOption, util } from 'echarts';
 import 'echarts/extension/bmap/bmap';
 
 const SymbolSize = 20;
-const Data = [
-  [15, 0],
-  [50, 10],
-  [56.5, 20],
-  [46.5, 30],
-  [22.1, 40],
+const groupe = [
+  [56.5, 20, "1"],
+  [46.5, 30, "2"],
+  [22.1, 40, "3"],
 ];
+
+const PRV = [
+  [15, 15],
+];
+
+const PMA= [
+  [50, 10],
+];
+
+const Data = groupe.concat(PRV,PMA);
 
 @Component({
   selector: 'app-carte',
@@ -18,42 +26,93 @@ const Data = [
   styleUrls: ['./carte.component.less']
 })
 export class CarteComponent implements OnDestroy{
+
   updatePosition: () => void;
   options: EChartsOption = {
+    legend: {data:['group','PMA','PRV']},
     tooltip: {
       triggerOn: 'none',
       formatter: (params) =>
         'X: ' + params.data[0].toFixed(2) + '<br>Y: ' + params.data[1].toFixed(2),
     },
-    grid: {},
+    grid:{
+      show:false,
+      right:'0',
+      bottom:'0',
+      top:'0',
+      left:'0',
+    },
     xAxis: {
+      show:false,
       min: 0,
       max: 100,
       type: 'value',
     },
     yAxis: {
+      show:false,
       min: 0,
       max: 100,
       type: 'value',
     },
     series: [
       { // groupe
+        name:'group',
         id: 'group',
+        label: {
+          show: true,
+          formatter: function(d) {
+            return d.data[2];
+          }
+        },
         type: 'scatter',
         symbolSize: SymbolSize,
-        data: Data,
-        symbol: 'pin'
+        data: Data.slice(0, groupe.length),
+        symbol: 'circle',
+        itemStyle: {
+          borderColor: '#555',
+          color: '#37A2DA',
+          
+        },
+      //  label:"b",
       },
-      { // groupe
+      { // PRV
+        name:'PRV',
         id: 's',
-        type: 'effectScatter',
+        type: 'scatter',
         symbolSize: SymbolSize,
-        data: Data,
-        symbol: 'diamond'
+        data: Data.slice(groupe.length,groupe.length+1),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: '#e06343',
+        },
+      },
+      { // PMA
+        name:'PMA',
+        id: 't',
+        type: 'scatter',
+        symbolSize: SymbolSize,
+        data: Data.slice(groupe.length+1,groupe.length+2),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: '#FC7D02',
+        },
       }
     ],
   };
-  constructor() { }
+  constructor() { 
+
+    console.log("group");
+    console.log(Data.slice(0, groupe.length));
+
+    console.log("PRV");
+    console.log(Data.slice(groupe.length,groupe.length+1));
+
+    console.log("PMA");
+    console.log(Data.slice(groupe.length+1,groupe.length+2));
+
+  }
 
   ngOnDestroy() {
     if (this.updatePosition) {
@@ -68,13 +127,49 @@ export class CarteComponent implements OnDestroy{
       // Update data
       myChart.setOption({
         series: [
-          {
+          { // groupe
+            name:'group',
             id: 'group',
-            data: Data,
+            type: 'scatter',
+            symbolSize: SymbolSize,
+            data: Data.slice(0, groupe.length),
+            symbol: 'circle',
+            itemStyle: {
+              borderColor: '#555',
+              color: '#37A2DA',
+              
+            },
+            label: {
+              show: true,
+              formatter: function(d) {
+                return d.data[2];
+              }
+            }
+          //  label:"b",
           },
-          {
+          { // PRV
+            name:'PRV',
             id: 's',
-            data: Data,
+            type: 'scatter',
+            symbolSize: SymbolSize,
+            data: Data.slice(groupe.length,groupe.length+1),
+            symbol: 'diamond',
+            itemStyle: {
+              borderColor: '#555',
+              color: '#e06343',
+            },
+          },
+          { // PMA
+            name:'PMA',
+            id: 't',
+            type: 'scatter',
+            symbolSize: SymbolSize,
+            data: Data.slice(groupe.length+1,groupe.length+2),
+            symbol: 'diamond',
+            itemStyle: {
+              borderColor: '#555',
+              color: '#FC7D02',
+            },
           }
         ],
       });
@@ -116,7 +211,7 @@ export class CarteComponent implements OnDestroy{
               cy: 0,
               r: SymbolSize / 2,
             },
-            invisible: false,
+            invisible: true,
             draggable: true,
             ondrag: util.curry<(dataIndex: any) => void, number>(onPointDragging, dataIndex),
             onmousemove: util.curry<(dataIndex: any) => void, number>(showTooltip, dataIndex),
