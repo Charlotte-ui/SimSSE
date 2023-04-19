@@ -29,6 +29,8 @@ getGroupePlastrons(id:string): Observable<Plastron[]|undefined> {
   return this.firebaseService.getElementInCollectionByMatchingChamp<Plastron>("Plastron","groupe",id);
 }
 
+setScenario(scenario:Scenario) {
 
+}
 
 }

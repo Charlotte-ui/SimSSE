@@ -15,15 +15,17 @@ import { ConfirmDeleteDialogComponent } from '../core/confirm-delete-dialog/conf
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
 import { MatTable } from '@angular/material/table';
+import { ProfilService } from '../core/services/profil.service';
 
 interface tableElementPlastron{
   modele:string;
   triage:Triage;
   description:string;
-  profil:string;
   groupe:number;
   statut:Statut;
-  id:string;
+  id:number;
+  age:number;
+  sexe:boolean;
 }
 
 @Component({
@@ -49,7 +51,7 @@ export class ScenarioComponent implements OnInit {
 
   keysGroup: string[] = ['UR', 'UA', 'EU','psy','impliques'];
   displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU','psy','impliques','edit','delete'];
-  displayedColumnsPlastron: string[] = ['modele', 'triage', 'profil','groupe','statut', 'description'];
+  displayedColumnsPlastron: string[] = ['id','modele', 'triage', 'groupe','statut', 'description'];
 
 
   dataSourceGroup = [];
@@ -71,6 +73,7 @@ export class ScenarioComponent implements OnInit {
     private form: FormBuilder,
     public scenarioService:ScenarioService,
     public modelService:ModeleService,
+    public profilService:ProfilService,
     private router: Router,
     public dialog: MatDialog) {
 
@@ -78,7 +81,6 @@ export class ScenarioComponent implements OnInit {
       this.defaultElementPlastron.description = "";
       this.defaultElementPlastron.groupe = 1;
       this.defaultElementPlastron.modele = "Associer ou créer un modèle";
-      this.defaultElementPlastron.profil = "Créer un profil";
       this.defaultElementPlastron.statut = Statut.Todo;
       this.defaultElementPlastron.triage = Triage.UR;
      // let tab = Object.keys(this.defaultElementPlastron);
@@ -131,9 +133,6 @@ export class ScenarioComponent implements OnInit {
     );
   }
 
-
-
-
   public removeGroup(groupId:number){
 
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent,
@@ -152,7 +151,7 @@ export class ScenarioComponent implements OnInit {
   }
 
   public onSubmit(){
-
+    this.scenarioService.setScenario(this.scenarioFormGroup);
   }
 
   goToPlastron(plastronId:string){
@@ -165,7 +164,7 @@ export class ScenarioComponent implements OnInit {
   public completePlastrons(){
     console.log(this.plastrons);
 
-    this.dataSourcePlastron = new Array<tableElementPlastron>(50);
+    this.dataSourcePlastron = new Array<tableElementPlastron>(this.totalPlastron);
     this.dataSourcePlastron = new Array(this.totalPlastron).fill(null).map(()=> ({...this.defaultElementPlastron}))
 
 
@@ -177,11 +176,7 @@ export class ScenarioComponent implements OnInit {
   }
 
   private addPlastronToDatasource(plastron:Plastron,index:number){
-
-
   //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
-
-
     console.log(this.dataSourcePlastron);
 
     this.modelService.getModeleById(plastron.modele).subscribe(
@@ -190,16 +185,60 @@ export class ScenarioComponent implements OnInit {
         this.dataSourcePlastron[index].modele = response.titre;
         this.dataSourcePlastron[index].description = response.description;
         this.dataSourcePlastron[index].triage = response.triage;
-        this.dataSourcePlastron[index].id = plastron.id;
+        this.dataSourcePlastron[index].statut = Statut.Doing;
+        this.dataSourcePlastron[index].id = reponse.id;
+        // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
+        if(index == this.plastrons.length-1) this.updateDataSourceTriage(index)
 
+      }
+    );
+
+    this.profilService.getProfilById(plastron.profil).subscribe(
+      (response) => {
+        console.log(response)
+        this.dataSourcePlastron[index].age = response.age;
+        this.dataSourcePlastron[index].sexe = response.sexe;
       }
     );
 
   }
 
+  private updateDataSourceTriage(indexStart:number){
+    let UR = 0;
+    let UA = 0;
+    let EU = 0; // on compte le nombre de plastrons déjà réalisés dans chaque catégorie
+
+    this.dataSourcePlastron.forEach((plastron,index) => {
+      
+
+      if(index<=indexStart){ // pour les plastrons déjà complétés, on compte
+        switch(plastron.triage){
+          case 'UR': UR++;
+          break
+          case 'UA': UA++;
+          break
+          case 'EU': EU++;
+          break
+        }
+      }
+      else{ // sinon on modifie le triage des platrons à compléter
+        if(UR<this.scenario.UR) UR++;
+        else if(EU<this.scenario.EU){
+          EU++;
+          plastron.triage = Triage.EU
+        }
+        else plastron.triage = Triage.UA
+      }
+
+
+
+
+
+    });
+  }
+
 
   addGroup(){
-
     let newGroup:Partial<Groupe> = {
       "impliques":0,
       "EU":0,
