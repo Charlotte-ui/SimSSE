@@ -19,7 +19,7 @@ export class NodeDialogComponent<T extends Node|Link> {
   champs;
 
   numbers = ["x","y","pente"];
-  hidden = ["x","y"];
+  hidden = ["x","y","state"];
 
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent<T>>,

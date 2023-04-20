@@ -20,7 +20,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:98
     }
 
@@ -30,7 +30,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:16
     }
 
@@ -40,7 +40,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:80
     }
 
@@ -50,7 +50,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#e66",
       cible:36
     }
 
@@ -60,7 +60,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:80
     }
 
@@ -70,7 +70,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:200,
-      couleur:"",
+      couleur:"#fc8451",
       cible:130
     }
 
@@ -80,7 +80,7 @@ export class PlastronService {
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:27
     }
 

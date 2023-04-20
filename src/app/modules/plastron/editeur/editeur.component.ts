@@ -17,7 +17,17 @@ import { retry } from 'rxjs';
 })
 export class EditeurComponent implements OnInit {
 
+
+
+  barreOutilsOpened:boolean;
+  inspecteurOpened:boolean;
+
+
+
   _targetVariable!: VariablePhysioInstance[];
+  _nodes!: Node[];
+
+
   get targetVariable(): VariablePhysioInstance[] {
     return this._targetVariable;
   }
@@ -31,7 +41,6 @@ export class EditeurComponent implements OnInit {
     }
   }
 
-  _nodes!: Node[];
   get nodes(): Node[] {
     return this._nodes;
   }
@@ -50,12 +59,10 @@ export class EditeurComponent implements OnInit {
     }
   }
 
-
   @Input() links: Link[];
   @Input() duration: number=100;
 
   triggeredEvents = [[0, 0], [50, 3]]
-
   allEvents!: Event[];
 
   /**

@@ -29,5 +29,10 @@ export interface Graph extends Node{
   nodes: Node[];
   links: Link[];
   gabarit:boolean;
+}
 
+export interface Action extends Event{
+}
+
+export interface BioEvent extends Event{
 }
