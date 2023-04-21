@@ -7,7 +7,7 @@
     </button>
 
     <button *ngIf="scenario" mat-button>
-      <span (click)="goToScenario()">{{scenario}}</span>
+      <span (click)="goToScenario()">{{scenario.titre}}</span>
     </button>
     <span *ngIf="plastron"> <mat-icon id="arrow">arrow_forward_ios</mat-icon> </span>
     <button *ngIf="plastron" mat-button>
