@@ -19,7 +19,7 @@ export class NodeDialogComponent<T extends Node|Link> {
   champs;
 
   numbers = ["x","y","pente"];
-  hidden = ["x","y","state","id","type",'links','nodes'];
+  hidden = ["x","y","state","id","type",'links','nodes','typeEvent'];
   listable = ["cible","source","target","event",'gabarit'];
   booleans = ["start"];
 
@@ -53,7 +53,7 @@ export class NodeDialogComponent<T extends Node|Link> {
         case 'bioevent': return " l'événement";
         case 'action': return " l'action";
         case 'trend': return " la tendance";
-        case 'group': return  " le groupe";
+        case 'graph': return  " le groupe";
       }
       return "";
     }
@@ -96,7 +96,7 @@ export class NodeDialogComponent<T extends Node|Link> {
         case 'eventbio': return "#FC9E4F";
         case 'eventaction': return "#73bfb8";
         case 'trend': return "#F2F3AE";
-        case 'group': return  "#F0D3F7";
+        case 'graph': return  "#F0D3F7";
       }
       return "";
     }
@@ -109,7 +109,7 @@ export class NodeDialogComponent<T extends Node|Link> {
         case 'eventbio': return "healing";
         case 'eventaction': return "touch_app";
         case 'trend': return "trending_up";
-        case 'group': return  "scatter_plot";
+        case 'graph': return  "scatter_plot";
         case 'eventstart': return  "input";
 
       }

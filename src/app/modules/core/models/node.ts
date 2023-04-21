@@ -45,6 +45,7 @@ export interface Graph extends Node{
   nodes: Node[];
   links: Link[];
   gabarit:string|boolean; // ref vers le graph gabarit si instance, true si gabarit
+  root:boolean; // le graph est a la racine du modele (true) ou fait partie d'un autre graph (false)
 }
 
 export interface Action extends Collection{

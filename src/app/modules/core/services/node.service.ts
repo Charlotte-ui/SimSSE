@@ -16,7 +16,7 @@ export class NodeService {
       name: 'chute sat',
       x: 30,
       y: 80,
-      type:NodeType.link,
+      type:NodeType.trend,
       cible:'SpO2',
       pente:-1,
       state:false
@@ -27,7 +27,7 @@ export class NodeService {
       name: 'acc respi',
       x: 15,
       y: 60,
-      type:NodeType.link,
+      type:NodeType.trend,
       cible:'FR',
       pente:1,
       state:false
@@ -114,7 +114,8 @@ export class NodeService {
       y:50,
       id:"0",
       type:NodeType.graph,
-      state:false
+      state:false,
+      root:false
     }
 
     return of ([graph])

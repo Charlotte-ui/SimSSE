@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Event } from 'src/app/modules/core/models/node';
+import { Event ,Node} from 'src/app/modules/core/models/node';
 
 @Component({
   selector: 'app-trigger-dialog',
@@ -10,7 +10,7 @@ import { Event } from 'src/app/modules/core/models/node';
 })
 export class TriggerDialogComponent {
   form: FormGroup;
-  events:(Event|number)[];
+  events:[Event,number,number][];
   isEdition!:boolean;
   titre!:string;
   validate!:string;
@@ -18,7 +18,7 @@ export class TriggerDialogComponent {
 
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<TriggerDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: [{},(Event|number)[],boolean] ) {}
+    @Inject(MAT_DIALOG_DATA) public data: [{},[Event,number,number][],boolean] ) {}
 
     ngOnInit() {
       console.log(this.data[0])
@@ -52,6 +52,21 @@ export class TriggerDialogComponent {
 
     delete() {
       this.dialogRef.close("delete");
+    }
+
+    getIcon(node:Node){
+      let type:string = node.type;
+      if (type == 'event') type+=(node as Event).typeEvent
+      switch(type){
+        case 'link': return "arrow_right_alt";
+        case 'eventbio': return "healing";
+        case 'eventaction': return "touch_app";
+        case 'trend': return "trending_up";
+        case 'graph': return  "scatter_plot";
+        case 'eventstart': return  "input";
+
+      }
+      return "";
     }
 
 }

@@ -3,14 +3,14 @@ import { Observable } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/modele';
-import { Trend,Event,Link, NodeType, EventType } from '../models/node';
+import { Trend,Event,Link, NodeType, EventType, Graph } from '../models/node';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ModeleService {
 
-  getGraph(modele: Modele) {
+  getGraph(modele: Modele):Graph {
     let trend1:Trend = {
       id:"1",
       name: 'chute sat',
@@ -86,7 +86,21 @@ export class ModeleService {
       start:true
     }
 
-    return [[start,trend1,trend2,event],[link1,link2,link3,link4]]
+    let graph: Graph ={
+      gabarit:false,
+      id:"-1",
+      links:[link1,link2,link3,link4],
+      name:"root",
+      nodes:[start,trend1,trend2,event],
+      root:true,
+      state:true,
+      type:NodeType.graph,
+      x:undefined,
+      y:undefined
+
+    }
+
+    return graph;
 
   }
 

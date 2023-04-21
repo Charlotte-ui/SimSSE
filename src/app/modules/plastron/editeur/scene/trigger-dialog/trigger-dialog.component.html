@@ -1,29 +1,35 @@
-<h1 mat-dialog-title>{{titre}}</h1>
+<div class="container">
+  <h1 mat-dialog-title>{{titre}}
+    <button mat-mini-fab  disabled id="flash">
+      <mat-icon  fontIcon="flash_on"></mat-icon>
+    </button>
+  </h1>
 
-<mat-dialog-content *ngIf="data" [formGroup]="form">
+  <mat-dialog-content *ngIf="data" [formGroup]="form">
 
-  <div mat-dialog-content>
-    <mat-form-field appearance="fill">
-      <mat-label>Evenement</mat-label>
-      <mat-select formControlName="eventId">
-        <mat-option *ngFor="let event of events" [value]="event[1]">
-          {{event[0].name}}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-  </div>
+    <div mat-dialog-content>
+      <mat-form-field appearance="fill">
+        <mat-label>Évenement</mat-label>
+        <mat-select formControlName="eventId">
+          <mat-option *ngFor="let event of events" [value]="event[1]">
+            {{event[0].name}} <mat-icon  [fontIcon]="getIcon(event[0])"></mat-icon>
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-  <div mat-dialog-content>
-    <mat-form-field appearance="fill">
-      <mat-label>Temps </mat-label>
-      <input matInput formControlName="xAxis">
-    </mat-form-field>
-  </div>
+    <div mat-dialog-content>
+      <mat-form-field appearance="fill">
+        <mat-label>Temps </mat-label>
+        <input matInput formControlName="xAxis">
+      </mat-form-field>
+    </div>
 
-  <div mat-dialog-actions>
-    <button mat-button (click)="onNoClick()">Annuler</button>
-    <button mat-button (click)="save()">{{validate}}</button>
-    <button *ngIf="isEdition" mat-button (click)="delete()">Supprimer</button>
-  </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onNoClick()">Annuler</button>
+      <button mat-button (click)="save()">{{validate}}</button>
+      <button *ngIf="isEdition" mat-button (click)="delete()">Supprimer</button>
+    </div>
 
-</mat-dialog-content>
+  </mat-dialog-content>
+</div>
