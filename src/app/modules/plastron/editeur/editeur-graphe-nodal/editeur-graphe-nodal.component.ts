@@ -210,7 +210,7 @@ get links():  Link[] {
       let graph = node as Graph;
       dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
     }
-    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes]});
+    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes,"Modifier"]});
 
     dialogRef.afterClosed().subscribe(result => {
       if(result){
@@ -238,7 +238,7 @@ get links():  Link[] {
   onEdgeClick(event:any){
     let index = event.dataIndex;
     let link = this.links[index];
-    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes]});
+    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes,"Modifier"]});
 
     dialogRef.afterClosed().subscribe(result => {
       if(result){

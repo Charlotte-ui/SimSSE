@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Trend, Event, Node, Link, Graph } from '../../core/models/node';
+import { Trend, Event, Node, Link, Graph, BioEvent, Action, NodeType,EventType } from '../../core/models/node';
 import { VariablePhysio, VariablePhysioInstance } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
@@ -63,7 +63,10 @@ export class EditeurComponent implements OnInit {
   @Input() duration: number=100;
 
   triggeredEvents = [[0, 0], [50, 3]]
-  allEvents!: Event[];
+  allBioevents!: BioEvent[];
+  allActions!: Action[];
+  allGraphs!: Graph[];
+
 
   /**
    * all trends is the nodes and theirs ids
@@ -75,10 +78,6 @@ export class EditeurComponent implements OnInit {
    */
   events:(Event|number)[][];
 
-
-
-  allGraphs!: Graph[];
-
   curves:Curve[];
 
 
@@ -86,9 +85,21 @@ export class EditeurComponent implements OnInit {
 
   ngOnInit(): void {
 
-    this.reglesService.getEventGabarit().subscribe(
+    this.reglesService.getBioEvents().subscribe(
       (response) => {
-        this.allEvents = response as Event[];
+        this.allBioevents = response as BioEvent[];
+      }
+    );
+
+    this.reglesService.getActions().subscribe(
+      (response) => {
+        this.allActions = response as Action[];
+      }
+    );
+
+    this.reglesService.getActions().subscribe(
+      (response) => {
+        this.allActions = response as Action[];
       }
     );
 
@@ -104,7 +115,7 @@ export class EditeurComponent implements OnInit {
     this.curves = [];
     this.targetVariable.forEach((variable,index) => {
       this.curves.push({
-        nom:variable.nom,
+        nom:variable.name,
         values:[],
         currentMax:0
       })
@@ -121,41 +132,64 @@ export class EditeurComponent implements OnInit {
     switch (element) {
       case 'link':
         return this.createLink();
-      case 'event':
-        let event = {
+      case 'bioevent':
+        let bioevent = {
           id: indice.toString(),
-          name: 'Event ' + indice,
+          name: 'Évenement ' + indice,
           x: x,
           y: y,
-          type: 'event',
-          event: 'oxygénothérapie'
+          type: NodeType.event,
+          typeEvent:EventType.bio,
+          event: ''
         } as Event
-        return this.createNode(event);
+        return this.createNode(bioevent,this.allBioevents);
+      case 'action':
+        let action = {
+          id: indice.toString(),
+          name: 'Action ' + indice,
+          x: x,
+          y: y,
+          type: NodeType.event,
+          typeEvent:EventType.action,
+          event: undefined
+        } as Event
+        return this.createNode(action,this.allActions);
       case 'trend':
         let trend = {
           id: indice.toString(),
           name: 'Tendance ' + indice,
           x: x,
           y: y,
-          type: 'trend',
-          cible: 'SpO2',
+          type: element,
+          cible: undefined,
           pente: -1
         } as Trend
-        return this.createNode(trend);
+        return this.createNode(trend,this.targetVariable);
       case 'group':
-        return this.createGroup();
+        let group = {
+          id: indice.toString(),
+          name: 'Groupe ' + indice,
+          x: x,
+          y: y,
+          type: NodeType.graph,
+          gabarit:undefined,
+          links: undefined,
+          nodes:undefined,
+          state:false,
+        } as Graph
+        return this.createNode(group,this.allGraphs);
     }
   }
 
-  createNode(newNode: Trend | Event) {
-
+  createNode(newNode: Node,liste:any[]) {
     const dialogRef = this.dialog.open(NodeDialogComponent, {
-      data: [newNode, this.nodes],
+      data: [newNode, liste,"Ajouter"],
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result);
-      if (result !== "delete") {
+    dialogRef.afterClosed().subscribe((result:Node) => {
+      if (result) {
+        console.log(result);
+        if (result.type == NodeType.graph) this.initGroup(result as Graph)
         this.nodes.push(result)
         this.nodes = [...this.nodes] // force change detection by forcing the value reference update
         console.log("node create");
@@ -169,17 +203,14 @@ export class EditeurComponent implements OnInit {
     let link: Link = { id: index.toString(), source: undefined, target: undefined, type: "link", start: true };
 
     const dialogRef = this.dialog.open(NodeDialogComponent, {
-      data: [link, this.nodes],
+      data: [link, this.nodes,"Ajouter"],
     });
 
     dialogRef.afterClosed().subscribe(result => {
       console.log('The dialog was closed');
-      console.log(result);
 
-      if (result == "delete") {
-
-      }
-      else if (result) {
+      if (result) {
+        console.log(result);
         this.links.push(result);
         this.links = [...this.links] // force change detection by forcing the value reference update
         this.initCurves()
@@ -189,36 +220,9 @@ export class EditeurComponent implements OnInit {
     });
   }
 
-  createGroup() {
-    const dialogRef = this.dialog.open(GraphDialogComponent, {
-      data: this.allGraphs,
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-      console.log(result);
-
-      if (result == "delete") {
-
-      }
-      else if (result) {
-
-        let graph = result.graph;
-        graph.id = this.nodes.length;
-        graph.gabarit = false;
-
-
-        this.nodes.push(result.graph)
-
-        console.log(this.nodes)
-        this.nodes = [...this.nodes] // TODO force change detection by forcing the value reference update
-        console.log(result.graph);
-
-      }
-
-    });
-
-
+  initGroup(group:Graph) {
+    group.links = this.allGraphs[Number(group.gabarit)].links;
+    group.nodes = this.allGraphs[Number(group.gabarit)].nodes;
   }
 
   updateNodes(event) {
@@ -266,7 +270,7 @@ export class EditeurComponent implements OnInit {
     let res = undefined;
 
     this.targetVariable.forEach(variable => {
-      if (variable.nom == name) res = variable;
+      if (variable.name == name) res = variable;
     });
 
     return res;
@@ -321,7 +325,7 @@ export class EditeurComponent implements OnInit {
     let trends:number[] = [];
 
     this.nodes.forEach(node => {
-      if (node.type == "trend" && (node as Trend).cible == variable.nom && node.state) { // state = true => node active
+      if (node.type == "trend" && (node as Trend).cible == variable.name && node.state) { // state = true => node active
         trends.push(Number((node as Trend).pente))
       }
     });

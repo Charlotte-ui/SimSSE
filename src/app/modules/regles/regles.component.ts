@@ -34,8 +34,8 @@ export class ReglesComponent {
         this.variables.forEach(variable => {
           let v = structuredClone(variable);
 
-          let ma = this.initTableMoyenne(v.nom,v.moyennesAge,v.sdAge,true);
-          let ms = this.initTableMoyenne(v.nom,v.moyennesSexe,v.sdSexe,false);
+          let ma = this.initTableMoyenne(v.name,v.moyennesAge,v.sdAge,true);
+          let ms = this.initTableMoyenne(v.name,v.moyennesSexe,v.sdSexe,false);
 
           delete v.moyennesAge;
           delete v.moyennesSexe;
@@ -51,7 +51,7 @@ export class ReglesComponent {
       }
     );
 
-    this.regleService.getEventGabarit().subscribe(
+    this.regleService.getBioEvents().subscribe(
       (response) => {
         this.events = response;
       }

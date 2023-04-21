@@ -2,7 +2,7 @@
 <ng-container *ngIf="trends">
   <app-variable-controller *ngFor="let variable of variables"
                         [variable]="variable"
-                        [tendances]="getTrendByCible(variable.nom)"
+                        [tendances]="getTrendByCible(variable.name)"
                         (newVariable)="setNewVariable(variable,$event)">
   </app-variable-controller>
 </ng-container>

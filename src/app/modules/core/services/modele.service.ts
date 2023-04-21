@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/modele';
-import { Trend,Event,Link } from '../models/node';
+import { Trend,Event,Link, NodeType, EventType } from '../models/node';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +16,7 @@ export class ModeleService {
       name: 'chute sat',
       x: 30,
       y: 80,
-      type:'trend',
+      type: NodeType.trend,
       cible:'SpO2',
       pente:-1,
       state:false
@@ -27,7 +27,7 @@ export class ModeleService {
       name: 'acc respi',
       x: 15,
       y: 60,
-      type:'trend',
+      type:NodeType.trend,
       cible:'FR',
       pente:1,
       state:false
@@ -37,7 +37,8 @@ export class ModeleService {
       name: 'Oxygéno.',
       x: 40,
       y: 50,
-      type:'event',
+      type:NodeType.event,
+      typeEvent:EventType.action,
       event:'oxygénothérapie',
       state:false
     }
@@ -47,7 +48,8 @@ export class ModeleService {
       name: 'Start',
       x: 5,
       y: 95,
-      type:'start',
+      type:NodeType.event,
+      typeEvent:EventType.start,
       event:'start',
       state:false
     }
