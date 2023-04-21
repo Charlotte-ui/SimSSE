@@ -1,24 +1,12 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Input, OnDestroy } from '@angular/core';
 import * as echarts from 'echarts/types/dist/echarts';
 import { EChartsOption, util } from 'echarts';
 import 'echarts/extension/bmap/bmap';
 
 const SymbolSize = 20;
-const groupe = [
-  [56.5, 20, "1"],
-  [46.5, 30, "2"],
-  [22.1, 40, "3"],
-];
+let Data = [];
+let SceneNb = 0;
 
-const PRV = [
-  [15, 15],
-];
-
-const PMA= [
-  [50, 10],
-];
-
-const Data = groupe.concat(PRV,PMA);
 
 @Component({
   selector: 'app-carte',
@@ -27,9 +15,18 @@ const Data = groupe.concat(PRV,PMA);
 })
 export class CarteComponent implements OnDestroy{
 
+
+  @Input() set data(value: (string | number)[][]) {
+    if (value) { // if value isnt undefined
+      Data =  value;
+      SceneNb = value.length - 3 ; // le nombre de groupe est le nombre de data  sauf PRV et PMA et CADI
+      this.updateChart();
+    }
+  } 
+
   updatePosition: () => void;
-  options: EChartsOption = {
-    legend: {data:['group','PMA','PRV']},
+  initialChartOption: EChartsOption = {
+    legend: {data:['group','PMA','PRV','CADI']},
     tooltip: {
       triggerOn: 'none',
       formatter: (params) =>
@@ -54,65 +51,13 @@ export class CarteComponent implements OnDestroy{
       max: 100,
       type: 'value',
     },
-    series: [
-      { // groupe
-        name:'group',
-        id: 'group',
-        label: {
-          show: true,
-          formatter: function(d) {
-            return d.data[2];
-          }
-        },
-        type: 'scatter',
-        symbolSize: SymbolSize,
-        data: Data.slice(0, groupe.length),
-        symbol: 'circle',
-        itemStyle: {
-          borderColor: '#555',
-          color: '#37A2DA',
-          
-        },
-      //  label:"b",
-      },
-      { // PRV
-        name:'PRV',
-        id: 's',
-        type: 'scatter',
-        symbolSize: SymbolSize,
-        data: Data.slice(groupe.length,groupe.length+1),
-        symbol: 'diamond',
-        itemStyle: {
-          borderColor: '#555',
-          color: '#e06343',
-        },
-      },
-      { // PMA
-        name:'PMA',
-        id: 't',
-        type: 'scatter',
-        symbolSize: SymbolSize,
-        data: Data.slice(groupe.length+1,groupe.length+2),
-        symbol: 'diamond',
-        itemStyle: {
-          borderColor: '#555',
-          color: '#FC7D02',
-        },
-      }
-    ],
+    series: [],
   };
-  constructor() { 
 
-    console.log("group");
-    console.log(Data.slice(0, groupe.length));
+  mergeOptions = {};
 
-    console.log("PRV");
-    console.log(Data.slice(groupe.length,groupe.length+1));
 
-    console.log("PMA");
-    console.log(Data.slice(groupe.length+1,groupe.length+2));
-
-  }
+  constructor() {}
 
   ngOnDestroy() {
     if (this.updatePosition) {
@@ -121,8 +66,10 @@ export class CarteComponent implements OnDestroy{
   }
 
   onChartReady(myChart: any) {
+
     const onPointDragging = function (dataIndex) {
       Data[dataIndex] = myChart.convertFromPixel({ gridIndex: 0 }, this.position) as number[];
+      Data[dataIndex].push(String(dataIndex+1));
 
       // Update data
       myChart.setOption({
@@ -132,12 +79,13 @@ export class CarteComponent implements OnDestroy{
             id: 'group',
             type: 'scatter',
             symbolSize: SymbolSize,
-            data: Data.slice(0, groupe.length),
+            data: Data.slice(0, SceneNb),
             symbol: 'circle',
             itemStyle: {
               borderColor: '#555',
-              color: '#37A2DA',
-              
+              color: 'rgba(245, 40, 145, 1)',
+              opacity:1
+
             },
             label: {
               show: true,
@@ -145,31 +93,46 @@ export class CarteComponent implements OnDestroy{
                 return d.data[2];
               }
             }
-          //  label:"b",
           },
           { // PRV
             name:'PRV',
-            id: 's',
+            id: 'PRV',
             type: 'scatter',
             symbolSize: SymbolSize,
-            data: Data.slice(groupe.length,groupe.length+1),
+            data: Data.slice(SceneNb,SceneNb+1),
             symbol: 'diamond',
             itemStyle: {
               borderColor: '#555',
-              color: '#e06343',
+              color: 'rgba(71, 245, 39, 1)',
+              opacity:1
+
             },
           },
           { // PMA
             name:'PMA',
-            id: 't',
+            id: 'PMA',
             type: 'scatter',
             symbolSize: SymbolSize,
-            data: Data.slice(groupe.length+1,groupe.length+2),
+            data: Data.slice(SceneNb+1,SceneNb+2),
             symbol: 'diamond',
             itemStyle: {
               borderColor: '#555',
-              color: '#FC7D02',
+              color: 'rgba(245, 39, 39, 1)',
+              opacity:1
             },
+          },
+          { // CADI
+          name:'CADI',
+          id: 'CADI',
+          type: 'scatter',
+          symbolSize: SymbolSize,
+          data: Data.slice(SceneNb+2,SceneNb+3),
+          symbol: 'diamond',
+          itemStyle: {
+            borderColor: '#555',
+            color: 'rgba(39, 213, 245, 1)',
+            opacity:1
+          },
           }
         ],
       });
@@ -190,6 +153,7 @@ export class CarteComponent implements OnDestroy{
     };
 
     const updatePosition = () => {
+
       myChart.setOption({
         graphic: util.map(Data, (item) => ({
           position: myChart.convertToPixel({ gridIndex: 0 }, item),
@@ -222,4 +186,84 @@ export class CarteComponent implements OnDestroy{
       });
     }, 0);
   }
+
+  public updateChart(){
+
+    let series = [
+      { // groupe
+        name:'group',
+        id: 'group',
+        label: {
+          show: true,
+          formatter: function(d) {
+            return d.data[2];
+          }
+        },
+        type: 'scatter',
+        symbolSize: SymbolSize,
+        data: Data.slice(0, SceneNb),
+        symbol: 'circle',
+        itemStyle: {
+          borderColor: '#555',
+          color: 'rgba(245, 40, 145, 1)',
+          opacity:1
+
+          
+        },
+      },
+      { // PRV
+        name:'PRV',
+        id: 'PRV',
+        type: 'scatter',
+        symbolSize: SymbolSize,
+        data: Data.slice(SceneNb,SceneNb+1),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: 'rgba(71, 245, 39, 1)',
+          opacity:1
+
+        },
+      },
+      { // PMA
+        name:'PMA',
+        id: 'PMA',
+        type: 'scatter',
+        symbolSize: SymbolSize,
+        data: Data.slice(SceneNb+1,SceneNb+2),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: 'rgba(245, 39, 39, 1)',
+          opacity:1
+
+        },
+      },
+      { // CADI
+        name:'CADI',
+        id: 'CADI',
+        type: 'scatter',
+        symbolSize: SymbolSize,
+        data: Data.slice(SceneNb+2,SceneNb+3),
+        symbol: 'diamond',
+        itemStyle: {
+          borderColor: '#555',
+          color: 'rgba(39, 213, 245, 1)',
+          opacity:1
+
+        },
+      }
+    ]
+
+    this.mergeOptions = {
+      series: series
+    };
+
+
+  }
+
+
 }
+
+
+
