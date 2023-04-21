@@ -6,7 +6,7 @@ import { Model } from 'echarts';
 import { Modele } from '../core/models/modele';
 import { ProfilService } from '../core/services/profil.service';
 import {  VariablePhysio, VariablePhysioInstance } from '../core/models/variablePhysio';
-import { Link, Event, Trend } from '../core/models/node';
+import { Link, Event, Trend, Graph } from '../core/models/node';
 import { RegleService } from '../core/services/regle.service';
 import { Profil } from '../core/models/profil';
 import { PlastronService } from '../core/services/plastron.service';
@@ -23,8 +23,7 @@ export class PlastronComponent implements OnInit {
   modele!:Modele;
   profil!:Profil;
   targetVariable!:VariablePhysioInstance[];
-  data:(Event|Trend)[];
-  links:Link[];
+  graph!:Graph;
   scenario:Scenario;
 
   constructor(private route: ActivatedRoute,
@@ -78,9 +77,7 @@ export class PlastronComponent implements OnInit {
   }
 
   initGragh(){
-    let graph = this.modelService.getGraph(this.modele);
-    this.data = graph[0] as (Event | Trend)[]
-    this.links  = graph[1] as Link[]
+    this.graph = this.modelService.getGraph(this.modele);
   }
 
   changeModeleRef(newModele){

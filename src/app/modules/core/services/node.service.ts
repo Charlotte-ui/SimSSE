@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Trend,Event, Link, Graph } from '../models/node';
+import { Trend,Event, Link, Graph, NodeType ,EventType} from '../models/node';
 import { of } from 'rxjs';
 
 @Injectable({
@@ -16,7 +16,7 @@ export class NodeService {
       name: 'chute sat',
       x: 30,
       y: 80,
-      type:'trend',
+      type:NodeType.trend,
       cible:'SpO2',
       pente:-1,
       state:false
@@ -27,7 +27,7 @@ export class NodeService {
       name: 'acc respi',
       x: 15,
       y: 60,
-      type:'trend',
+      type:NodeType.trend,
       cible:'FR',
       pente:1,
       state:false
@@ -37,7 +37,8 @@ export class NodeService {
       name: 'Oxygéno.',
       x: 40,
       y: 50,
-      type:'event',
+      type: NodeType.event,
+      typeEvent:EventType.action,
       event:'oxygénothérapie',
       state:false
     }
@@ -47,7 +48,8 @@ export class NodeService {
       name: 'Start',
       x: 5,
       y: 95,
-      type:'start',
+      type:NodeType.event,
+      typeEvent:EventType.start,
       event:'start',
       state:false
     }
@@ -57,7 +59,8 @@ export class NodeService {
       name: 'End',
       x: 95,
       y: 95,
-      type:'start',
+      type:NodeType.event,
+      typeEvent:EventType.start,
       event:'end',
       state:false
     }
@@ -110,8 +113,9 @@ export class NodeService {
       x:50,
       y:50,
       id:"0",
-      type:"graph",
-      state:false
+      type:NodeType.graph,
+      state:false,
+      root:false
     }
 
     return of ([graph])

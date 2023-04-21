@@ -16,71 +16,71 @@ export class PlastronService {
   getVariablesCibles(plastron: Plastron): Observable<VariablePhysioInstance[]> {
     let SpO2:VariablePhysioInstance = {
       id:"0",
-      nom:"SpO2",
+      name:"SpO2",
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:98
     }
 
     let FR:VariablePhysioInstance = {
       id:"1",
-      nom:"FR",
+      name:"FR",
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:16
     }
 
     let FC:VariablePhysioInstance = {
       id:"2",
-      nom:"FC",
+      name:"FC",
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:80
     }
 
     let HemoCue:VariablePhysioInstance = {
       id:"3",
-      nom:"HemoCue",
+      name:"HemoCue",
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#e66",
       cible:36
     }
 
     let PAD:VariablePhysioInstance = {
       id:"4",
-      nom:"PAD",
+      name:"PAD",
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:80
     }
 
     let PAS:VariablePhysioInstance = {
       id:"5",
-      nom:"PAS",
+      name:"PAS",
       rand:1,
       min:0,
       max:200,
-      couleur:"",
+      couleur:"#fc8451",
       cible:130
     }
 
     let Temp:VariablePhysioInstance = {
       id:"6",
-      nom:"Temp",
+      name:"Temp",
       rand:1,
       min:0,
       max:100,
-      couleur:"",
+      couleur:"#5470c5",
       cible:27
     }
 

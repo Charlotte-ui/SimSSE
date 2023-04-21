@@ -1,25 +1,11 @@
-<h2>Tendance</h2>
 
-<div class="example-button-container">
-    <button mat-fab  (click)="onClick('trend')">
-        <mat-icon  fontIcon="trending_up"></mat-icon>
-    </button>
-  </div>
-<h2>Evenement</h2>
-<div class="example-button-container">
-    <button mat-fab  (click)="onClick('event')">
-        <mat-icon  fontIcon="event"></mat-icon>
-    </button>
-  </div>
-  <h2>Connection</h2>
-  <div class="example-button-container">
-      <button mat-fab  (click)="onClick('link')">
-          <mat-icon  fontIcon="arrow_right_alt"></mat-icon>
+<div class="container barre-container">
+  <div *ngFor="let button of buttons"  class="container button-container">
+    <div class="text">{{button.name}}</div>
+      <button mat-mini-fab  (click)="onClick(button.type)" [style.background]="button.color">
+          <mat-icon  [fontIcon]="button.icon"></mat-icon>
       </button>
-   </div>
-   <h2>Groupe</h2>
-   <div class="example-button-container">
-       <button mat-fab  (click)="onClick('group')">
-           <mat-icon  fontIcon="group_work"></mat-icon>
-       </button>
-    </div>
+  </div>
+</div>
+
+

@@ -1,6 +1,12 @@
 
-<h1 mat-dialog-title>{{nom}}</h1>
+<h1 mat-dialog-title>{{graph.name}}</h1>
 
 <mat-dialog-content>
-  <app-editeur-graphe-nodal class="dialog" [nodes]="dataGraph" [links]="linksGraph" (updateNode)="updateNodes($event)"></app-editeur-graphe-nodal>
+  <app-editeur-graphe-nodal class="dialog" [graph]="graph" (updateNode)="updateNodes($event)"></app-editeur-graphe-nodal>
+
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Annuler</button>
+    <button mat-button (click)="save()">Enregistrer</button>
+    <button mat-button (click)="delete()">Supprimer</button>
+  </div>
 </mat-dialog-content>
