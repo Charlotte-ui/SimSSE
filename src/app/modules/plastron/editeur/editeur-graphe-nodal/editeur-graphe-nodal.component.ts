@@ -171,14 +171,10 @@ get links():  Link[] {
 
 
   updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
-
-
     let width = this.graphScene.nativeElement.clientWidth
     let height = this.graphScene.nativeElement.clientHeight
-
     let newX = offsetX/width*100;
     let newY = (height-offsetY)/height*100; // passage de coordonnees matricielles à graphiques
-
     node.x  = newX;
     node.y  = newY;
   }
