@@ -7,6 +7,8 @@ import { Trend,Event, Link, Graph ,Node} from 'src/app/modules/core/models/node'
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
+import { NodeType } from 'src/app/modules/core/models/node';
+import { EventType } from 'src/app/modules/core/models/node';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',
@@ -17,31 +19,22 @@ export class EditeurGrapheNodalComponent implements OnInit {
   echartsInstance ;
   mergeOptions = {};
 
-  _nodes!:  Node[];
-  get nodes():  Node[] {
-    return this._nodes;
+  _graph!:  Graph;
+  get graph():  Graph {
+    return this._graph;
 }
-@Input() set nodes(value:Node[] ) {
+@Input() set graph(value:Graph ) {
   if (value!=undefined){
-    this._nodes = value;
+    this._graph = value;
+    this.initGraphLink();
     this.initGraphData();
+    this.updateChart();
   }
 }
 
 @Output() updateNode = new EventEmitter<Node[]>();
 @Output() updateLink = new EventEmitter<Link[]>();
 
-
-_links!:  Link[];
-get links():  Link[] {
-  return this._links;
-}
-@Input() set links(value:Link[] ) {
-  if (value!=undefined){
-    this._links = value;
-    this.initGraphLink();
-  }
-}
 
   graphData = []
 
@@ -84,26 +77,31 @@ get links():  Link[] {
   //initialisateurs
 
   initGraphData(){
-    this.graphData = new Array(this.nodes.length);
+    this.graphData = new Array(this.graph.nodes.length);
 
-    this.nodes.forEach(node => {
+    this.graph.nodes.forEach(node => {
+      let draggable = (node.type == NodeType.event && (node as Event).typeEvent == EventType.start)?false:true;
+      let cat:string = node.type;
+      cat+= (node.type == NodeType.event )?(node as Event).typeEvent:"";
+      console.log(node)
 
-      let draggable = (node.name=='Start')?false:true;
+      console.log(node.type)
+      console.log(cat)
+
       this.graphData[node.id] = {name:node.name,
-        category:node.type,
+        category:cat,
         draggable: draggable,
         layout: 'none',
         value:[node.x,node.y]
       }
     });
 
-    this.updateChart();
   }
 
   initGraphLink(){
-    this.graphLink = new Array(this.links.length);
+    this.graphLink = new Array(this.graph.links.length);
 
-    this.links.forEach(link => {
+    this.graph.links.forEach(link => {
       this.graphLink[link.id] = {
         source:Number(link.source),
         target:Number(link.target),
@@ -114,19 +112,6 @@ get links():  Link[] {
     });
 
 
-    this.updateChart();
-
-/*     {
-      source: 0,
-      target: 1,
-      symbolSize: [5, 20],
-      label: {
-        show: true
-      },
-      lineStyle: {
-        color: 5,
-      }
-    } */
 
   }
 
@@ -153,7 +138,23 @@ get links():  Link[] {
         },
         data: this.graphData,
         links: this.graphLink,
-        categories: [{name:'event'},{name:'trend'},{name:'graph'},{name:'start'}],
+        categories: [{
+          name:'eventbio',
+          itemStyle:{color:"#FC9E4F"}
+        },{
+          name:'eventaction',
+          itemStyle:{color:"#73bfb8"}
+        },{
+          name:'eventstart',
+          symbol:'rect',
+          itemStyle:{color:"#FFFFFF",borderColor:"#000000",borderWidth:1}
+        },{
+          name:'trend',
+          itemStyle:{color:"#F2F3AE"}
+        },{
+          name:'graph',
+          itemStyle:{color:"#F0D3F7"}
+        }],
         lineStyle: {
           opacity: 1,
           width: 1,
@@ -161,6 +162,9 @@ get links():  Link[] {
         }
       }
     ]
+    console.log("series")
+
+    console.log(series)
 
     this.mergeOptions = {
       series: series
@@ -168,7 +172,6 @@ get links():  Link[] {
 
 
   }
-
 
   updateNodeCoordinate(offsetX:number,offsetY:number,node:Node){
 
@@ -199,7 +202,7 @@ get links():  Link[] {
     console.log(event)
 
     let index = event.dataIndex;
-    let node = this.nodes[index];
+    let node = this.graph.nodes[index];
 
     // update the coordinate ; if not is reset to start coordinates
     this.updateNodeCoordinate(event.event.offsetX,event.event.offsetY,node)
@@ -210,19 +213,18 @@ get links():  Link[] {
       let graph = node as Graph;
       dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
     }
-    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.nodes]});
+    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.graph.nodes,"Modifier"]});
 
     dialogRef.afterClosed().subscribe(result => {
       if(result){
         if (result == "delete"){
-          this.nodes.splice(index, 1);
+          this.graph.nodes.splice(index, 1);
           this.graphData.splice(index, 1);
         }
         else  {
           result.x = node.x;
           result.y = node.y;
-          this.nodes[index] = result;
-
+          this.graph.nodes[index] = result;
           this.graphData[index].name = result.name;
         }
 
@@ -237,17 +239,17 @@ get links():  Link[] {
 
   onEdgeClick(event:any){
     let index = event.dataIndex;
-    let link = this.links[index];
-    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.nodes]});
+    let link = this.graph.links[index];
+    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.graph.nodes,"Modifier"]});
 
     dialogRef.afterClosed().subscribe(result => {
       if(result){
         if (result == "delete"){
-          this.links.splice(index, 1);
+          this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);
         }
         else  {
-          this.links[index] = result;
+          this.graph.links[index] = result;
           this.graphLink[index]= {
             source:Number(result.source),
             target:Number(result.target),
@@ -257,7 +259,7 @@ get links():  Link[] {
             //TODO debbug color
           }
           console.log("this.graphLink[index]");
-          console.log(this.links[index]);
+          console.log(this.graph.links[index]);
 
           console.log(this.graphLink[index]);
         }

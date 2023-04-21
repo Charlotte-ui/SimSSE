@@ -1,4 +1,5 @@
 import { Listable } from "./listable";
+import { Graph } from "./node";
 
 
 export enum Triage {
@@ -11,6 +12,5 @@ export enum Triage {
 export interface Modele extends Listable{
     triage:Triage;
     gabarit:boolean;
-
-
+    graph:Graph;
 }

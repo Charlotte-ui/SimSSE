@@ -1,52 +1,46 @@
-<h1 mat-dialog-title>Modifier le noeud</h1>
 
-<mat-dialog-content [formGroup]="form">
+<div class="container">
+  <h1 mat-dialog-title>{{titre}}
+  <button mat-mini-fab  [style.background]="getColor(node)" disabled>
+    <mat-icon  [fontIcon]="getIcon(node)"></mat-icon>
+  </button>
+</h1>
 
-  <ng-container *ngFor="let champ of champs">
+  <mat-dialog-content [formGroup]="form">
 
-    <div *ngIf="!isHidden(champ)"   mat-dialog-content>
-      <mat-form-field appearance="fill">
-        <mat-label>{{champ}}</mat-label>
-        <input matInput [formControlName]="champ" [type]="getType(champ)">
-      </mat-form-field>
-    </div>
-  </ng-container>
+    <ng-container *ngFor="let champ of champs">
 
+      <div *ngIf="!isHidden(champ)"   mat-dialog-content>
 
-<div *ngIf="node.type == 'link'" mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>Source</mat-label>
-    <mat-select formControlName="source">
-      <mat-option *ngFor="let node of nodes" [value]="node.id">
-        {{node.name}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+        <mat-form-field appearance="fill" *ngIf="getType(champ) != 'boolean'">
+          <mat-label>{{champ}}</mat-label>
+
+          <input *ngIf="getType(champ) == 'text'|| getType(champ) =='number'" matInput [formControlName]="champ" [type]="getType(champ)">
+
+          <mat-select *ngIf="getType(champ) == 'liste'" [formControlName]="champ">
+            <mat-option *ngFor="let elem of liste" [value]="elem.id">
+              {{elem.name}}  <mat-icon  *ngIf="node.type == 'link'"  [fontIcon]="getIcon(elem)"></mat-icon>
+            </mat-option>
+          </mat-select>
+
+        </mat-form-field>
+
+        <div *ngIf="getType(champ) == 'boolean'" class="noOverflow">
+
+          <mat-label>Effet</mat-label>
+          <mat-radio-group formControlName="start" aria-label="Select an option">
+            <mat-radio-button [value]="true">Start</mat-radio-button>
+            <mat-radio-button [value]="false">Stop</mat-radio-button>
+          </mat-radio-group>
+        </div>
+      </div>
+    </ng-container>
+
+  <div mat-dialog-actions>
+    <button mat-button (click)="onNoClick()">Annuler</button>
+    <button mat-button (click)="save()">Enregistrer</button>
+    <button *ngIf="data[2] == 'Modifier'" mat-button (click)="delete()">Supprimer</button>
+  </div>
+
+  </mat-dialog-content>
 </div>
-
-<div *ngIf="node.type == 'link'" mat-dialog-content>
-  <mat-form-field appearance="fill">
-    <mat-label>Cible</mat-label>
-    <mat-select formControlName="target">
-      <mat-option *ngFor="let node of nodes" [value]="node.id">
-        {{node.name}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-</div>
-
-<div *ngIf="node.type == 'link'" mat-dialog-content>
-    <mat-label>Effet</mat-label>
-      <mat-radio-group formControlName="start" aria-label="Select an option">
-        <mat-radio-button [value]="true">Start</mat-radio-button>
-        <mat-radio-button [value]="false">Stop</mat-radio-button>
-      </mat-radio-group>
-</div>
-
-<div mat-dialog-actions>
-  <button mat-button (click)="onNoClick()">Annuler</button>
-  <button mat-button (click)="save()">Enregistrer les modifications</button>
-  <button mat-button (click)="delete()">Supprimer</button>
-</div>
-
-</mat-dialog-content>

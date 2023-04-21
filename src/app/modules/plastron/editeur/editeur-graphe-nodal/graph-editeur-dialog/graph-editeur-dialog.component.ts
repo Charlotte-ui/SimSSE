@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Graph, Trend,Event,Link } from 'src/app/modules/core/models/node';
+import { Graph, Trend,Event,Link,Node } from 'src/app/modules/core/models/node';
 
 @Component({
   selector: 'app-graph-editeur-dialog',
@@ -9,9 +9,7 @@ import { Graph, Trend,Event,Link } from 'src/app/modules/core/models/node';
 })
 export class GraphEditeurDialogComponent {
 
-  dataGraph:(Event|Trend)[];
-  linksGraph:Link[];
-  nom:string;
+  graph:Graph;
 
   constructor(public dialogRef: MatDialogRef<GraphEditeurDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Graph ) {
@@ -22,22 +20,27 @@ export class GraphEditeurDialogComponent {
     ngOnInit() {
       console.log("GraphDialogComponent")
 
-      this.dataGraph = this.data.nodes as (Event|Trend)[];
-      console.log(this.dataGraph)
-
-      this.linksGraph = this.data.links;
-
-      console.log(this.linksGraph)
-
-      this.nom = this.data.name;
+      this.graph = this.data;
 
   }
 
   updateNodes(event){
     console.log("updateNodes")
     console.log(event)
-    this.dataGraph = [...event]; //TODO link to database
+    this.graph.nodes = [...event]; //TODO link to database
 
+  }
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  save() {
+    this.dialogRef.close(this.data);
+  }
+
+  delete() {
+    this.dialogRef.close("delete");
   }
 
 }

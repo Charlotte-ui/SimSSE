@@ -12,9 +12,106 @@
 }
 
 #barre-outils{
-    background-color: aliceblue;
+    width: fit-content;
 }
 
 #inspecteur{
-    background-color:beige;
+ //   width: fit-content;
+    height: fit-content;
+    position: fixed;
+    right: 3px;
+    transform: rotate(180deg) translateY(-600px);
+    transform: scaleX(-1);
+}
+
+#scene{
+  //width: 50%;
+}
+
+// for the collapsible panels
+
+.panel-title-barre-outils{
+  flex-direction: row-reverse;
+}
+
+.panel-title-inspecteur{
+  transform: scale(-1, 1);
+  flex-direction: row;
+}
+
+.panel-retracted{
+  height: min-content;
+}
+
+/* Accordion with height 600px and panel content width of 400px each */
+.mat-accordion {
+  display: block;
+  transform-origin: top left;
+  transform: rotate(-90deg) translateX(-600px); /* rotate and position it; translateX value corresponds to panel height */
+  width: 600px; /* this will be the height of the accordion (inversed due to rotation) */
+}
+
+.mat-expansion-panel {
+ // display: flex!important;
+ // flex-direction: column;
+  max-height: 500px; /* this will be the width of the panel (inversed due to rotation) */
+}
+
+.mat-expansion-panel-header{
+ // order: 2;
+ z-index: 1;
+}
+
+.panel-content {
+  transform-origin: top left;
+  transform: rotate(90deg); /* rotate back */
+  margin-left: 100%; /* position it */
+  height: 90px; /* real height of the content */
+  width: min-content; /* real width of the content */
+}
+
+.panel-content2 {
+  transform-origin: top left;
+  transform: rotate(90deg); /* rotate back */
+  margin-left: 100%; /* position it */
+  height: 250px; /* real height of the content */
+  width: min-content; /* real width of the content */
+  margin-top: -30px;
+}
+
+.reverse{
+  transform: scaleY(-1)!important;
+}
+
+.barre-container{
+  position: fixed;
+ // max-width: min-content;
+}
+
+.editeur{
+  padding: 0;
+}
+
+.smallMargLeft{
+  margin-left: 20px;
+}
+
+.bigMargLeft{
+  margin-left: 110px;
+}
+
+.smallMargRight{
+  width: 95%;
+}
+
+.bigMargRight{
+  width: 75%;
+}
+
+.small{
+  width: 20px;
+}
+
+.big{
+  width: 250px;
 }

@@ -1,20 +1,51 @@
 <mat-grid-list cols="5" >
 
-  <div class="container">
+  <div class="container editeur">
     <div class="row">
-      <div class="col-1" id="barre-outils">
-        <app-barre-outils (newElement)="addElement($event)"></app-barre-outils>
+
+      <div id="barre-outils" >
+        <mat-accordion multi="true" class="barre-container">
+          <mat-expansion-panel (closed)="barreOutilsOpened=false" (opened)="barreOutilsOpened=true">
+            <mat-expansion-panel-header class="panel-retracted">
+              <mat-panel-description class="panel-title-barre-outils">
+                Barre d'outils
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="panel-content">
+              <app-barre-outils (newElement)="addElement($event)"></app-barre-outils>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
       </div>
-      <div class="col-9">
+
+      <div *ngIf="graph"  id="scene" [ngClass]="{smallMargLeft: !barreOutilsOpened, bigMargLeft: barreOutilsOpened, smallMargRight: !inspecteurOpened, bigMargRight: inspecteurOpened}">
         <div class="row">
-          <app-scene [curves]="curves" [triggeredEvents]="triggeredEvents" [duration]="duration"  [nodes]="nodes" (updateTrigger)="updateTriggers($event)"></app-scene>
+          <app-scene [events]="events" [curves]="curves" [triggeredEvents]="triggeredEvents" [duration]="duration"  [nodes]="graph.nodes" (updateTrigger)="updateTriggers($event)"></app-scene>
         </div>
         <div class="row">
-          <app-editeur-graphe-nodal [nodes]="nodes" [links]="links" (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
+          <app-editeur-graphe-nodal [graph]="graph" (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
         </div>
       </div>
-      <div class="col-2" id="inspecteur">
-        <app-inspecteur [variables]="targetVariable" [trends]="trends" (updateVariable)="updateVariables($event)"></app-inspecteur>
+
+
+      <div id="inspecteur" [ngClass]="{small: !inspecteurOpened, big: inspecteurOpened}">
+        <mat-accordion multi="true" class="barre-container">
+          <mat-expansion-panel  (closed)="inspecteurOpened=false" (opened)="inspecteurOpened=true">
+            <mat-expansion-panel-header class="panel-retracted">
+              <mat-panel-description class="panel-title-inspecteur">
+                Inspecteur
+              </mat-panel-description>
+            </mat-expansion-panel-header>
+            <div class="reverse">
+              <div class="panel-content2">
+                <app-inspecteur [variables]="targetVariable" [trends]="trends" (updateVariable)="updateVariables($event)"></app-inspecteur>
+              </div>
+            </div>
+          </mat-expansion-panel>
+        </mat-accordion>
       </div>
     </div>
   </div>
+
+
+

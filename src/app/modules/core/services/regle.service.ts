@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { VariablePhysio, VariablePhysioGabarit } from '../models/variablePhysio';
 import { Observable, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
-import { Trend,Event,Node, Link } from '../../core/models/node';
+import { Trend,Event,Node, Link, BioEvent, Action, Graph } from '../../core/models/node';
 
 
 @Injectable({
@@ -15,7 +15,7 @@ export class RegleService {
   getVariableGarbarit(): Observable<VariablePhysioGabarit[]> {
     let SpO2:VariablePhysioGabarit = {
       id:"0",
-      nom:"SpO2",
+      name:"SpO2",
       rand:1,
       min:0,
       max:100,
@@ -28,7 +28,7 @@ export class RegleService {
 
     let FR:VariablePhysioGabarit = {
       id:"1",
-      nom:"FR",
+      name:"FR",
       rand:1,
       min:0,
       max:100,
@@ -41,7 +41,7 @@ export class RegleService {
 
     let FC:VariablePhysioGabarit = {
       id:"2",
-      nom:"FC",
+      name:"FC",
       rand:1,
       min:0,
       max:100,
@@ -54,7 +54,7 @@ export class RegleService {
 
     let HemoCue:VariablePhysioGabarit = {
       id:"3",
-      nom:"HemoCue",
+      name:"HemoCue",
       rand:1,
       min:0,
       max:100,
@@ -67,7 +67,7 @@ export class RegleService {
 
     let PAD:VariablePhysioGabarit = {
       id:"4",
-      nom:"PAD",
+      name:"PAD",
       rand:1,
       min:0,
       max:100,
@@ -80,7 +80,7 @@ export class RegleService {
 
     let PAS:VariablePhysioGabarit = {
       id:"5",
-      nom:"PAS",
+      name:"PAS",
       rand:1,
       min:0,
       max:200,
@@ -93,7 +93,7 @@ export class RegleService {
 
     let Temp:VariablePhysioGabarit = {
       id:"6",
-      nom:"Temp",
+      name:"Temp",
       rand:1,
       min:0,
       max:100,
@@ -113,17 +113,42 @@ export class RegleService {
 
 
 
-  getEventGabarit(): Observable<Partial<Event>[]> {
-    let oxy:Partial<Event> = {
-      event: "oxygénothérapie",
+  getBioEvents(): Observable<BioEvent[]> {
+    let oxy:BioEvent = {
+      name: "mort",
+      id: "mort",
     }
 
-    let garrot:Partial<Event> = {
-      event: "garrot",
+    let garrot:BioEvent = {
+      name: "arrêt cardio-vasculaire",
+      id: "arrêt cardio-vasculaire",
     }
 
-    let pls:Partial<Event> = {
-      type: "event",
+    let hypox:BioEvent = {
+      name: "hypoxémie",
+      id: "hypoxémie",
+    }
+
+    let events = [oxy,garrot,hypox];
+
+    return of(events);
+    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
+  }
+
+  getActions(): Observable<Action[]> {
+    let oxy:Action = {
+      name: "oxygénothérapie",
+      id: "oxygénothérapie",
+    }
+
+    let garrot:Action = {
+      name: "garrot",
+      id: "garrot",
+    }
+
+    let pls:Action = {
+      name: "pls",
+      id: "pls",
     }
 
     let events = [oxy,garrot,pls];
@@ -131,6 +156,7 @@ export class RegleService {
     return of(events);
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
+
 
   createVariable(variable:VariablePhysio){
 

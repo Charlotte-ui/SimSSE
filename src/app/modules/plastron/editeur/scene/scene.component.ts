@@ -25,6 +25,10 @@ export class SceneComponent implements OnInit {
   @Input() duration:number;
   @Input() nodes:Node[];
   @Input() triggeredEvents:number[][]; //  time id
+    /**
+   * all events is the nodes and theirs ids
+   */
+    @Input() events:[Event,number,number][];
 
   _curves!:  Curve[];
   get curves():  Curve[] {
@@ -44,10 +48,7 @@ export class SceneComponent implements OnInit {
 
 
 
-  /**
-   * all events is the nodes and theirs ids
-   */
-  events:(Event|number)[][];
+
 
 
   // Echart Graph Variables

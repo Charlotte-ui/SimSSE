@@ -3,7 +3,7 @@ import { Collection } from "../services/firebase.service";
 
 export interface VariablePhysio extends Collection{
     rand:number;
-    nom:string;
+    name:string;
     min:number;
     max:number;
     couleur:string;
