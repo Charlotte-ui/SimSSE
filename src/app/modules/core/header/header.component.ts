@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Scenario } from '../models/scenario';
 
 @Component({
   selector: 'app-header',
@@ -8,7 +9,7 @@ import { Router } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
 
-  @Input() scenario: string;
+  @Input() scenario: Scenario;
   @Input() plastron: string;
 
 
@@ -26,6 +27,10 @@ export class HeaderComponent implements OnInit {
   }
 
   goToScenario(){
+    if (this.plastron){ // si plastron n'est pas initialisé, pas besoin de changer de page
+      console.log(this.scenario)
+      this.router.navigate(['/scenario/'+this.scenario.id]);
+    }
 
   }
 

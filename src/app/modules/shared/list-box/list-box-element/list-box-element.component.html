@@ -10,18 +10,12 @@
     </div>
 
     <div class="col-9 texte">
-        <h2>{{element.titre}}</h2>
+      <button mat-button (click)="goToElement(element.id)"><h2>{{element.titre}}</h2></button>
         <div id="description">
           <textarea disabled [value]="element.description"></textarea>
         </div>
     </div>
     <div class="col-1 buttons">
-        <button
-          mat-mini-fab
-          (click)="goToElement(element.id)">
-          <mat-icon>edit</mat-icon>
-        </button>
-
         <button
           mat-mini-fab
           (click)="removeElement()">
