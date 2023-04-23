@@ -8,6 +8,8 @@ import { ScenarioResolver } from './modules/scenario/scenario.resolver';
 import { PlastronComponent } from './modules/plastron/plastron.component';
 import { PlastronResolver } from './modules/plastron/plastron.resolver';
 import { ReglesComponent } from './modules/regles/regles.component';
+import { ModeleComponent } from './modules/modele/modele.component';
+import { ModeleResolver } from './modules/modele/modele.resolver';
 
 const routes: Routes = [
 {path: '', redirectTo: '/connexion', pathMatch: 'full'},
@@ -16,6 +18,8 @@ const routes: Routes = [
 {path: 'regles', component: ReglesComponent},
 {path: 'plastron/:id', component: PlastronComponent,resolve: { data: PlastronResolver }},
 {path: 'scenario/:id', component: ScenarioComponent,resolve: { data: ScenarioResolver }},
+{path: 'modele/:id', component: ModeleComponent,resolve: { data: ModeleResolver }},
+
 //{path: 'accueil', component: AccueilComponent,canActivate: [AuthGuard]},
 //{path: 'regles', component: ReglesComponent,canActivate: [AuthGuard]},
 //{path: 'plastron/:id', component: PlastronComponent,resolve: { data: PlastronResolver },canActivate: [AuthGuard]},

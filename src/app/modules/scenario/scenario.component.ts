@@ -23,7 +23,8 @@ interface tableElementPlastron{
   description:string;
   groupe:number;
   statut:Statut;
-  id:number;
+  id:string;
+  numero:number;
   age:number;
   sexe:boolean;
 }
@@ -46,6 +47,15 @@ export class ScenarioComponent implements OnInit {
   scenario!: Scenario ;
   groupes!: Groupe[];
   plastrons!: Plastron[];
+
+  groupPositions = [
+    [56.5, 20, "1"],
+    [46.5, 30, "2"],
+    [22.1, 40, "3"],
+    [15, 15],
+    [50, 10],
+    [20, 50]
+  ];
 
   defaultElementPlastron!:tableElementPlastron;
 
@@ -156,6 +166,8 @@ export class ScenarioComponent implements OnInit {
 
   goToPlastron(plastronId:string){
 
+    console.log(plastronId)
+
     this.router.navigate(['/plastron/'+plastronId]);
 
 
@@ -186,6 +198,7 @@ export class ScenarioComponent implements OnInit {
         this.dataSourcePlastron[index].description = response.description;
         this.dataSourcePlastron[index].triage = response.triage;
         this.dataSourcePlastron[index].statut = Statut.Doing;
+        this.dataSourcePlastron[index].id = plastron.id;
         // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
         if(index == this.plastrons.length-1) this.updateDataSourceTriage(index)
 
@@ -208,7 +221,8 @@ export class ScenarioComponent implements OnInit {
     let EU = 0; // on compte le nombre de plastrons déjà réalisés dans chaque catégorie
 
     this.dataSourcePlastron.forEach((plastron,index) => {
-      this.dataSourcePlastron[index].id = index+1;
+      
+      this.dataSourcePlastron[index].numero = index+1;
 
       if(index<=indexStart){ // pour les plastrons déjà complétés, on compte
         switch(plastron.triage){

@@ -65,6 +65,7 @@ import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/gr
 import { TagsComponent } from './modules/shared/tags/tags.component';
 import { CarteComponent } from './modules/scenario/carte/carte.component';
 import { GraphEditeurDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/graph-editeur-dialog/graph-editeur-dialog.component';
+import { ModeleComponent } from './modules/modele/modele.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -96,7 +97,8 @@ import { GraphEditeurDialogComponent } from './modules/plastron/editeur/editeur-
     GraphDialogComponent,
     TagsComponent,
     CarteComponent,
-    GraphEditeurDialogComponent
+    GraphEditeurDialogComponent,
+    ModeleComponent
   ],
   imports: [
     BrowserModule,
