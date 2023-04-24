@@ -12,6 +12,7 @@ export class HeaderComponent implements OnInit {
   @Input() scenario: Scenario;
   @Input() plastron: string;
 
+  @Input() save: (args: any) => void;
 
   constructor(private router: Router) { }
 
