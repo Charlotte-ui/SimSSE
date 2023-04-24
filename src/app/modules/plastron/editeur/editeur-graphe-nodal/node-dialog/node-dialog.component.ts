@@ -88,7 +88,6 @@ export class NodeDialogComponent<T extends Node|Link> {
     }
 
     getColor(node:Node|Link){
-
       let type:string = node.type;
       if (type == 'event') type+=(node as Event).typeEvent
       switch(type){
@@ -115,6 +114,17 @@ export class NodeDialogComponent<T extends Node|Link> {
       }
       return "";
     }
+
+    getValue(elem){
+      if ('event' in elem) return elem.event;
+      if ('couleur' in elem) return elem.name; // si varible TODO trouver une soluce plus propre
+      else return elem.id;
+    }
+
+    getName(elem){
+      return ('event' in elem)?elem.event:elem.name;
+    }
+
 
 }
 

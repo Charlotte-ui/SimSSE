@@ -30,10 +30,7 @@ export class EditeurComponent implements OnInit {
   @Input() set targetVariable(value: VariablePhysioInstance[]) {
     if (value) { // if value isnt undefined
       this._targetVariable = value;
-      console.log("set targetVariable");
-      console.log(value);
       this.initCurves();
-
     }
   }
 
@@ -46,9 +43,6 @@ export class EditeurComponent implements OnInit {
       this.events = new Array<[Event,number,number]>();
       this.trends = [];
       this.initTrendsEventsRecursive(value)
-      console.log("this.events")
-      console.log(this.events)
-
       if (this.targetVariable) this.initCurves();
     }
   }
@@ -57,7 +51,7 @@ export class EditeurComponent implements OnInit {
 
   @Input() duration: number=100;
 
-  triggeredEvents = [[0, 0], [50, 3]]
+
 
 
   // liste de tout les modèles d'événements et de graphs existant
@@ -130,10 +124,10 @@ export class EditeurComponent implements OnInit {
 
 
   initTrendsEventsRecursive(graph:Graph){
-    console.log("initTrendsEventsRecursive")
+    //console.log("initTrendsEventsRecursive")
 
     graph.nodes.forEach((node, i) => {
-      console.log(node)
+     // console.log(node)
       switch (node.type) {
         case 'event':
           this.events.push([node as Event, i,Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
@@ -160,7 +154,6 @@ export class EditeurComponent implements OnInit {
       case 'bioevent':
         let bioevent = {
           id: indice.toString(),
-          name: 'Évenement ' + indice,
           x: x,
           y: y,
           type: NodeType.event,
@@ -171,7 +164,6 @@ export class EditeurComponent implements OnInit {
       case 'action':
         let action = {
           id: indice.toString(),
-          name: 'Action ' + indice,
           x: x,
           y: y,
           type: NodeType.event,
@@ -213,12 +205,9 @@ export class EditeurComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result:Node) => {
       if (result) {
-        console.log(result);
         if (result.type == NodeType.graph) this.initGroup(result as Graph)
         this.graph.nodes.push(result)
         this.graph = structuredClone(this.graph);// TODO force change detection by forcing the value reference update
-        console.log("node create");
-        console.log(result);
       }
     });
   }
@@ -232,16 +221,12 @@ export class EditeurComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
-
       if (result) {
-        console.log(result);
         this.graph.links.push(result);
         this.graph = structuredClone(this.graph);// TODO force change detection by forcing the value reference update
         this.initCurves()
         this.curves = [...this.curves]
       }
-
     });
   }
 
@@ -257,11 +242,7 @@ export class EditeurComponent implements OnInit {
     }
     else{
       let node = event[0] as Node;
-      console.log("new x" + node.x)
-      console.log("new y" + node.y)
       this.graph.nodes[event[1]] = node;
-      console.log(this.graph.nodes[event[1]]);
-
       if (node.type == 'trend') { // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
         let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
         let variable = this.getVariableByName(trend.cible)
@@ -324,7 +305,7 @@ export class EditeurComponent implements OnInit {
    * @param t
    */
   updateNodesStates(t:number){
-    this.updateNodeStatesRecursive(this.triggeredEvents,this.graph,t)
+    this.updateNodeStatesRecursive(this.graph.triggeredEvents,this.graph,t)
   }
 
   /**
@@ -332,24 +313,38 @@ export class EditeurComponent implements OnInit {
    * @param graph
    * @param t
    */
-  updateNodeStatesRecursive(triggeredEvents:number[][],graph:Graph,t:number){
+  updateNodeStatesRecursive(triggeredEvents:[number,string][],graph:Graph,t:number){
     triggeredEvents.forEach(event => {
       if (event[0] == t) { // event trigger at time t
-        let idEvent = event[1];
+        let nameEvent = event[1];
         graph.links.forEach(link => {
-          if (idEvent == link.source){
-            let nodeTrigger = graph.nodes[link.target];
+          if (nameEvent == link.source){
+            let nodeTrigger = graph.nodes[Number(link.target)];
             nodeTrigger.state = link.start;
             if(nodeTrigger.type == NodeType.graph) {
-              let triggeredGraphEvents = [[0,0]] // the start is triggered
-               // TODO add manual triggered for other events
-              this.updateNodeStatesRecursive(triggeredGraphEvents,nodeTrigger as Graph,t) // si le node est un graph, on updte les états des nodes internes
+              if (nodeTrigger.state) this.updateNodeStatesRecursive(triggeredEvents,nodeTrigger as Graph,t) // si le node est un graph, on updte les états des nodes internes
+              else this.setAllNodesStatesToFalse(nodeTrigger as Graph) // desctivate all nodes states
             }
           }
         })
       }
     })
+
+    //update all the graph who could have been triggered internaly
+    graph.nodes.forEach(node =>{
+      if (node.type == NodeType.graph && node.state) this.updateNodeStatesRecursive(triggeredEvents,node as Graph,t)
+    })
   }
+
+
+  setAllNodesStatesToFalse(graph:Graph){
+    graph.nodes.forEach(node =>
+      {
+        node.state = false;
+        if (node.type == NodeType.graph) this.setAllNodesStatesToFalse(node as Graph)
+      })
+  }
+
 
   // tools
 
@@ -361,10 +356,14 @@ export class EditeurComponent implements OnInit {
    * @returns
    */
   calculTrend(variable:VariablePhysioInstance){
+   // console.log("calculTrend "+variable.name)
     let trend = 0;
      // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     let trends = this.calculTrendRecursive(variable,this.graph.nodes);
     if(trends.length>0) trend = this.reduceTrends(trends)
+  //  console.log(trends)
+  //  console.log(trend)
+
     return trend;
   }
 
@@ -375,6 +374,7 @@ export class EditeurComponent implements OnInit {
  * @returns
  */
   private calculTrendRecursive(variable:VariablePhysioInstance,nodes:Node[]){
+   // console.log("calculTrendRecursive "+variable.name)
     let trends:number[] = []; // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     nodes.forEach(node => {
       if(node.state){ // si le node est actif
@@ -382,8 +382,9 @@ export class EditeurComponent implements OnInit {
           trends.push(Number((node as Trend).pente))
         }
         if (node.type == "graph") { // si le node est un graph
+
           let graphTrends = this.calculTrendRecursive(variable,(node as Graph).nodes);
-          trends.concat(graphTrends);
+          trends=trends.concat(graphTrends);
         }
       }
     });
@@ -431,7 +432,6 @@ export class EditeurComponent implements OnInit {
 
       curve.values.push([i, newValue])
     }
-    console.log(curve)
   }
 
   // Standard Normal variate using Box-Muller transform.
@@ -445,13 +445,13 @@ export class EditeurComponent implements OnInit {
 
   private getEventAtTime(time: number): number[] | undefined {
     let result = undefined;
-    this.triggeredEvents.forEach(event => {
+    this.graph.triggeredEvents.forEach(event => {
       if (event[0] == time) result = event;
     });
     return result;
   }
 
-  private getTrendsFromEvent(event: number): any[] {
+  private getTrendsFromEvent(event: string): any[] {
     let trends = [];
     this.graph.links.forEach(link => {
       if (event == link.source) trends.push([link.target, link.start]);

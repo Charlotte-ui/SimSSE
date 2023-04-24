@@ -34,7 +34,6 @@ export class NodeService {
     }
     let event:Event = {
       id:"3",
-      name: 'Oxygéno.',
       x: 40,
       y: 50,
       type: NodeType.event,
@@ -45,7 +44,6 @@ export class NodeService {
 
     let start:Event = {
       id:"0",
-      name: 'Start',
       x: 5,
       y: 95,
       type:NodeType.event,
@@ -56,7 +54,6 @@ export class NodeService {
 
     let end:Event = {
       id:"4",
-      name: 'End',
       x: 95,
       y: 95,
       type:NodeType.event,
@@ -67,7 +64,7 @@ export class NodeService {
 
     let link1:Link = {
       id:"0",
-      source: 3,
+      source: 'oxygénothérapie',
       target: 1,
       type:"link",
       start:false
@@ -75,7 +72,7 @@ export class NodeService {
 
     let link2:Link = {
       id:"1",
-      source: 3,
+      source: 'oxygénothérapie',
       target: 2,
       type:"link",
       start:false
@@ -83,7 +80,7 @@ export class NodeService {
 
     let link3:Link = {
       id:"2",
-      source: 0,
+      source: 'start',
       target: 1,
       type:"link",
       start:true
@@ -91,7 +88,7 @@ export class NodeService {
 
     let link4:Link = {
       id:"3",
-      source: 0,
+      source: 'start',
       target: 2,
       type:"link",
       start:true
@@ -99,7 +96,7 @@ export class NodeService {
 
     let link5:Link = {
       id:"4",
-      source: 3,
+      source: 'oxygénothérapie',
       target: 4,
       type:"link",
       start:true
@@ -115,7 +112,8 @@ export class NodeService {
       id:"0",
       type:NodeType.graph,
       state:false,
-      root:false
+      root:false,
+      triggeredEvents:undefined
     }
 
     return of ([graph])

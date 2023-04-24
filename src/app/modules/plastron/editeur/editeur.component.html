@@ -20,10 +20,10 @@
 
       <div *ngIf="graph"  id="scene" [ngClass]="{smallMargLeft: !barreOutilsOpened, bigMargLeft: barreOutilsOpened, smallMargRight: !inspecteurOpened, bigMargRight: inspecteurOpened}">
         <div class="row">
-          <app-scene [events]="events" [curves]="curves" [triggeredEvents]="triggeredEvents" [duration]="duration"  [nodes]="graph.nodes" (updateTrigger)="updateTriggers($event)"></app-scene>
+          <app-scene [events]="events" [curves]="curves" [duration]="duration"  [graph]="graph" (updateTrigger)="updateTriggers($event)"></app-scene>
         </div>
         <div class="row">
-          <app-editeur-graphe-nodal [graph]="graph" (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
+          <app-editeur-graphe-nodal [graph]="graph" [allBioevents]="allBioevents" [allActions]="allActions" [targetVariable]="targetVariable"  (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
         </div>
       </div>
 

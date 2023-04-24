@@ -15,8 +15,6 @@ export class TriggerDialogComponent {
   titre!:string;
   validate!:string;
 
-
-
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<TriggerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: [{},[Event,number,number][],boolean] ) {}
 
@@ -25,7 +23,12 @@ export class TriggerDialogComponent {
     //  console.log(this.data[0])
 
       this.form = this.fb.group(this.data[0]);
-      this.events = this.data[1]
+      this.events = this.reduceEventArray(this.data[1])
+      this.events.forEach(event => {
+
+      });
+
+
       this.isEdition = this.data[2];
 
       if (this.isEdition) {
@@ -68,5 +71,22 @@ export class TriggerDialogComponent {
       }
       return "";
     }
+
+    /**
+     * reduit la liste des evenements pour ne pas les afficher en double s'ils sont  présent plusieurs fois dans le Graph
+     * enlève les événement start et end
+     * @param array
+     * @returns
+     */
+    private reduceEventArray(array: [Event,number,number][]): [Event,number,number][]{
+      let arrayTemp:string[] = ["start","end"];
+      return array.reduce((acc: [Event,number,number][], cur: [Event,number,number]) => {
+        if (!arrayTemp.includes(cur[0].event)) {
+            arrayTemp.push(cur[0].event)
+              acc.push(cur);
+          }
+          return acc;
+      }, [])
+  }
 
 }

@@ -3,12 +3,13 @@ import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NodeDialogComponent } from './node-dialog/node-dialog.component';
-import { Trend,Event, Link, Graph ,Node} from 'src/app/modules/core/models/node';
+import { Trend,Event, Link, Graph ,Node, BioEvent, Action} from 'src/app/modules/core/models/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
 import { NodeType } from 'src/app/modules/core/models/node';
 import { EventType } from 'src/app/modules/core/models/node';
+import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',
@@ -31,6 +32,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
     this.updateChart();
   }
 }
+
+@Input() allBioevents!: BioEvent[];
+@Input() allActions!: Action[];
+@Input() targetVariable!: VariablePhysioInstance[];
+
 
 @Output() updateNode = new EventEmitter<Node[]>();
 @Output() updateLink = new EventEmitter<Link[]>();
@@ -81,18 +87,16 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     this.graph.nodes.forEach(node => {
       let draggable = (node.type == NodeType.event && (node as Event).typeEvent == EventType.start)?false:true;
+      let name = (node.type == NodeType.event)?(node as Event).event:(node as Trend|Graph).name;
       let cat:string = node.type;
       cat+= (node.type == NodeType.event )?(node as Event).typeEvent:"";
-      console.log(node)
 
-      console.log(node.type)
-      console.log(cat)
-
-      this.graphData[node.id] = {name:node.name,
+      this.graphData[node.id] = {
+        name:name,
         category:cat,
         draggable: draggable,
         layout: 'none',
-        value:[node.x,node.y]
+        value:[node.x,node.y],
       }
     });
 
@@ -103,16 +107,13 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     this.graph.links.forEach(link => {
       this.graphLink[link.id] = {
-        source:Number(link.source),
-        target:Number(link.target),
+        source:link.source, // name of the node
+        target:Number(link.target), // id of the node
         lineStyle: {
           color: link.start?"#2E933C":"#DE1A1A",
         }
       }
     });
-
-
-
   }
 
 
@@ -162,9 +163,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         }
       }
     ]
-    console.log("series")
 
-    console.log(series)
 
     this.mergeOptions = {
       series: series
@@ -205,13 +204,22 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     let dialogRef;
 
-    if(event.data.category == 'graph')  {
-      let graph = node as Graph;
-      dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
+    switch(event.data.category ){
+      case 'graph':
+        dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: node as Graph});
+        break;
+      case 'eventbio':
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allBioevents,"Modifier"]});
+        break;
+      case 'eventaction':
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allActions,"Modifier"]});
+        break;
+      case 'trend':
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.targetVariable,"Modifier"]});
     }
-    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.graph.nodes,"Modifier"]});
 
-    dialogRef.afterClosed().subscribe(result => {
+
+    if(dialogRef) dialogRef.afterClosed().subscribe(result => {
       if(result){
         if (result == "delete"){
           this.graph.nodes.splice(index, 1);
@@ -264,19 +272,6 @@ export class EditeurGrapheNodalComponent implements OnInit {
       }
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   }
 

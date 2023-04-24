@@ -16,7 +16,6 @@ export enum EventType {
 
 
 export interface Node extends Collection{
-    name: string;
     x: number;
     y: number;
     type: NodeType;
@@ -27,6 +26,7 @@ export interface Node extends Collection{
 export interface Trend extends Node{
     cible: string;
     pente: number;
+    name: string;
 }
 
 export interface Event extends Node{
@@ -36,16 +36,18 @@ export interface Event extends Node{
 
 export interface Link extends Collection{
     type: string;
-    source: number,
+    source: string,
     target: number,
     start:boolean
 }
 
 export interface Graph extends Node{
+  name: string;
   nodes: Node[];
   links: Link[];
   gabarit:string|boolean; // ref vers le graph gabarit si instance, true si gabarit
   root:boolean; // le graph est a la racine du modele (true) ou fait partie d'un autre graph (false)
+  triggeredEvents:[number,string][]; //  time and name of all the current triggerdes events, undefined if gabarit is true
 }
 
 export interface Action extends Collection{
