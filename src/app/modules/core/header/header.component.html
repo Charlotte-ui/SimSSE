@@ -21,7 +21,7 @@
   </button>
   <app-triage *ngIf="triage" [triage]="triage"></app-triage>
   <button
-    *ngIf="plastron"
+    *ngIf="plastron || plastron"
     mat-icon-button
   >
     <mat-icon>save</mat-icon>
@@ -41,3 +41,4 @@
     <mat-icon>share</mat-icon>
   </button>
 </mat-toolbar>
+
