@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { Node,Trend,Event, Link, NodeType } from 'src/app/modules/core/models/node';
+import { Node,Trend,Event, Link, NodeType, EventType } from 'src/app/modules/core/models/node';
 import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({
@@ -35,7 +35,7 @@ export class NodeDialogComponent<T extends Node|Link> {
       this.liste = this.data[1];
       this.node = this.data[0];
       this.edition = this.data[2]
-      this.completeTitle(this.node.type)
+      this.titre=this.completeTitle((this.node.type==NodeType.event)?(this.node as Event).typeEvent:this.node.type)
       console.log("create node dialog")
 
       console.log(this.node)
@@ -49,11 +49,12 @@ export class NodeDialogComponent<T extends Node|Link> {
     completeTitle(type:string):string{
       let start = (this.edition)?"Modifier":"Ajouter";
       switch(type){
-        case 'link': return start+" le lien";
-        case 'bioevent': return start+" l'événement";
-        case 'action': return start+" l'action";
-        case 'trend': return start+" la tendance";
-        case 'graph': return  start+" le groupe";
+        case NodeType.link: return start+" le lien";
+        case EventType.bio: return start+" l'événement";
+        case EventType.action: return start+" l'action";
+        case NodeType.trend: return start+" la tendance";
+        case NodeType.graph: return  start+" le groupe";
+        case NodeType.timer: return  start+" le timer";
       }
       return "";
     }

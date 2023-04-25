@@ -110,16 +110,15 @@ export class Graph extends Node{
 }
 
 export class Timer extends Node{
-
+  name:string;
   duration:number; // total duration of the timer
   counter:number;  // curent time
-  name:string;
 
   constructor(id:string,x:number,y:number) {
     super(id,x,y,NodeType.timer);
+    this.name = "Timer "+this.id; // TODO : pq le getName() ne fonctionne pas ?
     this.duration = 0;
     this.counter = 0
-    this.name = "Timer "+this.id; // TODO : pq le getName() ne fonctionne pas ?
   }
 
   public override getName(): string {

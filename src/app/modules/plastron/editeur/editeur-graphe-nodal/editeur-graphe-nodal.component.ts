@@ -251,7 +251,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
   onEdgeClick(event:any){
     let index = event.dataIndex;
     let link = this.graph.links[index];
-    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.graph.nodes,"Modifier"]});
+    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.graph.nodes,true]});
 
     dialogRef.afterClosed().subscribe(result => {
       if(result){
