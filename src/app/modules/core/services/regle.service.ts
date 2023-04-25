@@ -13,97 +13,14 @@ export class RegleService {
   constructor(firebaseService:FirebaseService) {}
 
   getVariableGarbarit(): Observable<VariablePhysioGabarit[]> {
-    let SpO2:VariablePhysioGabarit = {
-      id:"0",
-      name:"SpO2",
-      rand:1,
-      min:0,
-      max:100,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
 
-    let FR:VariablePhysioGabarit = {
-      id:"1",
-      name:"FR",
-      rand:1,
-      min:0,
-      max:100,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
-
-    let FC:VariablePhysioGabarit = {
-      id:"2",
-      name:"FC",
-      rand:1,
-      min:0,
-      max:100,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
-
-    let HemoCue:VariablePhysioGabarit = {
-      id:"3",
-      name:"HemoCue",
-      rand:1,
-      min:0,
-      max:100,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
-
-    let PAD:VariablePhysioGabarit = {
-      id:"4",
-      name:"PAD",
-      rand:1,
-      min:0,
-      max:100,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
-
-    let PAS:VariablePhysioGabarit = {
-      id:"5",
-      name:"PAS",
-      rand:1,
-      min:0,
-      max:200,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
-
-    let Temp:VariablePhysioGabarit = {
-      id:"6",
-      name:"Temp",
-      rand:1,
-      min:0,
-      max:100,
-      couleur:"",
-      moyennesAge:[90,91,92,93,94,95,96,97,98,99],
-      moyennesSexe:[95,95],
-      sdAge:1,
-      sdSexe:1
-    }
-
+    let SpO2 = new VariablePhysioGabarit("0",1,"SpO2",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
+    let FR = new VariablePhysioGabarit("1",1,"FR",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
+    let FC = new VariablePhysioGabarit("2",1,"FC",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
+    let HemoCue = new VariablePhysioGabarit("3",1,"HemoCue",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
+    let PAD = new VariablePhysioGabarit("4",1,"PAD",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
+    let PAS = new VariablePhysioGabarit("5",1,"PAS",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
+    let Temp = new VariablePhysioGabarit("6",1,"Temp",0,100,"",[90,91,92,93,94,95,96,97,98,99],1)
 
     let variables = [SpO2,FR,FC,HemoCue,Temp,PAD,PAS];
 

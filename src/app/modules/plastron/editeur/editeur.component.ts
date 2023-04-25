@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { Trend, Event, Node, Link, Graph, BioEvent, Action, NodeType,EventType } from '../../core/models/node';
+import { Trend, Event, Node, Link, Graph, BioEvent, Action, NodeType,EventType, Timer } from '../../core/models/node';
 import { VariablePhysio, VariablePhysioInstance } from '../../core/models/variablePhysio';
 import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
@@ -9,6 +9,7 @@ import { NodeService } from '../../core/services/node.service';
 import { GraphDialogComponent } from './graph-dialog/graph-dialog.component';
 import { Curve } from './scene/scene.component';
 import { retry } from 'rxjs';
+import { Modele } from '../../core/models/modele';
 
 @Component({
   selector: 'app-editeur',
@@ -22,7 +23,6 @@ export class EditeurComponent implements OnInit {
   inspecteurOpened:boolean;
 
   _targetVariable!: VariablePhysioInstance[];
-  _graph: Graph;
 
   get targetVariable(): VariablePhysioInstance[] {
     return this._targetVariable;
@@ -34,31 +34,26 @@ export class EditeurComponent implements OnInit {
     }
   }
 
-  get graph(): Graph {
-    return this._graph;
+  _modele!: Modele;
+  get modele():  Modele {
+    return this._modele;
   }
-  @Input() set graph(value: Graph) {
-    if (value) { // if value isnt undefined
-      this._graph = value;
+  @Input() set modele(value:Modele ) {
+    if(value){
+      this._modele = value;
       this.events = new Array<[Event,number,number]>();
       this.trends = [];
-      this.initTrendsEventsRecursive(value)
-      if (this.targetVariable) this.initCurves();
+      this.initTrendsEventsRecursive(this.modele.graph)
+      if (this.targetVariable) this.initCurves();;
     }
   }
 
-
-
   @Input() duration: number=100;
-
-
-
 
   // liste de tout les modèles d'événements et de graphs existant
   allBioevents!: BioEvent[];
   allActions!: Action[];
   allGraphs!: Graph[];
-
 
   /**
    * all currents trends in the nodes
@@ -76,11 +71,9 @@ export class EditeurComponent implements OnInit {
    */
   curves:Curve[];
 
-
   constructor(public dialog: MatDialog, public reglesService: RegleService, public nodeService: NodeService) { }
 
   ngOnInit(): void {
-
     this.reglesService.getBioEvents().subscribe(
       (response) => {
         this.allBioevents = response as BioEvent[];
@@ -104,7 +97,6 @@ export class EditeurComponent implements OnInit {
         this.allGraphs = response;
       }
     );
-
   }
 
   /**
@@ -121,7 +113,6 @@ export class EditeurComponent implements OnInit {
       this.calculCurve(this.duration,variable,this.curves[index])
     });
   }
-
 
   initTrendsEventsRecursive(graph:Graph){
     //console.log("initTrendsEventsRecursive")
@@ -142,59 +133,29 @@ export class EditeurComponent implements OnInit {
     });
   }
 
-
   addElement(element: string) {
-    let indice = this.graph.nodes.length;
+    let indice = this.modele.graph.nodes.length;
     let x = 50; // l'element est ajouter au milieu
     let y = 50;
 
     switch (element) {
-      case 'link':
+      case NodeType.link:
         return this.createLink();
-      case 'bioevent':
-        let bioevent = {
-          id: indice.toString(),
-          x: x,
-          y: y,
-          type: NodeType.event,
-          typeEvent:EventType.bio,
-          event: ''
-        } as Event
+      case EventType.bio:
+        let bioevent = new Event(indice.toString(),x,y,EventType.bio);
         return this.createNode(bioevent,this.allBioevents);
-      case 'action':
-        let action = {
-          id: indice.toString(),
-          x: x,
-          y: y,
-          type: NodeType.event,
-          typeEvent:EventType.action,
-          event: undefined
-        } as Event
+      case EventType.action:
+        let action = new Event(indice.toString(),x,y,EventType.action);
         return this.createNode(action,this.allActions);
-      case 'trend':
-        let trend = {
-          id: indice.toString(),
-          name: 'Tendance ' + indice,
-          x: x,
-          y: y,
-          type: element,
-          cible: undefined,
-          pente: -1
-        } as Trend
+      case NodeType.trend:
+        let trend = new Trend (indice.toString(),x,y)
         return this.createNode(trend,this.targetVariable);
-      case 'group':
-        let group = {
-          id: indice.toString(),
-          name: 'Groupe ' + indice,
-          x: x,
-          y: y,
-          type: NodeType.graph,
-          gabarit:undefined,
-          links: undefined,
-          nodes:undefined,
-          state:false,
-        } as Graph
+      case NodeType.graph:
+        let group = new Graph(indice.toString(),x,y)
         return this.createNode(group,this.allGraphs);
+      case NodeType.timer:
+        let timer = new Timer(indice.toString(),x,y)
+        return this.createNode(timer,[]);
     }
   }
 
@@ -206,24 +167,27 @@ export class EditeurComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result:Node) => {
       if (result) {
         if (result.type == NodeType.graph) this.initGroup(result as Graph)
-        this.graph.nodes.push(result)
-        this.graph = structuredClone(this.graph);// TODO force change detection by forcing the value reference update
+        this.modele.graph.nodes.push(result)
+        this.modele = structuredClone(this.modele);// TODO force change detection by forcing the value reference update
       }
     });
   }
 
   createLink() {
-    let index = this.graph.links.length;
-    let link: Link = { id: index.toString(), source: undefined, target: undefined, type: "link", start: true };
+    let index = this.modele.graph.links.length;
+    let link: Link = new Link(index.toString());
 
     const dialogRef = this.dialog.open(NodeDialogComponent, {
-      data: [link, this.graph.nodes,"Ajouter"],
+      data: [link, this.modele.graph.nodes,"Ajouter"],
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.graph.links.push(result);
-        this.graph = structuredClone(this.graph);// TODO force change detection by forcing the value reference update
+        console.log("create link ")
+        console.log(result)
+
+        this.modele.graph.links.push(result);
+        this.modele = structuredClone(this.modele);// TODO force change detection by forcing the value reference update
         this.initCurves()
         this.curves = [...this.curves]
       }
@@ -242,7 +206,7 @@ export class EditeurComponent implements OnInit {
     }
     else{
       let node = event[0] as Node;
-      this.graph.nodes[event[1]] = node;
+      this.modele.graph.nodes[event[1]] = node;
       if (node.type == 'trend') { // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
         let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
         let variable = this.getVariableByName(trend.cible)
@@ -250,7 +214,7 @@ export class EditeurComponent implements OnInit {
       }
       else this.initCurves()
     }
-    this.graph = structuredClone(this.graph);
+    this.modele.graph = structuredClone(this.modele.graph);
     this.curves = [...this.curves]
 
   }
@@ -260,7 +224,6 @@ export class EditeurComponent implements OnInit {
 
     this.initCurves()
     this.curves = [...this.curves]
-
   }
 
   updateTriggers(event) {
@@ -305,7 +268,7 @@ export class EditeurComponent implements OnInit {
    * @param t
    */
   updateNodesStates(t:number){
-    this.updateNodeStatesRecursive(this.graph.triggeredEvents,this.graph,t)
+    this.updateNodeStatesRecursive(this.modele.triggeredEvents,this.modele.graph,t)
   }
 
   /**
@@ -333,7 +296,17 @@ export class EditeurComponent implements OnInit {
     //update all the graph who could have been triggered internaly
     graph.nodes.forEach(node =>{
       if (node.type == NodeType.graph && node.state) this.updateNodeStatesRecursive(triggeredEvents,node as Graph,t)
+      else if (node.type == NodeType.timer && node.state) this.advenceTimer(node as Timer,t)
     })
+  }
+
+  advenceTimer(timer:Timer,t:number){
+    timer.counter ++;
+    if (timer.counter == timer.duration) {
+      this.modele.triggeredEvents.push([t,timer.id])
+      timer.state = false; // the timer end
+    }
+
   }
 
 
@@ -359,11 +332,8 @@ export class EditeurComponent implements OnInit {
    // console.log("calculTrend "+variable.name)
     let trend = 0;
      // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
-    let trends = this.calculTrendRecursive(variable,this.graph.nodes);
+    let trends = this.calculTrendRecursive(variable,this.modele.graph.nodes);
     if(trends.length>0) trend = this.reduceTrends(trends)
-  //  console.log(trends)
-  //  console.log(trend)
-
     return trend;
   }
 
@@ -374,7 +344,6 @@ export class EditeurComponent implements OnInit {
  * @returns
  */
   private calculTrendRecursive(variable:VariablePhysioInstance,nodes:Node[]){
-   // console.log("calculTrendRecursive "+variable.name)
     let trends:number[] = []; // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     nodes.forEach(node => {
       if(node.state){ // si le node est actif
@@ -419,7 +388,7 @@ export class EditeurComponent implements OnInit {
 
     for (let i = 0; i < size; i++) {
       this.updateNodesStates(i); // each minute that pass we updates the states of the nodes
-      if(this.graph.nodes) trend = this.calculTrend(variable); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
+      if(this.modele.graph.nodes) trend = this.calculTrend(variable); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
 
       if (i > 0) prevValue = curve.values[i - 1][1]
 
@@ -441,22 +410,6 @@ export class EditeurComponent implements OnInit {
     let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     // Transform to the desired mean and standard deviation:
     return z * stdev + mean;
-  }
-
-  private getEventAtTime(time: number): number[] | undefined {
-    let result = undefined;
-    this.graph.triggeredEvents.forEach(event => {
-      if (event[0] == time) result = event;
-    });
-    return result;
-  }
-
-  private getTrendsFromEvent(event: string): any[] {
-    let trends = [];
-    this.graph.links.forEach(link => {
-      if (event == link.source) trends.push([link.target, link.start]);
-    });
-    return trends;
   }
 
 }

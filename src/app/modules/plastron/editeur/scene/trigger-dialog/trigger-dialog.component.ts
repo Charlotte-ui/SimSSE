@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Event ,Node} from 'src/app/modules/core/models/node';
+import { Button } from 'src/app/modules/shared/buttons';
 
 @Component({
   selector: 'app-trigger-dialog',
@@ -14,6 +15,8 @@ export class TriggerDialogComponent {
   isEdition!:boolean;
   titre!:string;
   validate!:string;
+
+  button:Button = new Button()
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<TriggerDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: [{},[Event,number,number][],boolean] ) {}
@@ -57,20 +60,6 @@ export class TriggerDialogComponent {
       this.dialogRef.close("delete");
     }
 
-    getIcon(node:Node){
-      let type:string = node.type;
-      if (type == 'event') type+=(node as Event).typeEvent
-      switch(type){
-        case 'link': return "arrow_right_alt";
-        case 'eventbio': return "healing";
-        case 'eventaction': return "touch_app";
-        case 'trend': return "trending_up";
-        case 'graph': return  "scatter_plot";
-        case 'eventstart': return  "input";
-
-      }
-      return "";
-    }
 
     /**
      * reduit la liste des evenements pour ne pas les afficher en double s'ils sont  présent plusieurs fois dans le Graph

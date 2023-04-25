@@ -1,8 +1,8 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { Node,Trend,Event, Link } from 'src/app/modules/core/models/node';
-
+import { Node,Trend,Event, Link, NodeType } from 'src/app/modules/core/models/node';
+import { Button } from 'src/app/modules/shared/buttons';
 
 @Component({
   selector: 'app-node-dialog',
@@ -18,32 +18,29 @@ export class NodeDialogComponent<T extends Node|Link> {
   node:T|Link;
   champs;
 
-  numbers = ["x","y","pente"];
-  hidden = ["x","y","state","id","type",'links','nodes','typeEvent'];
+  numbers = ["x","y","pente","duration"];
+  hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root'];
   listable = ["cible","source","target","event",'gabarit'];
   booleans = ["start"];
 
   titre!:string;
 
+  button = new Button();
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent<T>>,
-    @Inject(MAT_DIALOG_DATA) public data: [(T|Link),any[],string] ) {}
+    @Inject(MAT_DIALOG_DATA) public data: [T,any[],string] ) {}
 
     ngOnInit() {
       this.liste = this.data[1];
       this.node = this.data[0];
       this.titre = this.data[2] + this.completeTitle(this.node.type)
-      this.form = this.fb.group(this.node);
+      console.log("create node dialog")
 
       console.log(this.node)
+      this.form = this.fb.group(this.node);
+
 
       this.setChamp();
-
- /*      if (this.node.type == "link"){
-        let link = this.node as Link;
-        if (link.target) this.form.controls['target'].setValue(link.target.toString());
-        if (link.source) this.form.controls['source'].setValue(link.source.toString());
-      } */
 
     }
 
@@ -87,42 +84,25 @@ export class NodeDialogComponent<T extends Node|Link> {
       return false;
     }
 
-    getColor(node:Node|Link){
-      let type:string = node.type;
-      if (type == 'event') type+=(node as Event).typeEvent
-      switch(type){
-        case 'link': return "#90C2E7";
-        case 'eventbio': return "#FC9E4F";
-        case 'eventaction': return "#73bfb8";
-        case 'trend': return "#F2F3AE";
-        case 'graph': return  "#F0D3F7";
-      }
-      return "";
-    }
-
-    getIcon(node:Node|Link){
-      let type:string = node.type;
-      if (type == 'event') type+=(node as Event).typeEvent
-      switch(type){
-        case 'link': return "arrow_right_alt";
-        case 'eventbio': return "healing";
-        case 'eventaction': return "touch_app";
-        case 'trend': return "trending_up";
-        case 'graph': return  "scatter_plot";
-        case 'eventstart': return  "input";
-
-      }
-      return "";
-    }
-
     getValue(elem){
       if ('event' in elem) return elem.event;
       if ('couleur' in elem) return elem.name; // si varible TODO trouver une soluce plus propre
       else return elem.id;
     }
 
-    getName(elem){
-      return ('event' in elem)?elem.event:elem.name;
+    getName(elem:Node|any){
+      if (elem instanceof Node ) return elem.getName();
+      else if ("name" in elem) return elem.name;
+      return elem.event;
+    //TODO rendre plus propre
+    }
+
+    getColor(node:Node|Link){
+      return this.button.getButtonByType((node instanceof Event)?node.typeEvent:node.type).color;
+    }
+
+    getIcon(node:Node|Link){
+      return this.button.getButtonByType((node.type == NodeType.event)?(node as Event).typeEvent:node.type).icon;
     }
 
 
