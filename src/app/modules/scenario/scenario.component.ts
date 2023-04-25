@@ -14,8 +14,9 @@ import { AddRegleDialogComponent } from '../regles/tab-regles/add-regle-dialog/a
 import { ConfirmDeleteDialogComponent } from '../core/confirm-delete-dialog/confirm-delete-dialog.component';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { MatTable } from '@angular/material/table';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ProfilService } from '../core/services/profil.service';
+import { MatSort, Sort } from '@angular/material/sort';
 
 interface tableElementPlastron{
   modele:string;
@@ -52,9 +53,12 @@ export class ScenarioComponent implements OnInit {
   defaultElementPlastron!:tableElementPlastron;
   displayedColumnsPlastron: string[] = ['id','modele', 'triage', 'groupe','statut', 'description'];
   dataSourcePlastron:Array<tableElementPlastron> = [];
+  sortedDataSourcePlastron:Array<tableElementPlastron> = [];
+
   expandedElement!:tableElementPlastron|null;
 
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
+  @ViewChild(MatSort) sort: MatSort;
 
   constructor(private route: ActivatedRoute,
     private form: FormBuilder,
@@ -73,7 +77,6 @@ export class ScenarioComponent implements OnInit {
      // let tab = Object.keys(this.defaultElementPlastron);
 
    //   type staffKeys = keyof tableElementPlastron; // "name" | "salary"
-
 
     }
 
@@ -99,6 +102,10 @@ export class ScenarioComponent implements OnInit {
 
   }
 
+  ngAfterViewInit() {
+   // this.dataSourcePlastron.sort = this.sort;
+  }
+
   private initialisePlastron(groupe){
     console.log("initialisePlastron")
     console.log(groupe)
@@ -111,16 +118,9 @@ export class ScenarioComponent implements OnInit {
     );
   }
 
-
-
-
   goToPlastron(plastronId:string){
-
     console.log(plastronId)
-
     this.router.navigate(['/plastron/'+plastronId]);
-
-
   }
 
   public completePlastrons(){
@@ -193,10 +193,12 @@ export class ScenarioComponent implements OnInit {
       }
 
 
-
-
-
     });
+
+    this.sortedDataSourcePlastron =  this.dataSourcePlastron.slice();
+
+
+ 
   }
 
 
@@ -235,7 +237,42 @@ export class ScenarioComponent implements OnInit {
     //this.scenarioService.setScenario(this.scenarioFormGroup);
   }
 
+  /** Announce the change in sort state for assistive technology. */
+  sortData(sort: any) {
+    const data = this.dataSourcePlastron.slice();
+    sort = sort as Sort;
 
+    console.log(sort)
+    if (!sort.active || sort.direction === '') {
+      this.sortedDataSourcePlastron = data;
+      return;
+    }
+
+    this.sortedDataSourcePlastron = data.sort((a, b) => {
+      console.log(a)
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'id':
+          return this.compare(Number(a.numero), Number(b.numero), isAsc);
+        case 'modele':
+          return this.compare(a.modele, b.modele, isAsc);
+        case 'triage':
+          return this.compare(a.triage, b.triage, isAsc);
+        case 'groupe':
+          return this.compare(a.groupe, b.groupe, isAsc);
+        case 'statut':
+          return this.compare(a.statut, b.statut, isAsc);
+        default:
+          return 0;
+      }
+    });
+  }
+
+    compare(a: number | string, b: number | string, isAsc: boolean) {
+      console.log("a: "+a+", b:"+b)
+      console.log((a < b ? -1 : 1) * (isAsc ? 1 : -1))
+      return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    }
 
 
 }

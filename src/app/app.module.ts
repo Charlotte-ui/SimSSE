@@ -37,6 +37,7 @@ import {MatRadioModule} from '@angular/material/radio';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatSortModule} from '@angular/material/sort';
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -141,7 +142,8 @@ import { GeneralInfosComponent } from './modules/scenario/general-infos/general-
     MatRadioModule,
     DragDropModule,
     MatChipsModule,
-    MatAutocompleteModule
+    MatAutocompleteModule,
+    MatSortModule
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
