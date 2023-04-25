@@ -138,24 +138,21 @@ export class SceneComponent implements OnInit {
 
     this.modele.triggeredEvents.forEach(event => { // time id
       let markline = [];
-
       let node = this.getNodeByID(event[1].toString()) // TODO get the getName() to work
-
       let name = ("event" in node)?(node as Event).event : "Fin "+(node as Timer).name
-
-
+      let color = ("event" in node)?"#FEEA00" : "#C8FFBE"
 
       markline.push({
         name:name,
         xAxis: event[0],
         yAxis: 0,
-        lineStyle :{color:"#FEEA00"}
+        lineStyle :{color:color}
       })
       markline.push(
         {name:"end",
         xAxis: event[0],
         yAxis: this.markLineY,
-        lineStyle :{color:"#FEEA00"}
+        lineStyle :{color:color}
       })
 
       this.markLineData.push(markline);
@@ -207,7 +204,7 @@ export class SceneComponent implements OnInit {
     if (event.componentType!= "markLine") return;
 
     let trigger = event.data;
-    trigger["eventId"] = this.getEventAtTime(trigger.xAxis)[1];
+    trigger["event"] = this.getEventAtTime(trigger.xAxis)[1];
 
     this.openTriggerDialog(event.data,true);
 

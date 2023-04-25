@@ -37,7 +37,7 @@ export class Curve{
 
       if (i > 0) prevValue = this.values[i - 1][1]
 
-      let newValue = prevValue + this.gaussianRandom(0, this.variable.rand) + trend;
+      let newValue = Math.round(prevValue + this.gaussianRandom(0, this.variable.rand) + trend);
       //let newValue = variable.cible + i*trend + this.gaussianRandom(0, variable.rand) ;
 
       if (newValue > this.variable.max) newValue = this.variable.max;

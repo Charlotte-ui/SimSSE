@@ -131,19 +131,18 @@ export class EditeurComponent implements OnInit {
   }
 
   addElement(element: Node|Link) {
-    if ("type" in element){ // TODO element instanceof Node doesn't work
+    if (element.type == NodeType.link){ // TODO element instanceof Node doesn't work
+      let indice = this.modele.graph.links.length.toString();
+      (element as Link).id = indice;
+      this.modele.graph.links.push(element as Link);
+    }
+    else{
       let indice = this.modele.graph.nodes.length.toString();
       element.id = indice;
       if (element.type == NodeType.graph) this.initGroup(element as Graph)
       this.modele.graph.nodes.push(element as Node)
       console.log("addElement to model")
       console.log(this.modele)
-
-    }
-    else{
-      let indice = this.modele.graph.links.length.toString();
-      (element as Link).id = indice;
-      this.modele.graph.links.push(element as Link);
     }
     this.modele = structuredClone(this.modele);// TODO force change detection by forcing the value reference update
     this.initCurves()

@@ -15,6 +15,9 @@ export class TriggerDialogComponent {
   isEdition!:boolean;
   titre!:string;
   validate!:string;
+  noEditable:boolean=false;
+  icon = "flash_on";
+  id = "flash";
 
   button:Button = new Button()
 
@@ -22,6 +25,8 @@ export class TriggerDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: [{},[Event,number,number][],boolean] ) {}
 
     ngOnInit() {
+      console.log("init trigger dialog")
+
       console.log(this.data[0])
     //  console.log(this.data[0])
 
@@ -35,9 +40,18 @@ export class TriggerDialogComponent {
       this.isEdition = this.data[2];
 
       if (this.isEdition) {
-        this.form.get('eventId')?.disable();
-        this.titre = "Modifier le trigger"
-        this.validate = "Enregistrer les modifications"
+        if(Number.isNaN(Number(this.data[0]['event']))) { // if the trigger is a event
+          this.form.get('event')?.disable();
+          this.titre = "Modifier le trigger "+this.data[0]['name']
+          this.validate = "Enregistrer les modifications"
+        }
+        else{
+          this.noEditable = true;
+          this.icon = "access_alarm";
+          this.id = "time";
+          this.titre = "Vous ne pouvez pas déplacer la fin du timer"
+        }
+
       }
       else {
         this.titre = "Ajouter un trigger"
