@@ -3,12 +3,14 @@ import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { NodeDialogComponent } from './node-dialog/node-dialog.component';
-import { Trend,Event, Link, Graph ,Node} from 'src/app/modules/core/models/node';
+import { Trend,Event, Link, Graph ,Node, BioEvent, Action} from 'src/app/modules/core/models/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
 import { NodeType } from 'src/app/modules/core/models/node';
 import { EventType } from 'src/app/modules/core/models/node';
+import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
+import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',
@@ -31,6 +33,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
     this.updateChart();
   }
 }
+
+@Input() allBioevents!: BioEvent[];
+@Input() allActions!: Action[];
+@Input() targetVariable!: VariablePhysioInstance[];
+
 
 @Output() updateNode = new EventEmitter<Node[]>();
 @Output() updateLink = new EventEmitter<Link[]>();
@@ -66,13 +73,22 @@ export class EditeurGrapheNodalComponent implements OnInit {
     series: []
   };
 
+  categories = []
+
   @ViewChild('graphScene') graphScene: ElementRef;
 
 
-  constructor(public dialog: MatDialog) { }
+  constructor(public dialog: MatDialog) {
 
-  ngOnInit(): void {
-  }
+    Button.buttons.forEach(button => {
+      this.categories.push({
+        name:button.type,
+        itemStyle:{color:button.color},
+        symbol:button.symbol})
+    });
+   }
+
+  ngOnInit(): void {}
 
   //initialisateurs
 
@@ -81,18 +97,25 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     this.graph.nodes.forEach(node => {
       let draggable = (node.type == NodeType.event && (node as Event).typeEvent == EventType.start)?false:true;
-      let cat:string = node.type;
-      cat+= (node.type == NodeType.event )?(node as Event).typeEvent:"";
-      console.log(node)
 
-      console.log(node.type)
-      console.log(cat)
+      let name ;
 
-      this.graphData[node.id] = {name:node.name,
+      switch(node.type){
+        case NodeType.event : name = (node as Event).event
+        break
+        case NodeType.timer : name = node.type
+        break
+        default : name = (node as Trend|Graph).name;
+      }
+
+      let cat= (node.type == NodeType.event )?(node as Event).typeEvent:node.type;
+
+      this.graphData[node.id] = {
+        name:name,
         category:cat,
         draggable: draggable,
         layout: 'none',
-        value:[node.x,node.y]
+        value:[node.x,node.y],
       }
     });
 
@@ -102,17 +125,15 @@ export class EditeurGrapheNodalComponent implements OnInit {
     this.graphLink = new Array(this.graph.links.length);
 
     this.graph.links.forEach(link => {
+      let color = link.start?"#2E933C":"#DE1A1A";
+      let source = (Number.isNaN(Number(link.source)))?link.source:Number(link.source);
+
       this.graphLink[link.id] = {
-        source:Number(link.source),
-        target:Number(link.target),
-        lineStyle: {
-          color: link.start?"#2E933C":"#DE1A1A",
-        }
+        source:source, // name of the node
+        target:Number(link.target), // id of the node
+        lineStyle: {color:color}
       }
     });
-
-
-
   }
 
 
@@ -138,23 +159,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         },
         data: this.graphData,
         links: this.graphLink,
-        categories: [{
-          name:'eventbio',
-          itemStyle:{color:"#FC9E4F"}
-        },{
-          name:'eventaction',
-          itemStyle:{color:"#73bfb8"}
-        },{
-          name:'eventstart',
-          symbol:'rect',
-          itemStyle:{color:"#FFFFFF",borderColor:"#000000",borderWidth:1}
-        },{
-          name:'trend',
-          itemStyle:{color:"#F2F3AE"}
-        },{
-          name:'graph',
-          itemStyle:{color:"#F0D3F7"}
-        }],
+        categories: this.categories,
         lineStyle: {
           opacity: 1,
           width: 1,
@@ -162,9 +167,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         }
       }
     ]
-    console.log("series")
 
-    console.log(series)
 
     this.mergeOptions = {
       series: series
@@ -205,13 +208,25 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     let dialogRef;
 
-    if(event.data.category == 'graph')  {
-      let graph = node as Graph;
-      dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: graph});
+    switch(event.data.category ){
+      case NodeType.graph:
+        dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: node as Graph});
+        break;
+      case EventType.bio:
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allBioevents,true]});
+        break;
+      case EventType.action:
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allActions,true]});
+        break;
+      case NodeType.trend:
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.targetVariable,true]});
+        break;
+      case NodeType.timer:
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,[],true]});
     }
-    else  dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.graph.nodes,"Modifier"]});
 
-    dialogRef.afterClosed().subscribe(result => {
+
+    if(dialogRef) dialogRef.afterClosed().subscribe(result => {
       if(result){
         if (result == "delete"){
           this.graph.nodes.splice(index, 1);
@@ -264,19 +279,6 @@ export class EditeurGrapheNodalComponent implements OnInit {
       }
     });
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   }
 

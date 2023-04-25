@@ -33,7 +33,6 @@ export class InspecteurComponent implements OnInit {
     });
 
     return res;
-
   }
 
 }

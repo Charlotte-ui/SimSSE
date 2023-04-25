@@ -10,9 +10,9 @@
     <div mat-dialog-content>
       <mat-form-field appearance="fill">
         <mat-label>Évenement</mat-label>
-        <mat-select formControlName="eventId">
+        <mat-select formControlName="event">
           <mat-option *ngFor="let event of events" [value]="event[1]">
-            {{event[0].name}} <mat-icon  [fontIcon]="getIcon(event[0])"></mat-icon>
+            {{event[0].event}} <mat-icon  [fontIcon]="button.getButtonByType(event[0].type).icon"></mat-icon>
           </mat-option>
         </mat-select>
       </mat-form-field>

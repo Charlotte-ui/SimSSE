@@ -25,7 +25,6 @@ get variable():  VariablePhysio {
 @Input() set variable(value:VariablePhysio ) {
     this._variable = value;
     this.form = this.fb.group(value);
-
   }
 
   get tendances():  Trend[]  {
@@ -48,7 +47,6 @@ get variable():  VariablePhysio {
   changeValues(){
     console.log(this.form.value);
     this.newVariable.emit(this.form.value);
-
   }
 
 
