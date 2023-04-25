@@ -11,7 +11,12 @@
 
     <div class="col-9 texte">
       <button mat-button (click)="goToElement(element.id)"><h2>{{element.titre}}</h2></button>
-        <div id="description">
+      <div >
+        <mat-chip *ngFor="let tag of tags; index as i">
+          {{tag}}
+        </mat-chip>  
+      </div>
+      <div id="description">
           <textarea disabled [value]="element.description"></textarea>
         </div>
     </div>

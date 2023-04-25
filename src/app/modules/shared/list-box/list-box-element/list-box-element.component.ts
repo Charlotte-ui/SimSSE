@@ -14,6 +14,8 @@ export class ListBoxElementComponent<T extends Listable> {
 
   _element!:T;
 
+  tags = ['bloup','blip','blop']
+
   get element():  T{
     return this._element;
   }
