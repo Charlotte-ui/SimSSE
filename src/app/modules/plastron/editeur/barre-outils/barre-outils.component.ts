@@ -32,9 +32,6 @@ export class BarreOutilsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onClick(element:string){
-   //
-  }
 
   addElement(element: string) {
     let x = 50; // l'element est ajouter au milieu
