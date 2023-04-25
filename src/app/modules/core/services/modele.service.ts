@@ -10,95 +10,21 @@ import { Trend,Event,Link, NodeType, EventType, Graph } from '../models/node';
 })
 export class ModeleService {
 
-  getGraph(modele: Modele):Graph {
-    let trend1:Trend = {
-      id:"1",
-      name: 'chute sat',
-      x: 30,
-      y: 80,
-      type: NodeType.trend,
-      cible:'SpO2',
-      pente:-1,
-      state:false
-    }
+  getGraph():Graph {
+    let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
+    let trend2 = new Trend("2",15,60,'acc respi','FR',1)
+    let event:Event = new Event("3",40,50,EventType.action,'oxygénothérapie')
+    let start:Event = new Event("0",5,95,EventType.start,'start')
 
-    let trend2:Trend = {
-      id:"2",
-      name: 'acc respi',
-      x: 15,
-      y: 60,
-      type:NodeType.trend,
-      cible:'FR',
-      pente:1,
-      state:false
-    }
-    let event:Event = {
-      id:"3",
-      name: 'Oxygéno.',
-      x: 40,
-      y: 50,
-      type:NodeType.event,
-      typeEvent:EventType.action,
-      event:'oxygénothérapie',
-      state:false
-    }
 
-    let start:Event = {
-      id:"0",
-      name: 'Start',
-      x: 5,
-      y: 95,
-      type:NodeType.event,
-      typeEvent:EventType.start,
-      event:'start',
-      state:false
-    }
+    let link1:Link = new Link("0",'oxygénothérapie',1,false);
+    let link2:Link = new Link("1",'oxygénothérapie',2,false);
+    let link3:Link = new Link("2",'start',1,true);
+    let link4:Link = new Link("3",'start',2,true);
 
-    let link1:Link = {
-      id:"0",
-      source: 3,
-      target: 1,
-      type:"link",
-      start:false
-    }
 
-    let link2:Link = {
-      id:"1",
-      source: 3,
-      target: 2,
-      type:"link",
-      start:false
-    }
 
-    let link3:Link = {
-      id:"2",
-      source: 0,
-      target: 1,
-      type:"link",
-      start:true
-    }
-
-    let link4:Link = {
-      id:"3",
-      source: 0,
-      target: 2,
-      type:"link",
-      start:true
-    }
-
-    let graph: Graph ={
-      gabarit:false,
-      id:"-1",
-      links:[link1,link2,link3,link4],
-      name:"root",
-      nodes:[start,trend1,trend2,event],
-      root:true,
-      state:true,
-      type:NodeType.graph,
-      x:undefined,
-      y:undefined
-
-    }
+    let graph= new Graph("-1",0,0,"root",[start,trend1,trend2,event],[link1,link2,link3,link4],false,true)
 
     return graph;
 

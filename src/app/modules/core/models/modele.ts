@@ -13,4 +13,6 @@ export interface Modele extends Listable{
     triage:Triage;
     gabarit:boolean;
     graph:Graph;
+    triggeredEvents:[number,string][];
+    tags:string[];
 }

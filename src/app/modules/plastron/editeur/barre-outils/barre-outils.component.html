@@ -1,11 +1,13 @@
 
 <div class="container barre-container">
-  <div *ngFor="let button of buttons"  class="container button-container">
-    <div class="text">{{button.name}}</div>
-      <button mat-mini-fab  (click)="onClick(button.type)" [style.background]="button.color">
-          <mat-icon  [fontIcon]="button.icon"></mat-icon>
-      </button>
-  </div>
+  <ng-container *ngFor="let button of buttons">
+    <div *ngIf="button.outils"  class="container button-container">
+      <div class="text">{{button.name}}</div>
+        <button mat-mini-fab  (click)="addElement(button.type)" [style.background]="button.color">
+            <mat-icon  [fontIcon]="button.icon"></mat-icon>
+        </button>
+    </div>
+  </ng-container>
 </div>
 
 

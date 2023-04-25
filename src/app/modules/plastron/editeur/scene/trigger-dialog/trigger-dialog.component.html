@@ -1,18 +1,18 @@
 <div class="container">
   <h1 mat-dialog-title>{{titre}}
-    <button mat-mini-fab  disabled id="flash">
-      <mat-icon  fontIcon="flash_on"></mat-icon>
+    <button mat-mini-fab  disabled [id]="id">
+      <mat-icon  [fontIcon]="icon"></mat-icon>
     </button>
   </h1>
 
-  <mat-dialog-content *ngIf="data" [formGroup]="form">
+  <mat-dialog-content *ngIf="data && !noEditable" [formGroup]="form">
 
     <div mat-dialog-content>
       <mat-form-field appearance="fill">
         <mat-label>Évenement</mat-label>
-        <mat-select formControlName="eventId">
+        <mat-select formControlName="event">
           <mat-option *ngFor="let event of events" [value]="event[1]">
-            {{event[0].name}} <mat-icon  [fontIcon]="getIcon(event[0])"></mat-icon>
+            {{event[0].event}} <mat-icon  [fontIcon]="button.getButtonByType(event[0].type).icon"></mat-icon>
           </mat-option>
         </mat-select>
       </mat-form-field>

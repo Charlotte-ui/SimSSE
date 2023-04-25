@@ -11,6 +11,7 @@ export class HeaderComponent implements OnInit {
 
   @Input() scenario: Scenario;
   @Input() plastron: string;
+  @Input() triage: string;
 
   @Input() save: (args: any) => void;
 

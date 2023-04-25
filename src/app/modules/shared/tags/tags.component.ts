@@ -1,5 +1,5 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Component, ElementRef, Input, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -21,6 +21,8 @@ export class TagsComponent {
   @Input() allTags;
   @Input() tags;
 
+  @Output() newTags = new EventEmitter<string[]>();
+
   constructor() {
     this.filteredTags = this.tagCtrl.valueChanges.pipe(
       startWith(null),
@@ -40,6 +42,8 @@ export class TagsComponent {
     if (input) {
       input.value = '';
     }
+
+     this.newTags.emit(this.tags);
   }
 
   removeTag(index: number): void {
@@ -47,11 +51,15 @@ export class TagsComponent {
     if (index >= 0) {
       this.tags.splice(index, 1);
     }
+
+    
+     this.newTags.emit(this.tags);
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
     this.tags.push(event.option.viewValue);
     this.tagInput.nativeElement.value = '';
+    this.newTags.emit(this.tags);
   }
 
   private _filter(value: string): string[] {

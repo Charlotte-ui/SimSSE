@@ -35,15 +35,14 @@ export class ReglesComponent {
           let v = structuredClone(variable);
 
           let ma = this.initTableMoyenne(v.name,v.moyennesAge,v.sdAge,true);
-          let ms = this.initTableMoyenne(v.name,v.moyennesSexe,v.sdSexe,false);
+   //       let ms = this.initTableMoyenne(v.name,v.moyennesSexe,v.sdSexe,false);
 
           delete v.moyennesAge;
-          delete v.moyennesSexe;
-          delete v.sdSexe;
+
           delete v.sdAge;
           this.variablesDetails.push(v);
           this.moyennesAge.push(ma);
-          this.moyennesSexe.push(ms);
+    //      this.moyennesSexe.push(ms);
 
 
         });

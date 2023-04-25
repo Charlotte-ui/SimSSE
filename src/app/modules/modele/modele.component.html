@@ -1,7 +1,7 @@
 <app-header *ngIf="modele"  [plastron]="modele.titre"></app-header>
 <mat-tab-group>
     <mat-tab label="Cas clinique">
-      <app-editeur [targetVariable]="targetVariable" [graph]="graph"></app-editeur>
+      <app-editeur [targetVariable]="targetVariable" [modele]="modele"></app-editeur>
     </mat-tab>
     <mat-tab label="Tags et descriptions">
       <app-tags-descriptions [modele]="modele" (newModel)="changeModeleRef($event)"></app-tags-descriptions>
