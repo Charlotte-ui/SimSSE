@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { Button, IButton } from 'src/app/modules/shared/buttons';
+import { Button, IButton } from 'src/app/modules/core/models/buttons';
 
 
 

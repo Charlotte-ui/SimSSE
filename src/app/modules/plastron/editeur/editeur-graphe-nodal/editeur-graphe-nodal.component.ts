@@ -10,7 +10,7 @@ import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeu
 import { NodeType } from 'src/app/modules/core/models/node';
 import { EventType } from 'src/app/modules/core/models/node';
 import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
-import { Button } from 'src/app/modules/shared/buttons';
+import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({
   selector: 'app-editeur-graphe-nodal',

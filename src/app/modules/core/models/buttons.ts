@@ -1,5 +1,5 @@
 import { E } from "@angular/cdk/keycodes";
-import { EventType, NodeType } from "../core/models/node";
+import { EventType, NodeType } from "./node";
 
 export interface IButton{
   name:string,

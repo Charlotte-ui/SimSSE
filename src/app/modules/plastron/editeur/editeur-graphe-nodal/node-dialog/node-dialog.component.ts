@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { Node,Trend,Event, Link, NodeType } from 'src/app/modules/core/models/node';
-import { Button } from 'src/app/modules/shared/buttons';
+import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({
   selector: 'app-node-dialog',

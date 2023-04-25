@@ -5,12 +5,8 @@ import { Link, Trend, Event,Node, Graph, NodeType, Timer } from 'src/app/modules
 import {  VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 import { Modele } from 'src/app/modules/core/models/modele';
+import { Curve } from 'src/app/modules/core/models/curve';
 
-export interface Curve{
-  nom:string,
-  values: number [][], // x,y
-  currentMax:number,
-}
 
 @Component({
   selector: 'app-scene',
