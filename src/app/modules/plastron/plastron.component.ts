@@ -78,6 +78,7 @@ export class PlastronComponent implements OnInit {
   initGragh(){
     this.modele["triggeredEvents"] = [[0,'start'],[50,'oxygénothérapie']]
     this.modele["graph"] = this.modelService.getGraph(); ; // TODO remove when back is finish
+    this.modele["tags"] = ['Lemon', 'Lime' , 'Apple' ] ;
   }
 
   changeModeleRef(newModele){

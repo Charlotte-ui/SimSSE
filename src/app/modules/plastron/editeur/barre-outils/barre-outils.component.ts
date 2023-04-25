@@ -23,7 +23,7 @@ export class BarreOutilsComponent implements OnInit {
 
   @Output() newElement = new EventEmitter<Node|Link>();
 
-  buttons!:IButton[];
+  buttons!:IButton[]; 
 
   constructor(public dialog: MatDialog) {
     this.buttons = Button.buttons;
@@ -32,9 +32,6 @@ export class BarreOutilsComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onClick(element:string){
-   //
-  }
 
   addElement(element: string) {
     let x = 50; // l'element est ajouter au milieu

@@ -27,9 +27,7 @@
 
         <mat-card-content >
 
-          <app-tags [allTags]="allTags"  [tags]="tags"></app-tags>
-
-       
+          <app-tags *ngIf="modele"  [allTags]="allTags"  [tags]="modele.tags" (newTags)="updateTags($event)"></app-tags>
 
         </mat-card-content>
       </mat-card>

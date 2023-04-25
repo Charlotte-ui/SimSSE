@@ -1,13 +1,23 @@
-<app-header *ngIf="modele" [scenario]="scenario" [plastron]="modele.titre"></app-header>
+<app-header
+  *ngIf="modele"
+  [scenario]="scenario"
+  [plastron]="modele.titre"
+  [triage]="modele.triage"
+></app-header>
 <mat-tab-group>
-    <mat-tab label="Modèle - cas clinique">
-      <app-editeur [modele]="modele" [targetVariable]="targetVariable"></app-editeur>
-    </mat-tab>
-    <mat-tab label="Modèle - tags et descriptions">
-      <app-tags-descriptions [modele]="modele" (newModel)="changeModeleRef($event)"></app-tags-descriptions>
-    </mat-tab>
-    <mat-tab label="Profil">
-        <app-profil [profil]="profil"></app-profil>
-    </mat-tab>
-
+  <mat-tab label="Modèle - cas clinique">
+    <app-editeur
+      [modele]="modele"
+      [targetVariable]="targetVariable"
+    ></app-editeur>
+  </mat-tab>
+  <mat-tab label="Modèle - tags et descriptions">
+    <app-tags-descriptions
+      [modele]="modele"
+      (newModel)="changeModeleRef($event)"
+    ></app-tags-descriptions>
+  </mat-tab>
+  <mat-tab label="Profil">
+    <app-profil [profil]="profil"></app-profil>
+  </mat-tab>
 </mat-tab-group>
