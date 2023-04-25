@@ -1,5 +1,9 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Button, IButton } from 'src/app/modules/core/models/buttons';
+import { EventType, Graph, NodeType, Timer, Trend,Event,Node, Action, BioEvent, Link } from 'src/app/modules/core/models/node';
+import { NodeDialogComponent } from '../editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
+import { MatDialog } from '@angular/material/dialog';
 
 
 
@@ -10,11 +14,18 @@ import { Button, IButton } from 'src/app/modules/core/models/buttons';
 })
 export class BarreOutilsComponent implements OnInit {
 
-  @Output() newElement = new EventEmitter<string>();
+  // liste de tout les modèles d'événements et de graphs existant
+  @Input() allBioevents!: BioEvent[];
+  @Input() allActions!: Action[];
+  @Input() allGraphs!: Graph[];
+  @Input() targetVariable!: VariablePhysioInstance[];
+  @Input() nodes!: Node[];
+
+  @Output() newElement = new EventEmitter<Node|Link>();
 
   buttons!:IButton[];
 
-  constructor() {
+  constructor(public dialog: MatDialog) {
     this.buttons = Button.buttons;
   }
 
@@ -22,7 +33,63 @@ export class BarreOutilsComponent implements OnInit {
   }
 
   onClick(element:string){
-    this.newElement.emit(element);
+   //
   }
+
+  addElement(element: string) {
+    let x = 50; // l'element est ajouter au milieu
+    let y = 50;
+
+    switch (element) {
+      case NodeType.link:
+        return this.createLink();
+      case EventType.bio:
+        let bioevent = new Event("",x,y,EventType.bio);
+        return this.createNode(bioevent,this.allBioevents);
+      case EventType.action:
+        let action = new Event("",x,y,EventType.action);
+        return this.createNode(action,this.allActions);
+      case NodeType.trend:
+        let trend = new Trend ("",x,y)
+        return this.createNode(trend,this.targetVariable);
+      case NodeType.graph:
+        let group = new Graph("",x,y)
+        return this.createNode(group,this.allGraphs);
+      case NodeType.timer:
+        let timer = new Timer("",x,y)
+        return this.createNode(timer,[]);
+    }
+  }
+
+  createLink() {
+    let link: Link = new Link("");
+
+    const dialogRef = this.dialog.open(NodeDialogComponent, {
+      data: [link, this.nodes,false],
+    });
+
+    dialogRef.afterClosed().subscribe((result:Link) => {
+      if (result) {
+        console.log("create link ")
+        console.log(result)
+        this.newElement.emit(result);
+      }
+    });
+  }
+
+  createNode(newNode: Node,liste:any[]) {
+    const dialogRef = this.dialog.open(NodeDialogComponent, {
+      data: [newNode, liste,false],
+    });
+
+    dialogRef.afterClosed().subscribe((result:Node) => {
+      if (result) {
+        this.newElement.emit(result);
+      }
+    });
+  }
+
+
+
 
 }

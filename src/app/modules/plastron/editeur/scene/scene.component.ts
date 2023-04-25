@@ -24,7 +24,7 @@ export class SceneComponent implements OnInit {
  * all events is the nodes and theirs ids
  */
   @Input() events:[Event,number,number][];
-
+  @Input()  modele:Modele;
 
   _curves!:  Curve[];
   get curves():  Curve[] {
@@ -41,7 +41,7 @@ export class SceneComponent implements OnInit {
     }
   }
 
-  @Input()  modele:Modele;
+
 
 
   @Output() updateTrigger = new EventEmitter<[number,string][]>();

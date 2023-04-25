@@ -213,16 +213,16 @@ export class EditeurGrapheNodalComponent implements OnInit {
         dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: node as Graph});
         break;
       case EventType.bio:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allBioevents,"Modifier"]});
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allBioevents,true]});
         break;
       case EventType.action:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allActions,"Modifier"]});
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allActions,true]});
         break;
       case NodeType.trend:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.targetVariable,"Modifier"]});
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.targetVariable,true]});
         break;
       case NodeType.timer:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,[],"Modifier"]});
+        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,[],true]});
     }
 
 

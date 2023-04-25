@@ -130,65 +130,24 @@ export class EditeurComponent implements OnInit {
     });
   }
 
-  addElement(element: string) {
-    let indice = this.modele.graph.nodes.length;
-    let x = 50; // l'element est ajouter au milieu
-    let y = 50;
+  addElement(element: Node|Link) {
+    if ("type" in element){ // TODO element instanceof Node doesn't work
+      let indice = this.modele.graph.nodes.length.toString();
+      element.id = indice;
+      if (element.type == NodeType.graph) this.initGroup(element as Graph)
+      this.modele.graph.nodes.push(element as Node)
+      console.log("addElement to model")
+      console.log(this.modele)
 
-    switch (element) {
-      case NodeType.link:
-        return this.createLink();
-      case EventType.bio:
-        let bioevent = new Event(indice.toString(),x,y,EventType.bio);
-        return this.createNode(bioevent,this.allBioevents);
-      case EventType.action:
-        let action = new Event(indice.toString(),x,y,EventType.action);
-        return this.createNode(action,this.allActions);
-      case NodeType.trend:
-        let trend = new Trend (indice.toString(),x,y)
-        return this.createNode(trend,this.targetVariable);
-      case NodeType.graph:
-        let group = new Graph(indice.toString(),x,y)
-        return this.createNode(group,this.allGraphs);
-      case NodeType.timer:
-        let timer = new Timer(indice.toString(),x,y)
-        return this.createNode(timer,[]);
     }
-  }
-
-  createNode(newNode: Node,liste:any[]) {
-    const dialogRef = this.dialog.open(NodeDialogComponent, {
-      data: [newNode, liste,"Ajouter"],
-    });
-
-    dialogRef.afterClosed().subscribe((result:Node) => {
-      if (result) {
-        if (result.type == NodeType.graph) this.initGroup(result as Graph)
-        this.modele.graph.nodes.push(result)
-        this.modele = structuredClone(this.modele);// TODO force change detection by forcing the value reference update
-      }
-    });
-  }
-
-  createLink() {
-    let index = this.modele.graph.links.length;
-    let link: Link = new Link(index.toString());
-
-    const dialogRef = this.dialog.open(NodeDialogComponent, {
-      data: [link, this.modele.graph.nodes,"Ajouter"],
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log("create link ")
-        console.log(result)
-
-        this.modele.graph.links.push(result);
-        this.modele = structuredClone(this.modele);// TODO force change detection by forcing the value reference update
-        this.initCurves()
-        this.curves = [...this.curves]
-      }
-    });
+    else{
+      let indice = this.modele.graph.links.length.toString();
+      (element as Link).id = indice;
+      this.modele.graph.links.push(element as Link);
+    }
+    this.modele = structuredClone(this.modele);// TODO force change detection by forcing the value reference update
+    this.initCurves()
+    this.curves = [...this.curves]
   }
 
   initGroup(group:Graph) {
@@ -213,34 +172,26 @@ export class EditeurComponent implements OnInit {
     }
     this.modele.graph = structuredClone(this.modele.graph);
     this.curves = [...this.curves]
-
   }
 
   updateLinks(event) {
    // let index = Number(event[1])
-
     this.initCurves()
     this.curves = [...this.curves]
   }
 
   updateTriggers(event) {
     // let index = Number(event[1])
-
      this.initCurves()
      this.curves = [...this.curves]
-
    }
 
   getVariableByName(name:string):VariablePhysioInstance{
-
     let res = undefined;
-
     this.targetVariable.forEach(variable => {
       if (variable.name == name) res = variable;
     });
-
     return res;
-
   }
 
   updateVariables(event) {
@@ -260,21 +211,8 @@ export class EditeurComponent implements OnInit {
 
   }
 
-
-
-
-
-
-
-
   // tools
-
-
-
-
-
-
-
+/*
   isNodeTrigger(nodeTriggers,node):boolean|undefined{
     let res = undefined;
     nodeTriggers.forEach(nodeTrigger => {
@@ -282,9 +220,5 @@ export class EditeurComponent implements OnInit {
       }
     );
     return res;
-  }
-
-
-
-
+  } */
 }

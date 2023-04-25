@@ -24,16 +24,18 @@ export class NodeDialogComponent<T extends Node|Link> {
   booleans = ["start"];
 
   titre!:string;
+  edition!:boolean;
 
   button = new Button();
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent<T>>,
-    @Inject(MAT_DIALOG_DATA) public data: [T,any[],string] ) {}
+    @Inject(MAT_DIALOG_DATA) public data: [T,any[],boolean] ) {}
 
     ngOnInit() {
       this.liste = this.data[1];
       this.node = this.data[0];
-      this.titre = this.data[2] + this.completeTitle(this.node.type)
+      this.edition = this.data[2]
+      this.completeTitle(this.node.type)
       console.log("create node dialog")
 
       console.log(this.node)
@@ -45,12 +47,13 @@ export class NodeDialogComponent<T extends Node|Link> {
     }
 
     completeTitle(type:string):string{
+      let start = (this.edition)?"Modifier":"Ajouter";
       switch(type){
-        case 'link': return " le lien";
-        case 'bioevent': return " l'événement";
-        case 'action': return " l'action";
-        case 'trend': return " la tendance";
-        case 'graph': return  " le groupe";
+        case 'link': return start+" le lien";
+        case 'bioevent': return start+" l'événement";
+        case 'action': return start+" l'action";
+        case 'trend': return start+" la tendance";
+        case 'graph': return  start+" le groupe";
       }
       return "";
     }

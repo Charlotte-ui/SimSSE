@@ -1,7 +1,6 @@
-<mat-grid-list cols="5" >
 
   <div class="container editeur">
-    <div class="row">
+    <div *ngIf="modele && modele.graph" class="row">
 
       <div id="barre-outils" >
         <mat-accordion multi="true" class="barre-container">
@@ -12,15 +11,21 @@
               </mat-panel-description>
             </mat-expansion-panel-header>
             <div class="panel-content">
-              <app-barre-outils (newElement)="addElement($event)"></app-barre-outils>
+              <app-barre-outils
+              [allBioevents]="allBioevents"
+              [allActions]="allActions"
+              [allGraphs]="allGraphs"
+              [targetVariable]="targetVariable"
+              [nodes]="modele.graph.nodes"
+              (newElement)="addElement($event)"></app-barre-outils>
             </div>
           </mat-expansion-panel>
         </mat-accordion>
       </div>
 
-      <div *ngIf="modele && modele.graph"  id="scene" [ngClass]="{smallMargLeft: !barreOutilsOpened, bigMargLeft: barreOutilsOpened, smallMargRight: !inspecteurOpened, bigMargRight: inspecteurOpened}">
+      <div id="scene" [ngClass]="{smallMargLeft: !barreOutilsOpened, bigMargLeft: barreOutilsOpened, smallMargRight: !inspecteurOpened, bigMargRight: inspecteurOpened}">
         <div class="row">
-          <app-scene [events]="events" [curves]="curves" [duration]="duration" [modele]="modele" (updateTrigger)="updateTriggers($event)"></app-scene>
+          <app-scene [modele]="modele"  [events]="events" [curves]="curves" [duration]="duration" (updateTrigger)="updateTriggers($event)"></app-scene>
         </div>
         <div class="row">
           <app-editeur-graphe-nodal [graph]="modele.graph" [allBioevents]="allBioevents" [allActions]="allActions" [targetVariable]="targetVariable"  (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
