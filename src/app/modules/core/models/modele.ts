@@ -14,4 +14,5 @@ export interface Modele extends Listable{
     gabarit:boolean;
     graph:Graph;
     triggeredEvents:[number,string][];
+    tags:string[];
 }

@@ -135,10 +135,13 @@ export class SceneComponent implements OnInit {
     });
 
     this.markLineData = []
+    console.log("updateMarklineData")
 
     this.modele.triggeredEvents.forEach(event => { // time id
       let markline = [];
+      console.log(event)
       let node = this.getNodeByID(event[1].toString()) // TODO get the getName() to work
+      console.log(node)
       let name = ("event" in node)?(node as Event).event : "Fin "+(node as Timer).name
       let color = ("event" in node)?"#FEEA00" : "#C8FFBE"
 
