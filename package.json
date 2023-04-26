@@ -26,6 +26,7 @@
     "bootstrap": "^5.2.3",
     "echarts": "^5.4.2",
     "firebase": "^9.18.0",
+    "jspdf": "^2.5.1",
     "ngx-echarts": "^15.0.3",
     "rxjs": "~7.5.0",
     "tslib": "^2.5.0",
