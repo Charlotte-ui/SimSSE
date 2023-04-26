@@ -13,20 +13,32 @@
   <button *ngIf="scenario" mat-button>
     <span (click)="goToScenario()">{{ scenario.titre }}</span>
   </button>
+
   <span *ngIf="plastron">
     <mat-icon id="arrow">arrow_forward_ios</mat-icon>
   </span>
+
   <button *ngIf="plastron" mat-button>
     <span>{{ plastron }}</span>
   </button>
+
   <app-triage *ngIf="triage" [triage]="triage"></app-triage>
+
   <button
     *ngIf="plastron || scenario"
     mat-icon-button
+    [matTooltip]="plastron?'Enregister le plastron '+plastron:'Enregister le scenario'+scenario.titre "
+    (click)="save()"
+    [ngClass]="{activate: changesToSave}"
+    [disabled]="!changesToSave"
   >
     <mat-icon>save</mat-icon>
   </button>
-  <button *ngIf="plastron" mat-icon-button>
+  <button 
+  *ngIf="plastron" 
+  mat-icon-button
+  matTooltip="Enregister le plastron actuel en tant que nouveau modele"
+  (click)="saveAsNewModele()">
     <mat-icon>note_add</mat-icon>
   </button>
   <span class="example-spacer"></span>

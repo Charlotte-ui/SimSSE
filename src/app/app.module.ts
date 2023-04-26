@@ -38,6 +38,9 @@ import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatSortModule} from '@angular/material/sort';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatSnackBarModule} from '@angular/material/snack-bar'; 
+
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -69,6 +72,7 @@ import { GraphEditeurDialogComponent } from './modules/plastron/editeur/editeur-
 import { ModeleComponent } from './modules/modele/modele.component';
 import { GroupesComponent } from './modules/scenario/groupes/groupes.component';
 import { GeneralInfosComponent } from './modules/scenario/general-infos/general-infos.component';
+import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dialog.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -103,7 +107,8 @@ import { GeneralInfosComponent } from './modules/scenario/general-infos/general-
     GraphEditeurDialogComponent,
     ModeleComponent,
     GroupesComponent,
-    GeneralInfosComponent
+    GeneralInfosComponent,
+    ModeleDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -144,6 +149,9 @@ import { GeneralInfosComponent } from './modules/scenario/general-infos/general-
     MatChipsModule,
     MatAutocompleteModule,
     MatSortModule
+    MatTooltipModule,
+    MatSnackBarModule
+
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]

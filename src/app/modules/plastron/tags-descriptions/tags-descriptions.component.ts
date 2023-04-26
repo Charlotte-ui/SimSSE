@@ -34,31 +34,11 @@ export class TagsDescriptionsComponent {
 
   allTags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
 
+  @Output() newChange = new EventEmitter<boolean>();
+
+
   constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog) {}
 
-  saveAsNewModel(){
-    console.log("saveAsNewModel")
-
-    console.log(this.modele)
-    let newModel = structuredClone(this.modele);
-    newModel.titre="";
-    delete newModel.id;
-    delete newModel.gabarit;
-
-    const dialogRef = this.dialog.open(AddRegleDialogComponent,
-      {data: newModel});
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
-
-      if (result == undefined) return;
-
-      this.modelService.createNewModel(result,true);
-      this.newModele.emit(result);
-
-    });
-
-  }
 
   wrapArray(object){
     let clone = []
@@ -87,6 +67,7 @@ export class TagsDescriptionsComponent {
 
   updateTags(tags: string[]) {
     this.modele.tags = tags;
+    this.newChange.emit(true)
 
     }
 

@@ -38,7 +38,8 @@ export class ModeleService {
     return this.firebaseService.getElementInCollectionByIds<Modele>("Modele",id);
   }
 
-  createNewModel(modele:Modele,gabarit:boolean){
+  createNewModel(modele:Modele,gabarit:boolean):Modele{
+    return undefined;
     // TODOD
   }
 }

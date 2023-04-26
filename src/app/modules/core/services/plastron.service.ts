@@ -12,7 +12,7 @@ import { Scenario } from '../models/scenario';
 })
 export class PlastronService {
 
-
+  constructor() { }
   getVariablesCibles(plastron: Plastron): Observable<VariablePhysioInstance[]> {
 
 
@@ -31,7 +31,7 @@ export class PlastronService {
   }
 
   changeModelRef(plastron: Plastron, newModele: Modele) {
-    throw new Error('Method not implemented.');
+   //
   }
 
   getScenario(plastron: Plastron): Observable<Scenario> {
@@ -41,5 +41,10 @@ export class PlastronService {
     return of(scenario);
   }
 
-  constructor() { }
+  updatePlastron(plastron:Plastron) : Modele{
+    return undefined;
+    
+  }
+
+
 }
