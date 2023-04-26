@@ -37,8 +37,10 @@ import {MatRadioModule} from '@angular/material/radio';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar'; 
+
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -146,8 +148,10 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     DragDropModule,
     MatChipsModule,
     MatAutocompleteModule,
+    MatSortModule
     MatTooltipModule,
     MatSnackBarModule
+
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
