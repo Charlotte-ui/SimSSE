@@ -1,8 +1,9 @@
 import { number } from "echarts";
 import { Collection } from "../services/firebase.service";
+import { Nameable } from "./nameable";
 
 
-export abstract class VariablePhysio implements Collection{
+export abstract class VariablePhysio implements Collection,Nameable{
     id:string;
     rand:number;
     name:string;

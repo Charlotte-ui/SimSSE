@@ -10,6 +10,9 @@ import { Plastron } from '../models/plastron';
   providedIn: 'root'
 })
 export class ScenarioService {
+  createScenario(scenario: Scenario) :Scenario{
+    throw new Error('Method not implemented.');
+  }
 
   constructor(public firebaseService:FirebaseService) { }
 

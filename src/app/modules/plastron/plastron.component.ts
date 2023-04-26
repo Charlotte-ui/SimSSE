@@ -14,9 +14,7 @@ import { RegleService } from '../core/services/regle.service';
 import { Profil } from '../core/models/profil';
 import { PlastronService } from '../core/services/plastron.service';
 import { Scenario } from '../core/models/scenario';
-import { AddRegleDialogComponent } from '../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { NodeDialogComponent } from './editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -34,7 +32,7 @@ export class PlastronComponent implements OnInit {
 
   changesToSave:boolean=false;
 
-  allTags = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  allTags!:string[];
 
   constructor(
     private route: ActivatedRoute,
@@ -69,6 +67,10 @@ export class PlastronComponent implements OnInit {
 
         this.scenario = response;
         console.log(this.scenario);
+      });
+
+      this.regleService.getAllTagsPlastron().subscribe((response) => {
+        this.allTags = response;
       });
     });
   }
@@ -114,17 +116,14 @@ this.changesToSave = true
       console.log('saveAsNewModel');
       console.log(this.modele);
       let newModel = structuredClone(this.modele);
-      newModel.titre = '';
+      newModel.title = '';
       delete newModel.id;
       delete newModel.gabarit;
-
-      //   <span id="titre">{{modele.titre}}</span>.
-
       const dialogRef = this.dialog.open(ModeleDialogComponent, {
         data: [
           newModel,
           'Le plastron actuel dérive du modèle ' +
-            this.modele.titre +
+            this.modele.title +
             ', créer un nouveau modèle à partir du plastron actuel changera aussi le modèle auquel le plastron actuel fait référence.',
           this.allTags,
           false,
@@ -151,7 +150,7 @@ this.changesToSave = true
           this.changesToSave = false
 
       this._snackBar.open(
-        'Modifications du plastron ' + this.modele.titre + ' enregistrées !',
+        'Modifications du plastron ' + this.modele.title + ' enregistrées !',
         'Ok',
         {
           duration: 3000,

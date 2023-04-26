@@ -2,6 +2,6 @@ import { Collection } from "../services/firebase.service";
 
 
 export interface Listable extends Collection{
-    titre:string;
+    title:string;
     description:string;
 }

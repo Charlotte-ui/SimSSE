@@ -39,18 +39,14 @@ button{
     flex-grow: 1
 }
 
-
 tr.mat-mdc-footer-row td{
   font-weight: bold;
   background-color: rgb(243, 243, 243);
 }
 
-
-
 td{
   max-width: 150px;
 }
-
 
 .row{
   max-width: 100%;
@@ -85,16 +81,19 @@ mat-option{
   font-size: small;
 }
 
-
-
-
 .cdk-drag-animating{
   transition: transform 250ms cubic-bezier(0,0,0.2,1);
 }
-
 
 .box:not(.cdk-drag-placeholder){
   transition: transform 250ms cubic-bezier(0,0,0.2,1);
   transform: 0;
 }
 
+tr.box:not(.box):hover {
+  background: whitesmoke;
+}
+
+tr.box:not(.box):active {
+  background: #efefef;
+}

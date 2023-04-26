@@ -7,13 +7,13 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrls: ['./confirm-delete-dialog.component.less']
 })
 export class ConfirmDeleteDialogComponent {
-  nom!:string;
+  name!:string;
 
   constructor(public dialogRef: MatDialogRef<ConfirmDeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: string) {}
 
     ngOnInit() {
-      this.nom = this.data;
+      this.name = this.data;
 
   }
 

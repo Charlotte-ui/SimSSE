@@ -8,10 +8,10 @@
 <div class="container">
   <div class="row">
     <div class="col-6">
-      <app-list-box titre="Scenarios" type="Scenario"></app-list-box>
+      <app-list-box title="Scenarios" type="Scenario" (newElement)="createScenario($event)"></app-list-box>
     </div>
     <div class="col-6">
-      <app-list-box titre="Modèles" type="Modele"></app-list-box>
+      <app-list-box title="Modèles" type="Modele" (newElement)="createModele($event)"></app-list-box>
     </div>
   </div>
 </div>

@@ -1,7 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { NodeDialogComponent } from '../../plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Modele } from '../../core/models/modele';
 import { ModeleResolver } from '../modele.resolver';
 
@@ -14,7 +13,7 @@ export class ModeleDialogComponent {
   form: FormGroup;
   modele!:Modele;
   edition!:boolean;
-  titre!:string;
+  title!:string;
   message!:string;
   alltags!:string[];
 
@@ -26,7 +25,7 @@ export class ModeleDialogComponent {
       this.message=this.data[1]
       this.alltags=this.data[2]
       this.edition = this.data[3]
-      this.titre = this.edition?"Modifier le modele "+this.modele.titre:"Créer un nouveau modèle"
+      this.title = this.edition?"Modifier le modele "+this.modele.title:"Créer un nouveau modèle"
       
       this.form = this.fb.group(this.wrapArray(this.modele));
 

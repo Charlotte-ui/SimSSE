@@ -34,7 +34,7 @@ export class ListBoxElementComponent<T extends Listable> {
 
   removeElement(){
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent,
-      {data: this.element.titre});
+      {data: this.element.title});
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(result)

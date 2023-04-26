@@ -3,82 +3,74 @@ import { Listable } from '../../core/models/listable';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { AddRegleDialogComponent } from '../../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DialogComponent } from '../dialog/dialog.component';
 
 @Component({
   selector: 'app-list-box',
   templateUrl: './list-box.component.html',
-  styleUrls: ['./list-box.component.less']
+  styleUrls: ['./list-box.component.less'],
 })
 export class ListBoxComponent<T extends Listable> {
-
-  _type:string;
+  _type: string;
   keys;
-  elements!: T[]
+  elements!: T[];
 
-  @Input() titre!: string;
-  @Input() sousTitre!: string;
-  @Input() set type(value:string){
-    if(value) {
+  @Input() title!: string;
+  @Input() subTitle!: string;
+  @Input() set type(value: string) {
+    if (value) {
       this._type = value;
-      this.firebaseService.getCollectionById<T>(value).subscribe(
-        (elements) =>{
-          this.elements = elements
-          this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
-          const index = this.keys.indexOf("gabarit", 0);
-          if (index > -1) this.keys.splice(index, 1);
-          }
-      );
+      this.firebaseService.getCollectionById<T>(value).subscribe((elements) => {
+        this.elements = elements;
+        this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
+        const index = this.keys.indexOf('gabarit', 0);
+        if (index > -1) this.keys.splice(index, 1);
+      });
     }
-  };
+  }
+
+@Output() newElement = new EventEmitter<T>();
 
 
-
-  constructor(private router: Router,public firebaseService:FirebaseService,public dialog: MatDialog) {
-
+  constructor(
+    private router: Router,
+    public firebaseService: FirebaseService,
+    public dialog: MatDialog
+  ) {
     this.elements = [];
-
-
-
-
   }
 
-
-
-  addElement(){
-
+  addElement() {
     let newElement = {} as T;
-    this.keys.forEach(proprety => {
-      newElement[proprety]=""
+    this.keys.forEach((proprety) => {
+      newElement[proprety] = '';
     });
 
-
-    const dialogRef = this.dialog.open(AddRegleDialogComponent,
-      {data: newElement});
-
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result)
-
-      if (result == undefined) return;
-
-      this.elements.push(result) // add to database with gabarit = true
-
-      console.log(this.elements)
-
-
-
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: [newElement, [], false],
     });
 
+    dialogRef.afterClosed().subscribe((result:T) => {
+      
+
+      if (result ){
+        this.newElement.emit(result);
+        this.elements.push(result); // add to database with gabarit = true
+      
+
+        console.log(this.elements);
+      }
+
+     
+    });
   }
 
-  drop(event:CdkDragDrop<T[]>){
-    console.log("origin");
+  drop(event: CdkDragDrop<T[]>) {
+    console.log('origin');
 
     console.log(event);
 
-    moveItemInArray(this.elements,event.previousIndex,event.previousIndex);
+    moveItemInArray(this.elements, event.previousIndex, event.previousIndex);
   }
-
-
 }

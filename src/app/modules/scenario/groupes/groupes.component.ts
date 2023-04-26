@@ -1,9 +1,9 @@
 import { Component, Input } from '@angular/core';
 import { Groupe } from '../../core/models/groupe';
-import { AddRegleDialogComponent } from '../../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../core/models/scenario';
 import { ConfirmDeleteDialogComponent } from '../../core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { DialogComponent } from '../../shared/dialog/dialog.component';
 
 @Component({
   selector: 'app-groupes',
@@ -65,8 +65,8 @@ export class GroupesComponent {
 
   openDialog(element:Partial<Groupe>,id:number){
 
-    const dialogRef = this.dialog.open(AddRegleDialogComponent,
-      {data: element});
+    const dialogRef = this.dialog.open(DialogComponent,
+      {data: [element,[],false]});
 
     dialogRef.afterClosed().subscribe(result => {
       console.log(result)

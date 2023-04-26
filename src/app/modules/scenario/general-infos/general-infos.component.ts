@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ScenarioService } from '../../core/services/scenario.service';
 import { FormBuilder } from '@angular/forms';
 import { Scenario } from '../../core/models/scenario';
+import { RegleService } from '../../core/services/regle.service';
 
 @Component({
   selector: 'app-general-infos',
@@ -12,7 +13,7 @@ export class GeneralInfosComponent {
 
   scenarioFormGroup;
 
-  allTags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  allTags ;
   tags = ['Lemon', 'Lime' , 'Apple' ];
   displayedColumns: string[] = ['total', 'totalParticipant', 'totalPlastron'];
 
@@ -39,7 +40,12 @@ export class GeneralInfosComponent {
 
   constructor(
     private form: FormBuilder,
-    public scenarioService:ScenarioService) {
+    public scenarioService:ScenarioService,
+    public regleService:RegleService) {
+
+       this.regleService.getAllTagsPlastron().subscribe((response) => {
+        this.allTags = response;
+      });
     }
 
 }
