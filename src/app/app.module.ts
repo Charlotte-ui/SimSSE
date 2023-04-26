@@ -148,10 +148,9 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     DragDropModule,
     MatChipsModule,
     MatAutocompleteModule,
-    MatSortModule
+    MatSortModule,
     MatTooltipModule,
     MatSnackBarModule
-
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
