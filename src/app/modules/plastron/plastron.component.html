@@ -3,21 +3,26 @@
   [scenario]="scenario"
   [plastron]="modele.titre"
   [triage]="modele.triage"
-></app-header>
+  [changesToSave]="changesToSave"
+  (newModele)="saveAsNewModel($event)"
+  (newSave)="savePlastron($event)"
+>
+</app-header>
 <mat-tab-group>
   <mat-tab label="Modèle - cas clinique">
     <app-editeur
       [modele]="modele"
       [targetVariable]="targetVariable"
+      (newChange)="changeGraph($event)"
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Modèle - tags et descriptions">
     <app-tags-descriptions
       [modele]="modele"
-      (newModel)="changeModeleRef($event)"
+      (newChange)="changeModele()"
     ></app-tags-descriptions>
   </mat-tab>
   <mat-tab label="Profil">
-    <app-profil [profil]="profil"></app-profil>
+    <app-profil [profil]="profil" (newChange)="changeProfil()"></app-profil>
   </mat-tab>
 </mat-tab-group>

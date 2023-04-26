@@ -1,0 +1,35 @@
+<div class="container">
+  <h1 mat-dialog-title>{{ titre }}</h1>
+
+  <mat-dialog-content [formGroup]="form">
+    <div mat-dialog-content>
+      <div class="container">{{ message }}</div>
+
+      <mat-form-field appearance="fill" class="container">
+        <mat-label>Titre</mat-label>
+        <input matInput formControlName="titre" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" class="container">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+      </mat-form-field>
+
+      <div class="container noOverflow">
+        <mat-label>Triage</mat-label>
+        <mat-radio-group formControlName="triage" aria-label="Select an option">
+          <mat-radio-button value="UA">UA</mat-radio-button>
+          <mat-radio-button value="EU">EU</mat-radio-button>
+          <mat-radio-button value="UR">UR</mat-radio-button>
+        </mat-radio-group>
+      </div>
+
+      <app-tags [tags]="modele.tags" [allTags]="alltags"></app-tags>
+    </div>
+
+    <div mat-dialog-actions>
+      <button mat-button (click)="onNoClick()">Annuler</button>
+      <button mat-button (click)="save()">Enregistrer</button>
+    </div>
+  </mat-dialog-content>
+</div>
