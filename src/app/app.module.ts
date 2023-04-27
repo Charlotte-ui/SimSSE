@@ -148,7 +148,7 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     DragDropModule,
     MatChipsModule,
     MatAutocompleteModule,
-    MatSortModule
+    MatSortModule,
     MatTooltipModule,
     MatSnackBarModule
 
