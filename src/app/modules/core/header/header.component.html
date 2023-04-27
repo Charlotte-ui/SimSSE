@@ -34,6 +34,7 @@
   >
     <mat-icon>save</mat-icon>
   </button>
+
   <button 
   *ngIf="plastron" 
   mat-icon-button
@@ -41,7 +42,14 @@
   (click)="saveAsNewModele()">
     <mat-icon>note_add</mat-icon>
   </button>
+
+  <button *ngIf="plastron" mat-icon-button matTooltip="Télécharger la fiche plastron au format PDF"
+    (click)="saveAsPDF()">
+    <mat-icon>picture_as_pdf</mat-icon>
+  </button>
+
   <span class="example-spacer"></span>
+
   <button mat-icon-button (click)="goToRules()">
     <mat-icon>assignment</mat-icon>
   </button>

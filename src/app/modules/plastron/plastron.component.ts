@@ -17,6 +17,8 @@ import { Scenario } from '../core/models/scenario';
 import { MatDialog } from '@angular/material/dialog';
 import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { jsPDF } from "jspdf";
+
 
 @Component({
   selector: 'app-plastron',
@@ -33,6 +35,8 @@ export class PlastronComponent implements OnInit {
   changesToSave:boolean=false;
 
   allTags!:string[];
+
+ 
 
   constructor(
     private route: ActivatedRoute,
@@ -99,11 +103,8 @@ export class PlastronComponent implements OnInit {
 
   changeGraph($event){
     if ($event){
-      console.log("changesToSave")
-this.changesToSave = true
+      this.changesToSave = true
     }
-        
-
   }
 
   changeProfil(){
@@ -157,5 +158,15 @@ this.changesToSave = true
         }
       );
     }
+  }
+
+  exportAsPdf(event:boolean){
+    if (event){
+      // Default export is a4 paper, portrait, using millimeters for units
+        const doc = new jsPDF();
+        doc.text("Hello world!", 10, 10);
+        doc.save("a4.pdf");
+    }
+
   }
 }
