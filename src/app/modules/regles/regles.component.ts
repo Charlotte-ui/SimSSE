@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { VariablePhysio, VariablePhysioGabarit } from '../core/models/variablePhysio';
 import { RegleService } from '../core/services/regle.service';
-import { Event } from '../core/models/node';
+import { Action, BioEvent, Event } from '../core/models/node';
 
 
 @Component({
@@ -18,7 +18,8 @@ export class ReglesComponent {
   variablesDetails!: VariablePhysio[];
   moyennesAge!:any[];
   moyennesSexe!:any[];
-  events!: Partial<Event>[];
+  events!: BioEvent[];
+  actions!: Action[];
 
 
   constructor(public regleService:RegleService){}
@@ -51,14 +52,20 @@ export class ReglesComponent {
     );
 
     this.regleService.getBioEvents().subscribe(
-      (response) => {
+      (response:BioEvent[]) => {
         this.events = response;
+      }
+    );
+
+    this.regleService.getActions().subscribe(
+      (response:Action[]) => {
+        this.actions = response;
       }
     );
   }
 
-  initTableMoyenne(nom:string,moyennes,sd,age:boolean){
-    let m = {"nom":nom}
+  initTableMoyenne(name:string,moyennes,sd,age:boolean){
+    let m = {"name":name}
     moyennes.forEach((moyenne,i) => {
       let indice:string;
       if (age) indice=10*i+"-"+(i+1)*10
@@ -74,9 +81,12 @@ export class ReglesComponent {
 
   }
 
-  addEvent(event){
-    this.regleService.createEvent(event);
+  addBioEvent(event){
+    this.regleService.createBioEvent(event);
+  }
 
+  addAction(event){
+    this.regleService.createAction(event);
   }
 
 

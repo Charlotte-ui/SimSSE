@@ -5,37 +5,37 @@ import { Node,Trend,Event, Link, NodeType, EventType } from 'src/app/modules/cor
 import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({
-  selector: 'app-node-dialog',
-  templateUrl: './node-dialog.component.html',
-  styleUrls: ['./node-dialog.component.less']
+  selector: 'app-dialog',
+  templateUrl: './dialog.component.html',
+  styleUrls: ['./dialog.component.less']
 })
 
 
-export class NodeDialogComponent<T extends Node|Link> {
+export class DialogComponent<T extends Node|Link> { // valable aussi pour les modèles et les règles
 
   form: FormGroup;
   liste:any[];
   node:T|Link;
   champs;
 
-  numbers = ["x","y","pente","duration"];
+  numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","pente","duration"];
   hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root'];
-  listable = ["cible","source","target","event",'gabarit'];
+  listable = ["source","target","event",'gabarit'];
   booleans = ["start"];
 
-  titre!:string;
+  title!:string;
   edition!:boolean;
 
   button = new Button();
 
-  constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<NodeDialogComponent<T>>,
+  constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<DialogComponent<T>>,
     @Inject(MAT_DIALOG_DATA) public data: [T,any[],boolean] ) {}
 
     ngOnInit() {
       this.liste = this.data[1];
       this.node = this.data[0];
       this.edition = this.data[2]
-      this.titre=this.completeTitle((this.node.type==NodeType.event)?(this.node as Event).typeEvent:this.node.type)
+      this.title=this.completeTitle((this.node.type==NodeType.event)?(this.node as Event).typeEvent:this.node.type)
       console.log("create node dialog")
 
       console.log(this.node)

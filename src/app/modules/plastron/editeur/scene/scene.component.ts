@@ -83,8 +83,8 @@ export class SceneComponent implements OnInit {
     this.variableSelected = {}; // at init, all the variables are selected
 
     this.curves.forEach((curve) => {
-      this.legend.push(curve.nom);
-      this.variableSelected[curve.nom] = true;
+      this.legend.push(curve.name);
+      this.variableSelected[curve.name] = true;
 
       // curve.currentMax = 0 // the maximum value of the curve, used to set the height of the triggers
     });
@@ -123,7 +123,7 @@ export class SceneComponent implements OnInit {
   initGraphData() {
     this.graphData = {};
     this.curves.forEach((curve) => {
-      this.graphData[curve.nom] = curve.values;
+      this.graphData[curve.name] = curve.values;
     });
     this.updateMarklineData();
     this.updateChart();
@@ -138,7 +138,7 @@ export class SceneComponent implements OnInit {
     // on détermine la hauteur de la markline en fct de la taille des courbes
     this.markLineY = 0;
     this.curves.forEach((curve) => {
-      if (this.variableSelected[curve.nom] && curve.currentMax > this.markLineY)
+      if (this.variableSelected[curve.name] && curve.currentMax > this.markLineY)
         this.markLineY = curve.currentMax;
     });
 
@@ -180,10 +180,10 @@ export class SceneComponent implements OnInit {
 
     this.curves.forEach((curve) => {
       let serie = {
-        name: curve.nom,
+        name: curve.name,
         type: 'line',
         //     stack: 'x',
-        data: this.graphData[curve.nom],
+        data: this.graphData[curve.name],
       };
       series.push(serie);
     });

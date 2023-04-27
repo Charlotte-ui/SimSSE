@@ -19,10 +19,7 @@
               </div>
             </mat-card-header>
 
-            <mat-form-field>
-              <mat-label>Filtre</mat-label>
-              <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
-            </mat-form-field>
+            <app-tags [tags]="filterTags" [allTags]="allTags"></app-tags>
             
 
             <table mat-table  #table
@@ -67,7 +64,7 @@
                 <td mat-cell *matCellDef="let element">
                   <mat-form-field appearance="fill">
                     <mat-label>Groupe</mat-label>
-                    <mat-select [(value)]="element.groupe">
+                    <mat-select [(value)]="element.groupe" (selectionChange)="updateGroup($event,element)">
                       <mat-option *ngFor="let groupe of groupes" [value]="groupe.scene">
                         {{groupe.scene}}
                       </mat-option>
@@ -132,7 +129,7 @@
         </div>
 
         <div class="col-5 modele">
-          <app-list-box titre="Modèles" type="Modele" ></app-list-box>
+          <app-list-box title="Modèles" type="Modele" ></app-list-box>
         </div>
       </div>
     </div>

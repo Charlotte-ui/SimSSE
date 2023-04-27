@@ -56,12 +56,11 @@ import { ProfilComponent } from './modules/plastron/profil/profil.component';
 import { BarreOutilsComponent } from './modules/plastron/editeur/barre-outils/barre-outils.component';
 import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspecteur.component';
 import { EditeurGrapheNodalComponent } from './modules/plastron/editeur/editeur-graphe-nodal/editeur-graphe-nodal.component';
-import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { DialogComponent } from './modules/shared/dialog/dialog.component';
 import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger-dialog/trigger-dialog.component';
 import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
 import { ReglesComponent } from './modules/regles/regles.component';
 import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.component';
-import { AddRegleDialogComponent } from './modules/regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
 import { TriageComponent } from './modules/shared/triage/triage.component';
 import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
@@ -92,12 +91,11 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     BarreOutilsComponent,
     InspecteurComponent,
     EditeurGrapheNodalComponent,
-    NodeDialogComponent,
+    DialogComponent,
     TriggerDialogComponent,
     VariableControllerComponent,
     ReglesComponent,
     TabReglesComponent,
-    AddRegleDialogComponent,
     ConfirmDeleteDialogComponent,
     TriageComponent,
     TagsDescriptionsComponent,
@@ -151,7 +149,6 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     MatSortModule,
     MatTooltipModule,
     MatSnackBarModule
-
   ],
   providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]

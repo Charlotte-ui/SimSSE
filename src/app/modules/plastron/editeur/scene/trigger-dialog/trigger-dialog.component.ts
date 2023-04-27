@@ -13,7 +13,7 @@ export class TriggerDialogComponent {
   form: FormGroup;
   events:[Event,number,number][];
   isEdition!:boolean;
-  titre!:string;
+  title!:string;
   validate!:string;
   noEditable:boolean=false;
   icon = "flash_on";
@@ -42,19 +42,19 @@ export class TriggerDialogComponent {
       if (this.isEdition) {
         if(Number.isNaN(Number(this.data[0]['event']))) { // if the trigger is a event
           this.form.get('event')?.disable();
-          this.titre = "Modifier le trigger "+this.data[0]['name']
+          this.title = "Modifier le trigger "+this.data[0]['name']
           this.validate = "Enregistrer les modifications"
         }
         else{
           this.noEditable = true;
           this.icon = "access_alarm";
           this.id = "time";
-          this.titre = "Vous ne pouvez pas déplacer la fin du timer"
+          this.title = "Vous ne pouvez pas déplacer la fin du timer"
         }
 
       }
       else {
-        this.titre = "Ajouter un trigger"
+        this.title = "Ajouter un trigger"
         this.validate = "Ajouter"
 
 

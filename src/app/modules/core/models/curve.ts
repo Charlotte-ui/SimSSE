@@ -4,14 +4,14 @@ import { VariablePhysioInstance } from "./variablePhysio";
 
 
 export class Curve{
-  nom:string;
+  name:string;
   values: number [][]; // x,y
   currentMax:number;
   duration:number;
   variable:VariablePhysioInstance;
 
-  constructor(nom:string,duration?:number,variable?:VariablePhysioInstance){
-    this.nom = nom;
+  constructor(name:string,duration?:number,variable?:VariablePhysioInstance){
+    this.name = name;
     this.duration = (duration)?duration:0;
     this.variable = (variable)?variable:undefined;
     this.values = [];

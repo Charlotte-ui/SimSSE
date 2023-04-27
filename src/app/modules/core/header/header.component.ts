@@ -15,6 +15,7 @@ export class HeaderComponent implements OnInit {
 
   @Output() newModele = new EventEmitter<boolean>();
   @Output() newSave = new EventEmitter<boolean>();
+  @Output() newPDF = new EventEmitter<boolean>();
 
   constructor(private router: Router) {}
 
@@ -42,5 +43,9 @@ export class HeaderComponent implements OnInit {
 
   save() {
     this.newSave.emit(true);
+  }
+
+    saveAsPDF() {
+    this.newPDF.emit(true);
   }
 }

@@ -10,6 +10,7 @@ import { Trend,Event,Node, Link, BioEvent, Action, Graph } from '../../core/mode
 })
 export class RegleService {
 
+
   constructor(firebaseService:FirebaseService) {}
 
   getVariableGarbarit(): Observable<VariablePhysioGabarit[]> {
@@ -27,8 +28,6 @@ export class RegleService {
     return of(variables);
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
-
-
 
   getBioEvents(): Observable<BioEvent[]> {
     let oxy:BioEvent = {
@@ -74,6 +73,15 @@ export class RegleService {
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
 
+  getAllTagsPlastron(): Observable<string[]> {
+     let tags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry']
+    return of(tags);
+  }
+
+  getAllTagsScenario(): Observable<string[]> {
+     let tags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry']
+    return of(tags);
+  }
 
   createVariable(variable:VariablePhysio){
 
@@ -81,6 +89,13 @@ export class RegleService {
 
   createEvent(event:Event){
 
+  }
+
+    createAction(event: any) {
+    throw new Error('Method not implemented.');
+  }
+  createBioEvent(event: any) {
+    throw new Error('Method not implemented.');
   }
 
 
