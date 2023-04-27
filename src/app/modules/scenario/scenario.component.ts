@@ -28,7 +28,7 @@ import { RegleService } from '../core/services/regle.service';
 @Component({
   selector: 'app-scenario',
   templateUrl: './scenario.component.html',
-  styleUrls: ['./scenario.component.less']
+  styleUrls: ['./scenario.component.less'],
 })
 export class ScenarioComponent implements OnInit {
   scenario!: Scenario;
@@ -61,22 +61,21 @@ export class ScenarioComponent implements OnInit {
     });
   }
 
-  private initialisePlastron(groupe:Groupe) {
+  private initialisePlastron(groupe: Groupe) {
     console.log('initialisePlastron');
     console.log(groupe);
     this.scenarioService
       .getGroupePlastrons(groupe.id)
       .pipe(take(1))
-      .subscribe((response:Plastron[]) => {
+      .subscribe((response: Plastron[]) => {
         console.log(response);
-        response.forEach((plastron:Plastron) => { plastron.groupe = groupe});
-        
+        response.forEach((plastron: Plastron) => {
+          plastron.groupe = groupe;
+        });
+
         this.plastrons = this.plastrons.concat(response);
       });
   }
 
-
-  save(){
-    
-  }
+  save() {}
 }

@@ -1,12 +1,25 @@
-<app-header [scenario]="scenario" ></app-header>
+<app-header [scenario]="scenario"></app-header>
 <mat-tab-group>
   <mat-tab label="Infos générales">
-    <app-general-infos [scenario]="scenario" (newTotalPlastron)="totalPlastron = $event"></app-general-infos>
+    <app-general-infos
+      [scenario]="scenario"
+      (newTotalPlastron)="totalPlastron = $event"
+    ></app-general-infos>
   </mat-tab>
   <mat-tab label="Groupes">
-    <app-groupes *ngIf="groupes" [groupes]="groupes" [scenario]="scenario"></app-groupes>
+    <app-groupes
+      *ngIf="groupes"
+      [groupes]="groupes"
+      [scenario]="scenario"
+    ></app-groupes>
   </mat-tab>
   <mat-tab label="Plastrons et modèles">
-    <app-lot-plastrons [groupes]="groupes" [plastrons]="plastrons" [totalPlastron]="totalPlastron" [scenario]="scenario" (newChange)="save()"></app-lot-plastrons>
+    <app-lot-plastrons
+      [groupes]="groupes"
+      [plastrons]="plastrons"
+      [totalPlastron]="totalPlastron"
+      [scenario]="scenario"
+      (newChange)="save()"
+    ></app-lot-plastrons>
   </mat-tab>
 </mat-tab-group>

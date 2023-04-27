@@ -1,7 +1,7 @@
-import { Collection } from "../services/firebase.service";
+import { Collection } from '../services/firebase.service';
 
-
-export interface Listable extends Collection{
-    title:string;
-    description:string;
+export interface Listable extends Collection {
+  title: string;
+  description: string;
+  tags: string[];
 }

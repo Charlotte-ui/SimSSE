@@ -1,5 +1,11 @@
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
 import { Groupe } from '../../core/models/groupe';
@@ -90,7 +96,6 @@ export class LotPlastronsComponent {
 
   @Output() newChange = new EventEmitter<boolean>();
 
-
   constructor(
     private route: ActivatedRoute,
     private form: FormBuilder,
@@ -114,7 +119,7 @@ export class LotPlastronsComponent {
 
     //   type staffKeys = keyof tableElementPlastron; // "name" | "salary"
 
-    this.regleService.getAllTagsScenario().subscribe((response) => {
+    this.regleService.getAllTagsPlastron().subscribe((response) => {
       this.allTags = response;
     });
   }
@@ -181,23 +186,21 @@ export class LotPlastronsComponent {
   }
 
   updateGroup(event, element: tableElementPlastron) {
-    let plastron  = this.plastrons[element.id]
+    let plastron = this.plastrons[element.id];
     let newScene = event.value;
     let oldScene = plastron.groupe.scene;
     let newGroupe;
 
-    this.groupes.forEach(groupe => {
+    this.groupes.forEach((groupe) => {
       if (groupe.scene == newScene) {
-        groupe[element.triage] ++;
+        groupe[element.triage]++;
         newGroupe = groupe;
-      }
-      else if (groupe.scene == oldScene) groupe[element.triage] --;
+      } else if (groupe.scene == oldScene) groupe[element.triage]--;
     });
 
     plastron.groupe = newGroupe;
 
     this.newChange.emit(true);
-
   }
 
   public completePlastrons() {
@@ -220,18 +223,20 @@ export class LotPlastronsComponent {
   private addPlastronToDatasource(plastron: Plastron, index: number) {
     //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
 
-    this.modelService.getModeleById(plastron.modele).subscribe((response:Modele) => {
-      console.log(response);
-      this.dataSourcePlastron[index].modele = response.title;
-      this.dataSourcePlastron[index].description = response.description;
-      this.dataSourcePlastron[index].triage = response.triage;
-      this.dataSourcePlastron[index].statut = Statut.Doing;
-      this.dataSourcePlastron[index].id = index;
-      this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
-      // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
-      if (index == this.plastrons.length - 1)
-        this.updateDataSourceTriage(index);
-    });
+    this.modelService
+      .getModeleById(plastron.modele)
+      .subscribe((response: Modele) => {
+        console.log(response);
+        this.dataSourcePlastron[index].modele = response.title;
+        this.dataSourcePlastron[index].description = response.description;
+        this.dataSourcePlastron[index].triage = response.triage;
+        this.dataSourcePlastron[index].statut = Statut.Doing;
+        this.dataSourcePlastron[index].id = index;
+        this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
+        // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
+        if (index == this.plastrons.length - 1)
+          this.updateDataSourceTriage(index);
+      });
 
     this.profilService.getProfilById(plastron.profil).subscribe((response) => {
       console.log(response);

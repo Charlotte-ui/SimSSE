@@ -16,6 +16,8 @@ export class ListBoxComponent<T extends Listable> {
   keys;
   elements!: T[];
 
+  @Input() chips!: string[];
+
   @Input() title!: string;
   @Input() subTitle!: string;
   @Input() set type(value: string) {
@@ -30,8 +32,7 @@ export class ListBoxComponent<T extends Listable> {
     }
   }
 
-@Output() newElement = new EventEmitter<T>();
-
+  @Output() newElement = new EventEmitter<T>();
 
   constructor(
     private router: Router,
@@ -51,18 +52,13 @@ export class ListBoxComponent<T extends Listable> {
       data: [newElement, [], false],
     });
 
-    dialogRef.afterClosed().subscribe((result:T) => {
-      
-
-      if (result ){
+    dialogRef.afterClosed().subscribe((result: T) => {
+      if (result) {
         this.newElement.emit(result);
         this.elements.push(result); // add to database with gabarit = true
-      
 
         console.log(this.elements);
       }
-
-     
     });
   }
 
@@ -72,5 +68,15 @@ export class ListBoxComponent<T extends Listable> {
     console.log(event);
 
     moveItemInArray(this.elements, event.previousIndex, event.previousIndex);
+  }
+
+  changeFilter(event) {
+    let filter = event.value;
+
+    this.elements.forEach((element) => {
+      if (element.tags.filter((value) => filter.includes(value)).length > 0) {
+        element['show'] = true;
+      } else element['show'] = false;
+    });
   }
 }
