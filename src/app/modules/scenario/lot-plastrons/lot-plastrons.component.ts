@@ -37,6 +37,7 @@ interface tableElementPlastron {
   groupe: number;
   statut: Statut;
   id: number;
+  idPlastron:string;
   numero: number;
   age: number;
   sexe: boolean;
@@ -232,6 +233,7 @@ export class LotPlastronsComponent {
         this.dataSourcePlastron[index].triage = response.triage;
         this.dataSourcePlastron[index].statut = Statut.Doing;
         this.dataSourcePlastron[index].id = index;
+        this.dataSourcePlastron[index].idPlastron = plastron.id;
         this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
         // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
         if (index == this.plastrons.length - 1)

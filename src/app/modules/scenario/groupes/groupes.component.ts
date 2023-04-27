@@ -11,14 +11,20 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
   styleUrls: ['./groupes.component.less'],
 })
 export class GroupesComponent {
+  
+  
   groupPositions = [
-    [56.5, 20, '1'],
-    [46.5, 30, '2'],
-    [22.1, 40, '3'],
-    [15, 15],
-    [50, 10],
-    [20, 50],
+    [565, 200, '1'],
+    [465, 300, '2'],
+    [221, 400, '3'],
+    [150, 150],
+    [500, 100],
+    [200, 500],
   ];
+
+  PMA = [150, 150];
+  PRV = [500, 100];
+  CADI = [200, 500];
 
   editable: string[] = ['psy', 'impliques'];
   keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'impliques'];
@@ -45,6 +51,8 @@ export class GroupesComponent {
       // if value isnt undefined
       this._groupes = value;
       this.dataSourceGroup = value;
+
+     // this.initPosition(); TODO, use whenn BDD is ok
     }
   }
 
@@ -60,6 +68,21 @@ export class GroupesComponent {
     };
 
     this.openDialog(newGroup, -1);
+  }
+
+  initPosition(){
+
+    this.groupPositions = []
+
+
+    this.groupes.forEach(groupe => {
+      this.groupPositions.push(groupe.position)
+    });
+
+    this.groupPositions.push(this.PRV)
+    this.groupPositions.push(this.PMA)
+    this.groupPositions.push(this.CADI)
+
   }
 
   editGroup(id: number) {
@@ -119,5 +142,10 @@ export class GroupesComponent {
   public isEditable(champ: string) {
     if (this.editable.includes(champ)) return true;
     return false;
+  }
+
+  updatePosition(event){
+    console.log("updatePosition")
+    console.log(event)
   }
 }

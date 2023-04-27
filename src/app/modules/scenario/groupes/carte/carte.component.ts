@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, Output } from '@angular/core';
 import * as echarts from 'echarts/types/dist/echarts';
 import { EChartsOption, util } from 'echarts';
 import 'echarts/extension/bmap/bmap';
@@ -7,6 +7,11 @@ const SymbolSize = 20;
 let Data = [];
 let SceneNb = 0;
 
+let SIZE_MAP = 600;
+
+let MARGIN = 25;
+
+let MAX_POSITION = 1000 ;
 
 @Component({
   selector: 'app-carte',
@@ -14,6 +19,8 @@ let SceneNb = 0;
   styleUrls: ['./carte.component.less']
 })
 export class CarteComponent implements OnDestroy{
+
+
 
 
   @Input() set data(value: (string | number)[][]) {
@@ -24,6 +31,9 @@ export class CarteComponent implements OnDestroy{
     }
   } 
 
+  @Output() static newPosition = new EventEmitter<any[]>();
+  @Output() newPosition2 ;
+
   updatePosition: () => void;
   initialChartOption: EChartsOption = {
     legend: {data:['group','PMA','PRV','CADI']},
@@ -33,22 +43,22 @@ export class CarteComponent implements OnDestroy{
         'X: ' + params.data[0].toFixed(2) + '<br>Y: ' + params.data[1].toFixed(2),
     },
     grid:{
-      show:false,
+      show:true,
       right:'0',
       bottom:'0',
       top:'0',
       left:'0',
     },
     xAxis: {
-      show:false,
+      show:true,
       min: 0,
-      max: 100,
+      max: MAX_POSITION,
       type: 'value',
     },
     yAxis: {
-      show:false,
+      show:true,
       min: 0,
-      max: 100,
+      max: MAX_POSITION,
       type: 'value',
     },
     series: [],
@@ -57,7 +67,9 @@ export class CarteComponent implements OnDestroy{
   mergeOptions = {};
 
 
-  constructor() {}
+  constructor() {
+    this.newPosition2 = CarteComponent.newPosition;
+  }
 
   ngOnDestroy() {
     if (this.updatePosition) {
@@ -66,6 +78,11 @@ export class CarteComponent implements OnDestroy{
   }
 
   onChartReady(myChart: any) {
+
+    console.log("onChartReady")
+    console.log(Data)
+
+    
 
     const onPointDragging = function (dataIndex) {
       Data[dataIndex] = myChart.convertFromPixel({ gridIndex: 0 }, this.position) as number[];
@@ -136,6 +153,8 @@ export class CarteComponent implements OnDestroy{
           }
         ],
       });
+
+      CarteComponent.newPosition.emit(Data);
     };
 
     const showTooltip = (dataIndex) => {
@@ -169,7 +188,7 @@ export class CarteComponent implements OnDestroy{
         graphic: util.map(Data, (item, dataIndex) => {
           return {
             type: 'circle',
-            position: myChart.convertToPixel({ gridIndex: 0 }, item),
+            position: this.initPosition(item),
             shape: {
               cx: 0,
               cy: 0,
@@ -206,9 +225,7 @@ export class CarteComponent implements OnDestroy{
         itemStyle: {
           borderColor: '#555',
           color: 'rgba(245, 40, 145, 1)',
-          opacity:1
-
-          
+          opacity:1   
         },
       },
       { // PRV
@@ -259,6 +276,24 @@ export class CarteComponent implements OnDestroy{
       series: series
     };
 
+
+  }
+
+ //  myChart.convertToPixel({ gridIndex: 0 },index) does'nt work
+
+  initPosition(position:number[]){
+    console.log("old position")
+    console.log(position)
+
+    let newX = (SIZE_MAP+MARGIN*2) - position[1] * (SIZE_MAP+MARGIN*2) / MAX_POSITION ;
+    let newY =  position[0] * (SIZE_MAP+MARGIN*2) / MAX_POSITION ;
+
+
+    console.log("new position")
+    console.log([newY,newX])
+
+
+    return [newY,newX]
 
   }
 
