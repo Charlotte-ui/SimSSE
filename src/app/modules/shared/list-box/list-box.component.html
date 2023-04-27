@@ -13,10 +13,11 @@
     <mat-card-content>
         <mat-list cdkDropList [cdkDropListData]="elements" (cdkDropListDropped)="drop($event)">
             <ng-container  *ngFor="let element of elements">
+                <mat-divider></mat-divider>
                 <mat-list-item cdkDrag class="box">
                     <app-list-box-element [element]="element" [type]="_type" ></app-list-box-element>
                 </mat-list-item>
-                <mat-divider></mat-divider>
+              
             </ng-container >
 
         </mat-list>

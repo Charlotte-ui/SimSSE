@@ -72,6 +72,7 @@ import { ModeleComponent } from './modules/modele/modele.component';
 import { GroupesComponent } from './modules/scenario/groupes/groupes.component';
 import { GeneralInfosComponent } from './modules/scenario/general-infos/general-infos.component';
 import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dialog.component';
+import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plastrons.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -106,7 +107,8 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     ModeleComponent,
     GroupesComponent,
     GeneralInfosComponent,
-    ModeleDialogComponent
+    ModeleDialogComponent,
+    LotPlastronsComponent
   ],
   imports: [
     BrowserModule,

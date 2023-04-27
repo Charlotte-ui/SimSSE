@@ -21,8 +21,9 @@ export class GroupesComponent {
     [20, 50]
   ];
 
+  editable: string[] = ['psy','impliques'];
   keysGroup: string[] = ['UR', 'UA', 'EU','psy','impliques'];
-  displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU','psy','impliques','edit','delete'];
+  displayedColumnsGroup: string[] = ['scene', 'UR', 'UA', 'EU','psy','impliques','delete'];
   dataSourceGroup = [];
 
   @Input() scenario:Scenario;
@@ -116,6 +117,13 @@ export class GroupesComponent {
 
     });
   }
+
+
+  
+    public isEditable(champ:string){
+      if (this.editable.includes(champ)) return true;
+      return false;
+    }
 
 
 }

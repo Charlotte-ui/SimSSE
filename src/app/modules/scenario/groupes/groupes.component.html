@@ -12,31 +12,25 @@
         <!-- Keys Column -->
         <ng-container *ngFor="let key of keysGroup" [matColumnDef]="key">
           <th mat-header-cell *matHeaderCellDef>{{key}}</th>
-          <td mat-cell *matCellDef="let element">{{element[key]}}</td>
+          <td mat-cell *matCellDef="let element">
+            <ng-container *ngIf="!isEditable(key)">
+            {{element[key]}}
+            </ng-container>
+            <mat-form-field *ngIf="isEditable(key)">
+              <input matInput type="number" [value]="element[key]">
+            </mat-form-field>
+          
+          </td>
           <td mat-footer-cell *matFooterCellDef [ngClass]="getTotal(key) == scenario[key] ? 'ok' : 'noOk'" >{{getTotal(key)}}</td>
         </ng-container>
   
-        <!-- edit Column -->
-        <ng-container matColumnDef="edit">
+        <!-- delete Column -->
+        <ng-container matColumnDef="delete">
           <th mat-header-cell *matHeaderCellDef>
             <button mat-mini-fab (click)="addGroup()">
               <mat-icon>add</mat-icon>
             </button>
           </th>
-          <td mat-cell *matCellDef="let element; let i = index">
-            <button
-              mat-mini-fab
-              (click)="editGroup(i)">
-              <mat-icon>edit</mat-icon>
-            </button>
-            </td>
-          <td mat-footer-cell *matFooterCellDef></td>
-  
-        </ng-container>
-  
-        <!-- delete Column -->
-        <ng-container matColumnDef="delete">
-          <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let element; let i = index">
             <button
               mat-mini-fab
