@@ -5,6 +5,9 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DialogComponent } from '../dialog/dialog.component';
+import { ApiService } from '../../core/services/api.service';
+import { Scenario } from '../../core/models/scenario';
+import { Vertex } from '../../core/models/vertex';
 
 @Component({
   selector: 'app-list-box',
@@ -12,7 +15,6 @@ import { DialogComponent } from '../dialog/dialog.component';
   styleUrls: ['./list-box.component.less'],
 })
 export class ListBoxComponent<T extends Listable> {
-  _type: string;
   keys;
   elements!: T[];
 
@@ -20,10 +22,17 @@ export class ListBoxComponent<T extends Listable> {
 
   @Input() title!: string;
   @Input() subTitle!: string;
-  @Input() set type(value: string) {
+  
+
+  _classe: typeof Vertex;
+  get classe(): typeof Vertex {
+    return this._classe;
+}
+  @Input() set classe(value: typeof Vertex){
     if (value) {
-      this._type = value;
-      this.firebaseService.getCollectionById<T>(value).subscribe((elements) => {
+      this._classe = value;
+
+      this.apiService.getClasseElements<T>(value).subscribe((elements) => {
         this.elements = elements;
         this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
         const index = this.keys.indexOf('gabarit', 0);
@@ -32,11 +41,13 @@ export class ListBoxComponent<T extends Listable> {
     }
   }
 
+
+
   @Output() newElement = new EventEmitter<T>();
 
   constructor(
     private router: Router,
-    public firebaseService: FirebaseService,
+    public apiService: ApiService,
     public dialog: MatDialog
   ) {
     this.elements = [];

@@ -5,6 +5,7 @@ import { FirebaseService } from './firebase.service';
 import { Scenario } from '../models/scenario';
 import { Groupe } from '../models/groupe';
 import { Plastron } from '../models/plastron';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,9 +15,10 @@ export class ScenarioService {
     throw new Error('Method not implemented.');
   }
 
-  constructor(public firebaseService:FirebaseService) { }
+  constructor(public firebaseService:FirebaseService, public apiService:ApiService) { }
 
 getScenarios(): Observable<Scenario[]> {
+    
     return this.firebaseService.getCollectionById<Scenario>("Scenario");
 }
 

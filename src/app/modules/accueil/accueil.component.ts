@@ -6,6 +6,7 @@ import { Modele } from '../core/models/modele';
 import { ModeleService } from '../core/services/modele.service';
 import { RegleService } from '../core/services/regle.service';
 
+
 @Component({
   selector: 'app-accueil',
   templateUrl: './accueil.component.html',
@@ -14,6 +15,9 @@ import { RegleService } from '../core/services/regle.service';
 export class AccueilComponent implements OnInit {
   allTagsScenario!: string[];
   allTagsPlastron!: string[];
+
+  Scenario = Scenario;
+  Modele = Modele;
 
   constructor(
     private router: Router,
