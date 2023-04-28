@@ -1,4 +1,5 @@
 import { Collection } from "../services/firebase.service";
+import { Nameable } from "./nameable";
 
 
 export enum NodeType {
@@ -15,7 +16,7 @@ export enum EventType {
   action = "eventaction"
 }
 
-export abstract class Node implements Collection{
+export abstract class Node implements Collection, Nameable{
     id: string;
     x: number;
     y: number;
@@ -29,8 +30,9 @@ export abstract class Node implements Collection{
       this.type = type;
       this.state = false ;
     }
+    
+  abstract getName();
 
-    public abstract getName():string;
 }
 
 export class Trend extends Node{

@@ -8,4 +8,5 @@ export interface Groupe extends Collection{
     EU:number;
     scenario:string;
     scene:number;
+    position:(number|string)[]
 }

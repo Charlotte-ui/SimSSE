@@ -7,7 +7,7 @@ import {ENTER, COMMA} from '@angular/cdk/keycodes';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { Observable, map, startWith } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { AddRegleDialogComponent } from '../../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
+import { RegleService } from '../../core/services/regle.service';
 
 @Component({
   selector: 'app-tags-descriptions',
@@ -32,12 +32,16 @@ export class TagsDescriptionsComponent {
 
   @Output() newModele = new EventEmitter<Modele>();
 
-  allTags =  ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  allTags!:string[];
 
   @Output() newChange = new EventEmitter<boolean>();
 
 
-  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog) {}
+  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog,public regleService:RegleService) {
+        this.regleService.getAllTagsPlastron().subscribe((response) => {
+        this.allTags = response;
+      });
+  }
 
 
   wrapArray(object){

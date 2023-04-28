@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, Input, OnDestroy, Output, EventEmitter, View
 import { NgxEchartsModule, NGX_ECHARTS_CONFIG } from 'ngx-echarts';
 import { EChartsOption, util } from 'echarts';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { NodeDialogComponent } from './node-dialog/node-dialog.component';
+import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import { Trend,Event, Link, Graph ,Node, BioEvent, Action} from 'src/app/modules/core/models/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
@@ -213,16 +213,16 @@ export class EditeurGrapheNodalComponent implements OnInit {
         dialogRef = this.dialog.open(GraphEditeurDialogComponent, {data: node as Graph});
         break;
       case EventType.bio:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allBioevents,true]});
+        dialogRef = this.dialog.open(DialogComponent,{data: [node,this.allBioevents,true]});
         break;
       case EventType.action:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.allActions,true]});
+        dialogRef = this.dialog.open(DialogComponent,{data: [node,this.allActions,true]});
         break;
       case NodeType.trend:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,this.targetVariable,true]});
+        dialogRef = this.dialog.open(DialogComponent,{data: [node,this.targetVariable,true]});
         break;
       case NodeType.timer:
-        dialogRef = this.dialog.open(NodeDialogComponent,{data: [node,[],true]});
+        dialogRef = this.dialog.open(DialogComponent,{data: [node,[],true]});
     }
 
 
@@ -251,7 +251,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
   onEdgeClick(event:any){
     let index = event.dataIndex;
     let link = this.graph.links[index];
-    let dialogRef = this.dialog.open(NodeDialogComponent,{data: [link,this.graph.nodes,true]});
+    let dialogRef = this.dialog.open(DialogComponent,{data: [link,this.graph.nodes,true]});
 
     dialogRef.afterClosed().subscribe(result => {
       if(result){

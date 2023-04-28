@@ -1,31 +1,30 @@
 <div *ngIf="element" class="container">
   <div class="row">
-
     <div *ngIf="element['triage']" class="col-2 image">
       <app-triage [triage]="element['triage']"></app-triage>
     </div>
 
     <div *ngIf="element['image']" class="col-2 image">
-      <img src='{{ "assets/images/" + element["image"] + ".jpg" }}'/>
+      <img src="{{ 'assets/images/' + element['image'] + '.jpg' }}" />
     </div>
 
     <div class="col-9 texte">
-      <button mat-button (click)="goToElement(element.id)"><h2>{{element.titre}}</h2></button>
-      <div >
-        <mat-chip *ngFor="let tag of tags; index as i">
-          {{tag}}
-        </mat-chip>  
+      <button mat-button (click)="goToElement(element.id)">
+        <h2>{{ element.title }}</h2>
+      </button>
+      <div>
+        <mat-chip *ngFor="let tag of element.tags; index as i">
+          {{ tag }}
+        </mat-chip>
       </div>
       <div id="description">
-          <textarea disabled [value]="element.description"></textarea>
-        </div>
+        <textarea disabled [value]="element.description"></textarea>
+      </div>
     </div>
     <div class="col-1 buttons">
-        <button
-          mat-mini-fab
-          (click)="removeElement()">
-          <mat-icon>delete</mat-icon>
-        </button>
+      <button mat-mini-fab (click)="removeElement()">
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
   </div>
 </div>

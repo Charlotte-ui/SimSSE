@@ -11,7 +11,7 @@
   </button>
 
   <button *ngIf="scenario" mat-button>
-    <span (click)="goToScenario()">{{ scenario.titre }}</span>
+    <span (click)="goToScenario()">{{ scenario.title }}</span>
   </button>
 
   <span *ngIf="plastron">
@@ -27,7 +27,7 @@
   <button
     *ngIf="plastron || scenario"
     mat-icon-button
-    [matTooltip]="plastron?'Enregister le plastron '+plastron:'Enregister le scenario'+scenario.titre "
+    [matTooltip]="plastron?'Enregister le plastron '+plastron:'Enregister le scenario'+scenario.title "
     (click)="save()"
     [ngClass]="{activate: changesToSave}"
     [disabled]="!changesToSave"

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddRegleDialogComponent } from './add-regle-dialog.component';
+import { LotPlastronsComponent } from './lot-plastrons.component';
 
-describe('AddRegleDialogComponent', () => {
-  let component: AddRegleDialogComponent;
-  let fixture: ComponentFixture<AddRegleDialogComponent>;
+describe('LotPlastronsComponent', () => {
+  let component: LotPlastronsComponent;
+  let fixture: ComponentFixture<LotPlastronsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AddRegleDialogComponent ]
+      declarations: [ LotPlastronsComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AddRegleDialogComponent);
+    fixture = TestBed.createComponent(LotPlastronsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

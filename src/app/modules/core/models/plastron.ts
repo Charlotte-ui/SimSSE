@@ -1,3 +1,4 @@
+import { Groupe } from './groupe';
 import { Listable } from './listable';
 
 export enum Statut {
@@ -7,7 +8,7 @@ export enum Statut {
 }
 
 export interface Plastron extends Listable{
-    groupe:string;
+    groupe:Groupe;
     modele:string;
     profil:string;
     statut:Statut;

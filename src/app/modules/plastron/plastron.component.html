@@ -1,7 +1,7 @@
 <app-header
   *ngIf="modele"
   [scenario]="scenario"
-  [plastron]="modele.titre"
+  [plastron]="modele.title"
   [triage]="modele.triage"
   [changesToSave]="changesToSave"
   (newModele)="saveAsNewModel($event)"

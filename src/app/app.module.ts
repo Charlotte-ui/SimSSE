@@ -41,8 +41,10 @@ import {MatRadioModule} from '@angular/material/radio';
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MatChipsModule} from '@angular/material/chips';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar'; 
+
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -58,13 +60,12 @@ import { ProfilComponent } from './modules/plastron/profil/profil.component';
 import { BarreOutilsComponent } from './modules/plastron/editeur/barre-outils/barre-outils.component';
 import { InspecteurComponent } from './modules/plastron/editeur/inspecteur/inspecteur.component';
 import { EditeurGrapheNodalComponent } from './modules/plastron/editeur/editeur-graphe-nodal/editeur-graphe-nodal.component';
-import { NodeDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { DialogComponent } from './modules/shared/dialog/dialog.component';
 import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger-dialog/trigger-dialog.component';
 import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
 import { ReglesComponent } from './modules/regles/regles.component';
 import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.component';
-import { AddRegleDialogComponent } from './modules/regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
-import { ConfirmDeleteDialogComponent } from './modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
 import { TriageComponent } from './modules/shared/triage/triage.component';
 import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
@@ -75,6 +76,7 @@ import { ModeleComponent } from './modules/modele/modele.component';
 import { GroupesComponent } from './modules/scenario/groupes/groupes.component';
 import { GeneralInfosComponent } from './modules/scenario/general-infos/general-infos.component';
 import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dialog.component';
+import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plastrons.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -94,12 +96,11 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     BarreOutilsComponent,
     InspecteurComponent,
     EditeurGrapheNodalComponent,
-    NodeDialogComponent,
+    DialogComponent,
     TriggerDialogComponent,
     VariableControllerComponent,
     ReglesComponent,
     TabReglesComponent,
-    AddRegleDialogComponent,
     ConfirmDeleteDialogComponent,
     TriageComponent,
     TagsDescriptionsComponent,
@@ -110,7 +111,8 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     ModeleComponent,
     GroupesComponent,
     GeneralInfosComponent,
-    ModeleDialogComponent
+    ModeleDialogComponent,
+    LotPlastronsComponent
   ],
   imports: [
     BrowserModule,
@@ -151,6 +153,7 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
     DragDropModule,
     MatChipsModule,
     MatAutocompleteModule,
+    MatSortModule,
     MatTooltipModule,
     MatSnackBarModule
   ],

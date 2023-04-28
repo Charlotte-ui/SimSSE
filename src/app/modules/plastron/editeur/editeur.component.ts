@@ -16,7 +16,6 @@ import {
   VariablePhysio,
   VariablePhysioInstance,
 } from '../../core/models/variablePhysio';
-import { NodeDialogComponent } from './editeur-graphe-nodal/node-dialog/node-dialog.component';
 import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
 import { NodeService } from '../../core/services/node.service';

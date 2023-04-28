@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Button, IButton } from 'src/app/modules/core/models/buttons';
 import { EventType, Graph, NodeType, Timer, Trend,Event,Node, Action, BioEvent, Link } from 'src/app/modules/core/models/node';
-import { NodeDialogComponent } from '../editeur-graphe-nodal/node-dialog/node-dialog.component';
+import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -61,7 +61,7 @@ export class BarreOutilsComponent implements OnInit {
   createLink() {
     let link: Link = new Link("");
 
-    const dialogRef = this.dialog.open(NodeDialogComponent, {
+    const dialogRef = this.dialog.open(DialogComponent, {
       data: [link, this.nodes,false],
     });
 
@@ -75,7 +75,7 @@ export class BarreOutilsComponent implements OnInit {
   }
 
   createNode(newNode: Node,liste:any[]) {
-    const dialogRef = this.dialog.open(NodeDialogComponent, {
+    const dialogRef = this.dialog.open(DialogComponent, {
       data: [newNode, liste,false],
     });
 
