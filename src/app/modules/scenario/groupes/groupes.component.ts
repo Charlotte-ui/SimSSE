@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Groupe } from '../../core/models/groupe';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../core/models/scenario';
-import { ConfirmDeleteDialogComponent } from '../../core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 
 @Component({

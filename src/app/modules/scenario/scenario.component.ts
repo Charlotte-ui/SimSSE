@@ -10,7 +10,7 @@ import { take } from 'rxjs';
 import { ModeleService } from '../core/services/modele.service';
 import { Modele, Triage } from '../core/models/modele';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDeleteDialogComponent } from '../core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import {
   animate,
   state,

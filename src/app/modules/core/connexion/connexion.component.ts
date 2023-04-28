@@ -35,6 +35,7 @@ export class ConnexionComponent implements OnInit {
 
     console.log("connexion with :"+pseudo+", "+password)
 
+    // root simsse
     this.authentificationService.login(pseudo,password)
 
     this.router.navigate(['/accueil']);

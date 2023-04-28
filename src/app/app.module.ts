@@ -65,7 +65,7 @@ import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger
 import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
 import { ReglesComponent } from './modules/regles/regles.component';
 import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.component';
-import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from './modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { TriageComponent } from './modules/shared/triage/triage.component';
 import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
