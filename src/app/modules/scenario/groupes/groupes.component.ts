@@ -3,7 +3,7 @@ import { Groupe } from '../../core/models/groupe';
 import { AddRegleDialogComponent } from '../../regles/tab-regles/add-regle-dialog/add-regle-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../core/models/scenario';
-import { ConfirmDeleteDialogComponent } from '../../core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
   selector: 'app-groupes',

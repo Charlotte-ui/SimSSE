@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { environment } from 'src/environments/environment.api';
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -12,13 +12,15 @@ export class ApiService {
 
   constructor(private http: HttpClient, private _snackBar: MatSnackBar) { }
 
-  urlAPI = "" // environment.urlAPI
+
+
+
 
 
   getClasseElements<T>(classe:string) {
 
     this.http
-        .get<any>(`${this.urlAPI}/${classe}`, {
+        .get<any>(`${environment.urlAPI}/${classe}`, {
             headers: { user: 'editeur',mdp:'simsse' },
          //   params: { userId: userId },
         })

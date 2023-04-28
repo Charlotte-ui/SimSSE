@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { List } from 'echarts';
-import { ConfirmDeleteDialogComponent } from 'src/app/modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { Listable } from 'src/app/modules/core/models/listable';
 
 @Component({
