@@ -8,13 +8,14 @@ import { VariablePhysioInstance } from '../models/variablePhysio';
 import { Scenario } from '../models/scenario';
 import { Groupe } from '../models/groupe';
 import { ApiService } from './api.service';
+import { ModeleService } from './modele.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlastronService {
 
-  constructor(public apiService:ApiService) { }
+  constructor(public apiService:ApiService, public modeleService:ModeleService) { }
   getVariablesCibles(plastron: Plastron): Observable<VariablePhysioInstance[]> {
     let SpO2 = new VariablePhysioInstance("0",1,"SpO2",0,100,"#5470c5",98)
     let FR = new VariablePhysioInstance("1",1,"FR",0,100,"#5470c5",16)
@@ -45,9 +46,23 @@ export class PlastronService {
     return undefined;
   }
 
-  getPlastron(link): Observable<Plastron|undefined> {
-    return this.apiService.getDocument(link['in'].substring(1))
+  getPlastronByLink(link): Observable<Plastron|undefined> {
+    return this.getPlastronById(link['in'].substring(1));
+     // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
+  }
+
+  getPlastronById(id): Observable<Plastron|undefined> {
+    return this.apiService.getDocument(id)
     .pipe(map(response => (new Plastron(response))))
+     // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
+  }
+
+  getGroupeLink(id:string): Observable<any[]> {
+    return this.apiService.getRelationTo(id,"seComposeDe");
+  }
+
+  getModeleByLink(link): Observable<Modele|undefined> {
+    return this.modeleService.getModeleByLink(link['in'].substring(1));
      // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
   }
 

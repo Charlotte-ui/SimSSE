@@ -54,7 +54,7 @@ export class ScenarioComponent implements OnInit {
         .getScenarioGroupes(this.scenario.id)
         .subscribe((response) => {
           response['result'].forEach((link) => {
-            this.scenarioService.getGroupe(link).subscribe((group) => {
+            this.scenarioService.getGroupeByLink(link,'in').subscribe((group) => {
               this.groupes.push(group);
               this.initialisePlastron(group);
               this.groupes = [...this.groupes] // forced update
@@ -69,7 +69,7 @@ export class ScenarioComponent implements OnInit {
     this.scenarioService.getGroupePlastrons(groupe.id).subscribe((response) => {
       response['result'].forEach((link, index: number) => {
         this.plastronService
-          .getPlastron(link)
+          .getPlastronByLink(link)
           .subscribe((plastron: Plastron) => {
             groupPlastron.push(plastron);
             plastron.groupe = groupe;

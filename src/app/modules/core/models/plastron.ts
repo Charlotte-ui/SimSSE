@@ -1,5 +1,7 @@
 import { Groupe } from './groupe';
 import { Listable } from './listable';
+import { Modele } from './modele';
+import { Profil } from './profil';
 import { Vertex } from './vertex';
 
 export enum Statut {
@@ -14,8 +16,8 @@ export class Plastron extends Vertex implements Listable{
     tags: string[];
     id: string;
     groupe:Groupe;
-    modele:string;
-    profil:string;
+    modele:Modele;
+    profil:Profil;
     statut:Statut;
 
     public static override className = "Plastron"
@@ -28,8 +30,8 @@ export class Plastron extends Vertex implements Listable{
         this.tags = (object?.tags)?object.tags:[];
         this.id = (object?.id)?object.id:"";
         this.groupe = (object?.groupe)?object.groupe:undefined;
-        this.modele = (object?.modele)?object.modele:"";
-        this.profil = (object?.profil)?object.profil:"";
+        this.modele = (object?.modele)?object.modele:undefined;
+        this.profil = (object?.profil)?object.profil:undefined;
         this.statut = (object?.statut)?object.statut:Statut.Todo;
     }
 }

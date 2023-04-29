@@ -34,6 +34,11 @@ export class ApiService {
     return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE out=${rid}`)
   } 
 
+  getRelationTo(rid:string, relation:string):Observable<any> {
+    return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE in=${rid}`)
+  } 
+
+
   getDocument(rid:string):Observable<any> {
     return this.http.get<any>(`${environment.urlAPI}/document/simsse/${rid}`)
   }

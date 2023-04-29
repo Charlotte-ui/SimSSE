@@ -32,11 +32,22 @@ getScenarioGroupes(id:string): Observable<any[]> {
   //return this.firebaseService.getElementInCollectionByMatchingChamp<Groupe>("Groupe","scenario",id);
 }
 
-getGroupe(link): Observable<Groupe|undefined> {
-  return this.apiService.getDocument(link['in'].substring(1))
+getGroupeScenario(id:string): Observable<any[]> {
+  return this.apiService.getRelationTo(id,"seComposeDe");
+  //return this.firebaseService.getElementInCollectionByMatchingChamp<Groupe>("Groupe","scenario",id);
+}
+
+getGroupeByLink(link,direction): Observable<Groupe|undefined> {
+  return this.apiService.getDocument(link[direction].substring(1))
   .pipe(map(response => (new Groupe(response))))
    // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
 }
+
+getScenarioByLink(link,direction): Observable<Scenario|undefined> {
+  return this.getScenarioById(link[direction].substring(1)) 
+   // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
+}
+
 
 getGroupePlastrons(id:string): Observable<any[]> {
   return this.apiService.getRelationFrom(id,"seComposeDe");

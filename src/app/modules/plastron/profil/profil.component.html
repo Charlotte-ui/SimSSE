@@ -7,12 +7,6 @@
 
     <mat-card-content *ngIf="form" [formGroup]="form">
 
-
-      <mat-radio-group matInput formControlName="sexe">
-        <mat-radio-button [value]="false">Homme</mat-radio-button>
-        <mat-radio-button [value]="true">Femme</mat-radio-button>
-      </mat-radio-group>
-
       <mat-form-field appearance="fill">
         <mat-label>Âge</mat-label>
         <input matInput formControlName="age" type="number">
