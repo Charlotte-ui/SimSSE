@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/environments/environment.api';
+import { Router } from '@angular/router';
 
 interface User {
   login: string;
@@ -11,11 +12,7 @@ interface User {
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-
-    public currentUser!: User;
-
-    constructor(private http: HttpClient) {}
-
+    constructor(private http: HttpClient,private router: Router) {}
     login(login:string,mdp:string){
       //http://localhost:2480/connect/simsse 
       let token = btoa(login+":"+mdp);
@@ -26,8 +23,8 @@ export class AuthenticationService {
       })
       .subscribe((response: any) => {
           console.log("connexion") // TODO ; vérifier que erreur si mauvais mdp
-          let user = {"login":login,"token":token};
-          this.currentUser = user;
+          localStorage.setItem('currentUser', token);
+          this.router.navigate(['/accueil']);
       });
     }
 

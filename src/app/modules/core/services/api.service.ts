@@ -15,15 +15,17 @@ export class ApiService {
   token!:string
 
   constructor(private http: HttpClient, private authenticationService:AuthenticationService) { 
-    this.token = this.authenticationService.currentUser?.token; // le token s'initialise toujours à undefined
   }
 
   getClasseElements<T extends Vertex>(classe: typeof Vertex):Observable<T[]>{
-    this.token = this.authenticationService.currentUser?.token; 
+/*     this.token = this.authenticationService.currentUser?.token; 
     return this.http
-        .get<any>(`${environment.urlAPI}/query/simsse/sql/select from ${classe.className}`, {
-          headers: { Authorization: 'Basic '+ this.token },
-        })
+    .get<any>(`${environment.urlAPI}/query/simsse/sql/select from ${classe.className}`, {
+      headers: { Authorization: 'Basic '+ this.token },
+    })
+    .pipe(map(response => (classe.instanciateListe<T>(response.result)))) */
+    return this.http
+        .get<any>(`${environment.urlAPI}/query/simsse/sql/select from ${classe.className}`)
         .pipe(map(response => (classe.instanciateListe<T>(response.result))))
   }
 }

@@ -9,7 +9,6 @@ export enum Triage {
     UA = "UA"
 }
 
-
 export class Modele extends Vertex implements Listable{
     title: string;
     description: string;
@@ -37,13 +36,10 @@ export class Modele extends Vertex implements Listable{
     public static override instanciateListe<T>(list: any[]): T[] {
         let res: T[] = []
 
-
         list.forEach(element => {
             res.push(new Modele(element) as T)
         });
-
         return res;
-        
     }
 
 }

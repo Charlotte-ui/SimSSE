@@ -1,26 +1,19 @@
 import { Injectable } from '@angular/core';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterLink, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { map, Observable, take, tap ,mergeMap} from 'rxjs';
-import "firebase/compat/auth";
-import { AuthenticationService } from '../services/authentication.service';
-
+import { CanActivate, Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 
 export class AuthGuard implements CanActivate {
-    constructor(private router: Router,private authenticationService:AuthenticationService) {}
+    constructor(private router: Router) {}
 
 
-
-      canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
- 
-          if ( this.authenticationService.currentUser) return true;
-         else {
-            console.log("no user connected")
-            this.router.navigateByUrl('connexion');
-            return false;
-          }
-  
-      }
+      canActivate() {
+        if (localStorage.getItem('currentUser') != null) {
+            // authorised so return true
+            return true;
+        }
+        // not logged in so redirect 
+        this.router.navigateByUrl('connexion');
+        return false;
+    }
 }

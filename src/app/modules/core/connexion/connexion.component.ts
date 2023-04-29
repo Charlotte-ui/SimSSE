@@ -22,7 +22,7 @@ export class ConnexionComponent implements OnInit {
   });
 
 
-  constructor(private router: Router,private form: FormBuilder,public firebaseService: FirebaseService, public authentificationService:AuthenticationService) {}
+  constructor(private form: FormBuilder,public firebaseService: FirebaseService, public authentificationService:AuthenticationService) {}
 
   ngOnInit(): void {
   }
@@ -38,7 +38,7 @@ export class ConnexionComponent implements OnInit {
     // root simsse
     this.authentificationService.login(pseudo,password)
 
-    this.router.navigate(['/accueil']);
+   
 
 
 
