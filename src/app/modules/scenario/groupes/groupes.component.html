@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col-6">
       <table
+      *ngIf="dataSourceGroup"
         mat-table
         [dataSource]="dataSourceGroup"
         class="mat-elevation-z8 demo-table"

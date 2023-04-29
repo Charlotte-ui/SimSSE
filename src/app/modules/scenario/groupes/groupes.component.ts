@@ -37,7 +37,7 @@ export class GroupesComponent {
     'impliques',
     'delete',
   ];
-  dataSourceGroup = [];
+  dataSourceGroup!:Groupe[];
 
   @Input() scenario: Scenario;
 
@@ -49,9 +49,10 @@ export class GroupesComponent {
   @Input() set groupes(value: Groupe[]) {
     if (value) {
       // if value isnt undefined
+      console.log("set groupes")
+      console.log(value)
       this._groupes = value;
       this.dataSourceGroup = value;
-
      // this.initPosition(); TODO, use whenn BDD is ok
     }
   }

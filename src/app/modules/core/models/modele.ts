@@ -23,6 +23,7 @@ export class Modele extends Vertex implements Listable{
 
     constructor(object?:any) {
         super(object);
+        if(object["@rid"]) object["id"] = object["@rid"].substring(1)
         this.title = (object?.title)?object.title:"";
         this.description = (object?.description)?object.description:"";
         this.tags = (object?.tags)?object.tags:[];

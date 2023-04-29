@@ -30,11 +30,9 @@ export class AccueilComponent implements OnInit {
 
   ngOnInit(): void {
     this.tagService.getAllTags("scenario").subscribe((response) => {
-      console.log("allTagsScenario")
-      console.log(response)
       this.allTagsScenario = response;
     });
-    this.tagService.getAllTags("plastron").subscribe((response) => {
+    this.tagService.getAllTags("modele").subscribe((response) => {
       this.allTagsPlastron = response;
     });
   }

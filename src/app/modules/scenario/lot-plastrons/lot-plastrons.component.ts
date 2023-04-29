@@ -29,6 +29,7 @@ import {
   animate,
   group,
 } from '@angular/animations';
+import { Profil } from '../../core/models/profil';
 
 interface tableElementPlastron {
   modele: string;
@@ -59,6 +60,8 @@ interface tableElementPlastron {
   ],
 })
 export class LotPlastronsComponent {
+  Modele = Modele;
+
   filterTags: string[] = [];
   allTags!: string[];
   defaultElementPlastron!: tableElementPlastron;
@@ -98,15 +101,14 @@ export class LotPlastronsComponent {
   @Output() newChange = new EventEmitter<boolean>();
 
   constructor(
-    private route: ActivatedRoute,
-    private form: FormBuilder,
     public scenarioService: ScenarioService,
     public modelService: ModeleService,
     public profilService: ProfilService,
     private router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    public regleService: RegleService
+    public regleService: RegleService,
+    public modeleService: ModeleService,
   ) {
     this.defaultElementPlastron = new Object() as tableElementPlastron;
     this.defaultElementPlastron.description = '';
@@ -223,9 +225,10 @@ export class LotPlastronsComponent {
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
     //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
-
-    this.modelService
-      .getModeleById(plastron.modele)
+    this.modelService.getModeleLink(plastron.id).subscribe((response) => {
+      response['result'].forEach((link) => {
+        this.modelService
+      .getModeleByLink(link)
       .subscribe((response: Modele) => {
         console.log(response);
         this.dataSourcePlastron[index].modele = response.title;
@@ -239,12 +242,22 @@ export class LotPlastronsComponent {
         if (index == this.plastrons.length - 1)
           this.updateDataSourceTriage(index);
       });
-
-    this.profilService.getProfilById(plastron.profil).subscribe((response) => {
-      console.log(response);
-      this.dataSourcePlastron[index].age = response.age;
-      this.dataSourcePlastron[index].sexe = response.sexe;
+      });
     });
+
+    this.profilService.getProfilLink(plastron.id).subscribe((response) => {
+      response['result'].forEach((link) => {
+        this.profilService
+      .getProfilByLink(link)
+      .subscribe((response: Profil) => {
+        console.log(response);
+        this.dataSourcePlastron[index].age = response.age;
+      });
+      });
+    });
+
+  
+
   }
 
   private updateDataSourceTriage(indexStart: number) {
@@ -279,5 +292,10 @@ export class LotPlastronsComponent {
     });
 
     this.sortedDataSourcePlastron = this.dataSourcePlastron.slice();
+  }
+
+  createModele(modele: Modele) {
+    let newModele = this.modeleService.createNewModel(modele, true);
+    this.router.navigate(['/modele/' + newModele.id]);
   }
 }

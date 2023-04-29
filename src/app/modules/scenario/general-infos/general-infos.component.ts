@@ -14,7 +14,6 @@ export class GeneralInfosComponent {
   scenarioFormGroup;
 
   allTags ;
-  tags = ['Lemon', 'Lime' , 'Apple' ];
   displayedColumns: string[] = ['total', 'totalParticipant', 'totalPlastron'];
 
   dataTotal = [{toal: "", totalPlastron: 0, totalParticipant: 0}]

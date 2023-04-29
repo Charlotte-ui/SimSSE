@@ -165,7 +165,8 @@
     <div class="col-5 modele">
       <app-list-box
         title="Modèles"
-        type="Modele"
+        [classe]="Modele"
+        (newElement)="createModele($event)"
         [chips]="allTags"
       ></app-list-box>
     </div>

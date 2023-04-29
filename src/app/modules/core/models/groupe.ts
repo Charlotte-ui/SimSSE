@@ -1,6 +1,8 @@
 import { Collection } from "../services/firebase.service";
+import { Vertex } from "./vertex";
 
-export interface Groupe extends Collection{
+export class Groupe extends Vertex implements Collection{
+    id: string;
     impliques:number;
     psy:number;
     UA:number;
@@ -9,4 +11,21 @@ export interface Groupe extends Collection{
     scenario:string;
     scene:number;
     position:(number|string)[]
+
+    public static override className = "Groupe"
+
+    constructor(object?:any) {
+        super(object);
+        if(object["@rid"]) object["id"] = object["@rid"].substring(1)
+        this.scenario = (object?.scenario)?object.scenario:"";
+        this.scene = (object?.scene)?object.scene:-1;
+        this.position = (object?.position)?object.position:-1;
+        this.id = (object?.id)?object.id:"";
+        this.UA = (object?.UA)?object.UA:0;
+        this.impliques = (object?.impliques)?object.impliques:0;
+        this.psy = (object?.psy)?object.psy:0;
+        this.UR = (object?.UR)?object.UR:0;
+        this.EU = (object?.EU)?object.EU:0;
+
+    }
 }
