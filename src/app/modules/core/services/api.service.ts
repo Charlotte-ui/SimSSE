@@ -28,5 +28,22 @@ export class ApiService {
         .get<any>(`${environment.urlAPI}/query/simsse/sql/select from ${classe.className}`)
         .pipe(map(response => (classe.instanciateListe<T>(response.result))))
   }
+
+
+  getRelationFrom(rid:string, relation:string):Observable<any> {
+    return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE out=${rid}`)
+  } 
+
+  getDocument(rid:string):Observable<any> {
+    return this.http.get<any>(`${environment.urlAPI}/document/simsse/${rid}`)
+  }
+  
+  getClasseElementsWhithMatchingChamp<T extends Vertex>(classe: typeof Vertex,champ:string,value:string):Observable<T[]>{
+        return this.http
+            .get<any>(`${environment.urlAPI}/query/simsse/sql/select from ${classe.className} where ${champ}='${value}'`)
+            .pipe(map(response => (classe.instanciateListe<T>(response.result))))
+      }
+
+
 }
 

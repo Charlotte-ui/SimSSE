@@ -37,6 +37,7 @@ export class Modele extends Vertex implements Listable{
         let res: T[] = []
 
         list.forEach(element => {
+            element["id"] = element["@rid"].substring(1) // delete the #
             res.push(new Modele(element) as T)
         });
         return res;

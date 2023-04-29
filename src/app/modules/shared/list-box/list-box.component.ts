@@ -8,6 +8,7 @@ import { DialogComponent } from '../dialog/dialog.component';
 import { ApiService } from '../../core/services/api.service';
 import { Scenario } from '../../core/models/scenario';
 import { Vertex } from '../../core/models/vertex';
+import { TagService } from '../../core/services/tag.service';
 
 @Component({
   selector: 'app-list-box',
@@ -22,33 +23,40 @@ export class ListBoxComponent<T extends Listable> {
 
   @Input() title!: string;
   @Input() subTitle!: string;
-  
 
   _classe: typeof Vertex;
   get classe(): typeof Vertex {
     return this._classe;
-}
-  @Input() set classe(value: typeof Vertex){
+  }
+  @Input() set classe(value: typeof Vertex) {
     if (value) {
       this._classe = value;
-
       this.apiService.getClasseElements<T>(value).subscribe((elements) => {
         this.elements = elements;
         this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
         const index = this.keys.indexOf('gabarit', 0);
         if (index > -1) this.keys.splice(index, 1);
+        this.elements.forEach((element) => {
+          element.tags = [];
+          this.tagService.getTags(element.id).subscribe((response) => {
+            response['result'].forEach((link) => {
+              this.tagService.getTagName(link).subscribe((tag) => {
+                element.tags.push(tag.value)
+              });
+            });
+          });
+        });
       });
     }
   }
-
-
 
   @Output() newElement = new EventEmitter<T>();
 
   constructor(
     private router: Router,
     public apiService: ApiService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    public tagService: TagService
   ) {
     this.elements = [];
   }

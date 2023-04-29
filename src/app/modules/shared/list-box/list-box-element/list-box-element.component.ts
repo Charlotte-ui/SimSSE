@@ -18,8 +18,6 @@ export class ListBoxElementComponent<T extends Listable> {
   }
   @Input() set element(value: T) {
     this._element = value;
-
-    console.log(value);
   }
 
   @Input() type: string;

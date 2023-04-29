@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { Modele } from '../core/models/modele';
 import { ModeleService } from '../core/services/modele.service';
 import { RegleService } from '../core/services/regle.service';
+import { TagService } from '../core/services/tag.service';
 
 
 @Component({
@@ -23,14 +24,17 @@ export class AccueilComponent implements OnInit {
     private router: Router,
     public scenarioService: ScenarioService,
     public modeleService: ModeleService,
-    public regleService: RegleService
+    public regleService: RegleService,
+    public tagService:TagService
   ) {}
 
   ngOnInit(): void {
-    this.regleService.getAllTagsScenario().subscribe((response) => {
+    this.tagService.getAllTags("scenario").subscribe((response) => {
+      console.log("allTagsScenario")
+      console.log(response)
       this.allTagsScenario = response;
     });
-    this.regleService.getAllTagsPlastron().subscribe((response) => {
+    this.tagService.getAllTags("plastron").subscribe((response) => {
       this.allTagsPlastron = response;
     });
   }

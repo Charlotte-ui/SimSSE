@@ -12,6 +12,7 @@ export class Scenario extends Vertex implements Listable {
     psy:number;
     UR:number;
     EU:number; 
+    image:string;
 
     public static override className = "Scenario"
 
@@ -26,13 +27,18 @@ export class Scenario extends Vertex implements Listable {
         this.psy = (object?.psy)?object.psy:0;
         this.UR = (object?.UR)?object.UR:0;
         this.EU = (object?.EU)?object.EU:0;
+        this.image = (object?.image)?object.image:"";
+
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {
         let res: T[] = []
+        console.log("instanciateListe")
 
+        console.log(list)
 
         list.forEach(element => {
+            element["id"] = element["@rid"].substring(1) // delete the #
             res.push(new Scenario(element) as T)
         });
 

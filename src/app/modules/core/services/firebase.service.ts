@@ -42,10 +42,7 @@ export class FirebaseService {
    * @returns 
    */
 getCollectionById<T extends Collection>(collection:string): Observable<T[]> {
-  this.apiService.getClasseElements<Scenario>(Scenario).subscribe(element=>{
-    console.log("apiService getClasseElements")
-    console.log(element)
-  })
+
   return this.db.collection(collection).snapshotChanges().pipe(
     take(2),
     map((actions) => {
