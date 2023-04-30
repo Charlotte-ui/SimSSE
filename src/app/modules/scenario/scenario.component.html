@@ -1,5 +1,5 @@
 <app-header [scenario]="scenario"></app-header>
-<mat-tab-group>
+<mat-tab-group (selectedTabChange)="reloadPlastron($event)">
   <mat-tab label="Infos générales">
     <app-general-infos
       [scenario]="scenario"
@@ -13,8 +13,9 @@
       [scenario]="scenario"
     ></app-groupes>
   </mat-tab>
-  <mat-tab label="Plastrons et modèles">
+  <mat-tab label="Plastrons et modèles" >
     <app-lot-plastrons
+    *ngIf="plastrons"
       [groupes]="groupes"
       [plastrons]="plastrons"
       [totalPlastron]="totalPlastron"

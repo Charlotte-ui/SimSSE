@@ -24,34 +24,35 @@ getScenarios(): Observable<Scenario[]> {
 getScenarioById(id:string): Observable<Scenario|undefined> {
   return this.apiService.getDocument(id)
   .pipe(map(response => (new Scenario(response))))
-   // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
 }
 
-getScenarioGroupes(id:string): Observable<any[]> {
-  return this.apiService.getRelationFrom(id,"seComposeDe");
-  //return this.firebaseService.getElementInCollectionByMatchingChamp<Groupe>("Groupe","scenario",id);
+/**
+ * renvoi les groupes liés à un scenario
+ * @param id 
+ * @returns 
+ */
+getScenarioGroupes(id:string): Observable<Groupe[]> {
+  return this.apiService.getRelationFrom2(id,"seComposeDe",'Scenario')
+  .pipe(map(response => (Groupe.instanciateListe<Groupe>(response.result))))
 }
 
 getGroupeScenario(id:string): Observable<any[]> {
   return this.apiService.getRelationTo(id,"seComposeDe");
-  //return this.firebaseService.getElementInCollectionByMatchingChamp<Groupe>("Groupe","scenario",id);
 }
 
 getGroupeByLink(link,direction): Observable<Groupe|undefined> {
   return this.apiService.getDocument(link[direction].substring(1))
   .pipe(map(response => (new Groupe(response))))
-   // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
 }
 
 getScenarioByLink(link,direction): Observable<Scenario|undefined> {
   return this.getScenarioById(link[direction].substring(1)) 
-   // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
 }
 
 
-getGroupePlastrons(id:string): Observable<any[]> {
-  return this.apiService.getRelationFrom(id,"seComposeDe");
-  //return this.firebaseService.getElementInCollectionByMatchingChamp<Plastron>("Plastron","groupe",id);
+getGroupePlastrons(id:string): Observable<Plastron[]> {
+  return this.apiService.getRelationFrom2(id,"seComposeDe",'Groupe')
+  .pipe(map(response => (Plastron.instanciateListe<Plastron>(response.result))))
 }
 
 setScenario(scenario:Scenario) {

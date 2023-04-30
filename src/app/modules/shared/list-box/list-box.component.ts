@@ -38,13 +38,15 @@ export class ListBoxComponent<T extends Listable> {
         if (index > -1) this.keys.splice(index, 1);
         this.elements.forEach((element) => {
           element.tags = [];
-          this.tagService.getTags(element.id).subscribe((response) => {
-            response['result'].forEach((link) => {
-              this.tagService.getTagName(link).subscribe((tag) => {
-                element.tags.push(tag.value)
-              });
-            });
-          });
+
+          this.tagService.getTags(element.id,value.className).subscribe((response) => {
+            response.forEach(tag => { // TODO ; utiliser la classe TAG au lieu des string pour les tabeaux de tags
+              element.tags.push(tag.value)
+            });   
+          })
+
+
+  
         });
       });
     }

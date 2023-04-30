@@ -47,31 +47,8 @@ export class PlastronComponent implements OnInit {
     this.route.data.subscribe((response) => {
       this.plastron = response['data'];
 
-      this.modelService
-        .getModeleLink(this.plastron.id)
-        .subscribe((response) => {
-          response['result'].forEach((link) => {
-            this.modelService
-              .getModeleByLink(link)
-              .subscribe((response: Modele) => {
-                this.plastron.modele = response;
-                this.initGragh();
-              });
-          });
-        });
+      this.plastron.initModelProfil(this.plastronService) 
 
-      this.profilService
-        .getProfilLink(this.plastron.id)
-        .subscribe((response) => {
-          response['result'].forEach((link) => {
-            this.profilService
-              .getProfilByLink(link)
-              .subscribe((response: Profil) => {
-                this.plastron.profil = response;
-                this.initTargetVariables();
-              });
-          });
-        });
 
       this.plastronService
         .getGroupeLink(this.plastron.id)

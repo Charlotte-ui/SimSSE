@@ -28,4 +28,18 @@ export class Groupe extends Vertex implements Collection{
         this.EU = (object?.EU)?object.EU:0;
 
     }
+
+    public static override instanciateListe<T>(list: any[]): T[] {
+        let res: T[] = [];
+        console.log('instanciateListe');
+    
+        console.log(list);
+    
+        list.forEach((element) => {
+          element['id'] = element['@rid'].substring(1); // delete the #
+          res.push(new Groupe(element) as T);
+        });
+    
+        return res;
+      }
 }

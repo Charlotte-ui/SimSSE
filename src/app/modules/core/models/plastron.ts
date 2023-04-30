@@ -34,4 +34,36 @@ export class Plastron extends Vertex implements Listable{
         this.profil = (object?.profil)?object.profil:undefined;
         this.statut = (object?.statut)?object.statut:Statut.Todo;
     }
+
+    public static override instanciateListe<T>(list: any[]): T[] {
+        let res: T[] = [];
+        console.log('instanciateListe');
+    
+        console.log(list);
+    
+        list.forEach((element) => {
+          element['id'] = element['@rid'].substring(1); // delete the #
+          res.push(new Plastron(element) as T);
+        });
+    
+        return res;
+      }
+
+
+      public initModelProfil(plastronService) {
+        plastronService
+            .getPlastronModele(this.id)
+            .subscribe((modele: Modele) => {
+         
+              this.modele = modele;
+            });
+    
+          plastronService
+            .getPlastronProfil(this.id)
+            .subscribe((profil: Profil) => {
+      
+              this.profil = profil;
+            });
+    
+      }
 }

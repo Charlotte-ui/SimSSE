@@ -9,6 +9,7 @@ import { Scenario } from '../models/scenario';
 import { Groupe } from '../models/groupe';
 import { ApiService } from './api.service';
 import { ModeleService } from './modele.service';
+import { Profil } from '../models/profil';
 
 @Injectable({
   providedIn: 'root'
@@ -61,10 +62,27 @@ export class PlastronService {
     return this.apiService.getRelationTo(id,"seComposeDe");
   }
 
-  getModeleByLink(link): Observable<Modele|undefined> {
-    return this.modeleService.getModeleByLink(link['in'].substring(1));
+  /**
+   * renvoi le modele associé au plastron
+   * @param idPlastron 
+   * @returns 
+   */
+  getPlastronModele(idPlastron:string): Observable<Modele|undefined> {
+    return this.apiService.getRelationFrom2(idPlastron,"aModele","Plastron")
+    .pipe(map(response => new Modele(response.result[0])))
+    //return this.modeleService.getModeleByLink(link['in'].substring(1));
      // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
   }
+
+    /**
+   * renvoi le profil associé au plastron
+   * @param idPlastron 
+   * @returns 
+   */
+    getPlastronProfil(idPlastron:string): Observable<Profil|undefined> {
+      return this.apiService.getRelationFrom2(idPlastron,"aProfil","Plastron")
+      .pipe(map(response => new Profil(response.result[0])))
+    }
 
 
 }

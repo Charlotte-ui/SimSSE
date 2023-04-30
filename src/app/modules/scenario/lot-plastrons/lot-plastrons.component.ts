@@ -217,47 +217,28 @@ export class LotPlastronsComponent {
       .map(() => ({ ...this.defaultElementPlastron }));
 
     this.plastrons.forEach((plastron, index) => {
-      this.addPlastronToDatasource(plastron, index);
+      if (plastron.modele) this.addPlastronToDatasource(plastron, index);
+      // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
+      if (index == this.plastrons.length - 1) this.updateDataSourceTriage(index)
     });
 
     //this.dataSourcePlastron = this.plastrons;
   }
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
+
+    console.log("addPlastronToDatasource")
+    
     //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
-    this.modelService.getModeleLink(plastron.id).subscribe((response) => {
-      response['result'].forEach((link) => {
-        this.modelService
-      .getModeleByLink(link)
-      .subscribe((response: Modele) => {
-        console.log(response);
-        this.dataSourcePlastron[index].modele = response.title;
-        this.dataSourcePlastron[index].description = response.description;
-        this.dataSourcePlastron[index].triage = response.triage;
-        this.dataSourcePlastron[index].statut = Statut.Doing;
-        this.dataSourcePlastron[index].id = index;
-        this.dataSourcePlastron[index].idPlastron = plastron.id;
-        this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
-        // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
-        if (index == this.plastrons.length - 1)
-          this.updateDataSourceTriage(index);
-      });
-      });
-    });
 
-    this.profilService.getProfilLink(plastron.id).subscribe((response) => {
-      response['result'].forEach((link) => {
-        this.profilService
-      .getProfilByLink(link)
-      .subscribe((response: Profil) => {
-        console.log(response);
-        this.dataSourcePlastron[index].age = response.age;
-      });
-      });
-    });
-
-  
-
+    this.dataSourcePlastron[index].modele = plastron.modele.title;
+    this.dataSourcePlastron[index].description = plastron.modele.description;
+    this.dataSourcePlastron[index].triage = plastron.modele.triage;
+    this.dataSourcePlastron[index].statut = Statut.Doing;
+    this.dataSourcePlastron[index].id = index;
+    this.dataSourcePlastron[index].idPlastron = plastron.id;
+    this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
+    this.dataSourcePlastron[index].age = plastron.profil.age;
   }
 
   private updateDataSourceTriage(indexStart: number) {
