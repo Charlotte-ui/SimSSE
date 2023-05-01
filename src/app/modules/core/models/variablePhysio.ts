@@ -20,7 +20,6 @@ export abstract class VariablePhysio implements Collection,Nameable{
       this.couleur=couleur;
     }
 
-
     public getName(): string {
       return this.name;
     }
@@ -30,7 +29,6 @@ export abstract class VariablePhysio implements Collection,Nameable{
 export class VariablePhysioGabarit extends VariablePhysio{
   moyennesAge:[number,number,number,number,number,number,number,number,number,number]
   sdAge:number
-
 
   constructor(id:string,rand:number,name:string,min:number,max:number,couleur:string,moyennesAge?:[number,number,number,number,number,number,number,number,number,number],sdAge?:number) {
     super(id,rand,name,min,max,couleur);

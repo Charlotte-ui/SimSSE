@@ -21,12 +21,4 @@ export class ProfilService {
     // TODO update bdd
   }
 
-  getProfilLink(id:string): Observable<any[]> {
-    return this.apiService.getRelationFrom(id,"aProfil");
-  }
-
-  
-  getProfilByLink(link): Observable<Profil|undefined> {
-    return this.getProfilById(link['in'].substring(1));
-  }
 }

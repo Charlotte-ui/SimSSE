@@ -17,7 +17,7 @@ export class TagService {
 
   
   getTags(idObject:string,classe:string): Observable<Tag[]> {
-    return this.apiService.getRelationFrom2(idObject,"estTague",classe)
+    return this.apiService.getRelationFrom(idObject,"estTague",classe)
     .pipe(map(response => (Tag.instanciateListe<Tag>(response.result))))
   }
 }

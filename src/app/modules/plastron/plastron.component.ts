@@ -17,6 +17,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { jsPDF } from 'jspdf';
 import { ScenarioService } from '../core/services/scenario.service';
 import { Groupe } from '../core/models/groupe';
+import { TagService } from '../core/services/tag.service';
 
 @Component({
   selector: 'app-plastron',
@@ -35,12 +36,12 @@ export class PlastronComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private modelService: ModeleService,
-    private profilService: ProfilService,
     public regleService: RegleService,
     public plastronService: PlastronService,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    private scenarioService: ScenarioService
+    private scenarioService: ScenarioService,
+    private tagService:TagService
   ) {}
 
   ngOnInit(): void {
@@ -49,37 +50,22 @@ export class PlastronComponent implements OnInit {
 
       this.plastron.initModelProfil(this.plastronService) 
 
-
+      // TODO : replace the nested subscribe
       this.plastronService
-        .getGroupeLink(this.plastron.id)
-        .subscribe((response) => {
-          response['result'].forEach((link) => {
-            this.scenarioService
-              .getGroupeByLink(link, 'out')
-              .subscribe((groupe: Groupe) => {
-                this.scenarioService
-                  .getGroupeScenario(groupe.id)
-                  .subscribe((response) => {
-                    response['result'].forEach((link) => {
-                      this.scenarioService
-                        .getScenarioByLink(link, 'out')
-                        .subscribe((scenario: Scenario) => {
-                          this.scenario = scenario;
-                        });
-                    });
-                  });
-              });
-          });
+        .getPlastronGroupe(this.plastron.id)
+        .subscribe((groupe:Groupe) => {
+          console.log("groupe")
+          console.log(groupe)
+          this.scenarioService
+            .getGroupeScenario(groupe.id)
+            .subscribe((scenario: Scenario) => {
+              console.log("scenario")
+              console.log(scenario)  
+              this.scenario = scenario;
+            });
         });
-
-      this.plastronService.getScenario(this.plastron).subscribe((response) => {
-        console.log('scenario');
-
-        this.scenario = response;
-        console.log(this.scenario);
-      });
-
-      this.regleService.getAllTagsPlastron().subscribe((response) => {
+      
+      this.tagService.getAllTags("modele").subscribe((response) => {
         this.allTags = response;
       });
     });

@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment.api';
 import { Observable, map } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthenticationService } from './authentication.service';
 import { Vertex } from '../models/vertex';
 
@@ -29,17 +28,12 @@ export class ApiService {
         .pipe(map(response => (classe.instanciateListe<T>(response.result))))
   }
 
-
-  getRelationFrom(rid:string, relation:string):Observable<any> {
-    return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE out=${rid}`)
-  } 
-
-  getRelationFrom2(rid:string, relation:string,classe:string):Observable<any> {
+  getRelationFrom(rid:string, relation:string,classe:string):Observable<any> {
     return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT EXPAND( OUT("'${relation}'") ) FROM ${classe} WHERE @rid='${rid}'`)
   } 
 
-  getRelationTo(rid:string, relation:string):Observable<any> {
-    return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE in=${rid}`)
+  getRelationTo(rid:string, relation:string,classe:string):Observable<any> {
+    return this.http.get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT EXPAND( IN("'${relation}'") ) FROM ${classe} WHERE @rid='${rid}'`)
   } 
 
 

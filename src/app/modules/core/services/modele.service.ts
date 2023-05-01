@@ -33,9 +33,6 @@ export class ModeleService {
 
   constructor(public firebaseService:FirebaseService,public apiService:ApiService) { }
 
-  getModeleLink(id:string): Observable<any[]> {
-    return this.apiService.getRelationFrom(id,"aModele");
-  }
 
   getModeleById(id:string): Observable<Modele|undefined> {
     return this.apiService.getDocument(id)

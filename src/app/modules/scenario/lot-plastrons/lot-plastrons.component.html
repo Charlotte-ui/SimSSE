@@ -9,7 +9,7 @@
           </div>
         </mat-card-header>
 
-        <app-tags [tags]="filterTags" [allTags]="allTags"></app-tags>
+        <app-tags *ngIf="allTags" [tags]="filterTags" [allTags]="allTags"></app-tags>
 
         <table
           mat-table

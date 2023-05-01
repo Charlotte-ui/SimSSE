@@ -6,12 +6,9 @@ import 'echarts/extension/bmap/bmap';
 const SymbolSize = 20;
 let Data = [];
 let SceneNb = 0;
-
 let SIZE_MAP = 600;
-
 let MARGIN = 25;
-
-let MAX_POSITION = 1000 ;
+let MAX_POSITION = 100 ;
 
 @Component({
   selector: 'app-carte',
@@ -19,9 +16,6 @@ let MAX_POSITION = 1000 ;
   styleUrls: ['./carte.component.less']
 })
 export class CarteComponent implements OnDestroy{
-
-
-
 
   @Input() set data(value: (string | number)[][]) {
     if (value) { // if value isnt undefined
@@ -66,7 +60,6 @@ export class CarteComponent implements OnDestroy{
 
   mergeOptions = {};
 
-
   constructor() {
     this.newPosition2 = CarteComponent.newPosition;
   }
@@ -78,11 +71,6 @@ export class CarteComponent implements OnDestroy{
   }
 
   onChartReady(myChart: any) {
-
-    console.log("onChartReady")
-    console.log(Data)
-
-    
 
     const onPointDragging = function (dataIndex) {
       Data[dataIndex] = myChart.convertFromPixel({ gridIndex: 0 }, this.position) as number[];
@@ -275,29 +263,15 @@ export class CarteComponent implements OnDestroy{
     this.mergeOptions = {
       series: series
     };
-
-
   }
 
  //  myChart.convertToPixel({ gridIndex: 0 },index) does'nt work
 
   initPosition(position:number[]){
-    console.log("old position")
-    console.log(position)
-
     let newX = (SIZE_MAP+MARGIN*2) - position[1] * (SIZE_MAP+MARGIN*2) / MAX_POSITION ;
     let newY =  position[0] * (SIZE_MAP+MARGIN*2) / MAX_POSITION ;
-
-
-    console.log("new position")
-    console.log([newY,newX])
-
-
     return [newY,newX]
-
   }
-
-
 }
 
 

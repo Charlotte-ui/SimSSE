@@ -14,7 +14,7 @@
     </mat-form-field>
   </div>
   <div class="container">
-    <app-tags [allTags]="allTags"  [tags]="scenario.tags"></app-tags>
+    <app-tags *ngIf="allTags" [allTags]="allTags"  [tags]="scenario.tags"></app-tags>
   </div>
   <div class="container">
     <mat-form-field>

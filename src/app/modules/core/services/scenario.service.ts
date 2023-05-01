@@ -32,12 +32,13 @@ getScenarioById(id:string): Observable<Scenario|undefined> {
  * @returns 
  */
 getScenarioGroupes(id:string): Observable<Groupe[]> {
-  return this.apiService.getRelationFrom2(id,"seComposeDe",'Scenario')
+  return this.apiService.getRelationFrom(id,"seComposeDe",'Scenario')
   .pipe(map(response => (Groupe.instanciateListe<Groupe>(response.result))))
 }
 
-getGroupeScenario(id:string): Observable<any[]> {
-  return this.apiService.getRelationTo(id,"seComposeDe");
+getGroupeScenario(id:string): Observable<Scenario> {
+  return this.apiService.getRelationTo(id,"seComposeDe","Groupe")
+  .pipe(map(response => new Scenario(response.result[0])))
 }
 
 getGroupeByLink(link,direction): Observable<Groupe|undefined> {
@@ -51,7 +52,7 @@ getScenarioByLink(link,direction): Observable<Scenario|undefined> {
 
 
 getGroupePlastrons(id:string): Observable<Plastron[]> {
-  return this.apiService.getRelationFrom2(id,"seComposeDe",'Groupe')
+  return this.apiService.getRelationFrom(id,"seComposeDe",'Groupe')
   .pipe(map(response => (Plastron.instanciateListe<Plastron>(response.result))))
 }
 

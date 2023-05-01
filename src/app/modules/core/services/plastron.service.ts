@@ -58,9 +58,6 @@ export class PlastronService {
      // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
   }
 
-  getGroupeLink(id:string): Observable<any[]> {
-    return this.apiService.getRelationTo(id,"seComposeDe");
-  }
 
   /**
    * renvoi le modele associé au plastron
@@ -68,7 +65,7 @@ export class PlastronService {
    * @returns 
    */
   getPlastronModele(idPlastron:string): Observable<Modele|undefined> {
-    return this.apiService.getRelationFrom2(idPlastron,"aModele","Plastron")
+    return this.apiService.getRelationFrom(idPlastron,"aModele","Plastron")
     .pipe(map(response => new Modele(response.result[0])))
     //return this.modeleService.getModeleByLink(link['in'].substring(1));
      // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
@@ -80,8 +77,19 @@ export class PlastronService {
    * @returns 
    */
     getPlastronProfil(idPlastron:string): Observable<Profil|undefined> {
-      return this.apiService.getRelationFrom2(idPlastron,"aProfil","Plastron")
+      return this.apiService.getRelationFrom(idPlastron,"aProfil","Plastron")
       .pipe(map(response => new Profil(response.result[0])))
+    }
+
+
+  /**
+   * renvoi le groupe associé au plastron
+   * @param idPlastron 
+   * @returns 
+   */
+    getPlastronGroupe(idPlastron:string): Observable<Groupe|undefined> {
+      return this.apiService.getRelationTo(idPlastron,"seComposeDe","Plastron")
+      .pipe(map(response => new Groupe(response.result[0])))
     }
 
 
