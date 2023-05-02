@@ -21,7 +21,6 @@ export class ReglesComponent {
   events!: BioEvent[];
   actions!: Action[];
 
-
   constructor(public regleService:RegleService){}
 
   ngOnInit(): void {

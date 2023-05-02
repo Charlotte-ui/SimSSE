@@ -14,12 +14,13 @@ import {
   Action,
   Graph,
 } from '../../core/models/node';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RegleService {
-  constructor(firebaseService: FirebaseService) {}
+  constructor(firebaseService: FirebaseService,private apiService:ApiService) {}
 
   getVariableGarbarit(): Observable<VariablePhysioGabarit[]> {
     let SpO2 = new VariablePhysioGabarit(
@@ -100,7 +101,9 @@ export class RegleService {
   }
 
   getBioEvents(): Observable<BioEvent[]> {
-    let oxy: BioEvent = {
+    return this.apiService.getClasseElements(BioEvent)
+
+    /* let oxy: BioEvent = {
       name: 'mort',
       id: 'mort',
     };
@@ -118,11 +121,13 @@ export class RegleService {
     let events = [oxy, garrot, hypox];
 
     return of(events);
-    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
+    //return this.firebaseService.getCollectionById<Scenario>("Scenario"); */
   }
 
   getActions(): Observable<Action[]> {
-    let oxy: Action = {
+    return this.apiService.getClasseElements(Action)
+
+   /*  let oxy: Action = {
       name: 'oxygénothérapie',
       id: 'oxygénothérapie',
     };
@@ -135,11 +140,11 @@ export class RegleService {
     let pls: Action = {
       name: 'pls',
       id: 'pls',
-    };
+    }; 
 
     let events = [oxy, garrot, pls];
 
-    return of(events);
+    return of(events); */
     //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
 
