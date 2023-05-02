@@ -18,7 +18,8 @@ export class ScenarioService {
   constructor(public firebaseService:FirebaseService, public apiService:ApiService) { }
 
 getScenarios(): Observable<Scenario[]> {
-    return this.firebaseService.getCollectionById<Scenario>("Scenario");
+  return this.apiService.getClasseElements<Scenario>(Scenario);
+    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
 }
 
 getScenarioById(id:string): Observable<Scenario|undefined> {

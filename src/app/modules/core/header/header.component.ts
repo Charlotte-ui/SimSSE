@@ -26,6 +26,7 @@ export class HeaderComponent implements OnInit {
   }
 
   goToAccueil() {
+    console.log("go to accueil")
     this.router.navigate(['/accueil/']);
   }
 

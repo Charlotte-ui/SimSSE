@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { VariablePhysio, VariablePhysioGabarit } from '../core/models/variablePhysio';
+import { VariablePhysio, VariablePhysioTemplate } from '../core/models/variablePhysio';
 import { RegleService } from '../core/services/regle.service';
 import { Action, BioEvent, Event } from '../core/models/node';
 
@@ -14,7 +14,7 @@ import { Action, BioEvent, Event } from '../core/models/node';
 
 export class ReglesComponent {
 
-  variables!: VariablePhysioGabarit[];
+  variables!: VariablePhysioTemplate[];
   variablesDetails!: VariablePhysio[];
   moyennesAge!:any[];
   moyennesSexe!:any[];
@@ -25,7 +25,7 @@ export class ReglesComponent {
   constructor(public regleService:RegleService){}
 
   ngOnInit(): void {
-    this.regleService.getVariableGarbarit().subscribe(
+    this.regleService.getVariableTemplate().subscribe(
       (response) => {
         this.variables = response;
         this.variablesDetails = [];

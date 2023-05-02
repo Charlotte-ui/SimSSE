@@ -1,8 +1,7 @@
 import { Collection } from "../services/firebase.service";
 import { Vertex } from "./vertex";
 
-export class Groupe extends Vertex implements Collection{
-    id: string;
+export class Groupe extends Vertex{
     impliques:number;
     psy:number;
     UA:number;
@@ -17,12 +16,10 @@ export class Groupe extends Vertex implements Collection{
 
     constructor(object?:any) {
         super(object);
-        if(object["@rid"]) object["id"] = object["@rid"].substring(1)
         this.scenario = (object?.scenario)?object.scenario:"";
         this.scene = (object?.scene)?object.scene:-1;
         this.x = (object?.x)?object.x:50
         this.y = (object?.y)?object.y:50
-        this.id = (object?.id)?object.id:"";
         this.UA = (object?.UA)?object.UA:0;
         this.impliques = (object?.impliques)?object.impliques:0;
         this.psy = (object?.psy)?object.psy:0;

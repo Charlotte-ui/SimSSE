@@ -47,6 +47,16 @@ export class ApiService {
             .pipe(map(response => (classe.instanciateListe<T>(response.result))))
       }
 
+        getVariable(idModele,idVariableTemplate){
+ return this.http
+        .get<any>(`${environment.urlAPI}/query/simsse/sql/select intersect($a, $b) 
+	let $a = (SELECT EXPAND( IN('aTemplate') ) FROM VariablePhysioTemplate WHERE @rid='${idVariableTemplate}'), 
+    	$b = (SELECT EXPAND( OUT('aVariableCible') ) FROM Profil WHERE @rid='${idModele}')`)
+        
+
+    
+  }
+
 
 }
 

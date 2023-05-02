@@ -5,7 +5,7 @@ import { ModeleService } from '../core/services/modele.service';
 import { Modele } from '../core/models/modele';
 import { ProfilService } from '../core/services/profil.service';
 import {
-  VariablePhysioInstance,
+  VariablePhysioInstance, VariablePhysioTemplate,
 } from '../core/models/variablePhysio';
 import { RegleService } from '../core/services/regle.service';
 import { Profil } from '../core/models/profil';
@@ -26,7 +26,6 @@ import { TagService } from '../core/services/tag.service';
 })
 export class PlastronComponent implements OnInit {
   plastron!: Plastron;
-  targetVariable!: VariablePhysioInstance[];
   scenario: Scenario;
 
   changesToSave: boolean = false;
@@ -41,7 +40,8 @@ export class PlastronComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private scenarioService: ScenarioService,
-    private tagService:TagService
+    private tagService:TagService,
+    private profilService:ProfilService
   ) {}
 
   ngOnInit(): void {
@@ -50,33 +50,50 @@ export class PlastronComponent implements OnInit {
 
       this.plastron.initModelProfil(this.plastronService) 
 
+      /**
+       * init scenario
+       */
       // TODO : replace the nested subscribe
       this.plastronService
         .getPlastronGroupe(this.plastron.id)
         .subscribe((groupe:Groupe) => {
-          console.log("groupe")
-          console.log(groupe)
           this.scenarioService
             .getGroupeScenario(groupe.id)
-            .subscribe((scenario: Scenario) => {
-              console.log("scenario")
-              console.log(scenario)  
+            .subscribe((scenario: Scenario) => { 
               this.scenario = scenario;
             });
         });
       
+        /**
+         * init tags
+         */
       this.tagService.getAllTags("modele").subscribe((response) => {
         this.allTags = response;
       });
     });
-  }
 
-  initTargetVariables() {
-    this.plastronService
-      .getVariablesCibles(this.plastron)
-      .subscribe((response) => {
-        this.targetVariable = response;
+    /**
+     * init target variables
+     */
+    this.regleService.getVariableTemplate().subscribe((variablesTemplate:VariablePhysioTemplate[]) =>{
+      console.log("var physio tempalte")
+      console.log(variablesTemplate)
+      variablesTemplate.forEach(varTemp => {
+        this.profilService.getVariable(this.plastron.profil.id,varTemp.id).subscribe((variable:VariablePhysioInstance)=>{
+          if(variable.id == "") this.plastron.modele.createVariableCible(varTemp); // si la variable cible n'existe pas, on la crée
+          this.plastron.profil.targetVariable.push(variable)
+          console.log(variable)
+        })
+        
       });
+
+    })
+
+    /**
+     * init graph
+     */
+
+
   }
 
   initGragh() {

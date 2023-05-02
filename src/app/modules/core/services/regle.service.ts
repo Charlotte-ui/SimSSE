@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {
   VariablePhysio,
-  VariablePhysioGabarit,
+  VariablePhysioTemplate,
 } from '../models/variablePhysio';
 import { Observable, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
@@ -14,89 +14,16 @@ import {
   Action,
   Graph,
 } from '../../core/models/node';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RegleService {
-  constructor(firebaseService: FirebaseService) {}
+  constructor(firebaseService: FirebaseService, private apiService:ApiService) {}
 
-  getVariableGarbarit(): Observable<VariablePhysioGabarit[]> {
-    let SpO2 = new VariablePhysioGabarit(
-      '0',
-      1,
-      'SpO2',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-    let FR = new VariablePhysioGabarit(
-      '1',
-      1,
-      'FR',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-    let FC = new VariablePhysioGabarit(
-      '2',
-      1,
-      'FC',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-    let HemoCue = new VariablePhysioGabarit(
-      '3',
-      1,
-      'HemoCue',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-    let PAD = new VariablePhysioGabarit(
-      '4',
-      1,
-      'PAD',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-    let PAS = new VariablePhysioGabarit(
-      '5',
-      1,
-      'PAS',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-    let Temp = new VariablePhysioGabarit(
-      '6',
-      1,
-      'Temp',
-      0,
-      100,
-      '',
-      [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
-      1
-    );
-
-    let variables = [SpO2, FR, FC, HemoCue, Temp, PAD, PAS];
-
-    return of(variables);
-    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
+  getVariableTemplate(): Observable<VariablePhysioTemplate[]> {
+    return this.apiService.getClasseElements<VariablePhysioTemplate>(VariablePhysioTemplate);
   }
 
   getBioEvents(): Observable<BioEvent[]> {
