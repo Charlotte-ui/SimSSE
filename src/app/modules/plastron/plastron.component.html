@@ -1,8 +1,8 @@
 <app-header
-  *ngIf="modele"
+  *ngIf="plastron.modele"
   [scenario]="scenario"
-  [plastron]="modele.title"
-  [triage]="modele.triage"
+  [plastron]="plastron.modele.title"
+  [triage]="plastron.modele.triage"
   [changesToSave]="changesToSave"
   (newModele)="saveAsNewModel($event)"
   (newSave)="savePlastron($event)"
@@ -12,18 +12,18 @@
 <mat-tab-group>
   <mat-tab label="Modèle - cas clinique">
     <app-editeur
-      [modele]="modele"
+      [modele]="plastron.modele"
       [targetVariable]="targetVariable"
       (newChange)="changeGraph($event)"
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Modèle - tags et descriptions">
     <app-tags-descriptions
-      [modele]="modele"
+      [modele]="plastron.modele"
       (newChange)="changeModele()"
     ></app-tags-descriptions>
   </mat-tab>
   <mat-tab label="Profil">
-    <app-profil [profil]="profil" (newChange)="changeProfil()"></app-profil>
+    <app-profil [profil]="plastron.profil" (newChange)="changeProfil()"></app-profil>
   </mat-tab>
 </mat-tab-group>

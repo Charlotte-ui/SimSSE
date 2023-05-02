@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/modele';
 import { Trend,Event,Link, NodeType, EventType, Graph } from '../models/node';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -30,12 +31,17 @@ export class ModeleService {
 
   }
 
-  constructor(public firebaseService:FirebaseService) { }
-
+  constructor(public firebaseService:FirebaseService,public apiService:ApiService) { }
 
 
   getModeleById(id:string): Observable<Modele|undefined> {
-    return this.firebaseService.getElementInCollectionByIds<Modele>("Modele",id);
+    return this.apiService.getDocument(id)
+    .pipe(map(response => (new Modele(response))))
+    //return this.firebaseService.getElementInCollectionByIds<Modele>("Modele",id);
+  }
+
+  getModeleByLink(link): Observable<Modele|undefined> {
+    return this.getModeleById(link['in'].substring(1));
   }
 
   createNewModel(modele:Modele,gabarit:boolean):Modele{

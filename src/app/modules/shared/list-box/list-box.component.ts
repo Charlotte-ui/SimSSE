@@ -5,6 +5,10 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DialogComponent } from '../dialog/dialog.component';
+import { ApiService } from '../../core/services/api.service';
+import { Scenario } from '../../core/models/scenario';
+import { Vertex } from '../../core/models/vertex';
+import { TagService } from '../../core/services/tag.service';
 
 @Component({
   selector: 'app-list-box',
@@ -12,7 +16,6 @@ import { DialogComponent } from '../dialog/dialog.component';
   styleUrls: ['./list-box.component.less'],
 })
 export class ListBoxComponent<T extends Listable> {
-  _type: string;
   keys;
   elements!: T[];
 
@@ -20,14 +23,31 @@ export class ListBoxComponent<T extends Listable> {
 
   @Input() title!: string;
   @Input() subTitle!: string;
-  @Input() set type(value: string) {
+
+  _classe: typeof Vertex;
+  get classe(): typeof Vertex {
+    return this._classe;
+  }
+  @Input() set classe(value: typeof Vertex) {
     if (value) {
-      this._type = value;
-      this.firebaseService.getCollectionById<T>(value).subscribe((elements) => {
+      this._classe = value;
+      this.apiService.getClasseElements<T>(value).subscribe((elements) => {
         this.elements = elements;
         this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
         const index = this.keys.indexOf('gabarit', 0);
         if (index > -1) this.keys.splice(index, 1);
+        this.elements.forEach((element) => {
+          element.tags = [];
+
+          this.tagService.getTags(element.id,value.className).subscribe((response) => {
+            response.forEach(tag => { // TODO ; utiliser la classe TAG au lieu des string pour les tabeaux de tags
+              element.tags.push(tag.value)
+            });   
+          })
+
+
+  
+        });
       });
     }
   }
@@ -36,8 +56,9 @@ export class ListBoxComponent<T extends Listable> {
 
   constructor(
     private router: Router,
-    public firebaseService: FirebaseService,
-    public dialog: MatDialog
+    public apiService: ApiService,
+    public dialog: MatDialog,
+    public tagService: TagService
   ) {
     this.elements = [];
   }

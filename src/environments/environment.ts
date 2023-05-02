@@ -2,10 +2,11 @@
 // `ng build` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-import { environment as DEVELOPMENT}  from './environment.dev';
+import { environment as API}  from './environment.api';
+import { environment as FIREBASE}  from './environment.firebase';
 
 
-export const environment = DEVELOPMENT;
+export const environment = FIREBASE;
 
 /*
  * For easier debugging in development mode, you can import the following file

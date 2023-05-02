@@ -1,29 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { Groupe } from '../core/models/groupe';
 import { Scenario } from '../core/models/scenario';
-import { Plastron, Statut } from '../core/models/plastron';
-import { FirebaseService } from '../core/services/firebase.service';
+import { Plastron } from '../core/models/plastron';
 import { ScenarioService } from '../core/services/scenario.service';
-import { take } from 'rxjs';
 import { ModeleService } from '../core/services/modele.service';
-import { Modele, Triage } from '../core/models/modele';
 import { MatDialog } from '@angular/material/dialog';
-import { ConfirmDeleteDialogComponent } from '../core/confirm-delete-dialog/confirm-delete-dialog.component';
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
-import { CdkDragDrop } from '@angular/cdk/drag-drop';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { ProfilService } from '../core/services/profil.service';
-import { MatSort, Sort } from '@angular/material/sort';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { RegleService } from '../core/services/regle.service';
+import { TagService } from '../core/services/tag.service';
+import { PlastronService } from '../core/services/plastron.service';
+import { Modele } from '../core/models/modele';
+import { Profil } from '../core/models/profil';
 
 @Component({
   selector: 'app-scenario',
@@ -35,6 +23,7 @@ export class ScenarioComponent implements OnInit {
   groupes!: Groupe[];
   plastrons!: Plastron[];
   totalPlastron: number = 0;
+  plastronLoad = false; // have the plastrons been load in lot-plastrons component
 
   constructor(
     private route: ActivatedRoute,
@@ -42,40 +31,60 @@ export class ScenarioComponent implements OnInit {
     public modelService: ModeleService,
     public profilService: ProfilService,
     public dialog: MatDialog,
-    public regleService: RegleService
+    public regleService: RegleService,
+    public tagService: TagService,
+    public plastronService: PlastronService
   ) {}
 
   ngOnInit(): void {
     this.route.data.subscribe((response) => {
       this.scenario = response['data'];
-
+      this.scenario.tags = [];
+      this.tagService
+        .getTags(this.scenario.id, 'Scenario')
+        .subscribe((tags) => {
+          tags.forEach((tag) => {
+            this.scenario.tags.push(tag.value);
+          });
+        });
+      this.groupes = [];
+      this.plastrons = [];
       this.scenarioService
         .getScenarioGroupes(this.scenario.id)
-        .subscribe((response) => {
-          this.groupes = response;
-          this.plastrons = [];
-          this.groupes.forEach((groupe, index) => {
-            this.initialisePlastron(groupe);
-          });
+        .subscribe((groupes: Groupe[]) => {
+          this.groupes = groupes;
+          this.initialisePlastron(groupes);
+          // this.groupes = [...this.groupes] // forced update
         });
     });
   }
 
-  private initialisePlastron(groupe: Groupe) {
-    console.log('initialisePlastron');
-    console.log(groupe);
-    this.scenarioService
-      .getGroupePlastrons(groupe.id)
-      .pipe(take(1))
-      .subscribe((response: Plastron[]) => {
-        console.log(response);
-        response.forEach((plastron: Plastron) => {
-          plastron.groupe = groupe;
-        });
+  private initialisePlastron(groupes: Groupe[]) {
+    groupes.forEach((groupe) => {
+      this.scenarioService
+        .getGroupePlastrons(groupe.id)
+        .subscribe((plastrons: Plastron[]) => {
+          plastrons.map((plastron: Plastron) => {
+            plastron.groupe = groupe;
+            plastron.initModelProfil(this.plastronService) 
+          });
+          console.log("plsatrons")
+          console.log(plastrons)
 
-        this.plastrons = this.plastrons.concat(response);
-      });
+          this.plastrons = this.plastrons.concat(plastrons);
+
+        });
+    });
   }
 
   save() {}
+
+  reloadPlastron(event) {
+    console.log(event)
+
+    console.log("reloadPlastron")
+    if(event.index == 2 && !this.plastronLoad) {
+      this.plastrons = [...this.plastrons]} // forced update
+      this.plastronLoad = true;
+    }
 }

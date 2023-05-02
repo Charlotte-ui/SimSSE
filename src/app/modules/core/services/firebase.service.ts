@@ -10,6 +10,8 @@ import { getAuth } from 'firebase/auth';
 import { FieldPath, FieldValue } from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
+import { ApiService } from './api.service';
+import { Scenario } from '../models/scenario';
 
 export interface Collection{
   id: string;
@@ -20,7 +22,7 @@ export interface Collection{
 })
 export class FirebaseService {
 
-  constructor(private db: AngularFirestore) { }
+  constructor(private db: AngularFirestore, public apiService:ApiService) { }
 
 
 
@@ -40,6 +42,7 @@ export class FirebaseService {
    * @returns 
    */
 getCollectionById<T extends Collection>(collection:string): Observable<T[]> {
+
   return this.db.collection(collection).snapshotChanges().pipe(
     take(2),
     map((actions) => {

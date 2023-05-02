@@ -7,19 +7,23 @@ import {
 import { Observable, of } from 'rxjs';
 import { Plastron } from '../core/models/plastron';
 import { FirebaseService } from '../core/services/firebase.service';
+import { PlastronService } from '../core/services/plastron.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlastronResolver implements Resolve<Plastron> {
 
-  constructor(public firebaseService: FirebaseService,private router: Router) {}
+  constructor(public plastronService: PlastronService,private router: Router) {}
 
   public resolve(route: ActivatedRouteSnapshot): Promise<Plastron> {
     const plastronId = route.paramMap.get('id');
     return new Promise<Plastron| undefined>((resolve) => {
-       this.firebaseService
-      .getElementInCollectionByIds<Plastron>("Plastron",plastronId)
+
+
+
+       this.plastronService
+      .getPlastronById(plastronId)
       .subscribe((plastron:Plastron) => {
 
         plastron!.id = plastronId;

@@ -6,12 +6,16 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { JwtInterceptor } from './modules/core/helpers/jwt.interceptor';
+import { ErrorInterceptor } from './modules/core/helpers/error.interceptor';
+
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
 import { provideAuth,getAuth } from '@angular/fire/auth';
 import { provideFirestore,getFirestore } from '@angular/fire/firestore';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
+
 
 import { NgxEchartsModule } from 'ngx-echarts';
 
@@ -61,7 +65,7 @@ import { TriggerDialogComponent } from './modules/plastron/editeur/scene/trigger
 import { VariableControllerComponent } from './modules/plastron/editeur/inspecteur/variable-controller/variable-controller.component';
 import { ReglesComponent } from './modules/regles/regles.component';
 import { TabReglesComponent } from './modules/regles/tab-regles/tab-regles.component';
-import { ConfirmDeleteDialogComponent } from './modules/core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from './modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { TriageComponent } from './modules/shared/triage/triage.component';
 import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/tags-descriptions.component';
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
@@ -114,6 +118,7 @@ import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plas
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
+    HttpClientModule,
     AngularFirestoreModule,
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideAuth(() => getAuth()),
@@ -152,7 +157,9 @@ import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plas
     MatTooltipModule,
     MatSnackBarModule
   ],
-  providers: [{ provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
+  providers: [ { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
+    { provide: FIREBASE_OPTIONS, useValue: environment.firebase },ScenarioResolver],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

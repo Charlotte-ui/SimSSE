@@ -11,24 +11,22 @@ import { MatTable } from '@angular/material/table';
 import { Groupe } from '../../core/models/groupe';
 import { Triage, Modele } from '../../core/models/modele';
 import { Statut, Plastron } from '../../core/models/plastron';
-import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { ModeleService } from '../../core/services/modele.service';
 import { ProfilService } from '../../core/services/profil.service';
 import { RegleService } from '../../core/services/regle.service';
 import { ScenarioService } from '../../core/services/scenario.service';
 import { Scenario } from '../../core/models/scenario';
-import { take } from 'rxjs';
 import {
   trigger,
   state,
   style,
   transition,
   animate,
-  group,
 } from '@angular/animations';
+import { TagService } from '../../core/services/tag.service';
 
 interface tableElementPlastron {
   modele: string;
@@ -37,10 +35,9 @@ interface tableElementPlastron {
   groupe: number;
   statut: Statut;
   id: number;
-  idPlastron:string;
+  idPlastron: string;
   numero: number;
   age: number;
-  sexe: boolean;
 }
 
 @Component({
@@ -59,6 +56,7 @@ interface tableElementPlastron {
   ],
 })
 export class LotPlastronsComponent {
+  Modele = Modele;
   filterTags: string[] = [];
   allTags!: string[];
   defaultElementPlastron!: tableElementPlastron;
@@ -72,7 +70,6 @@ export class LotPlastronsComponent {
   ];
   dataSourcePlastron: Array<tableElementPlastron> = [];
   sortedDataSourcePlastron: Array<tableElementPlastron> = [];
-
   expandedElement!: tableElementPlastron | null;
 
   @Input() groupes!: Groupe[];
@@ -98,15 +95,15 @@ export class LotPlastronsComponent {
   @Output() newChange = new EventEmitter<boolean>();
 
   constructor(
-    private route: ActivatedRoute,
-    private form: FormBuilder,
     public scenarioService: ScenarioService,
     public modelService: ModeleService,
     public profilService: ProfilService,
     private router: Router,
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
-    public regleService: RegleService
+    public regleService: RegleService,
+    public modeleService: ModeleService,
+    public tagSetvice: TagService
   ) {
     this.defaultElementPlastron = new Object() as tableElementPlastron;
     this.defaultElementPlastron.description = '';
@@ -116,22 +113,14 @@ export class LotPlastronsComponent {
     this.defaultElementPlastron.triage = Triage.UR;
     this.defaultElementPlastron.id = -1;
 
-    // let tab = Object.keys(this.defaultElementPlastron);
-
-    //   type staffKeys = keyof tableElementPlastron; // "name" | "salary"
-
-    this.regleService.getAllTagsPlastron().subscribe((response) => {
+    this.tagSetvice.getAllTags('modele').subscribe((response) => {
       this.allTags = response;
     });
   }
 
   drop(event: CdkDragDrop<string, any, any[]>) {
-    console.log('drop');
-    console.log(event);
     let index = event.currentIndex;
     let modele = event.previousContainer.data[event.previousIndex] as Modele;
-    console.log(modele);
-
     if (this.dataSourcePlastron[index].triage == modele.triage) {
       this.dataSourcePlastron[index].modele = modele.title;
     } else {
@@ -149,14 +138,12 @@ export class LotPlastronsComponent {
     const data = this.dataSourcePlastron.slice();
     sort = sort as Sort;
 
-    console.log(sort);
     if (!sort.active || sort.direction === '') {
       this.sortedDataSourcePlastron = data;
       return;
     }
 
     this.sortedDataSourcePlastron = data.sort((a, b) => {
-      console.log(a);
       const isAsc = sort.direction === 'asc';
       switch (sort.active) {
         case 'id':
@@ -176,13 +163,10 @@ export class LotPlastronsComponent {
   }
 
   compare(a: number | string, b: number | string, isAsc: boolean) {
-    console.log('a: ' + a + ', b:' + b);
-    console.log((a < b ? -1 : 1) * (isAsc ? 1 : -1));
     return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
   goToPlastron(plastronId: string) {
-    console.log(plastronId);
     this.router.navigate(['/plastron/' + plastronId]);
   }
 
@@ -200,13 +184,10 @@ export class LotPlastronsComponent {
     });
 
     plastron.groupe = newGroupe;
-
     this.newChange.emit(true);
   }
 
   public completePlastrons() {
-    console.log(this.plastrons);
-
     this.dataSourcePlastron = new Array<tableElementPlastron>(
       this.totalPlastron
     );
@@ -215,7 +196,10 @@ export class LotPlastronsComponent {
       .map(() => ({ ...this.defaultElementPlastron }));
 
     this.plastrons.forEach((plastron, index) => {
-      this.addPlastronToDatasource(plastron, index);
+      if (plastron.modele) this.addPlastronToDatasource(plastron, index);
+      // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
+      if (index == this.plastrons.length - 1)
+        this.updateDataSourceTriage(index);
     });
 
     //this.dataSourcePlastron = this.plastrons;
@@ -223,28 +207,14 @@ export class LotPlastronsComponent {
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
     //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
-
-    this.modelService
-      .getModeleById(plastron.modele)
-      .subscribe((response: Modele) => {
-        console.log(response);
-        this.dataSourcePlastron[index].modele = response.title;
-        this.dataSourcePlastron[index].description = response.description;
-        this.dataSourcePlastron[index].triage = response.triage;
-        this.dataSourcePlastron[index].statut = Statut.Doing;
-        this.dataSourcePlastron[index].id = index;
-        this.dataSourcePlastron[index].idPlastron = plastron.id;
-        this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
-        // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
-        if (index == this.plastrons.length - 1)
-          this.updateDataSourceTriage(index);
-      });
-
-    this.profilService.getProfilById(plastron.profil).subscribe((response) => {
-      console.log(response);
-      this.dataSourcePlastron[index].age = response.age;
-      this.dataSourcePlastron[index].sexe = response.sexe;
-    });
+    this.dataSourcePlastron[index].modele = plastron.modele.title;
+    this.dataSourcePlastron[index].description = plastron.modele.description;
+    this.dataSourcePlastron[index].triage = plastron.modele.triage;
+    this.dataSourcePlastron[index].statut = Statut.Doing;
+    this.dataSourcePlastron[index].id = index;
+    this.dataSourcePlastron[index].idPlastron = plastron.id;
+    this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
+    this.dataSourcePlastron[index].age = plastron.profil.age;
   }
 
   private updateDataSourceTriage(indexStart: number) {
@@ -279,5 +249,10 @@ export class LotPlastronsComponent {
     });
 
     this.sortedDataSourcePlastron = this.dataSourcePlastron.slice();
+  }
+
+  createModele(modele: Modele) {
+    let newModele = this.modeleService.createNewModel(modele, true);
+    this.router.navigate(['/modele/' + newModele.id]);
   }
 }

@@ -2,7 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Groupe } from '../../core/models/groupe';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../core/models/scenario';
-import { ConfirmDeleteDialogComponent } from '../../core/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 
 @Component({
@@ -11,20 +11,12 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
   styleUrls: ['./groupes.component.less'],
 })
 export class GroupesComponent {
-  
-  
-  groupPositions = [
-    [565, 200, '1'],
-    [465, 300, '2'],
-    [221, 400, '3'],
-    [150, 150],
-    [500, 100],
-    [200, 500],
-  ];
 
-  PMA = [150, 150];
-  PRV = [500, 100];
-  CADI = [200, 500];
+  groupPositions!:any[];
+
+  PMA = [15, 15];
+  PRV = [50, 10];
+  CADI = [20, 50];
 
   editable: string[] = ['psy', 'impliques'];
   keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'impliques'];
@@ -37,7 +29,7 @@ export class GroupesComponent {
     'impliques',
     'delete',
   ];
-  dataSourceGroup = [];
+  dataSourceGroup!: Groupe[];
 
   @Input() scenario: Scenario;
 
@@ -48,11 +40,9 @@ export class GroupesComponent {
   }
   @Input() set groupes(value: Groupe[]) {
     if (value) {
-      // if value isnt undefined
       this._groupes = value;
       this.dataSourceGroup = value;
-
-     // this.initPosition(); TODO, use whenn BDD is ok
+      this.initPosition(); //TODO, use whenn BDD is ok
     }
   }
 
@@ -70,19 +60,15 @@ export class GroupesComponent {
     this.openDialog(newGroup, -1);
   }
 
-  initPosition(){
-
-    this.groupPositions = []
-
-
-    this.groupes.forEach(groupe => {
-      this.groupPositions.push(groupe.position)
+  initPosition() {
+    this.groupPositions = [];
+    this.groupes.forEach((groupe) => {
+      this.groupPositions.push([groupe.x,groupe.y,groupe.scene]);
     });
 
-    this.groupPositions.push(this.PRV)
-    this.groupPositions.push(this.PMA)
-    this.groupPositions.push(this.CADI)
-
+    this.groupPositions.push(this.PRV);
+    this.groupPositions.push(this.PMA);
+    this.groupPositions.push(this.CADI);
   }
 
   editGroup(id: number) {
@@ -144,8 +130,8 @@ export class GroupesComponent {
     return false;
   }
 
-  updatePosition(event){
-    console.log("updatePosition")
-    console.log(event)
+  updatePosition(event) {
+    console.log('updatePosition');
+    console.log(event);
   }
 }
