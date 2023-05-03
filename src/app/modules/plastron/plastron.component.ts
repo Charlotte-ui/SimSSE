@@ -3,6 +3,8 @@ import { ActivatedRoute } from '@angular/router';
 import { Plastron } from '../core/models/plastron';
 import { ModeleService } from '../core/services/modele.service';
 import { Modele } from '../core/models/modele';
+import { Graph } from '../core/models/node';
+
 import { ProfilService } from '../core/services/profil.service';
 import {
   VariablePhysioInstance, VariablePhysioTemplate,
@@ -93,6 +95,14 @@ export class PlastronComponent implements OnInit {
      * init graph
      */
 
+    this.modelService.getGraph(this.plastron.modele.id).subscribe((graph:Graph) =>{
+      console.log("graph")
+      console.log(graph)
+     
+     
+
+    })
+
 
   }
 
@@ -101,7 +111,7 @@ export class PlastronComponent implements OnInit {
       [0, 'start'],
       [50, 'oxygénothérapie'],
     ];
-    this.plastron.modele['graph'] = this.modelService.getGraph(); // TODO remove when back is finish
+   // this.plastron.modele['graph'] = this.modelService.getGraph(); // TODO remove when back is finish
     this.plastron.modele['tags'] = ['Lemon', 'Lime', 'Apple'];
   }
 

@@ -11,8 +11,30 @@ import { VariablePhysioInstance } from '../models/variablePhysio';
   providedIn: 'root',
 })
 export class ModeleService {
-  getGraph(): Graph {
-    let trend1 = new Trend('1', 30, 80, 'chute sat', 'SpO2', -1);
+  
+  constructor(
+    public firebaseService: FirebaseService,
+    public apiService: ApiService
+  ) {}
+
+  getModeleById(id: string): Observable<Modele | undefined> {
+    return this.apiService
+      .getDocument(id)
+      .pipe(map((response) => new Modele(response)));
+    //return this.firebaseService.getElementInCollectionByIds<Modele>("Modele",id);
+  }
+
+  getModeleByLink(link): Observable<Modele | undefined> {
+    return this.getModeleById(link['in'].substring(1));
+  }
+
+  createNewModel(modele: Modele, gabarit: boolean): Modele {
+    return undefined;
+    // TODOD
+  }
+
+  getGraph(id:string): Observable<Graph | undefined> {
+    /* let trend1 = new Trend('1', 30, 80, 'chute sat', 'SpO2', -1);
     let trend2 = new Trend('2', 15, 60, 'acc respi', 'FR', 1);
     let event: Event = new Event(
       '3',
@@ -38,28 +60,9 @@ export class ModeleService {
       false,
       true
     );
-
-    return graph;
+ */
+    return this.apiService.getRelationFrom(id,"rootGraph","Modele")
+    .pipe(map(response => new Graph(response.result[0])))
   }
 
-  constructor(
-    public firebaseService: FirebaseService,
-    public apiService: ApiService
-  ) {}
-
-  getModeleById(id: string): Observable<Modele | undefined> {
-    return this.apiService
-      .getDocument(id)
-      .pipe(map((response) => new Modele(response)));
-    //return this.firebaseService.getElementInCollectionByIds<Modele>("Modele",id);
-  }
-
-  getModeleByLink(link): Observable<Modele | undefined> {
-    return this.getModeleById(link['in'].substring(1));
-  }
-
-  createNewModel(modele: Modele, gabarit: boolean): Modele {
-    return undefined;
-    // TODOD
-  }
 }
