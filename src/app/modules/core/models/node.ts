@@ -1,5 +1,6 @@
 import { Collection } from "../services/firebase.service";
 import { Nameable } from "./nameable";
+import { Vertex } from "./vertex";
 
 
 export enum NodeType {
@@ -128,10 +129,55 @@ export class Timer extends Node{
   }
 }
 
-export interface Action extends Collection{
+export class Action extends Vertex{
+  public static override className = 'Action';
+
   name:string;
+
+  
+  constructor(object?: any) {
+    super(object);
+    this.name = object?.name ? object.name : '';
+  }
+
+  public static override instanciateListe<T>(list: any[]): T[] {
+    let res: T[] = [];
+    console.log('instanciateListe');
+
+    console.log(list);
+
+    list.forEach((element) => {
+      element['id'] = element['@rid'].substring(1); // delete the #
+      res.push(new Action(element) as T);
+    });
+
+    return res;
+  }
 }
 
-export interface BioEvent extends Collection{
+export class BioEvent extends Vertex{
+  public static override className = 'Event';
+
   name:string;
+
+  constructor(object?: any) {
+    super(object);
+    this.name = object?.name ? object.name : '';
+  }
+
+  public static override instanciateListe<T>(list: any[]): T[] {
+    let res: T[] = [];
+    console.log('instanciateListe');
+
+    console.log(list);
+
+    list.forEach((element) => {
+      element['id'] = element['@rid'].substring(1); // delete the #
+      res.push(new BioEvent(element) as T);
+    });
+
+    return res;
+  }
+
+
 }
