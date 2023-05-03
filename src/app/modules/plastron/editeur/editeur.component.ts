@@ -128,7 +128,20 @@ export class EditeurComponent implements OnInit {
         this.modelService
           .getGraphLinks(nodeIDArray)
           .subscribe((links: Link[]) => {
+   
+
+            // replace id node by event name so an event is triggered wathever his id is
+
+            links.forEach((link:Link) => {
+              let nodeSource = this.getNodeByID(link.out);
+              if (nodeSource.type == NodeType.event) link.out = (nodeSource as Event).event;
+            });
+
             this.modele.graph.links = links;
+            
+            if (this.targetVariable) this.initCurves();
+
+
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           });
 
@@ -136,7 +149,7 @@ export class EditeurComponent implements OnInit {
         this.trends = [];
         this.events = [];
         this.initTrendsEventsRecursive(this.modele.graph);
-        if (this.targetVariable) this.initCurves();
+        
       });
     });
   }
@@ -149,7 +162,7 @@ export class EditeurComponent implements OnInit {
     this.targetVariable.forEach((variable, index) => {
       let curve = new Curve(variable.name, this.duration, variable);
       this.curves.push(curve);
-      curve.calculCurve(this.modele);
+      curve.calculCurve(structuredClone(this.modele));
     });
   }
 
@@ -266,4 +279,13 @@ export class EditeurComponent implements OnInit {
     );
     return res;
   } */
+
+    getNodeByID(id: string):Node {
+    let result = undefined;
+    this.modele.graph.nodes.forEach((node: Node) => {
+      if (node.id == id) result = node;
+    });
+    return result;
+  }
+
 }

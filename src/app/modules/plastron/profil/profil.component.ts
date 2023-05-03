@@ -17,7 +17,6 @@ export class ProfilComponent implements OnInit {
   }
   @Input() set profil(value: Profil) {
     if (value) {
-      console.log(value);
       this._profil = value;
       this.form = this.fb.group(value);
     }

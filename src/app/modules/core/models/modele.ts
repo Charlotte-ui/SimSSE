@@ -1,5 +1,5 @@
 import { Listable } from "./listable";
-import { Graph } from "./node";
+import { Graph,Node } from "./node";
 import { VariablePhysioTemplate } from "./variablePhysio";
 import { Vertex } from "./vertex";
 
@@ -39,10 +39,11 @@ export class Modele extends Vertex implements Listable{
         let res: T[] = []
 
         list.forEach(element => {
-            element["id"] = element["@rid"].substring(1) // delete the #
             res.push(new Modele(element) as T)
         });
         return res;
     }
+
+    
 
 }

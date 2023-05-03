@@ -25,6 +25,10 @@ export class Curve{
    * @returns
    */
   public calculCurve(modele:Modele){
+    //console.group("calculCurve "+this.name)
+    //console.group("modele")
+    //console.group(modele)
+
     let trend = 0; //by default there is no trend, the curve is constante
     let prevValue = this.variable.cible; // at t=0 the previous value is the target
 
@@ -35,6 +39,7 @@ export class Curve{
       this.updateNodesStates(i,modele); // each minute that pass we updates the states of the nodes
       if(modele.graph.nodes) trend = this.calculTrend(modele); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
 
+    //  console.log(i+" "+trend)
       if (i > 0) prevValue = this.values[i - 1][1]
 
       let newValue = Math.round(prevValue + this.gaussianRandom(0, this.variable.rand) + trend);
@@ -63,11 +68,18 @@ export class Curve{
    */
   private updateNodeStatesRecursive(triggeredEvents:[number,string][],graph:Graph,t:number){
     triggeredEvents.forEach(event => {
+     
       if (event[0] == t) { // event trigger at time t
         let nameEvent = event[1];
+        console.log("nameEvent "+nameEvent)
+
         graph.links.forEach(link => {
+          console.log("nameEvent "+nameEvent+", link.out"+link.out)
           if (nameEvent == link.out){
-            let nodeTrigger = graph.nodes[Number(link.in)];
+            let nodeTrigger = this.getNodeByID(link.in,graph)
+            console.log("nodeTrigger")
+            console.log(nodeTrigger)
+          //  let nodeTrigger = graph.nodes[Number(link.in)];
             nodeTrigger.state = link.start;
             if(nodeTrigger.type == NodeType.graph) {
               if (nodeTrigger.state) this.updateNodeStatesRecursive(triggeredEvents,nodeTrigger as Graph,t) // si le node est un graph, on updte les états des nodes internes
@@ -152,5 +164,13 @@ export class Curve{
     let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     // Transform to the desired mean and standard deviation:
     return z * stdev + mean;
+  }
+
+   getNodeByID(id: string,graph:Graph):Node {
+    let result = undefined;
+    graph.nodes.forEach((node: Node) => {
+      if (node.id == id) result = node;
+    });
+    return result;
   }
 };

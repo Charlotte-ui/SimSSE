@@ -23,8 +23,6 @@ export class TagsDescriptionsComponent {
   }
   @Input() set modele(value:Modele ) {
     if(value){
-      console.log("set model tag et description")
-      console.log(value)
       this._modele = value;
       this.form = this.fb.group(this.wrapArray(value));
     }

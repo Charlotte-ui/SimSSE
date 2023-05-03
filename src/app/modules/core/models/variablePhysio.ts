@@ -40,12 +40,8 @@ export class VariablePhysioTemplate extends VariablePhysio{
 
     public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
-    console.log('instanciateListe');
-
-    console.log(list);
-
+    
     list.forEach((element) => {
-      element['id'] = element['@rid'].substring(1); // delete the #
       res.push(new VariablePhysioTemplate(element) as T);
     });
 

@@ -94,13 +94,11 @@ export class Event extends Node {
 
 export class Link extends Edge {
   type: string;
-  out: string ;
+  out: string;
   in: string;
   start: boolean;
 
-  constructor(
-    object?:any
-  ) {
+  constructor(object?: any) {
     super(object);
     this.out = object?.out ? object.out.substring(1) : undefined;
     this.in = object?.in ? object.in.substring(1) : undefined;
@@ -108,21 +106,15 @@ export class Link extends Edge {
     this.start = object?.start !== undefined ? object.start : true;
   }
 
-    public static override instanciateListe<T>(list: any[]): T[] {
+  public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
-    console.log('instanciateListe');
-
-    console.log(list);
 
     list.forEach((element) => {
-      element['id'] = element['@rid'].substring(1); // delete the #
       res.push(new Link(element) as T);
     });
 
     return res;
   }
-
-
 }
 
 export class Graph extends Node {
@@ -131,11 +123,12 @@ export class Graph extends Node {
   links: Link[];
   gabarit: string | boolean; // ref vers le graph gabarit si instance, true si gabarit
 
-    public static override className = 'Graph';
-
+  public static override className = 'Graph';
 
   constructor(object?: any) {
-    object? object.type = NodeType.graph : object = {type:NodeType.graph}
+    object
+      ? (object.type = NodeType.graph)
+      : (object = { type: NodeType.graph });
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
     this.nodes = object?.nodes ? object.nodes : [];
@@ -147,12 +140,8 @@ export class Graph extends Node {
     return this.name;
   }
 
-  
-    public static override instanciateListe<T>(list: any[]): T[] {
+  public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
-    console.log('instanciateListe');
-
-    console.log(list);
 
     list.forEach((element) => {
       res.push(new Graph(element) as T);
@@ -192,12 +181,8 @@ export class Action extends Vertex {
 
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
-    console.log('instanciateListe');
-
-    console.log(list);
 
     list.forEach((element) => {
-      element['id'] = element['@rid'].substring(1); // delete the #
       res.push(new Action(element) as T);
     });
 
@@ -217,12 +202,8 @@ export class BioEvent extends Vertex {
 
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
-    console.log('instanciateListe');
-
-    console.log(list);
 
     list.forEach((element) => {
-      element['id'] = element['@rid'].substring(1); // delete the #
       res.push(new BioEvent(element) as T);
     });
 

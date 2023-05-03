@@ -14,7 +14,6 @@ export class Tag extends Vertex {
         let res: T[] = []
 
         list.forEach(element => {
-            element["id"] = element["@rid"].substring(1) // delete the #
             res.push(new Tag(element) as T)
         });
         return res;

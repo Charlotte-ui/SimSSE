@@ -109,6 +109,8 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     DataName =  [] ;
     this.graph.nodes.forEach((node:Node,index:number) => {
+      console.log("node")
+      console.log(node)
       let draggable = (node.type == NodeType.event && (node as Event).typeEvent == EventType.start)?false:true;
 
       let name ;
@@ -125,8 +127,9 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
       let cat= (node.type == NodeType.event )?(node as Event).typeEvent:node.type;
 
+
       this.graphData[index] = {
-        name:node.id,//name,
+        name:(node.type == NodeType.event )?name:node.id,
         category:cat,
         draggable: draggable,
         layout: 'none',
