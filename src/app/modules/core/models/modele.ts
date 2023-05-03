@@ -32,7 +32,7 @@ export class Modele extends Vertex implements Listable{
         this.triage = (object?.triage)?object.triage:0;
         this.gabarit = (object?.gabarit)?object.gabarit:0;
         this.graph = (object?.graph)?object.graph:0;
-        this.triggeredEvents = (object?.triggeredEvents)?object.triggeredEvents:0;
+        this.triggeredEvents = (object?.triggeredEvents)?object.triggeredEvents:[];
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {

@@ -29,7 +29,8 @@ export class SceneComponent implements OnInit {
   /**
    * all events is the nodes and theirs ids
    */
-  @Input() events: [Event, number, number][];
+  //@Input() events: [Event, number, number][];
+  @Input() events;
   @Input() modele: Modele;
 
   _curves!: Curve[];

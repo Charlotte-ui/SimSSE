@@ -3,7 +3,7 @@ import { Observable, map } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/modele';
-import { Trend, Event, Link, NodeType, EventType, Graph } from '../models/node';
+import { Trend, Event, Link, NodeType, EventType, Graph,Node } from '../models/node';
 import { ApiService } from './api.service';
 import { VariablePhysioInstance } from '../models/variablePhysio';
 
@@ -65,4 +65,18 @@ export class ModeleService {
     .pipe(map(response => new Graph(response.result[0])))
   }
 
+  getGraphNodes(id:string): Observable<Node[] | undefined>{
+    return this.apiService.getRelationFrom(id,"aNode","Graph")
+    .pipe(map(response => (Node.instanciateListe<Node>(response.result))))
+  }
+
+    getTrigger(id:string): Observable<any | undefined>{
+    return this.apiService.getLinkAndRelationFrom(id,"triggeredAt","Modele")
+    .pipe(map(response => (response.result[0])))
+  }
+
+    getGraphLinks(arrayId:string[]): Observable<Link[] | undefined>{
+    return this.apiService.getLinkFromMultiple(arrayId,"link")
+    .pipe(map(response => (Link.instanciateListe<Link>(response.result))))
+  }
 }

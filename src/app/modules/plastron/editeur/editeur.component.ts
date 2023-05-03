@@ -23,6 +23,7 @@ import { GraphDialogComponent } from './graph-dialog/graph-dialog.component';
 import { retry } from 'rxjs';
 import { Modele } from '../../core/models/modele';
 import { Curve } from '../../core/models/curve';
+import { ModeleService } from '../../core/services/modele.service';
 
 @Component({
   selector: 'app-editeur',
@@ -54,10 +55,7 @@ export class EditeurComponent implements OnInit {
   @Input() set modele(value: Modele) {
     if (value) {
       this._modele = value;
-      this.events = new Array<[Event, number, number]>();
-      this.trends = [];
-      this.initTrendsEventsRecursive(this.modele.graph);
-      if (this.targetVariable) this.initCurves();
+      this.initGragh();
     }
   }
 
@@ -77,7 +75,8 @@ export class EditeurComponent implements OnInit {
    * all currents events in the nodes, theirs ids and the id of the graph their from
    * is there from the current graph id=-1
    */
-  events: [Event, number, number][];
+  //events: [Event, number, number][];
+  events: Event[];
 
   /**
    * courbes des data simulées
@@ -92,26 +91,61 @@ export class EditeurComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public reglesService: RegleService,
-    public nodeService: NodeService
+    public nodeService: NodeService,
+    private modelService: ModeleService
   ) {}
 
   // --- INITIALISATEURS -----------------------------------------
 
   ngOnInit(): void {
+
     this.reglesService.getBioEvents().subscribe((response) => {
       this.allBioevents = response as BioEvent[];
+      console.log("allBioevents")
+      console.log(response)
     });
 
     this.reglesService.getActions().subscribe((response) => {
       this.allActions = response as Action[];
+         console.log("allActions")
+      console.log(response)
     });
 
-    this.reglesService.getActions().subscribe((response) => {
-      this.allActions = response as Action[];
-    });
 
-    this.nodeService.getGraphGabarit().subscribe((response) => {
+    /*     this.nodeService.getGraphGabarit().subscribe((response) => {
       this.allGraphs = response;
+    }); */
+  }
+
+  /**
+   * init graph
+   */
+  initGragh() {
+    this.modelService.getGraph(this.modele.id).subscribe((graph: Graph) => {
+      this.modele.graph = graph;
+
+      this.modelService.getGraphNodes(graph.id).subscribe((nodes: Node[]) => {
+        this.modele.graph.nodes = nodes;
+
+        let nodeIDArray = nodes.map((node: Node) => node.id);
+
+        this.modelService
+          .getGraphLinks(nodeIDArray)
+          .subscribe((links: Link[]) => {
+            this.modele.graph.links = links;
+          });
+
+      //  this.events = new Array<[Event, number, number]>(); // id event and id graph
+        this.trends = [];
+        this.events = [];
+        this.initTrendsEventsRecursive(this.modele.graph);
+        console.log('trends');
+        console.log(this.trends);
+        console.log('events');
+        console.log(this.events);
+
+        if (this.targetVariable) this.initCurves();
+      });
     });
   }
 
@@ -119,6 +153,7 @@ export class EditeurComponent implements OnInit {
    * initialize all curves
    */
   initCurves() {
+    console.log("initCurves")
     this.curves = [];
     this.targetVariable.forEach((variable, index) => {
       let curve = new Curve(variable.name, this.duration, variable);
@@ -128,13 +163,15 @@ export class EditeurComponent implements OnInit {
   }
 
   initTrendsEventsRecursive(graph: Graph) {
-    //console.log("initTrendsEventsRecursive")
+    console.log('initTrendsEventsRecursive');
+    console.log(graph);
 
     graph.nodes.forEach((node, i) => {
-      // console.log(node)
+      console.log(node);
       switch (node.type) {
         case 'event':
-          this.events.push([node as Event, i, Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
+          //this.events.push([node as Event, i, Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
+          this.events.push(node as Event);
           break;
         case 'trend':
           this.trends.push(node as Trend);
@@ -183,7 +220,7 @@ export class EditeurComponent implements OnInit {
       if (node.type == 'trend') {
         // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
         let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
-        let variable = this.getVariableByName(trend.cible);
+        let variable = this.getVariableByName(trend.target);
         this.curves[variable.id].calculCurve(this.modele);
       } else this.initCurves();
     }

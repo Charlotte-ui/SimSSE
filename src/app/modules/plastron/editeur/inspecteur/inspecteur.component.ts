@@ -29,7 +29,7 @@ export class InspecteurComponent implements OnInit {
     let res = [];
 
     this.trends.forEach(trend => {
-      if (trend.cible == name) res.push(trend);
+      if (trend.target == name) res.push(trend);
     });
 
     return res;

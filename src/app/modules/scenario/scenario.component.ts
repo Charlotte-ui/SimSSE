@@ -59,20 +59,33 @@ export class ScenarioComponent implements OnInit {
     });
   }
 
+  // TODO : replace nested subscribe
   private initialisePlastron(groupes: Groupe[]) {
     groupes.forEach((groupe) => {
       this.scenarioService
         .getGroupePlastrons(groupe.id)
         .subscribe((plastrons: Plastron[]) => {
-          plastrons.map((plastron: Plastron) => {
+          plastrons.map((plastron: Plastron,index:number) => {
             plastron.groupe = groupe;
-            plastron.initModelProfil(this.plastronService) 
+
+            this.plastronService
+              .getPlastronModele(plastron.id)
+              .subscribe((modele: Modele) => {
+                plastron.modele = modele;
+
+                if(plastrons.length-1 == index) this.plastronLoad = true;
+              });
+
+            this.plastronService
+              .getPlastronProfil(plastron.id)
+              .subscribe((profil: Profil) => {
+                plastron.profil = profil;
+              });
           });
-          console.log("plsatrons")
-          console.log(plastrons)
+          console.log('plsatrons');
+          console.log(plastrons);
 
           this.plastrons = this.plastrons.concat(plastrons);
-
         });
     });
   }
@@ -80,11 +93,12 @@ export class ScenarioComponent implements OnInit {
   save() {}
 
   reloadPlastron(event) {
-    console.log(event)
+    console.log(event);
 
-    console.log("reloadPlastron")
-    if(event.index == 2 && !this.plastronLoad) {
-      this.plastrons = [...this.plastrons]} // forced update
-      this.plastronLoad = true;
-    }
+    console.log('reloadPlastron');
+    if (event.index == 2 && !this.plastronLoad) {
+      this.plastrons = [...this.plastrons];
+    } // forced update
+    this.plastronLoad = true;
+  }
 }

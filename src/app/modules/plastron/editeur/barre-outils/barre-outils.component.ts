@@ -41,19 +41,19 @@ export class BarreOutilsComponent implements OnInit {
       case NodeType.link:
         return this.createLink();
       case EventType.bio:
-        let bioevent = new Event("",x,y,EventType.bio);
+        let bioevent = new Event({type:EventType.bio});
         return this.createNode(bioevent,this.allBioevents);
       case EventType.action:
-        let action = new Event("",x,y,EventType.action);
+        let action = new Event({type:EventType.action});
         return this.createNode(action,this.allActions);
       case NodeType.trend:
-        let trend = new Trend ("",x,y)
+        let trend = new Trend ()
         return this.createNode(trend,this.targetVariable);
       case NodeType.graph:
-        let group = new Graph("",x,y)
+        let group = new Graph()
         return this.createNode(group,this.allGraphs);
       case NodeType.timer:
-        let timer = new Timer("",x,y)
+        let timer = new Timer()
         return this.createNode(timer,[]);
     }
   }

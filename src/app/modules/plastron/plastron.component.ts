@@ -3,11 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { Plastron } from '../core/models/plastron';
 import { ModeleService } from '../core/services/modele.service';
 import { Modele } from '../core/models/modele';
-import { Graph } from '../core/models/node';
+import { Graph, Node, Event, Link } from '../core/models/node';
 
 import { ProfilService } from '../core/services/profil.service';
 import {
-  VariablePhysioInstance, VariablePhysioTemplate,
+  VariablePhysioInstance,
+  VariablePhysioTemplate,
 } from '../core/models/variablePhysio';
 import { RegleService } from '../core/services/regle.service';
 import { Profil } from '../core/models/profil';
@@ -42,15 +43,33 @@ export class PlastronComponent implements OnInit {
     public dialog: MatDialog,
     private _snackBar: MatSnackBar,
     private scenarioService: ScenarioService,
-    private tagService:TagService,
-    private profilService:ProfilService
+    private tagService: TagService,
+    private profilService: ProfilService
   ) {}
 
   ngOnInit(): void {
     this.route.data.subscribe((response) => {
       this.plastron = response['data'];
 
-      this.plastron.initModelProfil(this.plastronService) 
+      /**
+       * init modele
+       */
+      this.plastronService
+        .getPlastronModele(this.plastron.id)
+        .subscribe((modele: Modele) => {
+          this.plastron.modele = modele;
+          //this.initGragh();
+          this.initTrigger();
+        });
+
+      /***
+       * init profil
+       */
+      this.plastronService
+        .getPlastronProfil(this.plastron.id)
+        .subscribe((profil: Profil) => {
+          this.plastron.profil = profil;
+        });
 
       /**
        * init scenario
@@ -58,18 +77,18 @@ export class PlastronComponent implements OnInit {
       // TODO : replace the nested subscribe
       this.plastronService
         .getPlastronGroupe(this.plastron.id)
-        .subscribe((groupe:Groupe) => {
+        .subscribe((groupe: Groupe) => {
           this.scenarioService
             .getGroupeScenario(groupe.id)
-            .subscribe((scenario: Scenario) => { 
+            .subscribe((scenario: Scenario) => {
               this.scenario = scenario;
             });
         });
-      
-        /**
-         * init tags
-         */
-      this.tagService.getAllTags("modele").subscribe((response) => {
+
+      /**
+       * init tags
+       */
+      this.tagService.getAllTags('modele').subscribe((response) => {
         this.allTags = response;
       });
     });
@@ -77,42 +96,48 @@ export class PlastronComponent implements OnInit {
     /**
      * init target variables
      */
-    this.regleService.getVariableTemplate().subscribe((variablesTemplate:VariablePhysioTemplate[]) =>{
-      console.log("var physio tempalte")
-      console.log(variablesTemplate)
-      variablesTemplate.forEach(varTemp => {
-        this.profilService.getVariable(this.plastron.profil.id,varTemp.id).subscribe((variable:VariablePhysioInstance)=>{
-          if(variable.id == "") this.plastron.modele.createVariableCible(varTemp); // si la variable cible n'existe pas, on la crée
-          this.plastron.profil.targetVariable.push(variable)
-          console.log(variable)
-        })
-        
+    this.regleService
+      .getVariableTemplate()
+      .subscribe((variablesTemplate: VariablePhysioTemplate[]) => {
+        console.log('var physio tempalte');
+        console.log(variablesTemplate);
+        variablesTemplate.forEach((varTemp) => {
+          this.profilService
+            .getVariable(this.plastron.profil.id, varTemp.id)
+            .subscribe((variable: VariablePhysioInstance) => {
+              if (variable.id == '')
+                this.plastron.modele.createVariableCible(varTemp); // si la variable cible n'existe pas, on la crée
+              else{
+                variable.name = varTemp.name;
+                variable.color = varTemp.color;
+                this.plastron.profil.targetVariable.push(variable);
+              }
+
+              console.log(variable);
+            });
+        });
       });
+      console.log("this.plastron")
 
-    })
+      console.log(this.plastron)
 
-    /**
-     * init graph
-     */
-
-    this.modelService.getGraph(this.plastron.modele.id).subscribe((graph:Graph) =>{
-      console.log("graph")
-      console.log(graph)
-     
-     
-
-    })
-
-
+          /*     
+    this.plastron.modele['tags'] = ['Lemon', 'Lime', 'Apple']; */
   }
 
-  initGragh() {
-    this.plastron.modele['triggeredEvents'] = [
-      [0, 'start'],
-      [50, 'oxygénothérapie'],
-    ];
-   // this.plastron.modele['graph'] = this.modelService.getGraph(); // TODO remove when back is finish
-    this.plastron.modele['tags'] = ['Lemon', 'Lime', 'Apple'];
+  
+
+  initTrigger() {
+    this.modelService
+      .getTrigger(this.plastron.modele.id)
+      .subscribe((result: any) => {
+        result.$a.forEach((event: Event, index: number) => {
+          this.plastron.modele.triggeredEvents.push([
+            result.$b[index].time,
+            event.event,
+          ]);
+        });
+      });
   }
 
   changeModele() {

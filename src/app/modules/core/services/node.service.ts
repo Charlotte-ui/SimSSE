@@ -12,7 +12,7 @@ export class NodeService {
 
   getGraphGabarit() {
 
-        let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
+   /*      let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
     let trend2 = new Trend("2",15,60,'acc respi','FR',1)
     let event:Event = new Event("3",40,50,EventType.action,'oxygénothérapie')
     let start:Event = new Event("0",5,95,EventType.start,'start')
@@ -29,6 +29,6 @@ export class NodeService {
 
     let graph= new Graph("0",50,50,"detresse respiratoire",[start,trend1,trend2,event,end],[link1,link2,link3,link4,link5],true,false)
 
-    return of ([graph])
+    return of ([graph]) */
   }
 }

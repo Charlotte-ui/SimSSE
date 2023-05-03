@@ -10,9 +10,7 @@ export enum Statut {
     Doing = "En cours"
 }
 
-export class Plastron extends Vertex implements Listable{
-    title: string;
-    description: string;
+export class Plastron extends Vertex {
     tags: string[];
     groupe:Groupe;
     modele:Modele;
@@ -23,12 +21,10 @@ export class Plastron extends Vertex implements Listable{
 
     constructor(object?:any) {
         super(object);
-        this.title = (object?.title)?object.title:"";
-        this.description = (object?.description)?object.description:"";
         this.tags = (object?.tags)?object.tags:[];
         this.groupe = (object?.groupe)?object.groupe:undefined;
-        this.modele = (object?.modele)?object.modele:undefined;
-        this.profil = (object?.profil)?object.profil:undefined;
+        this.modele = (object?.modele)?object.modele:new Modele();
+        this.profil = (object?.profil)?object.profil:new Profil();
         this.statut = (object?.statut)?object.statut:Statut.Todo;
     }
 
@@ -44,23 +40,5 @@ export class Plastron extends Vertex implements Listable{
         });
     
         return res;
-      }
-
-
-      public initModelProfil(plastronService) {
-        plastronService
-            .getPlastronModele(this.id)
-            .subscribe((modele: Modele) => {
-         
-              this.modele = modele;
-            });
-    
-          plastronService
-            .getPlastronProfil(this.id)
-            .subscribe((profil: Profil) => {
-      
-              this.profil = profil;
-            });
-    
-      }
+      } 
 }

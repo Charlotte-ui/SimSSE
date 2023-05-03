@@ -66,8 +66,8 @@ export class Curve{
       if (event[0] == t) { // event trigger at time t
         let nameEvent = event[1];
         graph.links.forEach(link => {
-          if (nameEvent == link.source){
-            let nodeTrigger = graph.nodes[Number(link.target)];
+          if (nameEvent == link.out){
+            let nodeTrigger = graph.nodes[Number(link.in)];
             nodeTrigger.state = link.start;
             if(nodeTrigger.type == NodeType.graph) {
               if (nodeTrigger.state) this.updateNodeStatesRecursive(triggeredEvents,nodeTrigger as Graph,t) // si le node est un graph, on updte les états des nodes internes
@@ -115,8 +115,8 @@ export class Curve{
     let trends:number[] = []; // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     nodes.forEach(node => {
       if(node.state){ // si le node est actif
-        if (node.type == "trend" && (node as Trend).cible == variable.name ) { // si le node est une trend
-          trends.push(Number((node as Trend).pente))
+        if (node.type == "trend" && (node as Trend).target == variable.name ) { // si le node est une trend
+          trends.push(Number((node as Trend).parameter))
         }
         if (node.type == "graph") { // si le node est un graph
 

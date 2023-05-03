@@ -126,11 +126,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     this.graph.links.forEach(link => {
       let color = link.start?"#2E933C":"#DE1A1A";
-      let source = (Number.isNaN(Number(link.source)))?link.source:Number(link.source);
+      let source = (Number.isNaN(Number(link.out)))?link.out:Number(link.out);
 
       this.graphLink[link.id] = {
         source:source, // name of the node
-        target:Number(link.target), // id of the node
+        target:Number(link.in), // id of the node
         lineStyle: {color:color}
       }
     });
