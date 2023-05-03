@@ -12,6 +12,7 @@
 <mat-tab-group>
   <mat-tab label="Modèle - cas clinique">
     <app-editeur
+    *ngIf="plastron.profil"
       [modele]="plastron.modele"
       [targetVariable]="plastron.profil.targetVariable"
       (newChange)="changeGraph($event)"
@@ -24,6 +25,7 @@
     ></app-tags-descriptions>
   </mat-tab>
   <mat-tab label="Profil">
+    *ngIf="plastron.profil"
     <app-profil [profil]="plastron.profil" (newChange)="changeProfil()"></app-profil>
   </mat-tab>
 </mat-tab-group>

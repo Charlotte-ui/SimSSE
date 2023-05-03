@@ -17,18 +17,17 @@ export enum EventType {
   action = "eventaction"
 }
 
-export abstract class Node implements Collection, Nameable{
-    id: string;
+export abstract class Node extends Vertex implements Nameable{
     x: number;
     y: number;
     type: NodeType;
     state: boolean; // activate or not activate
 
-    constructor(id:string,x:number,y:number,type:NodeType) {
-      this.id = id;
-      this.x = x;
-      this.y = y;
-      this.type = type;
+    constructor(object?:any) {
+      super(object);
+      this.x = object?.x?object.x:50;
+      this.y = object?.y?object.y:50;
+      this.type = object?.type?object.type:undefined;
       this.state = false ;
     }
     
@@ -42,11 +41,11 @@ export class Trend extends Node{
     pente: number;
     name: string;
 
-    constructor(id:string,x:number,y:number,name?:string,cible?:string,pente?:number) {
-      super(id,x,y,NodeType.trend);
-      this.name = (name)?name:'Tendance ' + id;
-      this.cible = (cible)?cible:undefined;
-      this.pente = (pente)?pente:0;
+    constructor(object?:any) {
+      super(object);
+      this.name = (object?.name)?object.name:'Tendance';
+      this.cible = (object?.cible)?object.cible:undefined;
+      this.pente = (object?.pente)?object.pente:0;
     }
 
 
@@ -60,10 +59,10 @@ export  class Event extends Node{
     event: string;
     typeEvent:string;
 
-    constructor(id:string,x:number,y:number,type:EventType,event?:string) {
-      super(id,x,y,NodeType.event);
-      this.event = (event)?event:undefined;
-      this.typeEvent = type;
+    constructor(object?:any) {
+      super(object);
+      this.event = (object?.event)?object.event:undefined;
+      this.typeEvent = (object?.typeEvent)?object.typeEvent:undefined;
     }
 
     override getName(): string {
@@ -97,13 +96,14 @@ export class Graph extends Node{
   root:boolean; // le graph est a la racine du modele (true) ou fait partie d'un autre graph (false)
 
 
-  constructor(id:string,x:number,y:number,name?:string,nodes?:Node[],links?:Link[],gabarit?:boolean,root?:boolean) {
-    super(id,x,y,NodeType.graph);
-    this.name = (name)?name:'Groupe ' + id;
-    this.nodes =(nodes)?nodes: undefined;
-    this.links = (links)?links:undefined;
-    this.gabarit = (gabarit)?gabarit:false;
-    this.root = (root)?root:false;
+  constructor(object?:any) {
+    object["type"] = NodeType.graph;
+    super(object);
+    this.name = (object?.name)?object.name:'Groupe';
+    this.nodes =(object?.nodes)?object.nodes: undefined;
+    this.links = (object?.links)?object.links:undefined;
+    this.gabarit = (object?.gabarit)?object.gabarit:false;
+    this.root = (object?.root)?object.root:false;
   }
 
   override getName(): string {
@@ -117,8 +117,8 @@ export class Timer extends Node{
   duration:number; // total duration of the timer
   counter:number;  // curent time
 
-  constructor(id:string,x:number,y:number) {
-    super(id,x,y,NodeType.timer);
+  constructor(object?:any) {
+    super(object);
     this.name = "Timer "+this.id; // TODO : pq le getName() ne fonctionne pas ?
     this.duration = 0;
     this.counter = 0
