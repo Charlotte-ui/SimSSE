@@ -4,6 +4,7 @@ import { FirebaseService } from './firebase.service';
 import { Profil } from '../models/profil';
 import { ApiService } from './api.service';
 import { map } from 'rxjs';
+import { VariablePhysioInstance } from '../models/variablePhysio';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,11 @@ export class ProfilService {
 
   updateProfil(profil:Profil){
     // TODO update bdd
+  }
+
+    getVariable(idProfil, idVariableTemplate) : Observable<VariablePhysioInstance | undefined> {
+    return this.apiService.getVariable(idProfil, idVariableTemplate)
+    .pipe(map((response) => new VariablePhysioInstance(response.result[0]["intersect($a, $b)"][0])));
   }
 
 }

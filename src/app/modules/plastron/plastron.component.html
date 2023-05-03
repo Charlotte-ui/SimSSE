@@ -13,7 +13,7 @@
   <mat-tab label="Modèle - cas clinique">
     <app-editeur
       [modele]="plastron.modele"
-      [targetVariable]="targetVariable"
+      [targetVariable]="plastron.profil.targetVariable"
       (newChange)="changeGraph($event)"
     ></app-editeur>
   </mat-tab>

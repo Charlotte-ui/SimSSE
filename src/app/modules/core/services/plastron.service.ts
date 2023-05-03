@@ -4,7 +4,7 @@ import { Observable, map, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
 import { Plastron } from '../models/plastron';
 import { Modele } from '../models/modele';
-import { VariablePhysioInstance } from '../models/variablePhysio';
+import { VariablePhysioInstance, VariablePhysioTemplate} from '../models/variablePhysio';
 import { Scenario } from '../models/scenario';
 import { Groupe } from '../models/groupe';
 import { ApiService } from './api.service';
@@ -18,18 +18,18 @@ export class PlastronService {
 
   constructor(public apiService:ApiService, public modeleService:ModeleService) { }
   getVariablesCibles(plastron: Plastron): Observable<VariablePhysioInstance[]> {
-    let SpO2 = new VariablePhysioInstance("0",1,"SpO2",0,100,"#5470c5",98)
-    let FR = new VariablePhysioInstance("1",1,"FR",0,100,"#5470c5",16)
-    let FC = new VariablePhysioInstance("2",1,"FC",0,100,"#5470c5",80)
-    let HemoCue = new VariablePhysioInstance("3",1,"HemoCue",0,100,"#5470c5",36)
-    let PAD = new VariablePhysioInstance("4",1,"PAD",0,100,"#5470c5",80)
-    let PAS = new VariablePhysioInstance("5",1,"PAS",0,100,"#5470c5",130)
-    let Temp = new VariablePhysioInstance("6",1,"Temp",0,100,"#5470c5",27)
+  //  let SpO2 = new VariablePhysioTemplate({"0",1,"SpO2",0,100,"#5470c5",98})
+//    let FR = new VariablePhysioTemplate({"1",1,"FR",0,100,"#5470c5",16})
+  //  let FC = new VariablePhysioTemplate({"2",1,"FC",0,100,"#5470c5",80})
+//    let HemoCue = new VariablePhysioTemplate({"3",1,"HemoCue",0,100,"#5470c5",36})
+  //  let PAD = new VariablePhysioTemplate({"4",1,"PAD",0,100,"#5470c5",80})
+ //   let PAS = new VariablePhysioTemplate({"5",1,"PAS",0,100,"#5470c5",130})
+  //  let Temp = new VariablePhysioTemplate({"6",1,"Temp",0,100,"#5470c5",27})
 
 
-    let variables = [SpO2,FR,FC,HemoCue,Temp,PAD,PAS];
+  //  let variables = [SpO2,FR,FC,HemoCue,Temp,PAD,PAS];
 
-    return of(variables);
+    return of([]);
   }
 
   changeModelRef(plastron: Plastron, newModele: Modele) {

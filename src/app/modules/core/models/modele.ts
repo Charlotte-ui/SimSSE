@@ -1,5 +1,6 @@
 import { Listable } from "./listable";
 import { Graph } from "./node";
+import { VariablePhysioTemplate } from "./variablePhysio";
 import { Vertex } from "./vertex";
 
 
@@ -10,9 +11,11 @@ export enum Triage {
 }
 
 export class Modele extends Vertex implements Listable{
+    createVariableCible(varTemp: VariablePhysioTemplate) {
+      throw new Error('Method not implemented.');
+    }
     title: string;
     description: string;
-    id: string;
     triage:Triage;
     gabarit:boolean;
     graph:Graph;
@@ -23,11 +26,9 @@ export class Modele extends Vertex implements Listable{
 
     constructor(object?:any) {
         super(object);
-        if(object["@rid"]) object["id"] = object["@rid"].substring(1)
         this.title = (object?.title)?object.title:"";
         this.description = (object?.description)?object.description:"";
         this.tags = (object?.tags)?object.tags:[];
-        this.id = (object?.id)?object.id:"";
         this.triage = (object?.triage)?object.triage:0;
         this.gabarit = (object?.gabarit)?object.gabarit:0;
         this.graph = (object?.graph)?object.graph:0;
