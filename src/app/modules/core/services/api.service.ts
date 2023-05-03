@@ -57,7 +57,7 @@ export class ApiService {
   getClasseElementsWhithMatchingChamp<T extends Vertex>(
     classe: typeof Vertex,
     champ: string,
-    value: string
+    value: string|boolean
   ): Observable<T[]> {
     return this.http
       .get<any>(

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Trend,Event, Link, Graph, NodeType ,EventType} from '../models/node';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { ApiService } from './api.service';
 
 @Injectable({
   providedIn: 'root'
@@ -8,9 +9,10 @@ import { of } from 'rxjs';
 export class NodeService {
 
 
-  constructor() { }
+  constructor(private apiService:ApiService) { }
 
-  getGraphGabarit() {
+  getGraphTemplate():Observable<Graph[]> {
+    return this.apiService.getClasseElementsWhithMatchingChamp<Graph>(Graph,"template","true")
 
    /*      let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
     let trend2 = new Trend("2",15,60,'acc respi','FR',1)
@@ -31,4 +33,6 @@ export class NodeService {
 
     return of ([graph]) */
   }
+
+
 }

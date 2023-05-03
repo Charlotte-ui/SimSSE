@@ -12,11 +12,19 @@ import { EventType } from 'src/app/modules/core/models/node';
 import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 import { Button } from 'src/app/modules/core/models/buttons';
 
+const GREEN = "#2E933C"
+const RED = "#DE1A1A"
+
+let DataName = []
+
 @Component({
   selector: 'app-editeur-graphe-nodal',
   templateUrl: './editeur-graphe-nodal.component.html',
   styleUrls: ['./editeur-graphe-nodal.component.less']
 })
+
+
+
 export class EditeurGrapheNodalComponent implements OnInit {
   echartsInstance ;
   mergeOptions = {};
@@ -26,8 +34,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
     return this._graph;
 }
 @Input() set graph(value:Graph ) {
-  if (value!=undefined){
+  if (value){
     this._graph = value;
+    console.log("this.graph")
+    console.log(this.graph)
+     console.log(this.graph.links)
     this.initGraphLink();
     this.initGraphData();
     this.updateChart();
@@ -93,9 +104,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
   //initialisateurs
 
   initGraphData(){
+ 
     this.graphData = new Array(this.graph.nodes.length);
 
-    this.graph.nodes.forEach(node => {
+    DataName =  [] ;
+    this.graph.nodes.forEach((node:Node,index:number) => {
       let draggable = (node.type == NodeType.event && (node as Event).typeEvent == EventType.start)?false:true;
 
       let name ;
@@ -106,12 +119,14 @@ export class EditeurGrapheNodalComponent implements OnInit {
         case NodeType.timer : name = node.type
         break
         default : name = (node as Trend|Graph).name;
-      }
+      } 
+
+      DataName.push(name)
 
       let cat= (node.type == NodeType.event )?(node as Event).typeEvent:node.type;
 
-      this.graphData[node.id] = {
-        name:name,
+      this.graphData[index] = {
+        name:node.id,//name,
         category:cat,
         draggable: draggable,
         layout: 'none',
@@ -122,25 +137,30 @@ export class EditeurGrapheNodalComponent implements OnInit {
   }
 
   initGraphLink(){
+  
     this.graphLink = new Array(this.graph.links.length);
 
-    this.graph.links.forEach(link => {
-      let color = link.start?"#2E933C":"#DE1A1A";
-      let source = (Number.isNaN(Number(link.out)))?link.out:Number(link.out);
-
-      this.graphLink[link.id] = {
-        source:source, // name of the node
-        target:Number(link.in), // id of the node
+    this.graph.links.forEach((link:Link,index:number) => {
+      let color = link.start?GREEN:RED;
+      //let source = (Number.isNaN(Number(link.out)))?link.out:Number(link.out);
+      this.graphLink[index] = {
+        source: link.out, //source, // name of the node
+        target:link.in, // id of the node
         lineStyle: {color:color}
       }
     });
+
   }
 
 
   //updateurs
 
   updateChart(){
-
+    console.log("updateChart")
+    console.log("data")
+    console.log(this.graphData)
+       console.log("links")
+    console.log(this.graphLink)
     let series = [
       {
         type: 'graph',
@@ -150,7 +170,8 @@ export class EditeurGrapheNodalComponent implements OnInit {
         symbolSize: [70, 30],
         roam: true,
         label: {
-          show: true
+          show: true,
+          formatter: function(d) {return DataName[d.dataIndex];}
         },
         edgeSymbol: ['circle', 'arrow'],
         edgeSymbolSize: [10, 10],

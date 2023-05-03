@@ -102,8 +102,8 @@ export class Link extends Edge {
     object?:any
   ) {
     super(object);
-    this.out = object?.out ? object.out : undefined;
-    this.in = object?.in ? object.in : undefined;
+    this.out = object?.out ? object.out.substring(1) : undefined;
+    this.in = object?.in ? object.in.substring(1) : undefined;
     this.type = NodeType.link;
     this.start = object?.start !== undefined ? object.start : true;
   }
@@ -131,8 +131,11 @@ export class Graph extends Node {
   links: Link[];
   gabarit: string | boolean; // ref vers le graph gabarit si instance, true si gabarit
 
+    public static override className = 'Graph';
+
+
   constructor(object?: any) {
-    object['type'] = NodeType.graph;
+    object? object.type = NodeType.graph : object = {type:NodeType.graph}
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
     this.nodes = object?.nodes ? object.nodes : [];
@@ -142,6 +145,20 @@ export class Graph extends Node {
 
   override getName(): string {
     return this.name;
+  }
+
+  
+    public static override instanciateListe<T>(list: any[]): T[] {
+    let res: T[] = [];
+    console.log('instanciateListe');
+
+    console.log(list);
+
+    list.forEach((element) => {
+      res.push(new Graph(element) as T);
+    });
+
+    return res;
   }
 }
 

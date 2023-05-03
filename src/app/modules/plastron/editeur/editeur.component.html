@@ -27,8 +27,8 @@
         <div class="row">
           <app-scene [modele]="modele"  [events]="events" [curves]="curves" [duration]="duration" (updateTrigger)="updateTriggers($event)"></app-scene>
         </div>
-        <div class="row">
-          <app-editeur-graphe-nodal [graph]="modele.graph" [allBioevents]="allBioevents" [allActions]="allActions" [targetVariable]="targetVariable"  (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
+        <div class="row" *ngIf="modele.graph">
+          <app-editeur-graphe-nodal  [graph]="modele.graph" [allBioevents]="allBioevents" [allActions]="allActions" [targetVariable]="targetVariable"  (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
         </div>
       </div>
 

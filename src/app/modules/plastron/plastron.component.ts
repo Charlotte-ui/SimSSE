@@ -99,8 +99,6 @@ export class PlastronComponent implements OnInit {
     this.regleService
       .getVariableTemplate()
       .subscribe((variablesTemplate: VariablePhysioTemplate[]) => {
-        console.log('var physio tempalte');
-        console.log(variablesTemplate);
         variablesTemplate.forEach((varTemp) => {
           this.profilService
             .getVariable(this.plastron.profil.id, varTemp.id)
@@ -112,15 +110,9 @@ export class PlastronComponent implements OnInit {
                 variable.color = varTemp.color;
                 this.plastron.profil.targetVariable.push(variable);
               }
-
-              console.log(variable);
             });
         });
       });
-      console.log("this.plastron")
-
-      console.log(this.plastron)
-
           /*     
     this.plastron.modele['tags'] = ['Lemon', 'Lime', 'Apple']; */
   }

@@ -101,20 +101,16 @@ export class EditeurComponent implements OnInit {
 
     this.reglesService.getBioEvents().subscribe((response) => {
       this.allBioevents = response as BioEvent[];
-      console.log("allBioevents")
-      console.log(response)
     });
 
     this.reglesService.getActions().subscribe((response) => {
       this.allActions = response as Action[];
-         console.log("allActions")
-      console.log(response)
     });
 
 
-    /*     this.nodeService.getGraphGabarit().subscribe((response) => {
+    this.nodeService.getGraphTemplate().subscribe((response) => {
       this.allGraphs = response;
-    }); */
+    }); 
   }
 
   /**
@@ -133,17 +129,13 @@ export class EditeurComponent implements OnInit {
           .getGraphLinks(nodeIDArray)
           .subscribe((links: Link[]) => {
             this.modele.graph.links = links;
+            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           });
 
       //  this.events = new Array<[Event, number, number]>(); // id event and id graph
         this.trends = [];
         this.events = [];
         this.initTrendsEventsRecursive(this.modele.graph);
-        console.log('trends');
-        console.log(this.trends);
-        console.log('events');
-        console.log(this.events);
-
         if (this.targetVariable) this.initCurves();
       });
     });
@@ -153,7 +145,6 @@ export class EditeurComponent implements OnInit {
    * initialize all curves
    */
   initCurves() {
-    console.log("initCurves")
     this.curves = [];
     this.targetVariable.forEach((variable, index) => {
       let curve = new Curve(variable.name, this.duration, variable);
@@ -163,11 +154,7 @@ export class EditeurComponent implements OnInit {
   }
 
   initTrendsEventsRecursive(graph: Graph) {
-    console.log('initTrendsEventsRecursive');
-    console.log(graph);
-
     graph.nodes.forEach((node, i) => {
-      console.log(node);
       switch (node.type) {
         case 'event':
           //this.events.push([node as Event, i, Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
