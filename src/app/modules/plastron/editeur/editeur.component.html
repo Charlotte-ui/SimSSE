@@ -1,56 +1,86 @@
-
-  <div class="container editeur">
-    <div *ngIf="modele && modele.graph" class="row">
-
-      <div id="barre-outils" >
-        <mat-accordion multi="true" class="barre-container">
-          <mat-expansion-panel (closed)="barreOutilsOpened=false" (opened)="barreOutilsOpened=true">
-            <mat-expansion-panel-header class="panel-retracted">
-              <mat-panel-description class="panel-title-barre-outils">
-                Barre d'outils
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <div class="panel-content">
-              <app-barre-outils
+<div class="container editeur">
+  <div *ngIf="modele && modele.graph" class="row">
+    <div id="barre-outils">
+      <mat-accordion multi="true" class="barre-container">
+        <mat-expansion-panel
+          (closed)="barreOutilsOpened = false"
+          (opened)="barreOutilsOpened = true"
+        >
+          <mat-expansion-panel-header class="panel-retracted">
+            <mat-panel-description class="panel-title-barre-outils">
+              Barre d'outils
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="panel-content">
+            <app-barre-outils
               [allBioevents]="allBioevents"
               [allActions]="allActions"
               [allGraphs]="allGraphs"
               [targetVariable]="targetVariable"
               [nodes]="modele.graph.nodes"
-              (newElement)="addElement($event)"></app-barre-outils>
-            </div>
-          </mat-expansion-panel>
-        </mat-accordion>
+              (newElement)="addElement($event)"
+            ></app-barre-outils>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+
+    <div
+      id="scene"
+      [ngClass]="{
+        smallMargLeft: !barreOutilsOpened,
+        bigMargLeft: barreOutilsOpened,
+        smallMargRight: !inspecteurOpened,
+        bigMargRight: inspecteurOpened
+      }"
+    >
+      <div class="row">
+        <app-scene
+          [modele]="modele"
+          [events]="events"
+          [curves]="curves"
+          [duration]="duration"
+          (updateTrigger)="updateTriggers($event)"
+        ></app-scene>
       </div>
-
-      <div id="scene" [ngClass]="{smallMargLeft: !barreOutilsOpened, bigMargLeft: barreOutilsOpened, smallMargRight: !inspecteurOpened, bigMargRight: inspecteurOpened}">
-        <div class="row">
-          <app-scene [modele]="modele"  [events]="events" [curves]="curves" [duration]="duration" (updateTrigger)="updateTriggers($event)"></app-scene>
-        </div>
-        <div class="row" *ngIf="modele.graph">
-          <app-editeur-graphe-nodal  [graph]="modele.graph" [allBioevents]="allBioevents" [allActions]="allActions" [targetVariable]="targetVariable"  (updateNode)="updateNodes($event)" (updateLink)="updateLinks($event)"></app-editeur-graphe-nodal>
-        </div>
-      </div>
-
-
-      <div id="inspecteur" [ngClass]="{small: !inspecteurOpened, big: inspecteurOpened}">
-        <mat-accordion multi="true" class="barre-container">
-          <mat-expansion-panel  (closed)="inspecteurOpened=false" (opened)="inspecteurOpened=true">
-            <mat-expansion-panel-header class="panel-retracted">
-              <mat-panel-description class="panel-title-inspecteur">
-                Inspecteur
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-            <div class="reverse">
-              <div class="panel-content2">
-                <app-inspecteur [variables]="targetVariable" [trends]="trends" (updateVariable)="updateVariables($event)"></app-inspecteur>
-              </div>
-            </div>
-          </mat-expansion-panel>
-        </mat-accordion>
+      <div class="row" *ngIf="modele.graph">
+        <app-editeur-graphe-nodal
+          [variablesTemplate]="variablesTemplate"
+          [graph]="modele.graph"
+          [allBioevents]="allBioevents"
+          [allActions]="allActions"
+          [targetVariable]="targetVariable"
+          (updateNode)="updateNodes($event)"
+          (updateLink)="updateLinks($event)"
+        ></app-editeur-graphe-nodal>
       </div>
     </div>
+
+    <div
+      id="inspecteur"
+      [ngClass]="{ small: !inspecteurOpened, big: inspecteurOpened }"
+    >
+      <mat-accordion multi="true" class="barre-container">
+        <mat-expansion-panel
+          (closed)="inspecteurOpened = false"
+          (opened)="inspecteurOpened = true"
+        >
+          <mat-expansion-panel-header class="panel-retracted">
+            <mat-panel-description class="panel-title-inspecteur">
+              Inspecteur
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <div class="reverse">
+            <div class="panel-content2">
+              <app-inspecteur
+                [variables]="targetVariable"
+                [trends]="trends"
+                (updateVariable)="updateVariables($event)"
+              ></app-inspecteur>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
   </div>
-
-
-
+</div>

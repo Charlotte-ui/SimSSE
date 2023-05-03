@@ -33,6 +33,8 @@ export class PlastronComponent implements OnInit {
 
   changesToSave: boolean = false;
 
+  variablesTemplate:VariablePhysioTemplate[] = [];
+
   allTags!: string[];
 
   constructor(
@@ -99,6 +101,7 @@ export class PlastronComponent implements OnInit {
     this.regleService
       .getVariableTemplate()
       .subscribe((variablesTemplate: VariablePhysioTemplate[]) => {
+        this.variablesTemplate = variablesTemplate;
         variablesTemplate.forEach((varTemp) => {
           this.profilService
             .getVariable(this.plastron.profil.id, varTemp.id)
@@ -108,6 +111,7 @@ export class PlastronComponent implements OnInit {
               else{
                 variable.name = varTemp.name;
                 variable.color = varTemp.color;
+                variable.template = varTemp.id;
                 this.plastron.profil.targetVariable.push(variable);
               }
             });

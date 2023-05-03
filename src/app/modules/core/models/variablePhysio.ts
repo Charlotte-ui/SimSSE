@@ -51,10 +51,12 @@ export class VariablePhysioTemplate extends VariablePhysio{
 
 export class VariablePhysioInstance extends VariablePhysio{
   cible:number;
+  template:string; // id of the variable template
 
   constructor(object?:any) {
     super(object);
     this.cible = object?.cible?object.cible:50;
+    this.template = object?.template?object.template:"";
   }
 
 

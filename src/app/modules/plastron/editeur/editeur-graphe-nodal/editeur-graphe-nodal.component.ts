@@ -9,7 +9,7 @@ import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
 import { NodeType } from 'src/app/modules/core/models/node';
 import { EventType } from 'src/app/modules/core/models/node';
-import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
+import { VariablePhysioInstance, VariablePhysioTemplate } from 'src/app/modules/core/models/variablePhysio';
 import { Button } from 'src/app/modules/core/models/buttons';
 
 const GREEN = "#2E933C"
@@ -48,7 +48,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
 @Input() allBioevents!: BioEvent[];
 @Input() allActions!: Action[];
 @Input() targetVariable!: VariablePhysioInstance[];
-
+@Input() variablesTemplate!: VariablePhysioTemplate[];
 
 @Output() updateNode = new EventEmitter<Node[]>();
 @Output() updateLink = new EventEmitter<Link[]>();
@@ -243,7 +243,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         dialogRef = this.dialog.open(DialogComponent,{data: [node,this.allActions,true]});
         break;
       case NodeType.trend:
-        dialogRef = this.dialog.open(DialogComponent,{data: [node,this.targetVariable,true]});
+        dialogRef = this.dialog.open(DialogComponent,{data: [node,this.variablesTemplate,true]});
         break;
       case NodeType.timer:
         dialogRef = this.dialog.open(DialogComponent,{data: [node,[],true]});

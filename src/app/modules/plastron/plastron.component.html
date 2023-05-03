@@ -15,6 +15,7 @@
     *ngIf="plastron.modele"
       [modele]="plastron.modele"
       [targetVariable]="plastron.profil.targetVariable"
+      [variablesTemplate]="variablesTemplate"
       (newChange)="changeGraph($event)"
     ></app-editeur>
   </mat-tab>

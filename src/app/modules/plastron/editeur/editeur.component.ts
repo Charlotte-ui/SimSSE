@@ -15,6 +15,7 @@ import {
 import {
   VariablePhysio,
   VariablePhysioInstance,
+  VariablePhysioTemplate,
 } from '../../core/models/variablePhysio';
 import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
@@ -60,6 +61,7 @@ export class EditeurComponent implements OnInit {
   }
 
   @Input() duration: number = 100;
+  @Input() variablesTemplate: VariablePhysioTemplate [];
 
   // liste de tout les modèles d'événements et de graphs existant
   allBioevents!: BioEvent[];

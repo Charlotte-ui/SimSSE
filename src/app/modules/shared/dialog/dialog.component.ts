@@ -18,7 +18,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
   node:T|Link;
   champs;
 
-  numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","pente","duration"];
+  numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","parameter","duration"];
   hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root'];
   listable = ["source","target","event",'gabarit'];
   booleans = ["start"];
@@ -36,7 +36,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
       this.node = this.data[0];
       this.edition = this.data[2]
       this.title=this.completeTitle((this.node.type==NodeType.event)?(this.node as Event).typeEvent:this.node.type)
-      console.log("create node dialog")
+      console.log("create dialog")
 
       console.log(this.node)
       this.form = this.fb.group(this.node);

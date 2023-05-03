@@ -127,7 +127,7 @@ export class Curve{
     let trends:number[] = []; // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     nodes.forEach(node => {
       if(node.state){ // si le node est actif
-        if (node.type == "trend" && (node as Trend).target == variable.name ) { // si le node est une trend
+        if (node.type == "trend" && (node as Trend).target == variable.template ) { // si le node est une trend
           trends.push(Number((node as Trend).parameter))
         }
         if (node.type == "graph") { // si le node est un graph
