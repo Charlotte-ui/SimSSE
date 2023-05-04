@@ -14,13 +14,14 @@
     ></app-groupes>
   </mat-tab>
   <mat-tab label="Plastrons et modèles" >
+    <ng-container *ngIf="totalPlastron">
     <app-lot-plastrons
-    *ngIf="plastrons"
       [groupes]="groupes"
       [plastrons]="plastrons"
       [totalPlastron]="totalPlastron"
       [scenario]="scenario"
       (newChange)="save()"
     ></app-lot-plastrons>
+    </ng-container>
   </mat-tab>
 </mat-tab-group>

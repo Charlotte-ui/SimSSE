@@ -22,7 +22,7 @@ export class ScenarioComponent implements OnInit {
   scenario!: Scenario;
   groupes!: Groupe[];
   plastrons!: Plastron[];
-  totalPlastron: number = 0;
+  totalPlastron!:number;
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
 
   constructor(
@@ -73,7 +73,9 @@ export class ScenarioComponent implements OnInit {
               .subscribe((modele: Modele) => {
                 plastron.modele = modele;
 
-                if(plastrons.length-1 == index) this.plastronLoad = true;
+                if(plastrons.length-1 == index) {
+                  this.plastrons = [...this.plastrons]; // forced update
+                }
               });
 
             this.plastronService
@@ -85,7 +87,7 @@ export class ScenarioComponent implements OnInit {
           console.log('plsatrons');
           console.log(plastrons);
 
-          this.plastrons = this.plastrons.concat(plastrons);
+          this.plastrons = [...this.plastrons.concat(plastrons)]; // forced update
         });
     });
   }
@@ -93,12 +95,6 @@ export class ScenarioComponent implements OnInit {
   save() {}
 
   reloadPlastron(event) {
-    console.log(event);
-
-    console.log('reloadPlastron');
-    if (event.index == 2 && !this.plastronLoad) {
-      this.plastrons = [...this.plastrons];
-    } // forced update
-    this.plastronLoad = true;
+   
   }
 }

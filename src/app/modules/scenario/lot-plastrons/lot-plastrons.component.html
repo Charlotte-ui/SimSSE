@@ -39,12 +39,12 @@
             </td>
           </ng-container>
 
-          <!-- Modele Column -->
-          <ng-container matColumnDef="modele">
+          <!-- Title Column -->
+          <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Modèle</th>
             <td mat-cell *matCellDef="let element">
               <button mat-button (click)="goToPlastron(element.idPlastron)">
-                {{ element.modele }}
+                {{ element.title }}
               </button>
             </td>
           </ng-container>

@@ -11,9 +11,9 @@ export enum NodeType {
 }
 
 export enum EventType {
-  start = 'eventstart',
-  bio = 'eventbio',
-  action = 'eventaction',
+  start = 'start',
+  bio = 'bio',
+  action = 'action',
 }
 
 export abstract class Node extends Vertex implements Nameable {
@@ -80,11 +80,14 @@ export class Trend extends Node {
 export class Event extends Node {
   event: string;
   typeEvent: string;
+  template:Action|BioEvent;
 
   constructor(object?: any) {
     super(object);
     this.event = object?.event ? object.event : undefined;
     this.typeEvent = object?.typeEvent ? object.typeEvent : undefined;
+    this.template = object?.template ? object.template : undefined;
+
   }
 
   override getName(): string {
@@ -171,12 +174,16 @@ export class Timer extends Node {
 
 export class Action extends Vertex {
   public static override className = 'Action';
+  public static actions: Action[] = [];
 
   name: string;
+
+
 
   constructor(object?: any) {
     super(object);
     this.name = object?.name ? object.name : '';
+    Action.actions.push(this);
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
@@ -187,6 +194,14 @@ export class Action extends Vertex {
     });
 
     return res;
+  }
+
+  public static getActionByID(id: string):Action {
+    let result = undefined;
+    Action.actions.forEach((action: Action) => {
+      if (action.id == id) result = action;
+    });
+    return result;
   }
 }
 

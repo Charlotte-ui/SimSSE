@@ -29,7 +29,7 @@ import {
 import { TagService } from '../../core/services/tag.service';
 
 interface tableElementPlastron {
-  modele: string;
+  title: string;
   triage: Triage;
   description: string;
   groupe: number;
@@ -62,7 +62,7 @@ export class LotPlastronsComponent {
   defaultElementPlastron!: tableElementPlastron;
   displayedColumnsPlastron: string[] = [
     'id',
-    'modele',
+    'title',
     'triage',
     'groupe',
     'statut',
@@ -82,11 +82,16 @@ export class LotPlastronsComponent {
     if (value) {
       // if value isnt undefined
       this._plastrons = value;
+      console.log("plastrons")
+      console.log(value)
       this.completePlastrons();
     }
   }
 
-  @Input() totalPlastron: number = 0;
+  /**
+   * nombre total de plastron désiré pour ce scenario
+   */
+  @Input() totalPlastron!: number ; 
   @Input() scenario: Scenario;
 
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
@@ -108,7 +113,7 @@ export class LotPlastronsComponent {
     this.defaultElementPlastron = new Object() as tableElementPlastron;
     this.defaultElementPlastron.description = '';
     this.defaultElementPlastron.groupe = undefined;
-    this.defaultElementPlastron.modele = 'Associer ou créer un modèle';
+    this.defaultElementPlastron.title = 'Associer un modèle';
     this.defaultElementPlastron.statut = Statut.Todo;
     this.defaultElementPlastron.triage = Triage.UR;
     this.defaultElementPlastron.id = -1;
@@ -122,7 +127,7 @@ export class LotPlastronsComponent {
     let index = event.currentIndex;
     let modele = event.previousContainer.data[event.previousIndex] as Modele;
     if (this.dataSourcePlastron[index].triage == modele.triage) {
-      this.dataSourcePlastron[index].modele = modele.title;
+      this.dataSourcePlastron[index].title = modele.title;
     } else {
       this._snackBar.open(
         'Attention, le modèle et le plastron doivent avoir le même triage',
@@ -148,8 +153,8 @@ export class LotPlastronsComponent {
       switch (sort.active) {
         case 'id':
           return this.compare(Number(a.numero), Number(b.numero), isAsc);
-        case 'modele':
-          return this.compare(a.modele, b.modele, isAsc);
+        case 'title':
+          return this.compare(a.title, b.title, isAsc);
         case 'triage':
           return this.compare(a.triage, b.triage, isAsc);
         case 'groupe':
@@ -188,11 +193,10 @@ export class LotPlastronsComponent {
   }
 
   public completePlastrons() {
-    this.dataSourcePlastron = new Array<tableElementPlastron>(
-      this.totalPlastron
-    );
-    this.dataSourcePlastron = new Array(this.totalPlastron)
-      .fill(null)
+    console.log("this.totalPlastron")
+    console.log(this.totalPlastron)
+    this.dataSourcePlastron = new Array<tableElementPlastron>(this.totalPlastron)
+      .fill({ ...this.defaultElementPlastron })
       .map(() => ({ ...this.defaultElementPlastron }));
 
     this.plastrons.forEach((plastron, index) => {
@@ -206,8 +210,9 @@ export class LotPlastronsComponent {
   }
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
+
     //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
-    this.dataSourcePlastron[index].modele = plastron.modele.title;
+    this.dataSourcePlastron[index].title = plastron.modele.title;
     this.dataSourcePlastron[index].description = plastron.modele.description;
     this.dataSourcePlastron[index].triage = plastron.modele.triage;
     this.dataSourcePlastron[index].statut = Statut.Doing;
@@ -215,6 +220,7 @@ export class LotPlastronsComponent {
     this.dataSourcePlastron[index].idPlastron = plastron.id;
     this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
     this.dataSourcePlastron[index].age = plastron.profil.age;
+
   }
 
   private updateDataSourceTriage(indexStart: number) {
@@ -249,6 +255,7 @@ export class LotPlastronsComponent {
     });
 
     this.sortedDataSourcePlastron = this.dataSourcePlastron.slice();
+
   }
 
   createModele(modele: Modele) {

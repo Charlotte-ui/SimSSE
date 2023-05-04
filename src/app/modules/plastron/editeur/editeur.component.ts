@@ -147,11 +147,11 @@ export class EditeurComponent implements OnInit {
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           });
 
-      //  this.events = new Array<[Event, number, number]>(); // id event and id graph
+
+              //  this.events = new Array<[Event, number, number]>(); // id event and id graph
         this.trends = [];
         this.events = [];
         this.initTrendsEventsRecursive(this.modele.graph);
-        
       });
     });
   }
@@ -173,6 +173,9 @@ export class EditeurComponent implements OnInit {
       switch (node.type) {
         case 'event':
           //this.events.push([node as Event, i, Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
+          graph.nodes[i]["template"] = Action.getActionByID((node as Event).event)
+          console.log("node template")
+          console.log(Action.getActionByID((node as Event).event))
           this.events.push(node as Event);
           break;
         case 'trend':
@@ -183,6 +186,8 @@ export class EditeurComponent implements OnInit {
           break;
       }
     });
+
+
   }
 
   initGroup(group: Graph) {

@@ -116,7 +116,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
       let name ;
 
       switch(node.type){
-        case NodeType.event : name = (node as Event).event
+        case NodeType.event : name = (node as Event).template? (node as Event).template.name:(node as Event).typeEvent
         break
         case NodeType.timer : name = node.type
         break

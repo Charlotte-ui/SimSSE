@@ -19,7 +19,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
   champs;
 
   numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","parameter","duration"];
-  hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root'];
+  hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root','template'];
   listable = ["source","target","event",'gabarit'];
   booleans = ["start"];
 
