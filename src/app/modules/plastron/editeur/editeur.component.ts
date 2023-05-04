@@ -230,18 +230,24 @@ export class EditeurComponent implements OnInit {
   }
 
   updateNodes(event) {
-    //let index = Number(event[1])
+    console.log("updateNodes")
+    console.log(event)
     if (event[0] == 'delete') {
-      this.initCurves();
+      this.updateCurve();
     } else {
       let node = event[0] as Node;
-      this.modele.graph.nodes[event[1]] = node;
-      if (node.type == 'trend') {
+      let index = event[1];
+      console.log("newnode")
+      console.log(node)
+      this.modele.graph.nodes[index] = node;
+/*       if (node.type == 'trend') {
         // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
         let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
-        let variable = this.getVariableByName(trend.target);
-        this.curves[variable.id].calculCurve(this.modele);
-      } else this.initCurves();
+        let variable = this.getVariableByTemplate(trend.target);
+        this.curves[index].calculCurve(this.modele);
+      } 
+      else */ 
+      this.updateCurve();
     }
     this.modele.graph = structuredClone(this.modele.graph);
     this.curves = [...this.curves];
@@ -290,10 +296,10 @@ export class EditeurComponent implements OnInit {
 
   // --- TOOLS -----------------------------------------
 
-  getVariableByName(name: string): VariablePhysioInstance {
+  getVariableByTemplate(idTemplate: string): VariablePhysioInstance {
     let res = undefined;
     this.targetVariable.forEach((variable) => {
-      if (variable.name == name) res = variable;
+      if (variable.template == idTemplate) res = variable;
     });
     return res;
   }

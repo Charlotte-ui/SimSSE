@@ -183,12 +183,6 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
   updateChart() {
 
-    console.log("this.graphData")
-    console.log(this.graphData)
-    console.log("this.graphLink")
-    console.log(this.graphLink)
-
-
     let series = [
       {
         type: 'graph',
