@@ -10,7 +10,7 @@
     <ng-container *ngFor="let champ of champs">
       <div *ngIf="!isHidden(champ)" mat-dialog-content>
         <mat-form-field appearance="fill" *ngIf="getType(champ) != 'boolean'">
-          <mat-label>{{ champ }}</mat-label>
+          <mat-label>{{ getLabel(champ) }}</mat-label>
 
           <input
             *ngIf="getType(champ) == 'text' || getType(champ) == 'number'"

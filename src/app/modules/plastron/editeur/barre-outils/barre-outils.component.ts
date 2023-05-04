@@ -59,8 +59,10 @@ export class BarreOutilsComponent implements OnInit {
   }
 
   createLink() {
-    let link: Link = new Link("");
+    let link: Link = new Link();
 
+    console.log("this.nodes")
+    console.log(this.nodes)
     const dialogRef = this.dialog.open(DialogComponent, {
       data: [link, this.nodes,false],
     });

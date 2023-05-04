@@ -58,9 +58,10 @@ export class EditeurGrapheNodalComponent implements OnInit {
   @Input() set graph(value: Graph) {
     if (value) {
       this._graph = value;
-      this.initGraphLink();
-      this.initGraphData();
-      this.updateChart();
+      if (value.links && value.links.length>0) this.initGraphLink();
+      if (value.nodes && value.nodes.length>0) this.initGraphData();
+      if (value.nodes && value.links) this.updateChart();
+
     }
   }
 

@@ -124,7 +124,10 @@ export class EditeurComponent implements OnInit {
       this.modelService.getGraphNodes(graph.id).subscribe((nodes: Node[]) => {
         this.modele.graph.nodes = nodes;
 
-        let nodeIDArray = nodes.map((node: Node) => node.id);
+        let nodeIDArray = nodes.map((node: Node) => node.id).filter(n => n);
+
+        console.log(nodeIDArray)
+        console.log("nodeIDArray")
 
         // TODO add node template
         this.modele.graph.nodes.forEach((node) => {

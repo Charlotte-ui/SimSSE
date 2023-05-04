@@ -62,6 +62,8 @@ export class Trend extends Node {
   name: string;
 
   constructor(object?: any) {
+    if (object) object["type"]=NodeType.trend;
+    else object = {type:NodeType.trend};
     super(object);
     this.name = object?.name ? object.name : 'Tendance';
     this.target = object?.target ? object.target : undefined;
@@ -155,7 +157,8 @@ export class Timer extends Node {
   counter: number; // curent time
 
   constructor(object?: any) {
-    object['type'] = NodeType.timer;
+    if (object) object['type'] = NodeType.timer;
+    else object = {type:NodeType.timer};
     super(object);
     this.name = 'Timer ' + this.id; // TODO : pq le getName() ne fonctionne pas ?
     this.duration = 0;

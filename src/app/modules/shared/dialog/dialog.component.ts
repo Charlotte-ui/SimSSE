@@ -20,8 +20,18 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
 
   numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","parameter","duration"];
   hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root','template'];
-  listable = ["source","target","event",'gabarit'];
+  listable = ["source","target","event",'gabarit','in','out'];
   booleans = ["start"];
+
+  champLabel={
+    name:"Nom",
+    target:"Cible",
+    parameter:"Paramètre",
+    event:"Évènement",
+    duration:"Durée",
+    out:"Depuis",
+    in:"Vers"
+  }
 
   title!:string;
   edition!:boolean;
@@ -47,7 +57,9 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
     }
 
     completeTitle(type:string):string{
+      console.log("completeTitle")
       let start = (this.edition)?"Modifier":"Ajouter";
+      console.log(start)
       switch(type){
         case NodeType.link: return start+" le lien";
         case EventType.bio: return start+" l'événement";
@@ -97,7 +109,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
     getName(elem:Node|any){
       if (elem instanceof Node ) return elem.getName();
       else if ("name" in elem) return elem.name;
-      return elem.event;
+      return elem.template?elem.template.name:elem.event;
     //TODO rendre plus propre
     }
 
@@ -107,6 +119,10 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
 
     getIcon(node:Node|Link){
       return this.button.getButtonByType((node.type == NodeType.event)?(node as Event).typeEvent:node.type).icon;
+    }
+
+    getLabel(champ:string){
+      return this.champLabel[champ]?this.champLabel[champ]:champ;
     }
 
 
