@@ -9,15 +9,18 @@ export class Curve {
   currentMax: number;
   duration: number;
   variable: VariablePhysioInstance;
+  color:string;
 
   constructor(
     name: string,
     duration?: number,
-    variable?: VariablePhysioInstance
+    variable?: VariablePhysioInstance,
+    color?:string
   ) {
     this.name = name;
     this.duration = duration ? duration : 0;
     this.variable = variable ? variable : undefined;
+    this.color = color ? "#"+color : "#d5ceeb";
     this.values = [];
     this.currentMax = 0;
   }

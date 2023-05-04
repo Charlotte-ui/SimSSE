@@ -194,7 +194,7 @@ export class EditeurComponent implements OnInit {
   initCurves() {
     this.curves = [];
     this.targetVariable.forEach((variable, index) => {
-      let curve = new Curve(variable.name, this.duration, variable);
+      let curve = new Curve(variable.name, this.duration, variable, variable.color);
       this.curves.push(curve);
       curve.calculCurve(structuredClone(this.modele));
     });

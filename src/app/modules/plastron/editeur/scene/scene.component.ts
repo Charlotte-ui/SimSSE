@@ -96,11 +96,13 @@ export class SceneComponent implements OnInit {
       legend: {
         data: this.legend,
       },
-      toolbox: {
-        feature: {
-          saveAsImage: {},
-        },
-      },
+      grid:{
+      show:false,
+      right:'50',
+      bottom:'50',
+      top:'50',
+      left:'50',
+    },
       xAxis: {
         type: 'value',
         boundaryGap: false,
@@ -198,6 +200,8 @@ export class SceneComponent implements OnInit {
         type: 'line',
         //     stack: 'x',
         data: this.graphData[curve.name],
+        lineStyle: {color: curve.color},
+        itemStyle: {color: curve.color},
       };
       series.push(serie);
     });
