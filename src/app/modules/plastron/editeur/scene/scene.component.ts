@@ -148,10 +148,10 @@ export class SceneComponent implements OnInit {
 
     this.markLineData = [];
 
-    this.modele.triggeredEvents.forEach((event) => {
+    this.modele.triggeredEvents.forEach((event:Trigger) => {
       // time id
       let markline = [];
-      let node = this.getNodeByID(event.id); // TODO get the getName() to work
+      let node = this.getNodeByID(event.id); 
       if (node) {
         // si le node est présent sur le graph
         let name ;

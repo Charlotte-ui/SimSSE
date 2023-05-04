@@ -133,21 +133,24 @@ export class EditeurGrapheNodalComponent implements OnInit {
           : true;
 
       let name;
-
+      let label;
       switch (node.type) {
         case NodeType.event:
-          name = (node as Event).template
+           label = (node as Event).template
             ? (node as Event).template.name
-            : (node as Event).typeEvent;
+            : (node as Event).typeEvent; 
+            name = (node as Event).event
           break;
         case NodeType.timer:
           name = node.type;
+          label = node.type;
           break;
         default:
           name = (node as Trend | Graph).name;
+          label = (node as Trend | Graph).name;
       }
 
-      DataName.push(name);
+      DataName.push(label);
 
       let cat =
         node.type == NodeType.event ? (node as Event).typeEvent : node.type;

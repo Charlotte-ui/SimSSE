@@ -126,9 +126,6 @@ export class EditeurComponent implements OnInit {
 
         let nodeIDArray = nodes.map((node: Node) => node.id).filter(n => n);
 
-        console.log(nodeIDArray)
-        console.log("nodeIDArray")
-
         // TODO add node template
         this.modele.graph.nodes.forEach((node) => {
           if (
@@ -142,7 +139,7 @@ export class EditeurComponent implements OnInit {
               )
               .subscribe((template) => {
                 node['template'] = template;
-                this.replaceEventByTemplate(node as Event);
+             //   this.replaceEventByTemplate(node as Event);
               });
           }
         });
@@ -155,9 +152,8 @@ export class EditeurComponent implements OnInit {
             links.forEach((link: Link) => {
               let nodeSource = this.getNodeByID(link.out);
               if (nodeSource.type == NodeType.event)
-                link.out = (nodeSource as Event).template
-                  ? (nodeSource as Event).template.name
-                  : (nodeSource as Event).event;
+                  link.out = (nodeSource as Event).event;
+
             });
 
             this.modele.graph.links = links;
@@ -172,19 +168,6 @@ export class EditeurComponent implements OnInit {
         this.events = [];
         this.initTrendsEventsRecursive(this.modele.graph);
       });
-    });
-  }
-
-  /**
-   * when a link has been initialize with the event proprerty, replace it with the template name
-   * @param event 
-   */
-  replaceEventByTemplate(event: Event) {
-    this.modele.graph.links.forEach((link) => {
-      if (link.out == event.event) {
-        link.out = event.template.name;
-        return;
-      }
     });
   }
 
@@ -274,8 +257,9 @@ export class EditeurComponent implements OnInit {
 
   updateTriggers(event) {
     // let index = Number(event[1])
-    this.initCurves();
-    this.curves = [...this.curves];
+    this.modele.triggeredEvents = event;
+    this.updateCurve()
+
   }
 
   updateVariables(event:[VariablePhysioInstance,number]) {
@@ -295,6 +279,13 @@ export class EditeurComponent implements OnInit {
     this.curves[index].calculCurve(this.modele);
     this.curves = [...this.curves];
     this.newChange.emit(true);
+  }
+
+  updateCurve(){
+    this.curves.forEach((curve) => {
+      curve.calculCurve(structuredClone(this.modele));
+    });
+    this.curves = [...this.curves];
   }
 
   // --- TOOLS -----------------------------------------

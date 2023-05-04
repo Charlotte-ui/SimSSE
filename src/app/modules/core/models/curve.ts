@@ -83,10 +83,11 @@ export class Curve {
     triggeredEvents.forEach((trigger) => {
       if (trigger.time == t) {
         // event trigger at time t
-        let nameEvent = trigger.id;
+      
         graph.links.forEach((link) => {
-          if (nameEvent == link.out) {
+          if (trigger.id == link.out) {
             let nodeTrigger = this.getNodeByID(link.in, graph);
+         
             //  let nodeTrigger = graph.nodes[Number(link.in)];
             nodeTrigger.state = link.start;
             if (nodeTrigger.type == NodeType.graph) {
