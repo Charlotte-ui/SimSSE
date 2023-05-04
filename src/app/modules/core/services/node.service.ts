@@ -1,20 +1,46 @@
 import { Injectable } from '@angular/core';
-import { Trend,Event, Link, Graph, NodeType ,EventType} from '../models/node';
-import { Observable, of } from 'rxjs';
+import {
+  Trend,
+  Event,
+  Link,
+  Graph,
+  NodeType,
+  EventType,
+  Action,
+  BioEvent,
+} from '../models/node';
+import { Observable, map, of } from 'rxjs';
 import { ApiService } from './api.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NodeService {
+  constructor(private apiService: ApiService) {}
 
+  getEventTemplate(
+    id: string,
+    eventType: EventType
+  ): Observable<Action | BioEvent> {
+    if (eventType == EventType.action)
+      return this.apiService
+        .getDocument(id)
+        .pipe(map((response) => new Action(response)));
+    if (eventType == EventType.bio)
+      return this.apiService
+        .getDocument(id)
+        .pipe(map((response) => new BioEvent(response)));
+    return undefined;
+  }
 
-  constructor(private apiService:ApiService) { }
+  getGraphTemplate(): Observable<Graph[]> {
+    return this.apiService.getClasseElementsWhithMatchingChamp<Graph>(
+      Graph,
+      'template',
+      'true'
+    );
 
-  getGraphTemplate():Observable<Graph[]> {
-    return this.apiService.getClasseElementsWhithMatchingChamp<Graph>(Graph,"template","true")
-
-   /*      let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
+    /*      let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
     let trend2 = new Trend("2",15,60,'acc respi','FR',1)
     let event:Event = new Event("3",40,50,EventType.action,'oxygénothérapie')
     let start:Event = new Event("0",5,95,EventType.start,'start')
@@ -33,6 +59,4 @@ export class NodeService {
 
     return of ([graph]) */
   }
-
-
 }

@@ -25,6 +25,7 @@ import { retry } from 'rxjs';
 import { Modele } from '../../core/models/modele';
 import { Curve } from '../../core/models/curve';
 import { ModeleService } from '../../core/services/modele.service';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-editeur',
@@ -61,7 +62,7 @@ export class EditeurComponent implements OnInit {
   }
 
   @Input() duration: number = 100;
-  @Input() variablesTemplate: VariablePhysioTemplate [];
+  @Input() variablesTemplate: VariablePhysioTemplate[];
 
   // liste de tout les modèles d'événements et de graphs existant
   allBioevents!: BioEvent[];
@@ -100,7 +101,6 @@ export class EditeurComponent implements OnInit {
   // --- INITIALISATEURS -----------------------------------------
 
   ngOnInit(): void {
-
     this.reglesService.getBioEvents().subscribe((response) => {
       this.allBioevents = response as BioEvent[];
     });
@@ -109,10 +109,9 @@ export class EditeurComponent implements OnInit {
       this.allActions = response as Action[];
     });
 
-
     this.nodeService.getGraphTemplate().subscribe((response) => {
       this.allGraphs = response;
-    }); 
+    });
   }
 
   /**
@@ -127,32 +126,62 @@ export class EditeurComponent implements OnInit {
 
         let nodeIDArray = nodes.map((node: Node) => node.id);
 
+        // TODO add node template
+        this.modele.graph.nodes.forEach((node) => {
+          if (
+            node.type == NodeType.event &&
+            (node as Event).typeEvent !== EventType.start
+          ) {
+            this.nodeService
+              .getEventTemplate(
+                (node as Event).event,
+                (node as Event).typeEvent
+              )
+              .subscribe((template) => {
+                node['template'] = template;
+                this.replaceEventByTemplate(node as Event);
+              });
+          }
+        });
+
         this.modelService
           .getGraphLinks(nodeIDArray)
           .subscribe((links: Link[]) => {
-   
-
             // replace id node by event name so an event is triggered wathever his id is
 
-            links.forEach((link:Link) => {
+            links.forEach((link: Link) => {
               let nodeSource = this.getNodeByID(link.out);
-              if (nodeSource.type == NodeType.event) link.out = (nodeSource as Event).event;
+              if (nodeSource.type == NodeType.event)
+                link.out = (nodeSource as Event).template
+                  ? (nodeSource as Event).template.name
+                  : (nodeSource as Event).event;
             });
 
             this.modele.graph.links = links;
-            
-            if (this.targetVariable) this.initCurves();
 
+            if (this.targetVariable) this.initCurves();
 
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           });
 
-
-              //  this.events = new Array<[Event, number, number]>(); // id event and id graph
+        //  this.events = new Array<[Event, number, number]>(); // id event and id graph
         this.trends = [];
         this.events = [];
         this.initTrendsEventsRecursive(this.modele.graph);
       });
+    });
+  }
+
+  /**
+   * when a link has been initialize with the event proprerty, replace it with the template name
+   * @param event 
+   */
+  replaceEventByTemplate(event: Event) {
+    this.modele.graph.links.forEach((link) => {
+      if (link.out == event.event) {
+        link.out = event.template.name;
+        return;
+      }
     });
   }
 
@@ -173,9 +202,10 @@ export class EditeurComponent implements OnInit {
       switch (node.type) {
         case 'event':
           //this.events.push([node as Event, i, Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
-          graph.nodes[i]["template"] = Action.getActionByID((node as Event).event)
-          console.log("node template")
-          console.log(Action.getActionByID((node as Event).event))
+          graph.nodes[i]['template'] = Action.getActionByID(
+            (node as Event).event
+          );
+
           this.events.push(node as Event);
           break;
         case 'trend':
@@ -186,8 +216,6 @@ export class EditeurComponent implements OnInit {
           break;
       }
     });
-
-
   }
 
   initGroup(group: Graph) {
@@ -208,8 +236,6 @@ export class EditeurComponent implements OnInit {
       element.id = indice;
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       this.modele.graph.nodes.push(element as Node);
-      console.log('addElement to model');
-      console.log(this.modele);
     }
     this.modele = structuredClone(this.modele); // TODO force change detection by forcing the value reference update
     this.initCurves();
@@ -287,12 +313,11 @@ export class EditeurComponent implements OnInit {
     return res;
   } */
 
-    getNodeByID(id: string):Node {
+  getNodeByID(id: string): Node {
     let result = undefined;
     this.modele.graph.nodes.forEach((node: Node) => {
       if (node.id == id) result = node;
     });
     return result;
   }
-
 }

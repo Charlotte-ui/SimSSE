@@ -40,9 +40,6 @@ export class SceneComponent implements OnInit {
   @Input() set curves(value: Curve[]) {
     if (value) {
       // if value isnt undefined
-      console.log('Input curves');
-      console.log(value);
-
       this._curves = value;
       if (this.legend.length < value.length) this.initLegend(); // if there is new variables to show, changed the legend
       this.initGraphData();
@@ -139,7 +136,10 @@ export class SceneComponent implements OnInit {
     // on détermine la hauteur de la markline en fct de la taille des courbes
     this.markLineY = 0;
     this.curves.forEach((curve) => {
-      if (this.variableSelected[curve.name] && curve.currentMax > this.markLineY)
+      if (
+        this.variableSelected[curve.name] &&
+        curve.currentMax > this.markLineY
+      )
         this.markLineY = curve.currentMax;
     });
 
@@ -148,7 +148,6 @@ export class SceneComponent implements OnInit {
     this.modele.triggeredEvents.forEach((event) => {
       // time id
       let markline = [];
-      console.log(this.modele.graph.nodes);
       let node = this.getNodeByID(event[1].toString()); // TODO get the getName() to work
       if (node) {
         // si le node est présent sur le graph
@@ -255,10 +254,6 @@ export class SceneComponent implements OnInit {
         const index = this.modele.triggeredEvents.indexOf(event);
         if (index > -1) this.modele.triggeredEvents.splice(index, 1);
       } else if (result) {
-        console.log('add trigger');
-
-        console.log(result);
-
         // update the time of the trigger
         if (edition)
           this.getEventAtTime(result.coord)[0] = Number(result.xAxis);
