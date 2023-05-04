@@ -1,5 +1,5 @@
 import { Groupe } from './groupe';
-import { Listable } from './listable';
+import { Listable } from './interfaces/listable';
 import { Modele } from './modele';
 import { Profil } from './profil';
 import { Vertex } from './vertex';

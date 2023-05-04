@@ -1,5 +1,6 @@
 import { Modele } from './modele';
 import { Graph, NodeType, Timer, Node, Trend } from './node';
+import { Trigger } from './trigger';
 import { VariablePhysioInstance } from './variablePhysio';
 
 export class Curve {
@@ -72,14 +73,14 @@ export class Curve {
    * @param t
    */
   private updateNodeStatesRecursive(
-    triggeredEvents: [number, string][],
+    triggeredEvents: Trigger[],
     graph: Graph,
     t: number
   ) {
-    triggeredEvents.forEach((event) => {
-      if (event[0] == t) {
+    triggeredEvents.forEach((trigger) => {
+      if (trigger.time == t) {
         // event trigger at time t
-        let nameEvent = event[1];
+        let nameEvent = trigger.id;
         graph.links.forEach((link) => {
           if (nameEvent == link.out) {
             let nodeTrigger = this.getNodeByID(link.in, graph);
@@ -166,11 +167,11 @@ export class Curve {
   private advanceTimer(
     timer: Timer,
     t: number,
-    triggeredEvents: [number, string][]
+    triggeredEvents: Trigger[]
   ) {
     timer.counter++;
     if (timer.counter == timer.duration) {
-      triggeredEvents.push([t, timer.id]);
+      triggeredEvents.push(new Trigger({time:t, id:timer.id, editable:false}));
       timer.state = false; // the timer end
     }
   }

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Listable } from '../../core/models/listable';
+import { Listable } from '../../core/models/interfaces/listable';
 import { FirebaseService } from '../../core/services/firebase.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';

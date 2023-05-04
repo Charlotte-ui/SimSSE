@@ -17,6 +17,7 @@ import {
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 import { Modele } from 'src/app/modules/core/models/modele';
 import { Curve } from 'src/app/modules/core/models/curve';
+import { Trigger } from 'src/app/modules/core/models/trigger';
 
 @Component({
   selector: 'app-scene',
@@ -46,7 +47,7 @@ export class SceneComponent implements OnInit {
     }
   }
 
-  @Output() updateTrigger = new EventEmitter<[number, string][]>();
+  @Output() updateTrigger = new EventEmitter<Trigger[]>();
 
   // Echart Graph Variables
   legend: any[] = [];
@@ -148,24 +149,37 @@ export class SceneComponent implements OnInit {
     this.modele.triggeredEvents.forEach((event) => {
       // time id
       let markline = [];
-      let node = this.getNodeByID(event[1].toString()); // TODO get the getName() to work
+      let node = this.getNodeByID(event.id); // TODO get the getName() to work
       if (node) {
         // si le node est présent sur le graph
-        let name =
-          'event' in node
-            ? (node as Event).event
-            : 'Fin ' + (node as Timer).name;
+        let name ;
+
+      switch (node.type) {
+        case NodeType.event:
+          name = (node as Event).template
+            ? (node as Event).template.name
+            : (node as Event).typeEvent;
+          break;
+        case NodeType.timer:
+          name = "Fin "+(node as Timer).name;
+          break;
+        default:
+          name = (node as Trend | Graph).name;
+        }
+
+
+
         let color = 'event' in node ? '#FEEA00' : '#C8FFBE';
 
         markline.push({
           name: name,
-          xAxis: event[0],
+          xAxis: event.time,
           yAxis: 0,
           lineStyle: { color: color },
         });
         markline.push({
           name: 'end',
-          xAxis: event[0],
+          xAxis: event.time,
           yAxis: this.markLineY,
           lineStyle: { color: color },
         });
@@ -213,8 +227,9 @@ export class SceneComponent implements OnInit {
     if (event.componentType != 'markLine') return;
 
     let trigger = event.data;
-    trigger['event'] = this.getEventAtTime(trigger.xAxis)[1];
-
+    let eventTriggered = this.getTriggerAtTime(trigger.xAxis);
+    trigger['editable'] = eventTriggered.editable ;
+    trigger['id'] = eventTriggered.id ;
     this.openTriggerDialog(event.data, true);
   }
 
@@ -231,7 +246,7 @@ export class SceneComponent implements OnInit {
       yAxis: 0,
       coord: [0, 0],
       type: null,
-      event: '',
+      id: '',
     };
 
     this.openTriggerDialog(newTrigger, false);
@@ -249,16 +264,16 @@ export class SceneComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result == 'delete') {
-        let event = this.getEventAtTime(result.coord);
+        let event = this.getTriggerAtTime(result.coord);
 
         const index = this.modele.triggeredEvents.indexOf(event);
         if (index > -1) this.modele.triggeredEvents.splice(index, 1);
       } else if (result) {
         // update the time of the trigger
         if (edition)
-          this.getEventAtTime(result.coord)[0] = Number(result.xAxis);
+          this.getTriggerAtTime(result.coord).time = Number(result.xAxis);
         else {
-          let event = [Number(result.xAxis), result.event] as [number, string];
+          let event = new Trigger({time:Number(result.xAxis), id:result.event});
           this.modele.triggeredEvents.push(event);
         }
 
@@ -270,10 +285,10 @@ export class SceneComponent implements OnInit {
 
   // tools
 
-  private getEventAtTime(time: number): [number, string] | undefined {
+  private getTriggerAtTime(time: number): Trigger | undefined {
     let result = undefined;
-    this.modele.triggeredEvents.forEach((event) => {
-      if (event[0] == time) result = event;
+    this.modele.triggeredEvents.forEach((trigger) => {
+      if (trigger.time == time) result = trigger;
     });
     return result;
   }

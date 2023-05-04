@@ -1,6 +1,6 @@
 import { number } from "echarts";
 import { Collection } from "../services/firebase.service";
-import { Nameable } from "./nameable";
+import { Nameable } from "./interfaces/nameable";
 import { Vertex } from "./vertex";
 
 

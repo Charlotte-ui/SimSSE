@@ -1,4 +1,4 @@
-import { Listable } from './listable';
+import { Listable } from './interfaces/listable';
 import { Vertex } from './vertex';
 
 export class Scenario extends Vertex implements Listable {

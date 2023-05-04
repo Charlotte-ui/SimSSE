@@ -1,4 +1,4 @@
-import { Collection } from '../services/firebase.service';
+import { Collection } from '../../services/firebase.service';
 
 export interface Listable extends Collection {
   title: string;

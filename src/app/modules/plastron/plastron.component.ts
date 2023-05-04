@@ -21,6 +21,7 @@ import { jsPDF } from 'jspdf';
 import { ScenarioService } from '../core/services/scenario.service';
 import { Groupe } from '../core/models/groupe';
 import { TagService } from '../core/services/tag.service';
+import { Trigger } from '../core/models/trigger';
 
 @Component({
   selector: 'app-plastron',
@@ -128,10 +129,10 @@ export class PlastronComponent implements OnInit {
       .getTrigger(this.plastron.modele.id)
       .subscribe((result: any) => {
         result.$a.forEach((event: Event, index: number) => {
-          this.plastron.modele.triggeredEvents.push([
-            result.$b[index].time,
-            event.event,
-          ]);
+          this.plastron.modele.triggeredEvents.push(new Trigger({
+            time:result.$b[index].time,
+            id:event.event,
+        }));
         });
       });
   }

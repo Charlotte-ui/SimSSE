@@ -18,5 +18,4 @@ export class Tag extends Vertex {
         });
         return res;
     }
-
 }

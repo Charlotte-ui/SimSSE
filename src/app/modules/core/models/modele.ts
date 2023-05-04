@@ -1,5 +1,6 @@
-import { Listable } from "./listable";
+import { Listable } from "./interfaces/listable";
 import { Graph,Node } from "./node";
+import { Trigger } from "./trigger";
 import { VariablePhysioTemplate } from "./variablePhysio";
 import { Vertex } from "./vertex";
 
@@ -19,7 +20,7 @@ export class Modele extends Vertex implements Listable{
     triage:Triage;
     gabarit:boolean;
     graph:Graph;
-    triggeredEvents:[number,string][];
+    triggeredEvents:Trigger[];
     tags:string[];
 
     public static override className = "Modele"

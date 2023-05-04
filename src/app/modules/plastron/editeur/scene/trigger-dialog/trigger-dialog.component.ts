@@ -11,37 +11,38 @@ import { Button } from 'src/app/modules/core/models/buttons';
 })
 export class TriggerDialogComponent {
   form: FormGroup;
-  events:[Event,number,number][];
+  //events:[Event,number,number][];
+  events:Event[];
   isEdition!:boolean;
   title!:string;
   validate!:string;
   noEditable:boolean=false;
   icon = "flash_on";
   id = "flash";
+  trigger;
 
   button:Button = new Button()
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<TriggerDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: [{},[Event,number,number][],boolean] ) {}
+    @Inject(MAT_DIALOG_DATA) public data: [{},Event[],boolean] ) {}
 
     ngOnInit() {
       console.log("init trigger dialog")
-
-      console.log(this.data[0])
+      this.trigger = this.data[0];
+      console.log(this.trigger)
     //  console.log(this.data[0])
-
-      this.form = this.fb.group(this.data[0]);
-      this.events = this.reduceEventArray(this.data[1])
-      this.events.forEach(event => {
-
-      });
-
-
       this.isEdition = this.data[2];
 
+      this.form = this.fb.group(this.trigger);
+
+      this.events = this.data[1]
+
+      console.log("this.events")
+      console.log(this.events)
+
       if (this.isEdition) {
-        if(Number.isNaN(Number(this.data[0]['event']))) { // if the trigger is a event
-          this.form.get('event')?.disable();
+        if(this.trigger.editable) { // if the trigger is a event
+          this.form.get('id')?.disable();
           this.title = "Modifier le trigger "+this.data[0]['name']
           this.validate = "Enregistrer les modifications"
         }

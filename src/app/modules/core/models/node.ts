@@ -1,5 +1,5 @@
 import { Collection } from '../services/firebase.service';
-import { Nameable } from './nameable';
+import { Nameable } from './interfaces/nameable';
 import { Edge, Vertex } from './vertex';
 
 export enum NodeType {
