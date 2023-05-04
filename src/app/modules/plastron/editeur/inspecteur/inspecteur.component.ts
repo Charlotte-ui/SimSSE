@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Trend } from 'src/app/modules/core/models/node';
-import { VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
+import { VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
 
 @Component({
   selector: 'app-inspecteur',
@@ -9,19 +9,22 @@ import { VariablePhysio } from 'src/app/modules/core/models/variablePhysio';
 })
 export class InspecteurComponent implements OnInit {
 
-  @Input() variables:VariablePhysio[];
+  @Input() variables:VariablePhysioInstance[];
   @Input() trends:Trend[];
 
-  @Output() updateVariable = new EventEmitter<(VariablePhysio|number)[]>();
+  @Output() updateVariable = new EventEmitter<[VariablePhysioInstance,number]>();
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  setNewVariable(oldVar:VariablePhysio,newVar:VariablePhysio){
+  setNewVariable(oldVar:VariablePhysioInstance,newVar:VariablePhysioInstance){
+    console.log("setNewVariable")
+    console.log(oldVar)
+    console.log(newVar)
     const index = this.variables.indexOf(oldVar);
-    if (index > -1) this.variables[index] = newVar;
+    //if (index > -1) this.variables[index] = newVar;
     this.updateVariable.emit([newVar,index]);
   }
 

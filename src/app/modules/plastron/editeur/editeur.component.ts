@@ -278,7 +278,7 @@ export class EditeurComponent implements OnInit {
     this.curves = [...this.curves];
   }
 
-  updateVariables(event) {
+  updateVariables(event:[VariablePhysioInstance,number]) {
     let index = Number(event[1]);
     let variable = event[0] as VariablePhysioInstance;
     this.targetVariable[index] = variable;
@@ -288,8 +288,10 @@ export class EditeurComponent implements OnInit {
     // mais alors toutes les courbes sont recalculées
     // pour ne recalculer qu'une seule courbe, on utilise la variable varToUpdate
     // ce qui trigger le @Input: varToUpdate du composant Scene
+    console.log("this.targetVariable")
+    console.log(this.targetVariable)
 
-    this.targetVariable[index] = variable;
+    this.curves[index].variable = variable;
     this.curves[index].calculCurve(this.modele);
     this.curves = [...this.curves];
     this.newChange.emit(true);
