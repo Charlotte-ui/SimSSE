@@ -26,6 +26,7 @@ import { Modele } from '../../core/models/modele';
 import { Curve } from '../../core/models/curve';
 import { ModeleService } from '../../core/services/modele.service';
 import { ApiService } from '../../core/services/api.service';
+import { trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-editeur',
@@ -230,14 +231,12 @@ export class EditeurComponent implements OnInit {
       console.log(this.modele);
     }
     this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
-    this.initCurves();
+    this.updateCurve();
     this.curves = [...this.curves];
     this.newChange.emit(true);
   }
 
   updateNodes(event) {
-    console.log('updateNodes');
-    console.log(event);
     if (event[0].delete) {
       let idNodeToDelete = event[0].id;
       // delete all the links link to the deleted node
@@ -270,7 +269,7 @@ export class EditeurComponent implements OnInit {
 
   updateLinks(event) {
     // let index = Number(event[1])
-    this.initCurves();
+    this.updateCurve();
     this.curves = [...this.curves];
     this.newChange.emit(true);
   }
@@ -291,8 +290,6 @@ export class EditeurComponent implements OnInit {
     // mais alors toutes les courbes sont recalculées
     // pour ne recalculer qu'une seule courbe, on utilise la variable varToUpdate
     // ce qui trigger le @Input: varToUpdate du composant Scene
-    console.log('this.targetVariable');
-    console.log(this.targetVariable);
 
     this.curves[index].variable = variable;
     this.curves[index].calculCurve(this.modele);
@@ -301,9 +298,14 @@ export class EditeurComponent implements OnInit {
   }
 
   updateCurve() {
+    
     this.curves.forEach((curve) => {
-      curve.calculCurve(structuredClone(this.modele));
+      // clean the triggereds of all the curves-genereted triggerd
+      this.modele.triggeredEvents = this.modele.triggeredEvents.filter(trigger => trigger.editable);
+      let newtriggered = curve.calculCurve(structuredClone(this.modele));
+      this.modele.triggeredEvents = newtriggered;
     });
+
     this.curves = [...this.curves];
   }
 

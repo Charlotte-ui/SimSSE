@@ -9,7 +9,7 @@ export class Trigger extends Vertex {
     constructor(object?:any) {
         super(object);
         this.time = (object?.time)?object.time:0;
-        this.editable = (object?.editable)?object.editable:true;
+        this.editable = (object?.editable !== undefined)?object.editable:true;
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {

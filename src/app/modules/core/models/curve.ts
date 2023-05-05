@@ -29,9 +29,9 @@ export class Curve {
    * generate the curve
    * @param size
    * @param variable
-   * @returns
+   * @returns the new triggeredEvents with the events that have been triggered during the calcul of curve 
    */
-  public calculCurve(modele: Modele) {
+  public calculCurve(modele: Modele): Trigger[] {
     //console.group("calculCurve "+this.name)
     //console.group("modele")
     //console.group(modele)
@@ -60,6 +60,8 @@ export class Curve {
 
       this.values.push([i, newValue]);
     }
+
+    return modele.triggeredEvents;
   }
 
   /**
@@ -83,12 +85,15 @@ export class Curve {
     triggeredEvents.forEach((trigger) => {
       if (trigger.time == t) {
         // event trigger at time t
+        console.log("trigger at time "+t)
+        console.log(trigger)
 
         graph.links.forEach((link) => {
           if (trigger.id == link.out) {
             let nodeTrigger = this.getNodeByID(link.in, graph);
 
-            //  let nodeTrigger = graph.nodes[Number(link.in)];
+            console.log("node trigger at time "+t)
+            console.log(nodeTrigger)
             if (nodeTrigger) {
               nodeTrigger.state = link.start;
               if (nodeTrigger.type == NodeType.graph) {
@@ -172,13 +177,19 @@ export class Curve {
   }
 
   private advanceTimer(timer: Timer, t: number, triggeredEvents: Trigger[]) {
+
     timer.counter++;
-    if (timer.counter == timer.duration) {
+    if (timer.counter == timer.duration) { // if the timer has ended
+
+      console.log("add the end timer trigger at time "+(t+1))
+
       triggeredEvents.push(
-        new Trigger({ time: t, id: timer.id, editable: false })
+        new Trigger({ time: t+1, id: timer.id, editable: false })
       );
       timer.state = false; // the timer end
     }
+
+    
   }
 
   private setAllNodesStatesToFalse(graph: Graph) {

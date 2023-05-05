@@ -147,7 +147,10 @@ export class SceneComponent implements OnInit {
     });
 
     this.markLineData = [];
+    console.log("updateMarklineData")
+    console.log("this.modele.triggeredEvents")
 
+    console.log(this.modele.triggeredEvents)
     this.modele.triggeredEvents.forEach((event:Trigger) => {
       // time id
       let markline = [];
