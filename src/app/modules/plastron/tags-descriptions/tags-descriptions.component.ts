@@ -8,6 +8,8 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { Observable, map, startWith } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { RegleService } from '../../core/services/regle.service';
+import { Tag } from '../../core/models/tag';
+import { TagService } from '../../core/services/tag.service';
 
 @Component({
   selector: 'app-tags-descriptions',
@@ -30,15 +32,13 @@ export class TagsDescriptionsComponent {
 
   @Output() newModele = new EventEmitter<Modele>();
 
-  allTags!:string[];
+  @Input() allTags!:Tag[];
 
   @Output() newChange = new EventEmitter<boolean>();
 
 
-  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog,public regleService:RegleService) {
-        this.regleService.getAllTagsPlastron().subscribe((response) => {
-        this.allTags = response;
-      });
+  constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog,public regleService:RegleService,private tagService:TagService) {
+   
   }
 
 
@@ -67,7 +67,7 @@ export class TagsDescriptionsComponent {
 
   }
 
-  updateTags(tags: string[]) {
+  updateTags(tags: Tag[]) {
     this.modele.tags = tags;
     this.newChange.emit(true)
 

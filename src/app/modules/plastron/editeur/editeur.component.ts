@@ -21,7 +21,7 @@ import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
 import { NodeService } from '../../core/services/node.service';
 import { GraphDialogComponent } from './graph-dialog/graph-dialog.component';
-import { retry } from 'rxjs';
+import { concat, forkJoin, of, retry, switchMap, zipAll } from 'rxjs';
 import { Modele } from '../../core/models/modele';
 import { Curve } from '../../core/models/curve';
 import { ModeleService } from '../../core/services/modele.service';
@@ -58,7 +58,10 @@ export class EditeurComponent implements OnInit {
   @Input() set modele(value: Modele) {
     if (value) {
       this._modele = value;
-      this.initGragh();
+      this.modelService.getGraph(this.modele.id).subscribe((graph: Graph) => {
+        this.modele.graph = graph;
+        this.initGraph(this.modele.graph, true);
+      });
     }
   }
 
@@ -79,7 +82,6 @@ export class EditeurComponent implements OnInit {
    * all currents events in the nodes, theirs ids and the id of the graph their from
    * is there from the current graph id=-1
    */
-  //events: [Event, number, number][];
   events: Event[];
 
   /**
@@ -116,58 +118,90 @@ export class EditeurComponent implements OnInit {
   }
 
   /**
-   * init graph
+   * init all the nodes and links of a graph
+   * @param graphId
    */
-  initGragh() {
-    this.modelService.getGraph(this.modele.id).subscribe((graph: Graph) => {
-      this.modele.graph = graph;
+  initGraph(graph: Graph, root: boolean) {
 
-      this.modelService.getGraphNodes(graph.id).subscribe((nodes: Node[]) => {
-        this.modele.graph.nodes = nodes;
+    this.modelService.getGraphNodes(graph.id)
+    .pipe(
+      switchMap((nodes:Node[]) => {
+
+        graph.nodes = nodes;
+
+        
 
         let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
+        console.log("nodeIDArray");
+        console.log(nodeIDArray);
 
-        // TODO add node template
-        this.modele.graph.nodes.forEach((node) => {
-          if (
+        const requestsTemplate = nodes.map((node: Node) =>{
+
+        if (
             node.type == NodeType.event &&
             (node as Event).typeEvent !== EventType.start
           ) {
-            this.nodeService
-              .getEventTemplate(
-                (node as Event).event,
-                (node as Event).typeEvent
-              )
-              .subscribe((template) => {
-                node['template'] = template;
-                //   this.replaceEventByTemplate(node as Event);
-              });
+            return this.nodeService
+              .getEventTemplate((node as Event).event, (node as Event).typeEvent)
           }
-        });
+          else return of(undefined)      
+        }
+              
+        );
 
-        this.modelService
-          .getGraphLinks(nodeIDArray)
-          .subscribe((links: Link[]) => {
-            // replace id node by event name so an event is triggered wathever his id is
+        const requestLink = this.modelService
+        .getGraphLinks(nodeIDArray)
+       
 
-            links.forEach((link: Link) => {
-              let nodeSource = this.getNodeByID(link.out);
-              if (nodeSource.type == NodeType.event)
-                link.out = (nodeSource as Event).event;
-            });
+        return forkJoin([concat(requestsTemplate).pipe(
+          zipAll()
+        ),requestLink])
 
-            this.modele.graph.links = links;
+      })
+    )
+    .subscribe((result: [(BioEvent | Action)[], Link[]]) => {
 
-            if (this.targetVariable) this.initCurves();
-
-            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+      let getNodeByID = function (id: string): Node {
+          let result = undefined;
+          graph.nodes.forEach((node: Node) => {
+            if (node.id == id) result = node;
           });
+          return result;
+      };
 
-        //  this.events = new Array<[Event, number, number]>(); // id event and id graph
+      
+      graph.nodes.forEach((node:Node,index:number) => {
+        if(node['template']) node['template'] = result[0][index];
+      });
+
+
+      graph.links =  result[1];
+      
+
+      
+      // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
+      graph.links.forEach((link: Link) => {
+        let nodeSource = getNodeByID(link.out);
+        if (nodeSource.type == NodeType.event)
+          link.out = (nodeSource as Event).event;
+      });
+
+          
+
+      // if the initialized graph is the root graph
+      if (root && this.targetVariable) {
+        this.modele.graph = graph;
+        this.initCurves();
+        this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+      }
+
+    // TODO : find the rigth place foor that
+      if (root) {
+        
         this.trends = [];
         this.events = [];
         this.initTrendsEventsRecursive(this.modele.graph);
-      });
+      }
     });
   }
 
@@ -210,8 +244,21 @@ export class EditeurComponent implements OnInit {
   }
 
   initGroup(group: Graph) {
-    group.links = this.allGraphs[Number(group.gabarit)].links;
-    group.nodes = this.allGraphs[Number(group.gabarit)].nodes;
+    console.log('initGroup');
+    console.log(group);
+
+    let graphTemplate = Graph.getGraphByID(group.template.toString());
+
+    this.initGraph(graphTemplate, false);
+    console.log(graphTemplate);
+
+    group.links = graphTemplate.links;
+    group.nodes = graphTemplate.nodes;
+
+    // TODO wait for the initialization of graphTemplate before copi the links and nodes
+
+    //group.links = this.allGraphs[Number(group.template)].links;
+    //  group.nodes = this.allGraphs[Number(group.template)].nodes;
   }
 
   // --- UPDATEURS -----------------------------------------
@@ -298,10 +345,11 @@ export class EditeurComponent implements OnInit {
   }
 
   updateCurve() {
-    
     this.curves.forEach((curve) => {
       // clean the triggereds of all the curves-genereted triggerd
-      this.modele.triggeredEvents = this.modele.triggeredEvents.filter(trigger => trigger.editable);
+      this.modele.triggeredEvents = this.modele.triggeredEvents.filter(
+        (trigger) => trigger.editable
+      );
       let newtriggered = curve.calculCurve(structuredClone(this.modele));
       this.modele.triggeredEvents = newtriggered;
     });
@@ -329,12 +377,4 @@ export class EditeurComponent implements OnInit {
     );
     return res;
   } */
-
-  getNodeByID(id: string): Node {
-    let result = undefined;
-    this.modele.graph.nodes.forEach((node: Node) => {
-      if (node.id == id) result = node;
-    });
-    return result;
-  }
 }

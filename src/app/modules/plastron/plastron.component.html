@@ -21,7 +21,9 @@
   </mat-tab>
   <mat-tab label="Modèle - tags et descriptions">
     <app-tags-descriptions
+    *ngIf="allTags"
       [modele]="plastron.modele"
+      [allTags]="allTags"
       (newChange)="changeModele()"
     ></app-tags-descriptions>
   </mat-tab>

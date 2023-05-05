@@ -4,6 +4,7 @@ import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { Observable, map, startWith } from 'rxjs';
+import { Tag } from '../../core/models/tag';
 
 @Component({
   selector: 'app-tags',
@@ -12,21 +13,21 @@ import { Observable, map, startWith } from 'rxjs';
 })
 export class TagsComponent {
   separatorKeysCodes = [ENTER, COMMA];
-  filteredTags: Observable<string[]>;
+  filteredTags: Observable<Tag[]>;
   tagCtrl = new FormControl();
 
   @ViewChild('auto') matAutocomplete: MatAutocomplete;
   @ViewChild('tagInput') tagInput: ElementRef<HTMLInputElement>;
 
-  @Input() allTags;
-  @Input() tags;
+  @Input() allTags:Tag[];
+  @Input() tags:Tag[];
 
-  @Output() newTags = new EventEmitter<string[]>();
+  @Output() newTags = new EventEmitter<Tag[]>();
 
   constructor() {
     this.filteredTags = this.tagCtrl.valueChanges.pipe(
       startWith(null),
-      map((tag: string | null) => tag ? this._filter(tag) : this.allTags.slice()));
+      map((tag: Tag) => tag ? this._filter(tag) : this.allTags.slice()));
   }
 
   addTag(event: MatChipInputEvent): void {
@@ -35,7 +36,7 @@ export class TagsComponent {
 
     // Add our fruit
     if ((value || '').trim()) {
-      this.tags.push(value);
+      this.tags.push(new Tag({value:value}));
     }
 
     // Reset the input value
@@ -57,15 +58,15 @@ export class TagsComponent {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.tags.push(event.option.viewValue);
+    this.tags.push(new Tag({value:event.option.viewValue}));
     this.tagInput.nativeElement.value = '';
     this.newTags.emit(this.tags);
   }
 
-  private _filter(value: string): string[] {
-    const filterValue = value.toLowerCase();
+  private _filter(tag: Tag): Tag[] {
+    const filterValue = tag.value;
 
-    return this.allTags.filter(tag => tag.toLowerCase().indexOf(filterValue) === 0);
+    return this.allTags.filter((value:Tag) => value.value.indexOf(filterValue) === 0);
   }
 
 

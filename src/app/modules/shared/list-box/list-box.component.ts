@@ -9,6 +9,8 @@ import { ApiService } from '../../core/services/api.service';
 import { Scenario } from '../../core/models/scenario';
 import { Vertex } from '../../core/models/vertex';
 import { TagService } from '../../core/services/tag.service';
+import { concat, finalize, switchMap, zipAll } from 'rxjs';
+import { Tag } from '../../core/models/tag';
 
 @Component({
   selector: 'app-list-box',
@@ -19,7 +21,7 @@ export class ListBoxComponent<T extends Listable> {
   keys;
   elements!: T[];
 
-  @Input() chips!: string[];
+  @Input() chips!: Tag[];
 
   @Input() title!: string;
   @Input() subTitle!: string;
@@ -31,24 +33,28 @@ export class ListBoxComponent<T extends Listable> {
   @Input() set classe(value: typeof Vertex) {
     if (value) {
       this._classe = value;
-      this.apiService.getClasseElements<T>(value).subscribe((elements) => {
-        this.elements = elements;
-        this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
-        const index = this.keys.indexOf('gabarit', 0);
-        if (index > -1) this.keys.splice(index, 1);
-        this.elements.forEach((element) => {
-          element.tags = [];
 
-          this.tagService.getTags(element.id,value.className).subscribe((response) => {
-            response.forEach(tag => { // TODO ; utiliser la classe TAG au lieu des string pour les tabeaux de tags
-              element.tags.push(tag.value)
-            });   
+      this.apiService
+        .getClasseElements<T>(value)
+        .pipe(
+          switchMap((elements: T[]) => {
+            const requests = elements.map((element: T) =>
+              this.tagService.getTags(element.id, value.className)
+            );
+
+            this.intElements(elements);
+
+            return concat(requests).pipe(
+              zipAll(),
+              finalize(() => {})
+            );
           })
-
-
-  
+        )
+        .subscribe((TagsArray: Tag[][]) => {
+          this.elements.forEach((element: T, index: number) => {
+            element.tags = TagsArray[index];
+          });
         });
-      });
     }
   }
 
@@ -61,6 +67,13 @@ export class ListBoxComponent<T extends Listable> {
     public tagService: TagService
   ) {
     this.elements = [];
+  }
+
+  intElements(elements: T[]) {
+    this.elements = elements;
+    this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
+    const index = this.keys.indexOf('template', 0);
+    if (index > -1) this.keys.splice(index, 1);
   }
 
   addElement() {
@@ -76,7 +89,7 @@ export class ListBoxComponent<T extends Listable> {
     dialogRef.afterClosed().subscribe((result: T) => {
       if (result) {
         this.newElement.emit(result);
-        this.elements.push(result); // add to database with gabarit = true
+        this.elements.push(result); // add to database with template = true
 
         console.log(this.elements);
       }

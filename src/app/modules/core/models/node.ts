@@ -73,6 +73,7 @@ export class Trend extends Node {
   override getName(): string {
     return this.name;
   }
+
 }
 
 export class Event extends Node {
@@ -125,7 +126,8 @@ export class Graph extends Node {
   name: string; // le graph est a la racine du modele, son nom est root
   nodes: Node[];
   links: Link[];
-  gabarit: string | boolean; // ref vers le graph gabarit si instance, true si gabarit
+  template: string | boolean; // ref vers le graph template si instance, true si template
+  public static graphs: Graph[] = [];
 
   public static override className = 'Graph';
 
@@ -136,7 +138,8 @@ export class Graph extends Node {
     this.name = object?.name ? object.name : 'Groupe';
     this.nodes = object?.nodes ? object.nodes : [];
     this.links = object?.links ? object.links : [];
-    this.gabarit = object?.gabarit ? object.gabarit : false;
+    this.template = object?.template ? object.template : false;
+    Graph.graphs.push(this);
   }
 
   override getName(): string {
@@ -151,6 +154,14 @@ export class Graph extends Node {
     });
 
     return res;
+  }
+
+  public static getGraphByID(id: string): Graph {
+    let result = undefined;
+    Graph.graphs.forEach((graph: Graph) => {
+      if (graph.id == id) result = graph;
+    });
+    return result;
   }
 }
 

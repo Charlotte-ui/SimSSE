@@ -6,6 +6,7 @@ import { Modele } from '../core/models/modele';
 import { ModeleService } from '../core/services/modele.service';
 import { RegleService } from '../core/services/regle.service';
 import { TagService } from '../core/services/tag.service';
+import { Tag } from '../core/models/tag';
 
 
 @Component({
@@ -14,8 +15,8 @@ import { TagService } from '../core/services/tag.service';
   styleUrls: ['./accueil.component.less'],
 })
 export class AccueilComponent implements OnInit {
-  allTagsScenario!: string[];
-  allTagsPlastron!: string[];
+  allTagsScenario!: Tag[];
+  allTagsPlastron!: Tag[];
 
   Scenario = Scenario;
   Modele = Modele;

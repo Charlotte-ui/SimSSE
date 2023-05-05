@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Data } from '@angular/router';
 import { Groupe } from '../core/models/groupe';
 import { Scenario } from '../core/models/scenario';
 import { Plastron } from '../core/models/plastron';
@@ -12,6 +12,8 @@ import { TagService } from '../core/services/tag.service';
 import { PlastronService } from '../core/services/plastron.service';
 import { Modele } from '../core/models/modele';
 import { Profil } from '../core/models/profil';
+import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
+import { Tag } from '../core/models/tag';
 
 @Component({
   selector: 'app-scenario',
@@ -22,7 +24,7 @@ export class ScenarioComponent implements OnInit {
   scenario!: Scenario;
   groupes!: Groupe[];
   plastrons!: Plastron[];
-  totalPlastron!:number;
+  totalPlastron!: number;
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
 
   constructor(
@@ -37,64 +39,62 @@ export class ScenarioComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.data.subscribe((response) => {
-      this.scenario = response['data'];
-      this.scenario.tags = [];
-      this.tagService
-        .getTags(this.scenario.id, 'Scenario')
-        .subscribe((tags) => {
-          tags.forEach((tag) => {
-            this.scenario.tags.push(tag.value);
-          });
-        });
-      this.groupes = [];
-      this.plastrons = [];
-      this.scenarioService
-        .getScenarioGroupes(this.scenario.id)
-        .subscribe((groupes: Groupe[]) => {
-          this.groupes = groupes;
-          this.initialisePlastron(groupes);
-          // this.groupes = [...this.groupes] // forced update
-        });
-    });
+    this.route.data
+      .pipe(
+        switchMap((response: Data) => {
+          this.scenario = response['data'];
+          this.scenario.tags = [];
+
+          const requestTag = this.tagService.getTags(
+            this.scenario.id,
+            'Scenario'
+          );
+
+          const requestGroupe = this.scenarioService.getScenarioGroupes(
+            this.scenario.id
+          );
+
+          return forkJoin([requestTag, requestGroupe]);
+        })
+      )
+      .subscribe((response: [Tag[], Groupe[]]) => {
+        this.groupes = response[1];
+        this.plastrons = [];
+        this.initialisePlastron();
+        this.scenario.tags = response[0];
+      });
   }
 
-  // TODO : replace nested subscribe
-  private initialisePlastron(groupes: Groupe[]) {
-    groupes.forEach((groupe) => {
+  private initialisePlastron() {
+    this.groupes.forEach((groupe) => {
+      let groupePlastron: Plastron[] = [];
+
       this.scenarioService
         .getGroupePlastrons(groupe.id)
-        .subscribe((plastrons: Plastron[]) => {
-          plastrons.map((plastron: Plastron,index:number) => {
-            plastron.groupe = groupe;
+        .pipe(
+          switchMap((plastrons: Plastron[]) => {
+            groupePlastron = plastrons;
 
-            this.plastronService
-              .getPlastronModele(plastron.id)
-              .subscribe((modele: Modele) => {
-                plastron.modele = modele;
+            const requests = plastrons.map((plastron: Plastron) => {
+              plastron.groupe = groupe;
+              return plastron.initModeleProfil(this.plastronService);
+            });
 
-                if(plastrons.length-1 == index) {
-                  this.plastrons = [...this.plastrons]; // forced update
-                }
-              });
-
-            this.plastronService
-              .getPlastronProfil(plastron.id)
-              .subscribe((profil: Profil) => {
-                plastron.profil = profil;
-              });
+            return concat(requests).pipe(zipAll());
+          })
+        )
+        .subscribe((result: [Modele, Profil][]) => {
+          groupePlastron.forEach((plastron: Plastron, index: number) => {
+            plastron.modele = result[index][0];
+            plastron.profil = result[index][1];
           });
-          console.log('plsatrons');
-          console.log(plastrons);
 
-          this.plastrons = [...this.plastrons.concat(plastrons)]; // forced update
+          this.plastrons = [...this.plastrons.concat(groupePlastron)]; // forced update
         });
     });
   }
 
   save() {}
 
-  reloadPlastron(event) {
-   
-  }
+  reloadPlastron(event) {}
 }

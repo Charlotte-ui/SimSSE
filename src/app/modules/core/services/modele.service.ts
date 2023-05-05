@@ -28,7 +28,7 @@ export class ModeleService {
     return this.getModeleById(link['in'].substring(1));
   }
 
-  createNewModel(modele: Modele, gabarit: boolean): Modele {
+  createNewModel(modele: Modele, template: boolean): Modele {
     return undefined;
     // TODOD
   }

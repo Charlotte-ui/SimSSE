@@ -27,6 +27,7 @@ import {
   animate,
 } from '@angular/animations';
 import { TagService } from '../../core/services/tag.service';
+import { Tag } from '../../core/models/tag';
 
 interface tableElementPlastron {
   title: string;
@@ -57,8 +58,8 @@ interface tableElementPlastron {
 })
 export class LotPlastronsComponent {
   Modele = Modele;
-  filterTags: string[] = [];
-  allTags!: string[];
+  filterTags: Tag[] = [];
+  allTags!: Tag[];
   defaultElementPlastron!: tableElementPlastron;
   displayedColumnsPlastron: string[] = [
     'id',
@@ -80,10 +81,7 @@ export class LotPlastronsComponent {
   }
   @Input() set plastrons(value: Plastron[]) {
     if (value) {
-      // if value isnt undefined
       this._plastrons = value;
-      console.log("plastrons")
-      console.log(value)
       this.completePlastrons();
     }
   }
@@ -193,8 +191,6 @@ export class LotPlastronsComponent {
   }
 
   public completePlastrons() {
-    console.log("this.totalPlastron")
-    console.log(this.totalPlastron)
     this.dataSourcePlastron = new Array<tableElementPlastron>(this.totalPlastron)
       .fill({ ...this.defaultElementPlastron })
       .map(() => ({ ...this.defaultElementPlastron }));

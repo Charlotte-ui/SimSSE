@@ -42,7 +42,7 @@ export class GroupesComponent {
     if (value) {
       this._groupes = value;
       this.dataSourceGroup = value;
-      this.initPosition(); //TODO, use whenn BDD is ok
+      this.initPosition(); 
     }
   }
 

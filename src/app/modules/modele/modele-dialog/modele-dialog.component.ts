@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Modele } from '../../core/models/modele';
 import { ModeleResolver } from '../modele.resolver';
+import { Tag } from '../../core/models/tag';
 
 @Component({
   selector: 'app-modele-dialog',
@@ -15,10 +16,10 @@ export class ModeleDialogComponent {
   edition!:boolean;
   title!:string;
   message!:string;
-  alltags!:string[];
+  alltags!:Tag[];
 
     constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<ModeleDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: [Modele,string,string[],boolean] ) {}
+    @Inject(MAT_DIALOG_DATA) public data: [Modele,string,Tag[],boolean] ) {}
 
         ngOnInit() {
       this.modele = this.data[0];

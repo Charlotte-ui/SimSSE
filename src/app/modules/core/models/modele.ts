@@ -1,5 +1,6 @@
 import { Listable } from "./interfaces/listable";
 import { Graph,Node } from "./node";
+import { Tag } from "./tag";
 import { Trigger } from "./trigger";
 import { VariablePhysioTemplate } from "./variablePhysio";
 import { Vertex } from "./vertex";
@@ -18,10 +19,10 @@ export class Modele extends Vertex implements Listable{
     title: string;
     description: string;
     triage:Triage;
-    gabarit:boolean;
+    template:boolean;
     graph:Graph;
     triggeredEvents:Trigger[];
-    tags:string[];
+    tags:Tag[];
 
     public static override className = "Modele"
 
@@ -31,7 +32,7 @@ export class Modele extends Vertex implements Listable{
         this.description = (object?.description)?object.description:"";
         this.tags = (object?.tags)?object.tags:[];
         this.triage = (object?.triage)?object.triage:0;
-        this.gabarit = (object?.gabarit)?object.gabarit:0;
+        this.template = (object?.template)?object.template:0;
         this.graph = (object?.graph)?object.graph:0;
         this.triggeredEvents = (object?.triggeredEvents)?object.triggeredEvents:[];
     }

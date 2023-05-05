@@ -19,8 +19,8 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
   champs;
 
   numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","parameter","duration"];
-  hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root','template'];
-  listable = ["source","target","event",'gabarit','in','out'];
+  hidden = ["x","y","state","id","type",'links','nodes','typeEvent','counter','root'];
+  listable = ["source","target","event",'template','in','out'];
   booleans = ["start"];
 
   champLabel={

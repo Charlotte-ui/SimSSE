@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Data } from '@angular/router';
 import { Plastron } from '../core/models/plastron';
 import { ModeleService } from '../core/services/modele.service';
 import { Modele } from '../core/models/modele';
@@ -22,6 +22,8 @@ import { ScenarioService } from '../core/services/scenario.service';
 import { Groupe } from '../core/models/groupe';
 import { TagService } from '../core/services/tag.service';
 import { Trigger } from '../core/models/trigger';
+import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
+import { Tag } from '../core/models/tag';
 
 @Component({
   selector: 'app-plastron',
@@ -34,9 +36,9 @@ export class PlastronComponent implements OnInit {
 
   changesToSave: boolean = false;
 
-  variablesTemplate:VariablePhysioTemplate[] = [];
+  variablesTemplate: VariablePhysioTemplate[] = [];
 
-  allTags!: string[];
+  allTags!: Tag[];
 
   constructor(
     private route: ActivatedRoute,
@@ -51,89 +53,97 @@ export class PlastronComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.data.subscribe((response) => {
-      this.plastron = response['data'];
+    this.route.data
+      .pipe(
+        switchMap((response: Data) => {
+          this.plastron = response['data'];
 
-      /**
-       * init modele
-       */
-      this.plastronService
-        .getPlastronModele(this.plastron.id)
-        .subscribe((modele: Modele) => {
-          this.plastron.modele = modele;
-          //this.initGragh();
-          this.initTrigger();
-        });
+          const requestModelProfil = this.plastron.initModeleProfil(
+            this.plastronService
+          );
 
-      /***
-       * init profil
-       */
-      this.plastronService
-        .getPlastronProfil(this.plastron.id)
-        .subscribe((profil: Profil) => {
-          this.plastron.profil = profil;
-        });
+          const requestScenario = this.plastronService
+            .getPlastronGroupe(this.plastron.id)
+            .pipe(
+              switchMap((groupe: Groupe) => {
+                const request = this.scenarioService.getGroupeScenario(
+                  groupe.id
+                );
+                return concat(request);
+              })
+            );
 
-      /**
-       * init scenario
-       */
-      // TODO : replace the nested subscribe
-      this.plastronService
-        .getPlastronGroupe(this.plastron.id)
-        .subscribe((groupe: Groupe) => {
-          this.scenarioService
-            .getGroupeScenario(groupe.id)
-            .subscribe((scenario: Scenario) => {
-              this.scenario = scenario;
-            });
-        });
-
-      /**
-       * init tags
-       */
-      this.tagService.getAllTags('modele').subscribe((response) => {
-        this.allTags = response;
+          return forkJoin([requestModelProfil, requestScenario]);
+        })
+      )
+      .subscribe((response: [[Modele, Profil], Scenario]) => {
+        this.plastron.modele = response[0][0];
+        this.plastron.profil = response[0][1];
+        this.scenario = response[1];
+        this.initTrigger();
+        this.initVariables();
       });
+ 
+    /**
+     * init tags
+     */
+    this.tagService.getAllTags('modele').subscribe((response:Tag[]) => {
+      this.allTags = response;
     });
 
-    /**
-     * init target variables
-     */
-    this.regleService
-      .getVariableTemplate()
-      .subscribe((variablesTemplate: VariablePhysioTemplate[]) => {
-        this.variablesTemplate = variablesTemplate;
-        variablesTemplate.forEach((varTemp) => {
-          this.profilService
-            .getVariable(this.plastron.profil.id, varTemp.id)
-            .subscribe((variable: VariablePhysioInstance) => {
-              if (variable.id == '')
-                this.plastron.modele.createVariableCible(varTemp); // si la variable cible n'existe pas, on la crée
-              else{
-                variable.name = varTemp.name;
-                variable.color = varTemp.color;
-                variable.template = varTemp.id;
-                this.plastron.profil.targetVariable.push(variable);
-              }
-            });
-        });
-      });
-          /*     
-    this.plastron.modele['tags'] = ['Lemon', 'Lime', 'Apple']; */
   }
-
-  
 
   initTrigger() {
     this.modelService
       .getTrigger(this.plastron.modele.id)
       .subscribe((result: any) => {
         result.$a.forEach((event: Event, index: number) => {
-          this.plastron.modele.triggeredEvents.push(new Trigger({
-            time:result.$b[index].time,
-            id:event.event, // replace by template
-        }));
+          this.plastron.modele.triggeredEvents.push(
+            new Trigger({
+              time: result.$b[index].time,
+              id: event.event, // replace by template
+            })
+          );
         });
+      });
+  }
+
+  /**
+     * init target variables
+     */
+  initVariables() {
+    this.regleService
+      .getVariableTemplate()
+      .pipe(
+        switchMap((variablesTemplates:VariablePhysioTemplate[]) => {
+          this.variablesTemplate = variablesTemplates;
+
+          const requests = variablesTemplates.map((varTemp:VariablePhysioTemplate) => 
+          this.profilService
+            .getVariable(this.plastron.profil.id, varTemp.id)
+          );
+            return concat(requests).pipe(
+              zipAll()
+            );
+
+        })
+      )
+      .subscribe((variables:VariablePhysioInstance[]) => {
+        this.plastron.profil.targetVariable = variables ;
+
+        variables.forEach((variable:VariablePhysioInstance,index:number) => {
+          if (variable.id == '')
+                this.plastron.modele.createVariableCible(
+                  this.variablesTemplate[index]
+                ); // si la variable cible n'existe pas, on la crée
+              else {
+                variable.name = this.variablesTemplate[index].name;
+                variable.color = this.variablesTemplate[index].color;
+                variable.template = this.variablesTemplate[index].id;
+              }
+        });
+              
+        
       });
   }
 
@@ -158,7 +168,7 @@ export class PlastronComponent implements OnInit {
       let newModel = structuredClone(this.plastron.modele);
       newModel.title = '';
       delete newModel.id;
-      delete newModel.gabarit;
+      delete newModel.template;
       const dialogRef = this.dialog.open(ModeleDialogComponent, {
         data: [
           newModel,

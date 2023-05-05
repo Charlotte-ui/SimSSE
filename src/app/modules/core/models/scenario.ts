@@ -1,10 +1,11 @@
 import { Listable } from './interfaces/listable';
+import { Tag } from './tag';
 import { Vertex } from './vertex';
 
 export class Scenario extends Vertex implements Listable {
   title: string;
   description: string;
-  tags: string[];
+  tags: Tag[];
   UA: number;
   impliques: number;
   psy: number;
