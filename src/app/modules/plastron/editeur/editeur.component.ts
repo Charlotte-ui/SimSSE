@@ -222,8 +222,10 @@ export class EditeurComponent implements OnInit {
       element.id = indice;
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       this.modele.graph.nodes.push(element as Node);
+      console.log("this.modele")
+      console.log(this.modele)
     }
-    this.modele = structuredClone(this.modele); // TODO force change detection by forcing the value reference update
+    this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
     this.initCurves();
     this.curves = [...this.curves];
     this.newChange.emit(true);

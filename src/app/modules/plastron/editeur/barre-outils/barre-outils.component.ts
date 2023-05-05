@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Button, IButton } from 'src/app/modules/core/models/buttons';
 import { EventType, Graph, NodeType, Timer, Trend,Event,Node, Action, BioEvent, Link } from 'src/app/modules/core/models/node';
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
-import { VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
+import { VariablePhysioInstance, VariablePhysioTemplate } from 'src/app/modules/core/models/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 
 
@@ -18,7 +18,7 @@ export class BarreOutilsComponent implements OnInit {
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
   @Input() allGraphs!: Graph[];
-  @Input() targetVariable!: VariablePhysioInstance[];
+  @Input() variables!: VariablePhysioTemplate[];
   @Input() nodes!: Node[];
 
   @Output() newElement = new EventEmitter<Node|Link>();
@@ -48,7 +48,7 @@ export class BarreOutilsComponent implements OnInit {
         return this.createNode(action,this.allActions);
       case NodeType.trend:
         let trend = new Trend ()
-        return this.createNode(trend,this.targetVariable);
+        return this.createNode(trend,this.variables);
       case NodeType.graph:
         let group = new Graph()
         return this.createNode(group,this.allGraphs);
@@ -61,8 +61,6 @@ export class BarreOutilsComponent implements OnInit {
   createLink() {
     let link: Link = new Link();
 
-    console.log("this.nodes")
-    console.log(this.nodes)
     const dialogRef = this.dialog.open(DialogComponent, {
       data: [link, this.nodes,false],
     });
@@ -83,6 +81,8 @@ export class BarreOutilsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result:Node) => {
       if (result) {
+        console.log("node created")
+        console.log(result)
         this.newElement.emit(result);
       }
     });
