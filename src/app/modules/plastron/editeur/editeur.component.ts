@@ -124,7 +124,7 @@ export class EditeurComponent implements OnInit {
       this.modelService.getGraphNodes(graph.id).subscribe((nodes: Node[]) => {
         this.modele.graph.nodes = nodes;
 
-        let nodeIDArray = nodes.map((node: Node) => node.id).filter(n => n);
+        let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
 
         // TODO add node template
         this.modele.graph.nodes.forEach((node) => {
@@ -139,7 +139,7 @@ export class EditeurComponent implements OnInit {
               )
               .subscribe((template) => {
                 node['template'] = template;
-             //   this.replaceEventByTemplate(node as Event);
+                //   this.replaceEventByTemplate(node as Event);
               });
           }
         });
@@ -152,8 +152,7 @@ export class EditeurComponent implements OnInit {
             links.forEach((link: Link) => {
               let nodeSource = this.getNodeByID(link.out);
               if (nodeSource.type == NodeType.event)
-                  link.out = (nodeSource as Event).event;
-
+                link.out = (nodeSource as Event).event;
             });
 
             this.modele.graph.links = links;
@@ -177,7 +176,12 @@ export class EditeurComponent implements OnInit {
   initCurves() {
     this.curves = [];
     this.targetVariable.forEach((variable, index) => {
-      let curve = new Curve(variable.name, this.duration, variable, variable.color);
+      let curve = new Curve(
+        variable.name,
+        this.duration,
+        variable,
+        variable.color
+      );
       this.curves.push(curve);
       curve.calculCurve(structuredClone(this.modele));
     });
@@ -222,8 +226,8 @@ export class EditeurComponent implements OnInit {
       element.id = indice;
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       this.modele.graph.nodes.push(element as Node);
-      console.log("this.modele")
-      console.log(this.modele)
+      console.log('this.modele');
+      console.log(this.modele);
     }
     this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
     this.initCurves();
@@ -232,25 +236,33 @@ export class EditeurComponent implements OnInit {
   }
 
   updateNodes(event) {
-    console.log("updateNodes")
-    console.log(event)
-    if (event[0] == 'delete') {
-      this.updateCurve();
+    console.log('updateNodes');
+    console.log(event);
+    if (event[0].delete) {
+      let idNodeToDelete = event[0].id;
+      // delete all the links link to the deleted node
+      this.modele.graph.links.forEach((link) => {
+        if (link.in == idNodeToDelete || link.out == idNodeToDelete)
+          this.modele.graph.links.splice(
+            this.modele.graph.links.indexOf(link),
+            1
+          );
+      });
     } else {
       let node = event[0] as Node;
       let index = event[1];
-      console.log("newnode")
-      console.log(node)
+      console.log('newnode');
+      console.log(node);
       this.modele.graph.nodes[index] = node;
-/*       if (node.type == 'trend') {
+      /*       if (node.type == 'trend') {
         // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
         let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
         let variable = this.getVariableByTemplate(trend.target);
         this.curves[index].calculCurve(this.modele);
       } 
-      else */ 
-      this.updateCurve();
+      else */
     }
+    this.updateCurve();
     this.modele.graph = structuredClone(this.modele.graph);
     this.curves = [...this.curves];
     this.newChange.emit(true);
@@ -266,11 +278,10 @@ export class EditeurComponent implements OnInit {
   updateTriggers(event) {
     // let index = Number(event[1])
     this.modele.triggeredEvents = event;
-    this.updateCurve()
-
+    this.updateCurve();
   }
 
-  updateVariables(event:[VariablePhysioInstance,number]) {
+  updateVariables(event: [VariablePhysioInstance, number]) {
     let index = Number(event[1]);
     let variable = event[0] as VariablePhysioInstance;
     this.targetVariable[index] = variable;
@@ -280,8 +291,8 @@ export class EditeurComponent implements OnInit {
     // mais alors toutes les courbes sont recalculées
     // pour ne recalculer qu'une seule courbe, on utilise la variable varToUpdate
     // ce qui trigger le @Input: varToUpdate du composant Scene
-    console.log("this.targetVariable")
-    console.log(this.targetVariable)
+    console.log('this.targetVariable');
+    console.log(this.targetVariable);
 
     this.curves[index].variable = variable;
     this.curves[index].calculCurve(this.modele);
@@ -289,7 +300,7 @@ export class EditeurComponent implements OnInit {
     this.newChange.emit(true);
   }
 
-  updateCurve(){
+  updateCurve() {
     this.curves.forEach((curve) => {
       curve.calculCurve(structuredClone(this.modele));
     });

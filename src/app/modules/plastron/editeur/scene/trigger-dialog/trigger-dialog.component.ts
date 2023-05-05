@@ -72,7 +72,7 @@ export class TriggerDialogComponent {
     }
 
     delete() {
-      this.dialogRef.close("delete");
+      this.dialogRef.close({delete:true,id:this.trigger.id});
     }
 
 

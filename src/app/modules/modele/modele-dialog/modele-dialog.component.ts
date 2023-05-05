@@ -42,7 +42,7 @@ export class ModeleDialogComponent {
     }
 
     delete() {
-      this.dialogRef.close("delete");
+      this.dialogRef.close({delete:true,id:this.modele.id});
     }
 
     

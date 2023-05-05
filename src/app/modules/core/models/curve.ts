@@ -9,18 +9,18 @@ export class Curve {
   currentMax: number;
   duration: number;
   variable: VariablePhysioInstance;
-  color:string;
+  color: string;
 
   constructor(
     name: string,
     duration?: number,
     variable?: VariablePhysioInstance,
-    color?:string
+    color?: string
   ) {
     this.name = name;
     this.duration = duration ? duration : 0;
     this.variable = variable ? variable : undefined;
-    this.color = color ? "#"+color : "#d5ceeb";
+    this.color = color ? '#' + color : '#d5ceeb';
     this.values = [];
     this.currentMax = 0;
   }
@@ -83,21 +83,24 @@ export class Curve {
     triggeredEvents.forEach((trigger) => {
       if (trigger.time == t) {
         // event trigger at time t
-      
+
         graph.links.forEach((link) => {
           if (trigger.id == link.out) {
             let nodeTrigger = this.getNodeByID(link.in, graph);
-         
+
             //  let nodeTrigger = graph.nodes[Number(link.in)];
-            nodeTrigger.state = link.start;
-            if (nodeTrigger.type == NodeType.graph) {
-              if (nodeTrigger.state)
-                this.updateNodeStatesRecursive(
-                  triggeredEvents,
-                  nodeTrigger as Graph,
-                  t
-                ); // si le node est un graph, on updte les états des nodes internes
-              else this.setAllNodesStatesToFalse(nodeTrigger as Graph); // desctivate all nodes states
+            if (nodeTrigger) {
+              nodeTrigger.state = link.start;
+              if (nodeTrigger.type == NodeType.graph) {
+                if (nodeTrigger.state)
+                  this.updateNodeStatesRecursive(
+                    triggeredEvents,
+                    nodeTrigger as Graph,
+                    t
+                  );
+                // si le node est un graph, on updte les états des nodes internes
+                else this.setAllNodesStatesToFalse(nodeTrigger as Graph); // desctivate all nodes states
+              }
             }
           }
         });
@@ -168,14 +171,12 @@ export class Curve {
     return trends;
   }
 
-  private advanceTimer(
-    timer: Timer,
-    t: number,
-    triggeredEvents: Trigger[]
-  ) {
+  private advanceTimer(timer: Timer, t: number, triggeredEvents: Trigger[]) {
     timer.counter++;
     if (timer.counter == timer.duration) {
-      triggeredEvents.push(new Trigger({time:t, id:timer.id, editable:false}));
+      triggeredEvents.push(
+        new Trigger({ time: t, id: timer.id, editable: false })
+      );
       timer.state = false; // the timer end
     }
   }

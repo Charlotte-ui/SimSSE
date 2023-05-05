@@ -81,6 +81,8 @@ export class Event extends Node {
   template: Action | BioEvent;
 
   constructor(object?: any) {
+    if (object) object["type"]=NodeType.event;
+    else object = {type:NodeType.event};
     super(object);
     this.event = object?.event ? object.event : undefined;
     this.typeEvent = object?.typeEvent ? object.typeEvent : undefined;
@@ -99,6 +101,8 @@ export class Link extends Edge {
   start: boolean;
 
   constructor(object?: any) {
+    if (object) object["type"]=NodeType.link;
+    else object = {type:NodeType.link};
     super(object);
     this.out = object?.out ? object.out.substring(1) : undefined;
     this.in = object?.in ? object.in.substring(1) : undefined;
@@ -126,9 +130,8 @@ export class Graph extends Node {
   public static override className = 'Graph';
 
   constructor(object?: any) {
-    object
-      ? (object.type = NodeType.graph)
-      : (object = { type: NodeType.graph });
+    if (object) object["type"]=NodeType.graph;
+    else object = {type:NodeType.graph};
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
     this.nodes = object?.nodes ? object.nodes : [];

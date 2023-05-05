@@ -277,7 +277,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
     if (dialogRef)
       dialogRef.afterClosed().subscribe((result) => {
         if (result) {
-          if (result == 'delete') {
+          if (result.delete) {
             this.graph.nodes.splice(index, 1);
             this.graphData.splice(index, 1);
           } else {
@@ -302,7 +302,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        if (result == 'delete') {
+        if (result.delete) {
           this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);
         } else {

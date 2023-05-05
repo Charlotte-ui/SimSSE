@@ -267,7 +267,7 @@ export class SceneComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result == 'delete') {
+      if (result.delete) {
         let event = this.getTriggerAtTime(result.coord);
 
         const index = this.modele.triggeredEvents.indexOf(event);

@@ -40,7 +40,7 @@ export class GraphEditeurDialogComponent {
   }
 
   delete() {
-    this.dialogRef.close("delete");
+    this.dialogRef.close({delete:true,id:this.graph.id});
   }
 
 }

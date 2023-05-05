@@ -15,7 +15,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
 
   form: FormGroup;
   liste:any[];
-  node:T|Link;
+  node:T;
   champs;
 
   numbers = ["rand","min","max","cible","impliques","psy","UR","EU","UA","x","y","parameter","duration"];
@@ -57,9 +57,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
     }
 
     completeTitle(type:string):string{
-      console.log("completeTitle")
       let start = (this.edition)?"Modifier":"Ajouter";
-      console.log(start)
       switch(type){
         case NodeType.link: return start+" le lien";
         case EventType.bio: return start+" l'événement";
@@ -84,7 +82,7 @@ export class DialogComponent<T extends Node|Link> { // valable aussi pour les mo
     }
 
     delete() {
-      this.dialogRef.close("delete");
+      this.dialogRef.close({delete:true,id:this.node.id});
     }
 
     public getType(champ:string){

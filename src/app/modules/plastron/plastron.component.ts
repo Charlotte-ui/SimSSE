@@ -131,7 +131,7 @@ export class PlastronComponent implements OnInit {
         result.$a.forEach((event: Event, index: number) => {
           this.plastron.modele.triggeredEvents.push(new Trigger({
             time:result.$b[index].time,
-            id:event.event,
+            id:event.event, // replace by template
         }));
         });
       });
