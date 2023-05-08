@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Trend } from 'src/app/modules/core/models/node';
-import { VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/variablePhysio';
+import { Trend } from 'src/app/modules/core/models/vertex/node';
+import { VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/vertex/variablePhysio';
 
 @Component({
   selector: 'app-variable-controller',

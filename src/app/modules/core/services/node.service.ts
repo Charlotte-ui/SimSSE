@@ -8,7 +8,7 @@ import {
   EventType,
   Action,
   BioEvent,
-} from '../models/node';
+} from '../models/vertex/node';
 import { Observable, map, of } from 'rxjs';
 import { ApiService } from './api.service';
 

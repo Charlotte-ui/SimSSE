@@ -11,12 +11,12 @@ import {
   Action,
   BioEvent,
   Link,
-} from 'src/app/modules/core/models/node';
+} from 'src/app/modules/core/models/vertex/node';
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from 'src/app/modules/core/models/variablePhysio';
+} from 'src/app/modules/core/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({

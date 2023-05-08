@@ -1,7 +1,7 @@
-import { Modele } from './modele';
-import { Graph, NodeType, Timer, Node, Trend } from './node';
+import { Modele } from './vertex/modele';
+import { Graph, NodeType, Timer, Node, Trend } from './vertex/node';
 import { Trigger } from './trigger';
-import { VariablePhysioInstance } from './variablePhysio';
+import { VariablePhysioInstance } from './vertex/variablePhysio';
 
 export class Curve {
   name: string;

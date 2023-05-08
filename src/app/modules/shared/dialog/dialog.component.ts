@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
-import { Node,Trend,Event, Link, NodeType, EventType } from 'src/app/modules/core/models/node';
+import { Node,Trend,Event, Link, NodeType, EventType } from 'src/app/modules/core/models/vertex/node';
 import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({

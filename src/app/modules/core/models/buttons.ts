@@ -1,4 +1,4 @@
-import { EventType, NodeType } from './node';
+import { EventType, NodeType } from './vertex/node';
 
 export interface IButton {
   name: string;
@@ -38,7 +38,7 @@ export class Button {
     {
       name: 'Timer',
       type: NodeType.timer,
-      icon: 'access_alarm',
+      icon: 'timer',
       color: '#C8FFBE',
       outils: true,
       symbol: 'roundRect',

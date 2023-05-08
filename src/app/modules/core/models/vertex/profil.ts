@@ -1,4 +1,4 @@
-import { Collection } from "../services/firebase.service";
+import { Collection } from "../../services/firebase.service";
 import { VariablePhysioInstance } from "./variablePhysio";
 import { Vertex } from "./vertex";
 

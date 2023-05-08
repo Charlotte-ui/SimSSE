@@ -11,18 +11,18 @@ import {
   NodeType,
   EventType,
   Timer,
-} from '../../core/models/node';
+} from '../../core/models/vertex/node';
 import {
   VariablePhysio,
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from '../../core/models/variablePhysio';
+} from '../../core/models/vertex/variablePhysio';
 import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
 import { NodeService } from '../../core/services/node.service';
 import { GraphDialogComponent } from './graph-dialog/graph-dialog.component';
 import { concat, forkJoin, of, retry, switchMap, zipAll } from 'rxjs';
-import { Modele } from '../../core/models/modele';
+import { Modele } from '../../core/models/vertex/modele';
 import { Curve } from '../../core/models/curve';
 import { ModeleService } from '../../core/services/modele.service';
 import { ApiService } from '../../core/services/api.service';
@@ -93,6 +93,11 @@ export class EditeurComponent implements OnInit {
    * préviens le plastron quand un changement a besoin d'être enregistré
    */
   @Output() newChange = new EventEmitter<boolean>();
+
+    /**
+   * préviens le plastron quand un changement a besoin d'être enregistré
+   */
+    @Output() newCurve = new EventEmitter<Curve[]>();
 
   constructor(
     public dialog: MatDialog,
@@ -220,6 +225,8 @@ export class EditeurComponent implements OnInit {
       this.curves.push(curve);
       curve.calculCurve(structuredClone(this.modele));
     });
+
+    this.newCurve.emit(this.curves)
   }
 
   initTrendsEventsRecursive(graph: Graph) {

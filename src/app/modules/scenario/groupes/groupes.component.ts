@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Groupe } from '../../core/models/groupe';
+import { Groupe } from '../../core/models/vertex/groupe';
 import { MatDialog } from '@angular/material/dialog';
-import { Scenario } from '../../core/models/scenario';
+import { Scenario } from '../../core/models/vertex/scenario';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 

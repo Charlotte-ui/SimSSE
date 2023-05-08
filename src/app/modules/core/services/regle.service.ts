@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {
   VariablePhysio,
   VariablePhysioTemplate,
-} from '../models/variablePhysio';
+} from '../models/vertex/variablePhysio';
 import { Observable, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
 import {
@@ -13,7 +13,7 @@ import {
   BioEvent,
   Action,
   Graph,
-} from '../../core/models/node';
+} from '../models/vertex/node';
 import { ApiService } from './api.service';
 
 @Injectable({

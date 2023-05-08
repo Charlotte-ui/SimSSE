@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { ScenarioService } from '../../core/services/scenario.service';
 import { FormBuilder } from '@angular/forms';
-import { Scenario } from '../../core/models/scenario';
+import { Scenario } from '../../core/models/vertex/scenario';
 import { TagService } from '../../core/services/tag.service';
 
 @Component({

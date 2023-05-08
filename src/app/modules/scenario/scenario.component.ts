@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
-import { Groupe } from '../core/models/groupe';
-import { Scenario } from '../core/models/scenario';
-import { Plastron } from '../core/models/plastron';
+import { Groupe } from '../core/models/vertex/groupe';
+import { Scenario } from '../core/models/vertex/scenario';
+import { Plastron } from '../core/models/vertex/plastron';
 import { ScenarioService } from '../core/services/scenario.service';
 import { ModeleService } from '../core/services/modele.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,10 +10,10 @@ import { ProfilService } from '../core/services/profil.service';
 import { RegleService } from '../core/services/regle.service';
 import { TagService } from '../core/services/tag.service';
 import { PlastronService } from '../core/services/plastron.service';
-import { Modele } from '../core/models/modele';
-import { Profil } from '../core/models/profil';
+import { Modele } from '../core/models/vertex/modele';
+import { Profil } from '../core/models/vertex/profil';
 import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../core/models/tag';
+import { Tag } from '../core/models/vertex/tag';
 
 @Component({
   selector: 'app-scenario',

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Scenario } from '../core/models/scenario';
+import { Scenario } from '../core/models/vertex/scenario';
 import { ScenarioService } from '../core/services/scenario.service';
 import { Router } from '@angular/router';
-import { Modele } from '../core/models/modele';
+import { Modele } from '../core/models/vertex/modele';
 import { ModeleService } from '../core/services/modele.service';
 import { RegleService } from '../core/services/regle.service';
 import { TagService } from '../core/services/tag.service';
-import { Tag } from '../core/models/tag';
+import { Tag } from '../core/models/vertex/tag';
 
 
 @Component({

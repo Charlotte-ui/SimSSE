@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { Scenario } from '../models/scenario';
+import { Scenario } from '../models/vertex/scenario';
 
 @Component({
   selector: 'app-header',

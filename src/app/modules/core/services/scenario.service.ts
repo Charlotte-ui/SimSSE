@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
-import { Scenario } from '../models/scenario';
-import { Groupe } from '../models/groupe';
-import { Plastron } from '../models/plastron';
+import { Scenario } from '../models/vertex/scenario';
+import { Groupe } from '../models/vertex/groupe';
+import { Plastron } from '../models/vertex/plastron';
 import { ApiService } from './api.service';
 
 @Injectable({

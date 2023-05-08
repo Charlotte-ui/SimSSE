@@ -3,6 +3,9 @@
   <button mat-icon-button (click)="addTrigger()">
     <mat-icon id="flash">flash_on</mat-icon>
   </button>
+  <button mat-icon-button (click)="addTimeStamp()">
+    <mat-icon>add_alarm</mat-icon>
+  </button>
 </div>
 
 <div *ngIf="initialChartOption" echarts [options]="initialChartOption" [merge]="mergeOptions" class="demo-chart" (chartInit)="onChartInit($event)" (chartClick)="onChartClick($event)" (chartLegendSelectChanged)="onChartLegendSelectChanged($event)"></div>

@@ -6,11 +6,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DialogComponent } from '../dialog/dialog.component';
 import { ApiService } from '../../core/services/api.service';
-import { Scenario } from '../../core/models/scenario';
-import { Vertex } from '../../core/models/vertex';
+import { Scenario } from '../../core/models/vertex/scenario';
+import { Vertex } from '../../core/models/vertex/vertex';
 import { TagService } from '../../core/services/tag.service';
 import { concat, finalize, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../../core/models/tag';
+import { Tag } from '../../core/models/vertex/tag';
 
 @Component({
   selector: 'app-list-box',

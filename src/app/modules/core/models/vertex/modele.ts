@@ -1,7 +1,7 @@
-import { Listable } from "./interfaces/listable";
+import { Listable } from "../interfaces/listable";
 import { Graph,Node } from "./node";
 import { Tag } from "./tag";
-import { Trigger } from "./trigger";
+import { Trigger } from "../trigger";
 import { VariablePhysioTemplate } from "./variablePhysio";
 import { Vertex } from "./vertex";
 
@@ -23,6 +23,7 @@ export class Modele extends Vertex implements Listable{
     graph:Graph;
     triggeredEvents:Trigger[];
     tags:Tag[];
+    timeStamps:number[];
 
     public static override className = "Modele"
 
@@ -35,6 +36,7 @@ export class Modele extends Vertex implements Listable{
         this.template = (object?.template)?object.template:0;
         this.graph = (object?.graph)?object.graph:0;
         this.triggeredEvents = (object?.triggeredEvents)?object.triggeredEvents:[];
+        this.timeStamps = (object?.timeStamps)?object.timeStamps:[];
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {

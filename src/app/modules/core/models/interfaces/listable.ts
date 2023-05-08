@@ -1,5 +1,5 @@
 import { Collection } from '../../services/firebase.service';
-import { Tag } from '../tag';
+import { Tag } from '../vertex/tag';
 
 export interface Listable extends Collection {
   title: string;

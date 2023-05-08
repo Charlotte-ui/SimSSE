@@ -1,4 +1,4 @@
-import { Vertex } from "./vertex";
+import { Vertex } from "./vertex/vertex";
 
 export class Trigger extends Vertex {
     time:number;

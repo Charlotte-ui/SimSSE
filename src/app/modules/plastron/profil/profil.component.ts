@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Profil } from '../../core/models/profil';
+import { Profil } from '../../core/models/vertex/profil';
 import { ProfilService } from '../../core/services/profil.service';
 
 @Component({

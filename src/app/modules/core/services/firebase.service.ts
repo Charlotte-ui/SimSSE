@@ -11,7 +11,7 @@ import { FieldPath, FieldValue } from 'firebase/firestore';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import { ApiService } from './api.service';
-import { Scenario } from '../models/scenario';
+import { Scenario } from '../models/vertex/scenario';
 
 export interface Collection{
   id: string;

@@ -1,4 +1,4 @@
-import { Listable } from './interfaces/listable';
+import { Listable } from '../interfaces/listable';
 import { Tag } from './tag';
 import { Vertex } from './vertex';
 

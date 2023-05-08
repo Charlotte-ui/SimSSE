@@ -7,7 +7,7 @@
 
   <mat-dialog-content *ngIf="data && !noEditable" [formGroup]="form">
 
-    <div mat-dialog-content>
+    <div mat-dialog-content *ngIf="isTrigger">
       <mat-form-field appearance="fill">
         <mat-label>Évenement</mat-label>
         <mat-select formControlName="id">

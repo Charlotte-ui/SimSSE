@@ -1,4 +1,4 @@
-import { Collection } from "../services/firebase.service";
+import { Collection } from "../../services/firebase.service";
 import { Vertex } from "./vertex";
 
 export class Groupe extends Vertex{

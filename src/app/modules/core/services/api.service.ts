@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment.api';
 import { Observable, map } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
-import { Vertex } from '../models/vertex';
+import { Vertex } from '../models/vertex/vertex';
 
 @Injectable({
   providedIn: 'root',

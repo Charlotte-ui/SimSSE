@@ -6,7 +6,7 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { Scenario } from '../core/models/scenario';
+import { Scenario } from '../core/models/vertex/scenario';
 import { FirebaseService } from '../core/services/firebase.service';
 import { ScenarioService } from '../core/services/scenario.service';
 

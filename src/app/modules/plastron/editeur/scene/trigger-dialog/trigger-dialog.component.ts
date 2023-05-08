@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Event ,Node} from 'src/app/modules/core/models/node';
+import { Event ,Node} from 'src/app/modules/core/models/vertex/node';
 import { Button } from 'src/app/modules/core/models/buttons';
 
 @Component({
@@ -11,20 +11,20 @@ import { Button } from 'src/app/modules/core/models/buttons';
 })
 export class TriggerDialogComponent {
   form: FormGroup;
-  //events:[Event,number,number][];
   events:Event[];
   isEdition!:boolean;
   title!:string;
   validate!:string;
   noEditable:boolean=false;
   icon = "flash_on";
-  id = "flash";
+  id ;
   trigger;
+  isTrigger:boolean;
 
   button:Button = new Button()
 
   constructor(private fb: FormBuilder,public dialogRef: MatDialogRef<TriggerDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: [{},Event[],boolean] ) {}
+    @Inject(MAT_DIALOG_DATA) public data: [{},Event[],boolean,boolean] ) {}
 
     ngOnInit() {
       console.log("init trigger dialog")
@@ -32,6 +32,7 @@ export class TriggerDialogComponent {
       console.log(this.trigger)
     //  console.log(this.data[0])
       this.isEdition = this.data[2];
+      this.isTrigger = this.data[3];
 
       this.form = this.fb.group(this.trigger);
 
@@ -39,26 +40,27 @@ export class TriggerDialogComponent {
 
       console.log("this.events")
       console.log(this.events)
+      this.icon = this.isTrigger?"flash_on":"add_alarm";
+      let element = this.isTrigger?"trigger":"time stamp";
+      this.id = this.isTrigger?"flash":"timeStamp";
 
       if (this.isEdition) {
         if(this.trigger.editable) { // if the trigger is a event
           this.form.get('id')?.disable();
-          this.title = "Modifier le trigger "+this.data[0]['name']
+          this.title = `Modifier le ${element} ${this.data[0]['name']}`
           this.validate = "Enregistrer les modifications"
         }
         else{
           this.noEditable = true;
           this.icon = "access_alarm";
-          this.id = "time";
+          this.id = "timer";
           this.title = "Vous ne pouvez pas déplacer la fin du timer"
         }
 
       }
       else {
-        this.title = "Ajouter un trigger"
+        this.title = `Ajouter un ${element}`
         this.validate = "Ajouter"
-
-
       }
 
     }

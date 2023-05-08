@@ -1,6 +1,6 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { Modele } from '../../core/models/modele';
+import { Modele } from '../../core/models/vertex/modele';
 import { ModeleService } from '../../core/services/modele.service';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {ENTER, COMMA} from '@angular/cdk/keycodes';
@@ -8,7 +8,7 @@ import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material
 import { Observable, map, startWith } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { RegleService } from '../../core/services/regle.service';
-import { Tag } from '../../core/models/tag';
+import { Tag } from '../../core/models/vertex/tag';
 import { TagService } from '../../core/services/tag.service';
 
 @Component({

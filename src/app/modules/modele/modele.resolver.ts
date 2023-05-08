@@ -4,7 +4,7 @@ import {
   RouterStateSnapshot,
   ActivatedRouteSnapshot
 } from '@angular/router';
-import { Modele } from '../core/models/modele';
+import { Modele } from '../core/models/vertex/modele';
 import { ModeleService } from '../core/services/modele.service';
 
 

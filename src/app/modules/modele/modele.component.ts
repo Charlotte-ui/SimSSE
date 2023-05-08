@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { Modele } from '../core/models/modele';
-import { Scenario } from '../core/models/scenario';
-import { VariablePhysioInstance } from '../core/models/variablePhysio';
-import { Graph } from '../core/models/node';
+import { Modele } from '../core/models/vertex/modele';
+import { Scenario } from '../core/models/vertex/scenario';
+import { VariablePhysioInstance } from '../core/models/vertex/variablePhysio';
+import { Graph } from '../core/models/vertex/node';
 import { ActivatedRoute } from '@angular/router';
 import { ModeleService } from '../core/services/modele.service';
 

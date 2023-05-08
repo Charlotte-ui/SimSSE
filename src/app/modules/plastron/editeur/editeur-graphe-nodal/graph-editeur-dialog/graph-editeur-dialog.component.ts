@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Graph, Trend,Event,Link,Node } from 'src/app/modules/core/models/node';
+import { Graph, Trend,Event,Link,Node } from 'src/app/modules/core/models/vertex/node';
 
 @Component({
   selector: 'app-graph-editeur-dialog',

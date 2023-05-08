@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import { Observable, map, of } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
-import { Plastron } from '../models/plastron';
-import { Modele } from '../models/modele';
-import { VariablePhysioInstance, VariablePhysioTemplate} from '../models/variablePhysio';
-import { Scenario } from '../models/scenario';
-import { Groupe } from '../models/groupe';
+import { Plastron } from '../models/vertex/plastron';
+import { Modele } from '../models/vertex/modele';
+import { VariablePhysioInstance, VariablePhysioTemplate} from '../models/vertex/variablePhysio';
+import { Scenario } from '../models/vertex/scenario';
+import { Groupe } from '../models/vertex/groupe';
 import { ApiService } from './api.service';
 import { ModeleService } from './modele.service';
-import { Profil } from '../models/profil';
+import { Profil } from '../models/vertex/profil';
 
 @Injectable({
   providedIn: 'root'

@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
-import { Modele } from '../models/modele';
-import { Trend, Event, Link, NodeType, EventType, Graph,Node } from '../models/node';
+import { Modele } from '../models/vertex/modele';
+import { Trend, Event, Link, NodeType, EventType, Graph,Node } from '../models/vertex/node';
 import { ApiService } from './api.service';
-import { VariablePhysioInstance } from '../models/variablePhysio';
+import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
 
 @Injectable({
   providedIn: 'root',

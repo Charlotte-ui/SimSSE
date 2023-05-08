@@ -8,9 +8,9 @@ import {
 } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
-import { Groupe } from '../../core/models/groupe';
-import { Triage, Modele } from '../../core/models/modele';
-import { Statut, Plastron } from '../../core/models/plastron';
+import { Groupe } from '../../core/models/vertex/groupe';
+import { Triage, Modele } from '../../core/models/vertex/modele';
+import { Statut, Plastron } from '../../core/models/vertex/plastron';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -18,7 +18,7 @@ import { ModeleService } from '../../core/services/modele.service';
 import { ProfilService } from '../../core/services/profil.service';
 import { RegleService } from '../../core/services/regle.service';
 import { ScenarioService } from '../../core/services/scenario.service';
-import { Scenario } from '../../core/models/scenario';
+import { Scenario } from '../../core/models/vertex/scenario';
 import {
   trigger,
   state,
@@ -27,7 +27,7 @@ import {
   animate,
 } from '@angular/animations';
 import { TagService } from '../../core/services/tag.service';
-import { Tag } from '../../core/models/tag';
+import { Tag } from '../../core/models/vertex/tag';
 
 interface tableElementPlastron {
   title: string;

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './api.service';
 import { Observable, flatMap, map, of, tap } from 'rxjs';
-import { Tag } from '../models/tag';
+import { Tag } from '../models/vertex/tag';
 
 @Injectable({
   providedIn: 'root'

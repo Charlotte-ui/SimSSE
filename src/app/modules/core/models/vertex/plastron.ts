@@ -1,10 +1,10 @@
 import { Observable, forkJoin } from 'rxjs';
 import { Groupe } from './groupe';
-import { Listable } from './interfaces/listable';
+import { Listable } from '../interfaces/listable';
 import { Modele } from './modele';
 import { Profil } from './profil';
 import { Vertex } from './vertex';
-import { PlastronService } from '../services/plastron.service';
+import { PlastronService } from '../../services/plastron.service';
 
 export enum Statut {
   Todo = 'A faire',

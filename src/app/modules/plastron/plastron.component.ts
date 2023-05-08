@@ -1,29 +1,31 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
-import { Plastron } from '../core/models/plastron';
+import { Plastron } from '../core/models/vertex/plastron';
 import { ModeleService } from '../core/services/modele.service';
-import { Modele } from '../core/models/modele';
-import { Graph, Node, Event, Link } from '../core/models/node';
+import { Modele } from '../core/models/vertex/modele';
+import { Graph, Node, Event, Link } from '../core/models/vertex/node';
 
 import { ProfilService } from '../core/services/profil.service';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from '../core/models/variablePhysio';
+} from '../core/models/vertex/variablePhysio';
 import { RegleService } from '../core/services/regle.service';
-import { Profil } from '../core/models/profil';
+import { Profil } from '../core/models/vertex/profil';
 import { PlastronService } from '../core/services/plastron.service';
-import { Scenario } from '../core/models/scenario';
+import { Scenario } from '../core/models/vertex/scenario';
 import { MatDialog } from '@angular/material/dialog';
 import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { jsPDF } from 'jspdf';
 import { ScenarioService } from '../core/services/scenario.service';
-import { Groupe } from '../core/models/groupe';
+import { Groupe } from '../core/models/vertex/groupe';
 import { TagService } from '../core/services/tag.service';
 import { Trigger } from '../core/models/trigger';
 import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../core/models/tag';
+import { Tag } from '../core/models/vertex/tag';
+import { Pdf } from '../core/models/pdf';
+import { Curve } from '../core/models/curve';
 
 @Component({
   selector: 'app-plastron',
@@ -39,6 +41,8 @@ export class PlastronComponent implements OnInit {
   variablesTemplate: VariablePhysioTemplate[] = [];
 
   allTags!: Tag[];
+
+  curves!:Curve[];
 
   constructor(
     private route: ActivatedRoute,
@@ -157,6 +161,12 @@ export class PlastronComponent implements OnInit {
     }
   }
 
+  changeCurves(event) {
+    if (event) {
+      this.curves = event;
+    }
+  }
+
   changeProfil() {
     this.changesToSave = true;
   }
@@ -213,10 +223,37 @@ export class PlastronComponent implements OnInit {
 
   exportAsPdf(event: boolean) {
     if (event) {
+
+      
+
+      new Pdf(this.plastron.modele,this.curves);
+/* 
       // Default export is a4 paper, portrait, using millimeters for units
       const doc = new jsPDF();
-      doc.text('Hello world!', 10, 10);
-      doc.save('a4.pdf');
+      doc.text('EXERCICE ORSEC', 80, 20);
+      doc.text('Nom :', 20, 40);
+      doc.text('Prénom :', 80, 40);
+      doc.rect(15, 30, 180, 15); // empty square
+
+      doc.text('Contexte', 20, 60);
+      doc.setFontSize(12);
+      doc.text(this.plastron.modele.description, 20, 70);
+
+      doc.line(15, 50, 200, 50); // horizontal line
+      doc.addPage();
+      doc.text( "Do you like that?",20,20);
+      doc.save('a4.pdf'); */
+
+
+  
+      
+    
+     
+    // Margins:
+   
+    
+  
+    
     }
   }
 }
