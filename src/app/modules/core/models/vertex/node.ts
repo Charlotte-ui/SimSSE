@@ -112,13 +112,7 @@ export class Link extends Edge {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    let res: T[] = [];
-
-    list.forEach((element) => {
-      res.push(new Link(element) as T);
-    });
-
-    return res;
+    return list.map(element => new Link(element) as T)
   }
 }
 
@@ -197,13 +191,7 @@ export class Action extends Vertex {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    let res: T[] = [];
-
-    list.forEach((element) => {
-      res.push(new Action(element) as T);
-    });
-
-    return res;
+    return list.map(element => new Action(element) as T)
   }
 
   public static getActionByID(id: string): Action {
@@ -226,12 +214,6 @@ export class BioEvent extends Vertex {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    let res: T[] = [];
-
-    list.forEach((element) => {
-      res.push(new BioEvent(element) as T);
-    });
-
-    return res;
+    return list.map(element => new BioEvent(element) as T)
   }
 }

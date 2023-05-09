@@ -31,12 +31,7 @@ export class Plastron extends Vertex {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    let res: T[] = [];
-    list.forEach((element) => {
-      res.push(new Plastron(element) as T);
-    });
-
-    return res;
+    return list.map(element => new Plastron(element) as T)
   }
 
   initModeleProfil(plastronService:PlastronService):Observable<[Modele, Profil]> {

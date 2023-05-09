@@ -39,13 +39,7 @@ export class VariablePhysioTemplate extends VariablePhysio{
   }
 
     public static override instanciateListe<T>(list: any[]): T[] {
-    let res: T[] = [];
-    
-    list.forEach((element) => {
-      res.push(new VariablePhysioTemplate(element) as T);
-    });
-
-    return res;
+    return list.map(element => new VariablePhysioTemplate(element) as T)
   }
 }
 

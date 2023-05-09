@@ -79,13 +79,11 @@ export class SceneComponent implements OnInit {
         lineStyle: { color: '#FEEA00' },
       },
     ];
-    this.variableSelected = {}; // at init, all the variables are selected
+    this.variableSelected = {}; 
 
     this.curves.forEach((curve) => {
       this.legend.push(curve.name);
-      this.variableSelected[curve.name] = true;
-
-      // curve.currentMax = 0 // the maximum value of the curve, used to set the height of the triggers
+      this.variableSelected[curve.name] = true; // at init, all the variables are selected
     });
     this.intitChartOption();
   }
@@ -148,7 +146,7 @@ export class SceneComponent implements OnInit {
 
     this.markLineData = [];
 
-    this.modele.triggeredEvents.forEach((event: Trigger) => {
+    this.modele.triggeredEvents.map((event: Trigger) => {
       // time id
       let markline = [];
       let node = this.getNodeByID(event.id);
@@ -188,7 +186,7 @@ export class SceneComponent implements OnInit {
       }
     });
 
-    this.modele.timeStamps.forEach((timeStamp: number) => {
+    this.modele.timeStamps.map((timeStamp: number) => {
       let markline = [];
       markline.push({
         name: '',
@@ -208,19 +206,15 @@ export class SceneComponent implements OnInit {
   }
 
   updateChart() {
-    let series = [];
-
-    this.curves.forEach((curve) => {
-      let serie = {
+    let series:any[] = this.curves.map(curve => (
+      {
         name: curve.name,
         type: 'line',
-        //     stack: 'x',
         data: this.graphData[curve.name],
         lineStyle: { color: curve.color },
         itemStyle: { color: curve.color },
-      };
-      series.push(serie);
-    });
+      }
+    ));
 
     // add triggers (markline)
     series.push({
@@ -232,6 +226,17 @@ export class SceneComponent implements OnInit {
         data: this.markLineData,
       },
     });
+
+    // add timeStamp (markline)
+/*     series.push({
+      name: 'timeStamp',
+      type: 'line',
+      //  stack: 'x',
+      data: [[50, 0]],
+      markLine: {
+        data: this.markLineData,
+      },
+    }); */
 
     this.mergeOptions = {
       series: series,
@@ -297,15 +302,14 @@ export class SceneComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (isTrigger) {
+        let event = this.getTriggerAtTime(result.coord);
         if (result.delete) {
-          let event = this.getTriggerAtTime(result.coord);
-
           const index = this.modele.triggeredEvents.indexOf(event);
           if (index > -1) this.modele.triggeredEvents.splice(index, 1);
         } else if (result) {
           // update the time of the trigger
           if (edition)
-            this.getTriggerAtTime(result.coord).time = Number(result.xAxis);
+            event.time = Number(result.xAxis);
           else {
             let event = new Trigger({
               time: Number(result.xAxis),
@@ -313,7 +317,6 @@ export class SceneComponent implements OnInit {
             });
             this.modele.triggeredEvents.push(event);
           }
-
           this.updateTrigger.emit(this.modele.triggeredEvents);
         }
       } else {

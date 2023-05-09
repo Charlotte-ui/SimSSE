@@ -40,12 +40,7 @@ export class Modele extends Vertex implements Listable{
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {
-        let res: T[] = []
-
-        list.forEach(element => {
-            res.push(new Modele(element) as T)
-        });
-        return res;
+        return list.map(element => new Modele(element) as T)
     }
 
     

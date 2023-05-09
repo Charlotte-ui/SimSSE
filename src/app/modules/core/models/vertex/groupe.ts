@@ -29,12 +29,6 @@ export class Groupe extends Vertex{
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {
-        let res: T[] = [];
-        list.forEach((element) => {
-          element['id'] = element['@rid'].substring(1); // delete the #
-          res.push(new Groupe(element) as T);
-        });
-    
-        return res;
-      }
+      return list.map(element => new Groupe(element) as T)
+    }
 }

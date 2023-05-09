@@ -84,7 +84,7 @@ export class ScenarioComponent implements OnInit {
           })
         )
         .subscribe((result: [Modele, Profil][]) => {
-          groupePlastron.forEach((plastron: Plastron, index: number) => {
+          groupePlastron.map((plastron: Plastron, index: number) => {
             plastron.modele = result[index][0];
             plastron.profil = result[index][1];
           });

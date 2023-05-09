@@ -74,6 +74,7 @@ export class Button {
 
   public getButtonByType(type: string): IButton | undefined {
     let res = Button.buttons[0];
+    
     Button.buttons.forEach((button) => {
       if (type == button.type) res = button;
     });

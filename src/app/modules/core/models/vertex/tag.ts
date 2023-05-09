@@ -11,11 +11,6 @@ export class Tag extends Vertex {
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {
-        let res: T[] = []
-
-        list.forEach(element => {
-            res.push(new Tag(element) as T)
-        });
-        return res;
+        return list.map(element => new Tag(element) as T)
     }
 }

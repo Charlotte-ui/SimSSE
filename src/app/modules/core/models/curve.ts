@@ -178,8 +178,6 @@ export class Curve {
     timer.counter++;
     if (timer.counter == timer.duration) { // if the timer has ended
 
-      console.log("add the end timer trigger at time "+(t+1))
-
       triggeredEvents.push(
         new Trigger({ time: t+1, id: timer.id, editable: false })
       );
@@ -190,7 +188,8 @@ export class Curve {
   }
 
   private setAllNodesStatesToFalse(graph: Graph) {
-    graph.nodes.forEach((node) => {
+
+    graph.nodes.map((node:Node) => {
       node.state = false;
       if (node.type == NodeType.graph)
         this.setAllNodesStatesToFalse(node as Graph);
@@ -208,6 +207,7 @@ export class Curve {
 
   getNodeByID(id: string, graph: Graph): Node {
     let result = undefined;
+
     graph.nodes.forEach((node: Node) => {
       if (node.id == id) result = node;
     });

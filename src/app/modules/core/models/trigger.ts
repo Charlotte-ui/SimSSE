@@ -12,12 +12,7 @@ export class Trigger extends Vertex {
         this.editable = (object?.editable !== undefined)?object.editable:true;
     }
 
-    public static override instanciateListe<T>(list: any[]): T[] {
-        let res: T[] = []
-
-        list.forEach(element => {
-            res.push(new Trigger(element) as T)
-        });
-        return res;
+    public static override instanciateListe<T>(list: any[]): T[] {  
+        return list.map(element => new Trigger(element) as T)
     }
 }

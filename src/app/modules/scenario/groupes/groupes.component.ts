@@ -61,10 +61,9 @@ export class GroupesComponent {
   }
 
   initPosition() {
-    this.groupPositions = [];
-    this.groupes.forEach((groupe) => {
-      this.groupPositions.push([groupe.x,groupe.y,groupe.scene]);
-    });
+    this.groupPositions = this.groupes.map(groupe => (
+      [groupe.x,groupe.y,groupe.scene]
+    ));
 
     this.groupPositions.push(this.PRV);
     this.groupPositions.push(this.PMA);

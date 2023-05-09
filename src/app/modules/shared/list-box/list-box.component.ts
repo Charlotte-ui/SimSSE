@@ -51,7 +51,7 @@ export class ListBoxComponent<T extends Listable> {
           })
         )
         .subscribe((TagsArray: Tag[][]) => {
-          this.elements.forEach((element: T, index: number) => {
+          this.elements.map((element: T, index: number) => {
             element.tags = TagsArray[index];
           });
         });

@@ -42,7 +42,7 @@ export class PlastronComponent implements OnInit {
 
   allTags!: Tag[];
 
-  curves!:Curve[];
+  curves!: Curve[];
 
   constructor(
     private route: ActivatedRoute,
@@ -87,67 +87,64 @@ export class PlastronComponent implements OnInit {
         this.initTrigger();
         this.initVariables();
       });
- 
+
     /**
      * init tags
      */
-    this.tagService.getAllTags('modele').subscribe((response:Tag[]) => {
+    this.tagService.getAllTags('modele').subscribe((response: Tag[]) => {
       this.allTags = response;
     });
-
   }
 
   initTrigger() {
     this.modelService
       .getTrigger(this.plastron.modele.id)
       .subscribe((result: any) => {
-        result.$a.forEach((event: Event, index: number) => {
-          this.plastron.modele.triggeredEvents.push(
+        this.plastron.modele.triggeredEvents = result.$a.map(
+          (event: Event, index: number) =>
             new Trigger({
               time: result.$b[index].time,
-              id: event.event, // replace by template
+              id: event.event,
             })
-          );
-        });
+        );
       });
   }
 
   /**
-     * init target variables
-     */
+   * init target variables
+   */
   initVariables() {
     this.regleService
       .getVariableTemplate()
       .pipe(
-        switchMap((variablesTemplates:VariablePhysioTemplate[]) => {
+        switchMap((variablesTemplates: VariablePhysioTemplate[]) => {
           this.variablesTemplate = variablesTemplates;
 
-          const requests = variablesTemplates.map((varTemp:VariablePhysioTemplate) => 
-          this.profilService
-            .getVariable(this.plastron.profil.id, varTemp.id)
+          const requests = variablesTemplates.map(
+            (varTemp: VariablePhysioTemplate) =>
+              this.profilService.getVariable(
+                this.plastron.profil.id,
+                varTemp.id
+              )
           );
-            return concat(requests).pipe(
-              zipAll()
-            );
-
+          return concat(requests).pipe(zipAll());
         })
       )
-      .subscribe((variables:VariablePhysioInstance[]) => {
-        this.plastron.profil.targetVariable = variables ;
+      .subscribe((variables: VariablePhysioInstance[]) => {
+        this.plastron.profil.targetVariable = variables;
 
-        variables.forEach((variable:VariablePhysioInstance,index:number) => {
+        variables.forEach((variable: VariablePhysioInstance, index: number) => {
           if (variable.id == '')
-                this.plastron.modele.createVariableCible(
-                  this.variablesTemplate[index]
-                ); // si la variable cible n'existe pas, on la crée
-              else {
-                variable.name = this.variablesTemplate[index].name;
-                variable.color = this.variablesTemplate[index].color;
-                variable.template = this.variablesTemplate[index].id;
-              }
+            this.plastron.modele.createVariableCible(
+              this.variablesTemplate[index]
+            );
+          // si la variable cible n'existe pas, on la crée
+          else {
+            variable.name = this.variablesTemplate[index].name;
+            variable.color = this.variablesTemplate[index].color;
+            variable.template = this.variablesTemplate[index].id;
+          }
         });
-              
-        
       });
   }
 
@@ -223,11 +220,8 @@ export class PlastronComponent implements OnInit {
 
   exportAsPdf(event: boolean) {
     if (event) {
-
-      
-
-      new Pdf(this.plastron.modele,this.curves);
-/* 
+      new Pdf(this.plastron.modele, this.curves);
+      /* 
       // Default export is a4 paper, portrait, using millimeters for units
       const doc = new jsPDF();
       doc.text('EXERCICE ORSEC', 80, 20);
@@ -244,16 +238,7 @@ export class PlastronComponent implements OnInit {
       doc.text( "Do you like that?",20,20);
       doc.save('a4.pdf'); */
 
-
-  
-      
-    
-     
-    // Margins:
-   
-    
-  
-    
+      // Margins:
     }
   }
 }

@@ -76,7 +76,7 @@ export class EditeurComponent implements OnInit {
           this.modele.graph.links = result[1];
 
           // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-          this.modele.graph.links.forEach((link: Link) => {
+          this.modele.graph.links.map((link: Link) => {
             let nodeSource = getNodeByID(link.out);
             if (nodeSource.type == NodeType.event)
               link.out = (nodeSource as Event).event;
@@ -238,11 +238,14 @@ export class EditeurComponent implements OnInit {
         graphTemplate.links = result[1];
 
         // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-        graphTemplate.links.forEach((link: Link) => {
+        graphTemplate.links.map((link: Link) => {
           let nodeSource = getNodeByID(link.out);
           if (nodeSource.type == NodeType.event)
             link.out = (nodeSource as Event).event;
         });
+
+
+
 
         // TODO : créer de nouveaux node and links avec de nouveaux id ?
         group.links = structuredClone(graphTemplate.links);
@@ -367,15 +370,4 @@ export class EditeurComponent implements OnInit {
     });
     return res;
   }
-
-  // tools
-  /*
-  isNodeTrigger(nodeTriggers,node):boolean|undefined{
-    let res = undefined;
-    nodeTriggers.forEach(nodeTrigger => {
-      if (nodeTrigger[0] == node.id) res = nodeTrigger[1];// res is true si le trigger est un start, false si c'est un stop
-      }
-    );
-    return res;
-  } */
 }

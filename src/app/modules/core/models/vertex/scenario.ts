@@ -29,12 +29,8 @@ export class Scenario extends Vertex implements Listable {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    let res: T[] = [];
-   
-    list.forEach((element) => {
-      res.push(new Scenario(element) as T);
-    });
+  
+    return list.map(element => new Scenario(element) as T)
 
-    return res;
   }
 }

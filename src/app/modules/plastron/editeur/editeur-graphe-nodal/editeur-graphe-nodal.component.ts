@@ -108,13 +108,13 @@ export class EditeurGrapheNodalComponent implements OnInit {
   @ViewChild('graphScene') graphScene: ElementRef;
 
   constructor(public dialog: MatDialog) {
-    Button.buttons.forEach((button) => {
-      this.categories.push({
+    this.categories = Button.buttons.map(button => (
+     {
         name: button.type,
         itemStyle: { color: button.color },
         symbol: button.symbol,
-      });
-    });
+      }
+    ));
   }
 
   ngOnInit(): void {}
