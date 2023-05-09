@@ -166,17 +166,15 @@ export class EditeurGrapheNodalComponent implements OnInit {
   }
 
   initGraphLink() {
-    this.graphLink = new Array(this.graph.links.length);
+    this.graphLink = this.graph.links.map(link=> this.parseLinkIntoGraphLink(link))
+  }
 
-    this.graph.links.forEach((link: Link, index: number) => {
-      let color = link.start ? GREEN : RED;
-      //let source = (Number.isNaN(Number(link.out)))?link.out:Number(link.out);
-      this.graphLink[index] = {
-        source: link.out, //source, // name of the node
-        target: link.in, // id of the node
-        lineStyle: { color: color },
+  parseLinkIntoGraphLink(link?:Link):any{
+     return {
+        source: link?.out,
+        target: link?.in, 
+        lineStyle: { color: link?.start ? GREEN : RED },
       };
-    });
   }
 
   //updateurs
@@ -281,7 +279,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
             this.graph.nodes.splice(index, 1);
             this.graphData.splice(index, 1);
           } else {
-            result.x = node.x;
+            result.x = node.x; // keep the update node coordinate
             result.y = node.y;
             this.graph.nodes[index] = result;
             this.graphData[index].name = result.name;
@@ -301,21 +299,12 @@ export class EditeurGrapheNodalComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result)
       if (result) {
         if (result.delete) {
           this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);
         } else {
-          console.log(this.graph.links)
-          this.graph.links[index] = result;
-          this.graphLink[index] = {
-            source: result.out,
-            target: result.in,
-            lineStyle: {
-              color: result.start ? '#2E933C' : '#DE1A1A',
-            },
-          };
+          this.graphLink[index] = this.parseLinkIntoGraphLink(this.graph.links[index])
         }
         this.updateChart();
         this.updateLink.emit([result, index]);

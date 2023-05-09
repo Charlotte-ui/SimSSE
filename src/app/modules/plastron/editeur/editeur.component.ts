@@ -286,7 +286,23 @@ export class EditeurComponent implements OnInit {
     } else {
       let node = event[0] as Node;
       let index = event[1];
-      this.modele.graph.nodes[index] = node;
+
+      if (node.type == NodeType.event){
+
+        let oldEvent = (node as Event).template.id;
+
+        // update template
+        (node as Event).template = Action.getActionByID((node as Event).event)
+
+          this.modele.graph.links.forEach((link) => {
+            if (link.in == oldEvent) link.in = (node as Event).event
+            if (link.out == oldEvent) link.out = (node as Event).event
+          });
+
+ 
+        // TODO update template
+      }
+    //  this.modele.graph.nodes[index] = node;
       /*       if (node.type == 'trend') {
         // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
         let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
@@ -301,9 +317,6 @@ export class EditeurComponent implements OnInit {
   }
 
   updateLinks(event) {
-    console.log("updateLinks")
-        console.log(event)
-
     // let index = Number(event[1])
     this.updateCurve();
     this.newChange.emit(true);
