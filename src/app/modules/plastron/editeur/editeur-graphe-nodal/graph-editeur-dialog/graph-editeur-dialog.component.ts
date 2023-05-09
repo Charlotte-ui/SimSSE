@@ -21,6 +21,7 @@ export class GraphEditeurDialogComponent {
       console.log("GraphDialogComponent")
 
       this.graph = this.data;
+      console.log(this.graph)
 
   }
 
