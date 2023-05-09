@@ -57,7 +57,7 @@ export class ApiService {
   getClasseElementsWhithMatchingChamp<T extends Vertex>(
     classe: typeof Vertex,
     champ: string,
-    value: string|boolean
+    value: string | boolean
   ): Observable<T[]> {
     return this.http
       .get<any>(
@@ -80,15 +80,42 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid='${rid}')
 	$b= (SELECT from ${relation} WHERE out='${rid}')`);
   }
 
-    getLinkAndRelationFromMultiple(arrayRid: string[], relation: string, classe: string) {
+  getLinkAndRelationFromMultiple(
+    arrayRid: string[],
+    relation: string,
+    classe: string
+  ) {
     return this.http
       .get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT $a, $b 
 let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arrayRid}]),
 	$b= (SELECT from ${relation} WHERE out in [${arrayRid}])`);
   }
 
-    getLinkFromMultiple(arrayRid: string[], relation: string) {
+  getLinkFromMultiple(arrayRid: string[], relation: string) {
+    return this.http.get<any>(
+      `${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE out in [${arrayRid}]`
+    );
+  }
+
+  updateProprertyOfVertex(id: string, champ: string, value: string) {
     return this.http
-      .get<any>(`${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE out in [${arrayRid}]`);
+      .put<any>(
+        `${environment.urlAPI}/command/simsse/sql/UPDATE ${id} SET ${champ}='${value}'`,
+        {}
+      )
+      .subscribe(() => {
+        console.log('updateProprertyOfVertex ' + id);
+      });
+  }
+
+  updateDocument(id: string, document, classe: string) {
+    let content = document;
+    content['@class'] = classe;
+
+    return this.http
+      .patch<any>(`${environment.urlAPI}/document/simsse/${id}`, content)
+      .subscribe(() => {
+        console.log('updateDocument ' + id);
+      });
   }
 }

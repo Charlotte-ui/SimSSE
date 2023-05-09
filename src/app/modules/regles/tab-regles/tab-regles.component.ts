@@ -34,7 +34,6 @@ export class TabReglesComponent<T> {
       if (index > -1) this.displayedColumns.splice(index, 1);
       this.displayedColumns.push('edit');
       this.displayedColumns.push('delete');
-      console.log(this.displayedColumns);
       this.dataSource = this.elements;
     }
   }

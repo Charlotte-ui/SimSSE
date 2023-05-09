@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Profil } from '../../core/models/vertex/profil';
 import { ProfilService } from '../../core/services/profil.service';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-profil',
@@ -19,12 +20,18 @@ export class ProfilComponent implements OnInit {
     if (value) {
       this._profil = value;
       this.form = this.fb.group(value);
+
+      this.form.get('age').valueChanges.subscribe((newAge:number) => {
+        console.log("newAge "+newAge)
+        //this.apiService.updateProprertyOfVertex(value.id,"age",newAge.toString())
+        this.apiService.updateDocument(value.id,value,"Profil")
+    })
     }
   }
 
   @Output() newChange = new EventEmitter<boolean>();
 
-  constructor(private fb: FormBuilder, public profilService: ProfilService) {}
+  constructor(private fb: FormBuilder, public profilService: ProfilService, public apiService:ApiService) {}
 
   ngOnInit(): void {}
 

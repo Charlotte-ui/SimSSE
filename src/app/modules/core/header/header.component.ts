@@ -26,14 +26,12 @@ export class HeaderComponent implements OnInit {
   }
 
   goToAccueil() {
-    console.log("go to accueil")
     this.router.navigate(['/accueil/']);
   }
 
   goToScenario() {
     if (this.plastron) {
       // si plastron n'est pas initialisé, pas besoin de changer de page
-      console.log(this.scenario);
       this.router.navigate(['/scenario/' + this.scenario.id]);
     }
   }
@@ -46,7 +44,7 @@ export class HeaderComponent implements OnInit {
     this.newSave.emit(true);
   }
 
-    saveAsPDF() {
+  saveAsPDF() {
     this.newPDF.emit(true);
   }
 }

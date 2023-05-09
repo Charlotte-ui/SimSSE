@@ -147,10 +147,7 @@ export class SceneComponent implements OnInit {
     });
 
     this.markLineData = [];
-    console.log('updateMarklineData');
-    console.log('this.modele.timeStamps');
 
-    console.log(this.modele.timeStamps);
     this.modele.triggeredEvents.forEach((event: Trigger) => {
       // time id
       let markline = [];
@@ -189,28 +186,25 @@ export class SceneComponent implements OnInit {
 
         this.markLineData.push(markline);
       }
-
-
-
     });
 
-    this.modele.timeStamps.forEach((timeStamp:number) => {
+    this.modele.timeStamps.forEach((timeStamp: number) => {
       let markline = [];
       markline.push({
-        name: "",
+        name: '',
         xAxis: timeStamp,
         yAxis: 0,
-        lineStyle: {color: "#6c757d" },
+        lineStyle: { color: '#6c757d' },
       });
       markline.push({
         name: 'end',
         xAxis: timeStamp,
         yAxis: this.markLineY,
-        lineStyle: { color: "#6c757d" },
+        lineStyle: { color: '#6c757d' },
       });
 
       this.markLineData.push(markline);
-    })
+    });
   }
 
   updateChart() {
@@ -322,17 +316,16 @@ export class SceneComponent implements OnInit {
 
           this.updateTrigger.emit(this.modele.triggeredEvents);
         }
-    
       } else {
         if (result.delete) {
           let index = this.modele.timeStamps.indexOf(result.coord);
           if (index > -1) this.modele.timeStamps.splice(index, 1);
         } else if (result) {
-          if (edition){
+          if (edition) {
             let index = this.modele.timeStamps.indexOf(result.coord);
-            if (index > -1) this.modele.timeStamps[index] = Number(result.xAxis);
-          }
-          else {
+            if (index > -1)
+              this.modele.timeStamps[index] = Number(result.xAxis);
+          } else {
             this.modele.timeStamps.push(result.xAxis);
           }
         }

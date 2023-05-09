@@ -301,19 +301,20 @@ export class EditeurGrapheNodalComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
+      console.log(result)
       if (result) {
         if (result.delete) {
           this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);
         } else {
+          console.log(this.graph.links)
           this.graph.links[index] = result;
           this.graphLink[index] = {
-            source: Number(result.source),
-            target: Number(result.target),
+            source: result.out,
+            target: result.in,
             lineStyle: {
               color: result.start ? '#2E933C' : '#DE1A1A',
             },
-            //TODO debbug color
           };
         }
         this.updateChart();

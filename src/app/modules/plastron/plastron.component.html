@@ -28,8 +28,8 @@
       (newChange)="changeModele()"
     ></app-tags-descriptions>
   </mat-tab>
-  <mat-tab label="Profil">
-    *ngIf="plastron.profil"
+  <mat-tab *ngIf="plastron.profil" label="Profil">
+    
     <app-profil [profil]="plastron.profil" (newChange)="changeProfil()"></app-profil>
   </mat-tab>
 </mat-tab-group>

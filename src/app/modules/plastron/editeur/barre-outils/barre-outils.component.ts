@@ -109,7 +109,6 @@ export class BarreOutilsComponent implements OnInit {
   getTemplate(listTemplate: any[], id): any {
     let res = undefined;
     listTemplate.forEach((template) => {
-      console.log(template)
       if (template.id == id) res = template;
     });
 

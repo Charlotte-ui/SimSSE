@@ -7,41 +7,39 @@ import { Router } from '@angular/router';
 
 interface User {
   login: string;
-  token:string;
+  token: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-    constructor(private http: HttpClient,private router: Router) {}
-    login(login:string,mdp:string){
-      //http://localhost:2480/connect/simsse 
-      let token = btoa(login+":"+mdp);
-      this.http
+  constructor(private http: HttpClient, private router: Router) {}
+  login(login: string, mdp: string) {
+    //http://localhost:2480/connect/simsse
+    let token = btoa(login + ':' + mdp);
+    this.http
       .get<any>(`${environment.urlAPI}/connect/simsse`, {
-          headers: { Authorization: 'Basic '+token },
-       //   params: { userId: userId },
+        headers: { Authorization: 'Basic ' + token },
+        //   params: { userId: userId },
       })
       .subscribe((response: any) => {
-          console.log("connexion") // TODO ; vérifier que erreur si mauvais mdp
-          localStorage.setItem('currentUser', token);
-          this.router.navigate(['/accueil']);
+        localStorage.setItem('currentUser', token);
+        this.router.navigate(['/accueil']);
       });
-    }
+  }
 
-    getUserInfo(u_login: string): Observable<User[]> {
+  getUserInfo(u_login: string): Observable<User[]> {
+    return this.http.post<any>(`${environment.urlAPI}/users/getInfo`, {
+      u_login,
+    });
+  }
+  isAdmin(u_login: string) {
+    return this.http.post<any>(`${environment.urlAPI}/users/isAdmin`, {
+      u_login,
+    });
+  }
 
-        return this.http.post<any>(`${environment.urlAPI}/users/getInfo`, {
-            u_login,
-        });
-    }
-    isAdmin(u_login: string) {
-        return this.http.post<any>(`${environment.urlAPI}/users/isAdmin`, {
-            u_login,
-        });
-    }
-
-    logout() {
-        // remove user from local storage and set current user to null
-        localStorage.clear();
-    }
+  logout() {
+    // remove user from local storage and set current user to null
+    localStorage.clear();
+  }
 }

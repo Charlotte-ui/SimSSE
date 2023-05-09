@@ -220,9 +220,6 @@ export class EditeurComponent implements OnInit {
   }
 
   initGroup(group: Graph) {
-    console.log('initGroup');
-    console.log(group);
-
     let graphTemplate = Graph.getGraphByID(group.template.toString());
 
     this.initGraph(graphTemplate).subscribe(
@@ -269,8 +266,6 @@ export class EditeurComponent implements OnInit {
       element.id = indice;
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       else this.modele.graph.nodes.push(element as Node);
-      console.log('this.modele');
-      console.log(this.modele);
     }
     this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
     this.updateCurve();
@@ -291,8 +286,6 @@ export class EditeurComponent implements OnInit {
     } else {
       let node = event[0] as Node;
       let index = event[1];
-      console.log('newnode');
-      console.log(node);
       this.modele.graph.nodes[index] = node;
       /*       if (node.type == 'trend') {
         // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
@@ -308,6 +301,9 @@ export class EditeurComponent implements OnInit {
   }
 
   updateLinks(event) {
+    console.log("updateLinks")
+        console.log(event)
+
     // let index = Number(event[1])
     this.updateCurve();
     this.newChange.emit(true);
