@@ -9,8 +9,9 @@ import { ApiService } from '../../core/services/api.service';
 import { Scenario } from '../../core/models/vertex/scenario';
 import { Vertex } from '../../core/models/vertex/vertex';
 import { TagService } from '../../core/services/tag.service';
-import { concat, finalize, switchMap, zipAll } from 'rxjs';
+import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../core/models/vertex/tag';
+import { Triage } from '../../core/models/vertex/modele';
 
 @Component({
   selector: 'app-list-box',
@@ -20,9 +21,12 @@ import { Tag } from '../../core/models/vertex/tag';
 export class ListBoxComponent<T extends Listable> {
   keys;
   elements!: T[];
+  triages:Triage[] = [Triage.EU,Triage.UA,Triage.UR]
+
+  filterTagElement!: string[];
+  filterTriageElement!: string[];
 
   @Input() chips!: Tag[];
-
   @Input() title!: string;
   @Input() subTitle!: string;
 
@@ -67,10 +71,15 @@ export class ListBoxComponent<T extends Listable> {
     public tagService: TagService
   ) {
     this.elements = [];
+    this.filterTagElement = [];
+    this.filterTriageElement = [];
   }
 
   intElements(elements: T[]) {
     this.elements = elements;
+    this.filterTagElement = [...elements.map(element=>(element.title))]
+    this.filterTriageElement = [...elements.map(element=>(element.title))]
+
     this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
     const index = this.keys.indexOf('template', 0);
     if (index > -1) this.keys.splice(index, 1);
@@ -104,13 +113,57 @@ export class ListBoxComponent<T extends Listable> {
     moveItemInArray(this.elements, event.previousIndex, event.previousIndex);
   }
 
-  changeFilter(event) {
+  changeFilterTag(event) {
     let filter = event.value;
-
+    console.log("filter ")
+    console.log(filter)
+    this.filterTagElement=[];
     this.elements.forEach((element) => {
-      if (element.tags.filter((value) => filter.includes(value)).length > 0) {
+      console.log("tags")
+      console.log(element.tags)
+      console.log("tags filtrées")
+      console.log(element.tags.filter((tag:Tag) => filter.includes(tag.value)))
+      if (element.tags.filter((tag:Tag) => filter.includes(tag.value)).length > 0){
+        this.filterTagElement.push(element.title);
+      }
+       
+    });
+
+    console.log("filter tag")
+    console.log(this.filterTagElement)
+
+    this.changeFilter();
+  }
+
+  
+  changeFilterTriage(event) {
+    let filter = event.value;
+       console.log("filter ")
+    console.log(filter)
+    this.filterTriageElement=[];
+    this.elements.forEach((element) => {
+       console.log("triage "+element.title)
+      console.log(element["triage"])
+      console.log("triage filtrées")
+      console.log(filter.indexOf(element["triage"]))
+      if (filter.indexOf(element["triage"])>=0)
+        this.filterTriageElement.push(element.title);
+    });
+
+        console.log("filter filterTriageElement")
+    console.log(this.filterTriageElement)
+
+    this.changeFilter();
+  }
+
+  changeFilter() {
+    this.elements.forEach((element) => {
+      if (
+        this.filterTagElement.indexOf(element.title) >= 0 &&
+        this.filterTriageElement.indexOf(element.title) >= 0
+      )
         element['show'] = true;
-      } else element['show'] = false;
+      else element['show'] = false;
     });
   }
 }

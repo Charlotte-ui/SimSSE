@@ -9,14 +9,24 @@
     <mat-card-subtitle>{{ subTitle }}</mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
+
+    <div class="container" *ngIf="keys?.indexOf('triage')>0">
+      Triage
+      <mat-chip-listbox multiple="true" (change)="changeFilterTriage($event)">
+        <mat-chip-option *ngFor="let triage of triages" selected>{{
+        triage
+          }}</mat-chip-option>
+      </mat-chip-listbox>
+    </div>
+
     <div class="container">
+      Tags
       <mat-chip-listbox
-        aria-label="Fish selection"
         multiple="true"
-        (change)="changeFilter($event)"
+        (change)="changeFilterTag($event)"
       >
         <mat-chip-option *ngFor="let chip of chips; index as i" selected>{{
-          chip
+          chip.value
         }}</mat-chip-option>
       </mat-chip-listbox>
     </div>

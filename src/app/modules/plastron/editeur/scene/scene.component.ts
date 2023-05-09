@@ -265,16 +265,7 @@ export class SceneComponent implements OnInit {
   }
 
   addTrigger() {
-    let newTrigger = {
-      name: '',
-      xAxis: 0,
-      yAxis: 0,
-      coord: [0, 0],
-      type: null,
-      id: '',
-    };
-
-    this.openTriggerDialog(newTrigger, false, true);
+    this.openTriggerDialog(new Trigger(), false, true);
   }
 
   addTimeStamp() {
@@ -301,6 +292,7 @@ export class SceneComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
+      if(result){
       if (isTrigger) {
         let event = this.getTriggerAtTime(result.coord);
         if (result.delete) {
@@ -334,7 +326,9 @@ export class SceneComponent implements OnInit {
         }
       }
       this.initGraphData();
+    }
     });
+  
   }
 
   // tools
