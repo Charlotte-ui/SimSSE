@@ -20,9 +20,6 @@ export class InspecteurComponent implements OnInit {
   }
 
   setNewVariable(oldVar:VariablePhysioInstance,newVar:VariablePhysioInstance){
-    console.log("setNewVariable")
-    console.log(oldVar)
-    console.log(newVar)
     const index = this.variables.indexOf(oldVar);
     //if (index > -1) this.variables[index] = newVar;
     this.updateVariable.emit([newVar,index]);

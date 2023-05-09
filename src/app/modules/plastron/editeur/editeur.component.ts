@@ -10,31 +10,17 @@ import {
   Action,
   NodeType,
   EventType,
-  Timer,
 } from '../../core/models/vertex/node';
 import {
-  VariablePhysio,
   VariablePhysioInstance,
   VariablePhysioTemplate,
 } from '../../core/models/vertex/variablePhysio';
-import { Target } from '@angular/compiler';
 import { RegleService } from '../../core/services/regle.service';
 import { NodeService } from '../../core/services/node.service';
-import { GraphDialogComponent } from './graph-dialog/graph-dialog.component';
-import {
-  Observable,
-  concat,
-  forkJoin,
-  of,
-  retry,
-  switchMap,
-  zipAll,
-} from 'rxjs';
+import { Observable, concat, forkJoin, of, switchMap, zipAll } from 'rxjs';
 import { Modele } from '../../core/models/vertex/modele';
 import { Curve } from '../../core/models/curve';
 import { ModeleService } from '../../core/services/modele.service';
-import { ApiService } from '../../core/services/api.service';
-import { trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-editeur',
@@ -66,46 +52,47 @@ export class EditeurComponent implements OnInit {
   @Input() set modele(value: Modele) {
     if (value) {
       this._modele = value;
-      this.modelService.getGraph(this.modele.id).subscribe((graph: Graph) => {
-        this.modele.graph = graph;
-        this.initGraph(this.modele.graph).subscribe(
-          (result: [(BioEvent | Action)[], Link[]]) => {
-            let getNodeByID = function (id: string): Node {
-              let result = undefined;
-              graph.nodes.forEach((node: Node) => {
-                if (node.id == id) result = node;
-              });
-              return result;
-            };
-
-        
-            graph.nodes.map((node:Node,index:number) =>{
-              if (node['template']) node['template'] = result[0][index];
-            })
-
-            graph.links = result[1];
-
-            // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-            graph.links.forEach((link: Link) => {
-              let nodeSource = getNodeByID(link.out);
-              if (nodeSource.type == NodeType.event)
-                link.out = (nodeSource as Event).event;
+      this.modelService
+        .getGraph(this.modele.id)
+        .pipe(
+          switchMap((graph: Graph) => {
+            this.modele.graph = graph;
+            return this.initGraph(this.modele.graph);
+          })
+        )
+        .subscribe((result: [(BioEvent | Action)[], Link[]]) => {
+          let getNodeByID = (id: string): Node => {
+            let result = undefined;
+            this.modele.graph.nodes.forEach((node: Node) => {
+              if (node.id == id) result = node;
             });
+            return result;
+          };
 
-            // if the initialized graph is the root graph
-            if (this.targetVariable) {
-              this.modele.graph = graph;
-              this.initCurves();
-              this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
-            }
+          this.modele.graph.nodes.map((node: Node, index: number) => {
+            if (node['template']) node['template'] = result[0][index];
+          });
 
-            // TODO : find the rigth place foor that
-            this.trends = [];
-            this.events = [];
-            this.initTrendsEventsRecursive(this.modele.graph);
+          this.modele.graph.links = result[1];
+
+          // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
+          this.modele.graph.links.forEach((link: Link) => {
+            let nodeSource = getNodeByID(link.out);
+            if (nodeSource.type == NodeType.event)
+              link.out = (nodeSource as Event).event;
+          });
+
+          // if the initialized graph is the root graph
+          if (this.targetVariable) {
+            this.initCurves();
+            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           }
-        );
-      });
+
+          // TODO : find the rigth place foor that
+          this.trends = [];
+          this.events = [];
+          this.initTrendsEventsRecursive(this.modele.graph);
+        });
     }
   }
 
@@ -239,36 +226,34 @@ export class EditeurComponent implements OnInit {
     let graphTemplate = Graph.getGraphByID(group.template.toString());
 
     this.initGraph(graphTemplate).subscribe(
-          (result: [(BioEvent | Action)[], Link[]]) => {
-            let getNodeByID = function (id: string): Node {
-              let result = undefined;
-              graphTemplate.nodes.forEach((node: Node) => {
-                if (node.id == id) result = node;
-              });
-              return result;
-            };
-            graphTemplate.nodes.map((node:Node,index:number) =>{
-              if (node['template']) node['template'] = result[0][index];
-            })
+      (result: [(BioEvent | Action)[], Link[]]) => {
+        let getNodeByID = function (id: string): Node {
+          let result = undefined;
+          graphTemplate.nodes.forEach((node: Node) => {
+            if (node.id == id) result = node;
+          });
+          return result;
+        };
+        graphTemplate.nodes.map((node: Node, index: number) => {
+          if (node['template']) node['template'] = result[0][index];
+        });
 
-            graphTemplate.links = result[1];
+        graphTemplate.links = result[1];
 
-            // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-            graphTemplate.links.forEach((link: Link) => {
-              let nodeSource = getNodeByID(link.out);
-              if (nodeSource.type == NodeType.event)
-                link.out = (nodeSource as Event).event;
-            });
+        // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
+        graphTemplate.links.forEach((link: Link) => {
+          let nodeSource = getNodeByID(link.out);
+          if (nodeSource.type == NodeType.event)
+            link.out = (nodeSource as Event).event;
+        });
 
-
-            // TODO : créer de nouveaux node and links avec de nouveaux id ?
-            group.links = structuredClone(graphTemplate.links);
-            group.nodes = structuredClone(graphTemplate.nodes);
-            this.modele.graph.nodes.push(group);
-            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
-
-          }
-        );
+        // TODO : créer de nouveaux node and links avec de nouveaux id ?
+        group.links = structuredClone(graphTemplate.links);
+        group.nodes = structuredClone(graphTemplate.nodes);
+        this.modele.graph.nodes.push(group);
+        this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+      }
+    );
   }
 
   // --- UPDATEURS -----------------------------------------
