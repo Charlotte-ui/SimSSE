@@ -21,7 +21,11 @@ import { Triage } from '../../core/models/vertex/modele';
 export class ListBoxComponent<T extends Listable> {
   keys;
   elements!: T[];
-  triages:Triage[] = [Triage.EU,Triage.UA,Triage.UR]
+  triages: Triage[] = [Triage.EU, Triage.UA, Triage.UR];
+  filtreActif: boolean = false;
+
+  filterTag!: string[];
+  filterTriage!: string[];
 
   filterTagElement!: string[];
   filterTriageElement!: string[];
@@ -77,8 +81,8 @@ export class ListBoxComponent<T extends Listable> {
 
   intElements(elements: T[]) {
     this.elements = elements;
-    this.filterTagElement = [...elements.map(element=>(element.title))]
-    this.filterTriageElement = [...elements.map(element=>(element.title))]
+    this.filterTagElement = [...elements.map((element) => element.title)];
+    this.filterTriageElement = [...elements.map((element) => element.title)];
 
     this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
     const index = this.keys.indexOf('template', 0);
@@ -114,44 +118,26 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   changeFilterTag(event) {
-    let filter = event.value;
-    console.log("filter ")
-    console.log(filter)
-    this.filterTagElement=[];
+    this.filterTag = event.value;
+    this.filterTagElement = [];
     this.elements.forEach((element) => {
-      console.log("tags")
-      console.log(element.tags)
-      console.log("tags filtrées")
-      console.log(element.tags.filter((tag:Tag) => filter.includes(tag.value)))
-      if (element.tags.filter((tag:Tag) => filter.includes(tag.value)).length > 0){
+      if (
+        element.tags.filter((tag: Tag) => this.filterTag.includes(tag.value)).length > 0
+      ) {
         this.filterTagElement.push(element.title);
       }
-       
     });
-
-    console.log("filter tag")
-    console.log(this.filterTagElement)
 
     this.changeFilter();
   }
 
-  
   changeFilterTriage(event) {
-    let filter = event.value;
-       console.log("filter ")
-    console.log(filter)
-    this.filterTriageElement=[];
+    this.filterTriage = event.value;
+    this.filterTriageElement = [];
     this.elements.forEach((element) => {
-       console.log("triage "+element.title)
-      console.log(element["triage"])
-      console.log("triage filtrées")
-      console.log(filter.indexOf(element["triage"]))
-      if (filter.indexOf(element["triage"])>=0)
+      if (this.filterTriage.indexOf(element['triage']) >= 0)
         this.filterTriageElement.push(element.title);
     });
-
-        console.log("filter filterTriageElement")
-    console.log(this.filterTriageElement)
 
     this.changeFilter();
   }
@@ -165,5 +151,18 @@ export class ListBoxComponent<T extends Listable> {
         element['show'] = true;
       else element['show'] = false;
     });
+
+    this.filtreActif = true;
+  }
+
+  deleteFilter() {
+    this.filterTriageElement = [];
+    this.filterTagElement = [];
+    this.elements.map((element) => {
+      element['show'] = true;
+      this.filterTagElement.push(element.title);
+      this.filterTriageElement.push(element.title);
+    });
+    this.filtreActif = false;
   }
 }

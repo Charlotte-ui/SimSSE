@@ -1,8 +1,9 @@
 <mat-card>
   <mat-card-header>
     <mat-card-title
-      >{{ title }}
-      <button mat-mini-fab (click)="addElement()">
+      >{{ classe.className+"s" }}
+  
+      <button id="addElement" mat-icon-button (click)="addElement()" [matTooltip]="'Ajouter un '+classe.className">
         <mat-icon>add</mat-icon>
       </button>
     </mat-card-title>
@@ -10,26 +11,58 @@
   </mat-card-header>
   <mat-card-content>
 
-    <div class="container" *ngIf="keys?.indexOf('triage')>0">
-      Triage
-      <mat-chip-listbox multiple="true" (change)="changeFilterTriage($event)">
-        <mat-chip-option *ngFor="let triage of triages" selected>{{
-        triage
-          }}</mat-chip-option>
-      </mat-chip-listbox>
-    </div>
 
-    <div class="container">
-      Tags
-      <mat-chip-listbox
-        multiple="true"
-        (change)="changeFilterTag($event)"
-      >
-        <mat-chip-option *ngFor="let chip of chips; index as i" selected>{{
-          chip.value
-        }}</mat-chip-option>
-      </mat-chip-listbox>
-    </div>
+    <mat-accordion>
+      <mat-expansion-panel hideToggle>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Filtres
+          </mat-panel-title>
+          <mat-panel-description>
+            <mat-chip-listbox *ngIf="filtreActif">
+
+              <mat-chip-option *ngFor="let element of filterTag" disabled>{{
+                element
+                }}</mat-chip-option>
+                <mat-chip-option *ngFor="let element of filterTriage" disabled>{{
+                  element
+                  }}</mat-chip-option>
+            </mat-chip-listbox>
+
+            <div id="noFiltre" *ngIf="!filtreActif">Aucun filtre actif</div>
+           
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+        <button mat-button color="primary" (click)="deleteFilter()">Effacer les filtres</button>
+            <div class="container row filtre" *ngIf="keys?.indexOf('triage') > 0">
+              <div class="col-1">Triage</div>
+              <div class="col-11">
+                <mat-chip-listbox multiple="true" (change)="changeFilterTriage($event)">
+                  <mat-chip-option *ngFor="let triage of triages" selected>{{
+                    triage
+                    }}</mat-chip-option>
+                </mat-chip-listbox>
+              </div>
+            </div>
+            <div class="container row filtre">
+              <div class="col-1">Tags</div>
+              <div class="col-11">
+                <mat-chip-listbox multiple="true" (change)="changeFilterTag($event)">
+                  <mat-chip-option *ngFor="let chip of chips; index as i" selected>{{
+                    chip.value
+                    }}</mat-chip-option>
+                </mat-chip-listbox>
+              </div>
+            </div>
+
+
+      </mat-expansion-panel>
+    </mat-accordion>
+
+
+
+
+
     <mat-list
       cdkDropList
       [cdkDropListData]="elements"
