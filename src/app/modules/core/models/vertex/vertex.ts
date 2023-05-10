@@ -10,6 +10,8 @@ export class Vertex {
 
     public static instanciateListe<T>(list:any[]):T[]{return undefined}
 
+    public static getType(element):string{return "vertex"}
+
 }
 
 export class Edge {
@@ -23,5 +25,8 @@ export class Edge {
     }
 
     public static instanciateListe<T>(list:any[]):T[]{return undefined}
+
+        public static getType(element):string{return "edge"}
+
 
 }

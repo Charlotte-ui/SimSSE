@@ -12,8 +12,9 @@ import { TagService } from '../core/services/tag.service';
 import { PlastronService } from '../core/services/plastron.service';
 import { Modele } from '../core/models/vertex/modele';
 import { Profil } from '../core/models/vertex/profil';
-import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
+import { Observable, concat, forkJoin, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../core/models/vertex/tag';
+import { WaitComponent } from '../shared/wait/wait.component';
 
 @Component({
   selector: 'app-scenario',
@@ -26,6 +27,10 @@ export class ScenarioComponent implements OnInit {
   plastrons!: Plastron[];
   totalPlastron!: number;
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
+  changesToSave = false;
+
+  newScenario!: Scenario;
+  newTags!: Tag[];
 
   constructor(
     private route: ActivatedRoute,
@@ -94,7 +99,39 @@ export class ScenarioComponent implements OnInit {
     });
   }
 
-  save() {}
+  updateScenario(newScenario: Scenario) {
+    this.changesToSave = true;
+    this.newScenario = newScenario;
+  }
+
+  updateTags(newTags: Tag[]) {
+    this.changesToSave = true;
+    this.newTags = newTags;
+  }
+
+  save() {
+    let requests: Observable<any>[] = [];
+    this.dialog.open(WaitComponent);
+    if (this.newScenario)
+      requests.push(this.scenarioService.updateScenario(this.newScenario));
+
+    if (this.newTags){
+            let tagToDelete = this.scenario.tags.filter(item => this.newTags.indexOf(item) < 0)
+// TODO : dabug tag filter
+      this.newTags = this.newTags.filter(item => this.scenario.tags.indexOf(item) < 0)
+      console.log("true new tags")
+      console.log(this.newTags )
+            console.log("tagToDelete")
+      console.log(tagToDelete )
+      if(this.newTags.length>0) requests.push(this.tagService.updateTags(this.newTags,this.scenario.id));
+
+    }
+
+    forkJoin(requests).subscribe((value) => {
+      this.changesToSave = false;
+      this.dialog.closeAll();
+    });
+  }
 
   reloadPlastron(event) {}
 }

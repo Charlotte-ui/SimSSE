@@ -33,4 +33,6 @@ export class Scenario extends Vertex implements Listable {
     return list.map(element => new Scenario(element) as T)
 
   }
+
+  public static override getType(element):string{return "scenario"}
 }

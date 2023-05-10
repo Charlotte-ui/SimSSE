@@ -69,7 +69,6 @@ export class ListBoxComponent<T extends Listable> {
   @Output() newElement = new EventEmitter<T>();
 
   constructor(
-    private router: Router,
     public apiService: ApiService,
     public dialog: MatDialog,
     public tagService: TagService
@@ -90,19 +89,16 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   addElement() {
-    let newElement = {} as T;
-    this.keys.forEach((proprety) => {
-      newElement[proprety] = '';
-    });
-
+    let newElement = new this.classe()
+ 
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newElement, [], false],
+      data: [newElement,this.classe,this.triages, false,['template']],
     });
 
     dialogRef.afterClosed().subscribe((result: T) => {
       if (result) {
         this.newElement.emit(result);
-        this.elements.push(result); // add to database with template = true
+        this.elements.push(result); 
 
         console.log(this.elements);
       }

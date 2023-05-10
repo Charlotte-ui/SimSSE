@@ -3,6 +3,7 @@ import { ScenarioService } from '../../core/services/scenario.service';
 import { FormBuilder } from '@angular/forms';
 import { Scenario } from '../../core/models/vertex/scenario';
 import { TagService } from '../../core/services/tag.service';
+import { Tag } from '../../core/models/vertex/tag';
 
 @Component({
   selector: 'app-general-infos',
@@ -26,6 +27,17 @@ export class GeneralInfosComponent {
       // if value isnt undefined
       this._scenario = value;
       this.scenarioFormGroup = this.form.group(this.scenario);
+
+      console.log("scenario")
+      console.log(value)
+
+ 
+      this.scenarioFormGroup.valueChanges.subscribe((newScenario:Scenario) => {
+          console.log('form value changed')
+          console.log(newScenario)
+          this.updateScenario.emit(newScenario)
+      })
+
       this.dataTotal[0].totalPlastron =
         this.scenario.EU + this.scenario.UA + this.scenario.UR;
       this.dataTotal[0].totalParticipant =
@@ -37,6 +49,9 @@ export class GeneralInfosComponent {
   }
 
   @Output() newTotalPlastron = new EventEmitter<number>();
+  @Output() updateScenario = new EventEmitter<Scenario>();
+  @Output() updateTags = new EventEmitter<Tag[]>();
+
 
   constructor(
     private form: FormBuilder,

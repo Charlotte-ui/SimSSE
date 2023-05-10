@@ -70,7 +70,6 @@ export class TagsDescriptionsComponent {
   updateTags(tags: Tag[]) {
     this.modele.tags = tags;
     this.newChange.emit(true)
-
-    }
+  }
 
 }

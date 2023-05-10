@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, delay, map, of } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Scenario } from '../models/vertex/scenario';
@@ -11,9 +11,7 @@ import { ApiService } from './api.service';
   providedIn: 'root'
 })
 export class ScenarioService {
-  createScenario(scenario: Scenario) :Scenario{
-    throw new Error('Method not implemented.');
-  }
+  
 
   constructor(public firebaseService:FirebaseService, public apiService:ApiService) { }
 
@@ -25,6 +23,24 @@ getScenarios(): Observable<Scenario[]> {
 getScenarioById(id:string): Observable<Scenario|undefined> {
   return this.apiService.getDocument(id)
   .pipe(map(response => (new Scenario(response))))
+}
+
+/**
+ * push a new Scenario in the database
+ * return the id of the new Scenario
+ * @param scenario 
+ */
+createScenario(scenario: Scenario):Observable<string>{
+    return of("34:2").pipe ( delay( 5000 ));
+}
+
+/**
+ * push a new Scenario in the database
+ * return the id of the new Scenario
+ * @param scenario 
+ */
+updateScenario(scenario: Scenario):Observable<string>{
+    return of("34:2").pipe ( delay( 5000 ));
 }
 
 /**

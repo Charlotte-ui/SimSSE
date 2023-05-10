@@ -9,8 +9,6 @@
           </div>
         </mat-card-header>
 
-        <app-tags *ngIf="allTags" [tags]="filterTags" [allTags]="allTags"></app-tags>
-
         <table
           mat-table
           #table
@@ -85,7 +83,10 @@
             <td mat-cell *matCellDef="let element">
               <mat-form-field appearance="fill">
                 <mat-label>Statut</mat-label>
-                <mat-select [(value)]="element.statut">
+                <mat-select
+                  [(value)]="element.statut"
+                  [disabled]="element.id == -1"
+                >
                   <mat-option value="En cours">En cours</mat-option>
                   <mat-option value="A faire">A faire</mat-option>
                   <mat-option value="Terminé">Terminé</mat-option>
@@ -101,11 +102,7 @@
               <button
                 mat-icon-button
                 aria-label="expand row"
-                (click)="
-                  expandedElement =
-                    expandedElement === element ? null : element;
-                  $event.stopPropagation()
-                "
+                (click)="expandElement($event,element)"
               >
                 <mat-icon *ngIf="expandedElement !== element"
                   >keyboard_arrow_down</mat-icon
@@ -132,9 +129,6 @@
               >
                 <div class="col-3 profil">
                   <div class="age">Âge : {{ element.age }}</div>
-                  <div class="sexe">
-                    Sexe : {{ element.sexe ? "Femme" : "Homme" }}
-                  </div>
                 </div>
                 <div class="col-9 description">
                   {{ element.description }}

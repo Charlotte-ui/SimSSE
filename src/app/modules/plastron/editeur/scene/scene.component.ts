@@ -344,7 +344,7 @@ export class SceneComponent implements OnInit {
   private getNodeByID(id: string): Node {
     let result = undefined;
     this.modele.graph.nodes.forEach((node) => {
-      // event are identified by name
+      // event are identified by evnt
 
       if (node.type == NodeType.event && (node as Event).event == id)
         result = node;

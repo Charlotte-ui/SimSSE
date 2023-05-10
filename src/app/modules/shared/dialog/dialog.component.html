@@ -1,8 +1,13 @@
 <div class="container">
   <h1 mat-dialog-title>
     {{ title }}
-    <button mat-mini-fab [style.background]="getColor(node)" disabled>
-      <mat-icon [fontIcon]="getIcon(node)"></mat-icon>
+    <button
+      *ngIf="getIcon(element)"
+      mat-mini-fab
+      [style.background]="getColor(element)"
+      disabled
+    >
+      <mat-icon [fontIcon]="getIcon(element)"></mat-icon>
     </button>
   </h1>
 
@@ -16,6 +21,7 @@
             *ngIf="getType(champ) == 'text' || getType(champ) == 'number'"
             matInput
             [formControlName]="champ"
+            [formControl]="getFormControl(champ)"
             [type]="getType(champ)"
           />
 
@@ -26,12 +32,16 @@
             <mat-option *ngFor="let elem of liste" [value]="getValue(elem)">
               {{ getName(elem) }}
               <mat-icon
-                *ngIf="node.type == 'link'"
+                *ngIf="element['type'] == 'link'"
                 [fontIcon]="getIcon(elem)"
               ></mat-icon>
             </mat-option>
           </mat-select>
         </mat-form-field>
+        
+        <mat-error *ngIf="getFormControl(champ).hasError('required')">
+          {{ getLabel(champ) }} est <strong>requis</strong>
+        </mat-error>
 
         <div *ngIf="getType(champ) == 'boolean'" class="noOverflow">
           <mat-label>Effet</mat-label>

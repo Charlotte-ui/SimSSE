@@ -32,7 +32,7 @@ export class PlastronService {
     return of([]);
   }
 
-  changeModelRef(plastron: Plastron, newModele: Modele) {
+  changeModelRef(plastron: Plastron, newModeleId: string) {
    //
   }
 

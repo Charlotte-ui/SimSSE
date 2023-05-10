@@ -28,6 +28,7 @@ import {
 } from '@angular/animations';
 import { TagService } from '../../core/services/tag.service';
 import { Tag } from '../../core/models/vertex/tag';
+import { WaitComponent } from '../../shared/wait/wait.component';
 
 interface tableElementPlastron {
   title: string;
@@ -89,7 +90,7 @@ export class LotPlastronsComponent {
   /**
    * nombre total de plastron désiré pour ce scenario
    */
-  @Input() totalPlastron!: number ; 
+  @Input() totalPlastron!: number;
   @Input() scenario: Scenario;
 
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
@@ -191,9 +192,16 @@ export class LotPlastronsComponent {
   }
 
   public completePlastrons() {
-    this.dataSourcePlastron = new Array<tableElementPlastron>(this.totalPlastron)
+    console.log('this.totalPlastron');
+    console.log(this.totalPlastron);
+    this.dataSourcePlastron = new Array<tableElementPlastron>(
+      this.totalPlastron
+    )
       .fill({ ...this.defaultElementPlastron })
       .map(() => ({ ...this.defaultElementPlastron }));
+
+    // s'il n'y a encore aucun plastron dans le scenario
+    if (this.plastrons.length == 0) this.updateDataSourceTriage(0);
 
     this.plastrons.forEach((plastron, index) => {
       if (plastron.modele) this.addPlastronToDatasource(plastron, index);
@@ -206,7 +214,6 @@ export class LotPlastronsComponent {
   }
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
-
     //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
     this.dataSourcePlastron[index].title = plastron.modele.title;
     this.dataSourcePlastron[index].description = plastron.modele.description;
@@ -216,7 +223,6 @@ export class LotPlastronsComponent {
     this.dataSourcePlastron[index].idPlastron = plastron.id;
     this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
     this.dataSourcePlastron[index].age = plastron.profil.age;
-
   }
 
   private updateDataSourceTriage(indexStart: number) {
@@ -251,11 +257,20 @@ export class LotPlastronsComponent {
     });
 
     this.sortedDataSourcePlastron = this.dataSourcePlastron.slice();
-
   }
 
   createModele(modele: Modele) {
-    let newModele = this.modeleService.createNewModel(modele, true);
-    this.router.navigate(['/modele/' + newModele.id]);
+    this.dialog.open(WaitComponent);
+
+    this.modeleService.createModele(modele, true).subscribe((id) => {
+      this.router.navigate(['/modele/' + id]);
+
+      this.dialog.closeAll();
+    });
+  }
+
+  expandElement(event, element: tableElementPlastron) {
+    this.expandedElement = this.expandedElement === element ? null : element;
+    event.stopPropagation();
   }
 }

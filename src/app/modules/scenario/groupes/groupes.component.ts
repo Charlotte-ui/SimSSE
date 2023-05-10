@@ -79,7 +79,7 @@ export class GroupesComponent {
 
   openDialog(element: Partial<Groupe>, id: number) {
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, [], false],
+      data: [element,Groupe, [], false],
     });
 
     dialogRef.afterClosed().subscribe((result) => {

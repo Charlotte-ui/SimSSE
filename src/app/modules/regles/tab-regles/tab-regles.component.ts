@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { VariablePhysio } from '../../core/models/vertex/variablePhysio';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { Vertex } from '../../core/models/vertex/vertex';
 
 @Component({
   selector: 'app-tab-regles',
@@ -63,7 +64,7 @@ export class TabReglesComponent<T> {
 
     console.log(element);
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, [], false],
+      data: [element, Vertex,[], false],
     });
 
     dialogRef.afterClosed().subscribe((result) => {

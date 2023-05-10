@@ -43,6 +43,8 @@ export class Modele extends Vertex implements Listable{
         return list.map(element => new Modele(element) as T)
     }
 
+    public static override getType(element):string{return "modele"}
+
     
 
 }

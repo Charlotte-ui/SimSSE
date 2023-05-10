@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, delay, map, of } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/vertex/modele';
@@ -28,9 +28,9 @@ export class ModeleService {
     return this.getModeleById(link['in'].substring(1));
   }
 
-  createNewModel(modele: Modele, template: boolean): Modele {
-    return undefined;
-    // TODOD
+  createModele(modele: Modele, template: boolean): Observable<string> {
+    modele.template = template;
+    return of("60:0").pipe ( delay( 5000 ));
   }
 
   getGraph(id:string): Observable<Graph | undefined> {

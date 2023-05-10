@@ -1,4 +1,3 @@
-import { Collection } from "../../services/firebase.service";
 import { Vertex } from "./vertex";
 
 export class Groupe extends Vertex{
@@ -31,4 +30,7 @@ export class Groupe extends Vertex{
     public static override instanciateListe<T>(list: any[]): T[] {
       return list.map(element => new Groupe(element) as T)
     }
+
+    
+    public static override getType(element):string{return "groupe"}
 }

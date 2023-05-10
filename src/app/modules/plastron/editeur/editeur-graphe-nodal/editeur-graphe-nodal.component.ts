@@ -25,6 +25,7 @@ import {
   Node,
   BioEvent,
   Action,
+  Timer,
 } from 'src/app/modules/core/models/vertex/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
@@ -126,29 +127,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     DataName = [];
     this.graph.nodes.forEach((node: Node, index: number) => {
-      let draggable =
-        node.type == NodeType.event &&
-        (node as Event).typeEvent == EventType.start
-          ? false
-          : true;
 
-      let name;
-      let label;
-      switch (node.type) {
-        case NodeType.event:
-           label = (node as Event).template
-            ? (node as Event).template.name
-            : (node as Event).typeEvent; 
-            name = (node as Event).event
-          break;
-        case NodeType.timer:
-          name = node.type;
-          label = node.type;
-          break;
-        default:
-          name = (node as Trend | Graph).name;
-          label = (node as Trend | Graph).name;
-      }
+      let draggable = Node.getType(node)== EventType.start? false:true;
+
+      let name = Node.getName(node)
+      let label = (node.type ==  NodeType.event && (node as Event).template)?(node as Event).template.name:name;
 
       DataName.push(label);
 
@@ -253,22 +236,22 @@ export class EditeurGrapheNodalComponent implements OnInit {
         break;
       case EventType.bio:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, this.allBioevents, true],
+          data: [node,Event, this.allBioevents, true],
         });
         break;
       case EventType.action:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, this.allActions, true],
+          data: [node, Event,this.allActions, true],
         });
         break;
       case NodeType.trend:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, this.variablesTemplate, true],
+          data: [node,Trend,this.variablesTemplate, true],
         });
         break;
       case NodeType.timer:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, [], true],
+          data: [node,Timer, [], true],
         });
     }
 
@@ -295,7 +278,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
     let index = event.dataIndex;
     let link = this.graph.links[index];
     let dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, this.graph.nodes, true],
+      data: [link, Link,this.graph.nodes, true],
     });
 
     dialogRef.afterClosed().subscribe((result) => {

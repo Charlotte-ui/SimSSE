@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="col-1 buttons">
-      <button mat-icon-button (click)="removeElement()">
+      <button mat-icon-button (click)="removeElement()" [matTooltip]="'Supprimer '+element.title">
         <mat-icon>delete</mat-icon>
       </button>
     </div>

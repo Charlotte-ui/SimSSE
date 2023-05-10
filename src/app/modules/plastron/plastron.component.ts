@@ -192,9 +192,12 @@ export class PlastronComponent implements OnInit {
 
         if (result == undefined) return;
 
-        let newModele = this.modelService.createNewModel(result, true);
+        
+        this.modelService.createModele(result, true).subscribe((id:string) =>{
+          this.plastronService.changeModelRef(this.plastron, id);
+        })
 
-        this.plastronService.changeModelRef(this.plastron, newModele);
+        
       });
     }
   }

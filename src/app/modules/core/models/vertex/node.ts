@@ -16,7 +16,7 @@ export enum EventType {
   action = 'action',
 }
 
-export abstract class Node extends Vertex implements Nameable {
+export abstract class Node extends Vertex {
   x: number;
   y: number;
   type: NodeType;
@@ -32,7 +32,19 @@ export abstract class Node extends Vertex implements Nameable {
     this.state = false;
   }
 
-  abstract getName();
+  static getName(element):string{
+
+    switch (element.type) {
+      case NodeType.event:
+        return Event.getName(element)
+      case NodeType.trend:
+        return Trend.getName(element)
+      case NodeType.graph:
+        return Graph.getName(element)
+      case NodeType.timer:
+        return Timer.getName(element)
+    }
+    return ""};
 
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
@@ -54,6 +66,12 @@ export abstract class Node extends Vertex implements Nameable {
 
     return res;
   }
+
+  public static override getType(element):string{
+    if (element.type == NodeType.event) return Event.getType(element)
+    return element.type;
+  }
+
 }
 
 export class Trend extends Node {
@@ -70,8 +88,8 @@ export class Trend extends Node {
     this.parameter = object?.parameter ? object.parameter : 0;
   }
 
-  override getName(): string {
-    return this.name;
+  static override getName(element): string {
+    return element.name;
   }
 
 }
@@ -90,8 +108,12 @@ export class Event extends Node {
     this.template = object?.template ? object.template : undefined;
   }
 
-  override getName(): string {
-    return this.event;
+  static override getName(element): string {
+    return element.event;
+  }
+
+  public static override getType(element):string{
+    return element.typeEvent
   }
 }
 
@@ -114,6 +136,9 @@ export class Link extends Edge {
   public static override instanciateListe<T>(list: any[]): T[] {
     return list.map(element => new Link(element) as T)
   }
+
+  public static override getType(element):string{return "link"}
+
 }
 
 export class Graph extends Node {
@@ -136,9 +161,11 @@ export class Graph extends Node {
     Graph.graphs.push(this);
   }
 
-  override getName(): string {
-    return this.name;
+ 
+  static override getName(element): string {
+    return element.name;
   }
+
 
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
@@ -173,9 +200,11 @@ export class Timer extends Node {
     this.counter = 0;
   }
 
-  public override getName(): string {
-    return 'Timer ' + this.id;
+
+  static override getName(element): string {
+    return element.name;
   }
+
 }
 
 export class Action extends Vertex {

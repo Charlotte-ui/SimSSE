@@ -1,9 +1,13 @@
-<app-header [scenario]="scenario"></app-header>
+<app-header [scenario]="scenario"   [changesToSave]="changesToSave"
+(newSave)="save()"
+></app-header>
 <mat-tab-group (selectedTabChange)="reloadPlastron($event)">
   <mat-tab label="Infos générales">
     <app-general-infos
       [scenario]="scenario"
       (newTotalPlastron)="totalPlastron = $event"
+      (updateScenario)="updateScenario($event)"
+      (updateTags)="updateTags($event)"
     ></app-general-infos>
   </mat-tab>
   <mat-tab label="Groupes">

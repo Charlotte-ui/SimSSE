@@ -7,6 +7,8 @@ import { ModeleService } from '../core/services/modele.service';
 import { RegleService } from '../core/services/regle.service';
 import { TagService } from '../core/services/tag.service';
 import { Tag } from '../core/models/vertex/tag';
+import { MatDialog } from '@angular/material/dialog';
+import { WaitComponent } from '../shared/wait/wait.component';
 
 
 @Component({
@@ -26,7 +28,8 @@ export class AccueilComponent implements OnInit {
     public scenarioService: ScenarioService,
     public modeleService: ModeleService,
     public regleService: RegleService,
-    public tagService:TagService
+    public tagService:TagService,
+    public dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -38,13 +41,27 @@ export class AccueilComponent implements OnInit {
     });
   }
 
-  createScenario(scenario: Scenario) {
-    let newScenario = this.scenarioService.createScenario(scenario);
-    this.router.navigate(['/scenario/' + newScenario.id]);
+  createScenario(scenario: Scenario) { // add to database with template = true
+   
+    this.dialog.open(WaitComponent);
+  
+    this.scenarioService.createScenario(scenario).subscribe(id =>{
+      this.router.navigate(['/scenario/' + id]);
+
+      this.dialog.closeAll();
+    })
+    
   }
 
   createModele(modele: Modele) {
-    let newModele = this.modeleService.createNewModel(modele, true);
-    this.router.navigate(['/modele/' + newModele.id]);
+
+    this.dialog.open(WaitComponent);
+
+    this.modeleService.createModele(modele, true).subscribe(id =>{
+      this.router.navigate(['/modele/' + id]);
+
+      this.dialog.closeAll();
+    })
+    
   }
 }

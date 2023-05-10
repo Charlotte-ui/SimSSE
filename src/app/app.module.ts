@@ -44,7 +44,7 @@ import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar'; 
-
+ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner'; 
 
 import { ConnexionComponent } from './modules/core/connexion/connexion.component';
 import { HeaderComponent } from './modules/core/header/header.component';
@@ -77,6 +77,7 @@ import { GroupesComponent } from './modules/scenario/groupes/groupes.component';
 import { GeneralInfosComponent } from './modules/scenario/general-infos/general-infos.component';
 import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dialog.component';
 import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plastrons.component';
+import { WaitComponent } from './modules/shared/wait/wait.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -112,7 +113,8 @@ import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plas
     GroupesComponent,
     GeneralInfosComponent,
     ModeleDialogComponent,
-    LotPlastronsComponent
+    LotPlastronsComponent,
+    WaitComponent
   ],
   imports: [
     BrowserModule,
@@ -155,7 +157,8 @@ import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plas
     MatAutocompleteModule,
     MatSortModule,
     MatTooltipModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   providers: [ { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },

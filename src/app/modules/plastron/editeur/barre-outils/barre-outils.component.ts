@@ -71,7 +71,7 @@ export class BarreOutilsComponent implements OnInit {
     let link: Link = new Link();
 
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, this.nodes, false],
+      data: [link,Link, this.nodes, false],
     });
 
     dialogRef.afterClosed().subscribe((result: Link) => {
@@ -85,7 +85,7 @@ export class BarreOutilsComponent implements OnInit {
 
   createNode(newNode: Node, liste: any[]) {
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newNode, liste, false],
+      data: [newNode,Node, liste, false],
     });
 
     dialogRef.afterClosed().subscribe((newNode: Node) => {
