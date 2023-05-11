@@ -17,6 +17,7 @@ import { TagService } from '../../core/services/tag.service';
   styleUrls: ['./tags-descriptions.component.less']
 })
 export class TagsDescriptionsComponent {
+  oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
 
   form: FormGroup;
   _modele!: Modele;
@@ -26,7 +27,20 @@ export class TagsDescriptionsComponent {
   @Input() set modele(value:Modele ) {
     if(value){
       this._modele = value;
+
+      this.tagService.getTags(value.id,'Modele').subscribe((tags:Tag[])=>{
+        value.tags = tags ;
+        this.oldTags = [...tags]
+
+      })
+
+
+
       this.form = this.fb.group(this.wrapArray(value));
+
+      this.form.valueChanges.subscribe(value=>{
+        this.newModele.emit(this.form.value)
+      })
     }
   }
 
@@ -34,7 +48,7 @@ export class TagsDescriptionsComponent {
 
   @Input() allTags!:Tag[];
 
-  @Output() newChange = new EventEmitter<boolean>();
+  @Output() newTags = new EventEmitter<any>();
 
 
   constructor(private fb: FormBuilder,public modelService:ModeleService,public dialog: MatDialog,public regleService:RegleService,private tagService:TagService) {
@@ -68,8 +82,16 @@ export class TagsDescriptionsComponent {
   }
 
   updateTags(tags: Tag[]) {
+    let newTags = this.modele.tags.filter(
+      (tag: Tag) => this.oldTags.indexOf(tag) < 0
+    );
+
+    let tagsToDelete = this.oldTags.filter(
+      (tag: Tag) => !tag.id || this.modele.tags.indexOf(tag) < 0
+    );
+
     this.modele.tags = tags;
-    this.newChange.emit(true)
+    this.newTags.emit({newTags:newTags,tagsToDelete:tagsToDelete})
   }
 
 }

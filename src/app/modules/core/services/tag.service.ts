@@ -64,7 +64,7 @@ export class TagService {
     return forkJoin(requests).pipe(
       switchMap((indexes: string[]) => {
         const requests = indexes.map((index: string) =>
-          this.apiService.createRelationBetween(index, sourceId, 'estTague')
+          this.apiService.createRelationBetween2(index, sourceId, 'estTague')
         );
 
         return concat(requests).pipe(zipAll());

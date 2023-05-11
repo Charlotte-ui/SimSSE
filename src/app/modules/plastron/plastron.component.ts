@@ -17,15 +17,15 @@ import { Scenario } from '../core/models/vertex/scenario';
 import { MatDialog } from '@angular/material/dialog';
 import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { jsPDF } from 'jspdf';
 import { ScenarioService } from '../core/services/scenario.service';
 import { Groupe } from '../core/models/vertex/groupe';
 import { TagService } from '../core/services/tag.service';
 import { Trigger } from '../core/models/trigger';
-import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
+import { Observable, concat, forkJoin, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../core/models/vertex/tag';
 import { Pdf } from '../core/models/pdf';
 import { Curve } from '../core/models/curve';
+import { WaitComponent } from '../shared/wait/wait.component';
 
 @Component({
   selector: 'app-plastron',
@@ -36,13 +36,23 @@ export class PlastronComponent implements OnInit {
   plastron!: Plastron;
   scenario: Scenario;
 
-  changesToSave: boolean = false;
 
   variablesTemplate: VariablePhysioTemplate[] = [];
 
   allTags!: Tag[];
 
   curves!: Curve[];
+
+
+  /**
+   * save the changes
+   */
+
+
+  changesToSave: boolean = false;
+  newTags:Tag[];
+  tagsToDelete:Tag[];
+
 
   constructor(
     private route: ActivatedRoute,
@@ -202,7 +212,23 @@ export class PlastronComponent implements OnInit {
     }
   }
 
-  savePlastron(event: boolean) {
+  save(event: boolean) {
+    let requests: Observable<any>[] = [];
+    this.dialog.open(WaitComponent);
+
+    // save the tags
+    if (this.newTags.length > 0)
+      requests.push(this.tagService.addTagsToSource(this.newTags, this.plastron.modele.id,'modele'));
+
+    if (this.tagsToDelete.length > 0)
+      requests.push(this.tagService.deleteTagsFromSource(this.tagsToDelete, this.plastron.modele.id));
+
+    forkJoin(requests).subscribe((value) => {
+      this.changesToSave = false;
+      this.dialog.closeAll();
+    });
+
+
     if (event) {
       console.log('savePlastron');
       console.log(this.plastron);
@@ -219,7 +245,13 @@ export class PlastronComponent implements OnInit {
         }
       );
     }
+
+
+
   }
+
+
+
 
   exportAsPdf(event: boolean) {
     if (event) {

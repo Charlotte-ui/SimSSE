@@ -1,5 +1,7 @@
-<app-header [scenario]="scenario"   [changesToSave]="changesToSave"
-(newSave)="save()"
+<app-header
+  [scenario]="scenario"
+  [changesToSave]="changesToSave"
+  (newSave)="save()"
 ></app-header>
 <mat-tab-group (selectedTabChange)="reloadPlastron($event)">
   <mat-tab label="Infos générales">
@@ -17,15 +19,15 @@
       [scenario]="scenario"
     ></app-groupes>
   </mat-tab>
-  <mat-tab label="Plastrons et modèles" >
+  <mat-tab label="Plastrons et modèles">
     <ng-container *ngIf="totalPlastron">
-    <app-lot-plastrons
-      [groupes]="groupes"
-      [plastrons]="plastrons"
-      [totalPlastron]="totalPlastron"
-      [scenario]="scenario"
-      (newChange)="save()"
-    ></app-lot-plastrons>
+      <app-lot-plastrons
+        [groupes]="groupes"
+        [plastrons]="plastrons"
+        [totalPlastron]="totalPlastron"
+        [scenario]="scenario"
+        (newChange)="save()"
+      ></app-lot-plastrons>
     </ng-container>
   </mat-tab>
 </mat-tab-group>

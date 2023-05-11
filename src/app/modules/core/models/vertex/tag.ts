@@ -11,6 +11,8 @@ export class Tag extends Vertex {
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {
+        console.log("Tag")
+        console.log(list)
         return list.map(element => new Tag(element) as T)
     }
 }

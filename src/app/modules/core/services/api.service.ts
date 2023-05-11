@@ -110,6 +110,21 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * UPDATE
    */
 
+/* 
+  $scope.update = function(){
+
+		$http({
+			method:'POST',
+			url:'http://localhost:2480/command/ApplicationData/sql/INSERT INTO details SET name = \''+ $scope.name + '\', age= \'' + $scope.age + '\', mobile = \'' + $scope.mobile + '\'',
+			headers: {
+				'Authorization':'Basic cm9vdDowMzMyMjIwNTU5'
+			}  
+		})
+		.then(function(response){
+			console.log("updated");
+			alert('record added')
+		}); */
+
   updateProprertyOfVertex(id: string, champ: string, value: string) {
     return this.http
       .put<any>(
@@ -136,7 +151,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * CREATE
    */
 
-  createDocument(document: Vertex) {
+  createDocument(document: Vertex|any) {
     return this.http.post<any>(
       `${environment.urlAPI}/document/simsse/`,
       document
@@ -144,7 +159,23 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
   }
 
   createRelationBetween(idIn: string, idOut: string, relation: string) {
-    return of('bloup');
+    let link = {
+      "@class":relation,
+      'in':idIn,
+      'out':idOut
+    }
+    return this.createDocument(link)
+  }
+
+    createRelationBetween2(idIn: string, idOut: string, relation: string) {
+    let link = {"@class":relation,
+      'in':idIn,
+      'out':idOut}
+
+    return this.http.post<any>(
+      `${environment.urlAPI}/query/simsse/sql/CREATE EDGE ${relation} FROM ${idOut} TO ${idIn}`,
+      link
+    );
   }
 
   /**

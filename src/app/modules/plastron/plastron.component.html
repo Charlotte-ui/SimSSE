@@ -5,7 +5,7 @@
   [triage]="plastron.modele.triage"
   [changesToSave]="changesToSave"
   (newModele)="saveAsNewModel($event)"
-  (newSave)="savePlastron($event)"
+  (newSave)="save($event)"
   (newPDF)="exportAsPdf($event)"
 >
 </app-header>
@@ -26,6 +26,7 @@
       [modele]="plastron.modele"
       [allTags]="allTags"
       (newChange)="changeModele()"
+      (newTags)="changesToSave = true ; newTags = $event.newTags; tagsToDelete = $event.tagsToDelete"
     ></app-tags-descriptions>
   </mat-tab>
   <mat-tab *ngIf="plastron.profil" label="Profil">

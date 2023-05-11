@@ -40,8 +40,8 @@ export class SceneComponent implements OnInit {
   }
   @Input() set curves(value: Curve[]) {
     if (value) {
-      // if value isnt undefined
       this._curves = value;
+      if(value.length == 0) this.initLegend(); // TODO remove after bdd update
       if (this.legend.length < value.length) this.initLegend(); // if there is new variables to show, changed the legend
       this.initGraphData();
     }

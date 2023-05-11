@@ -45,12 +45,15 @@ export class EditeurComponent implements OnInit {
     }
   }
 
+  
   _modele!: Modele;
   get modele(): Modele {
     return this._modele;
   }
   @Input() set modele(value: Modele) {
     if (value) {
+            console.log("input modele")
+
       this._modele = value;
       this.modelService
         .getGraph(this.modele.id)
@@ -118,7 +121,7 @@ export class EditeurComponent implements OnInit {
   /**
    * courbes des data simulées
    */
-  curves: Curve[];
+  curves: Curve[] = [];
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré

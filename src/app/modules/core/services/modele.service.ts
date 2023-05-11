@@ -1,20 +1,25 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, map, of } from 'rxjs';
+import { Observable, delay, map, of, switchMap } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/vertex/modele';
 import { Trend, Event, Link, NodeType, EventType, Graph,Node } from '../models/vertex/node';
 import { ApiService } from './api.service';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
+import { NodeService } from './node.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModeleService {
+  updateModele(modele: Modele): Observable<any> {
+    throw new Error('Method not implemented.');
+  }
   
   constructor(
     public firebaseService: FirebaseService,
-    public apiService: ApiService
+    public apiService: ApiService,
+    public nodeService:NodeService
   ) {}
 
   getModeleById(id: string): Observable<Modele | undefined> {
@@ -28,10 +33,7 @@ export class ModeleService {
     return this.getModeleById(link['in'].substring(1));
   }
 
-  createModele(modele: Modele, template: boolean): Observable<string> {
-    modele.template = template;
-    return of("60:0").pipe ( delay( 5000 ));
-  }
+
 
   getGraph(id:string): Observable<Graph | undefined> {
     /* let trend1 = new Trend('1', 30, 80, 'chute sat', 'SpO2', -1);
@@ -79,4 +81,25 @@ export class ModeleService {
     return this.apiService.getLinkFromMultiple(arrayId,"link")
     .pipe(map(response => (Link.instanciateListe<Link>(response.result))))
   }
+
+
+  /**
+ * push a new Modele in the database
+ * return the id of the new Modele
+ * @param modele 
+ */
+createModele(modele: Modele, template: boolean):Observable<string>{
+  modele["@class"] = "Modele";
+  modele["template"] = template;
+  delete modele.id;
+  delete modele.tags;
+  delete modele.graph;
+  delete modele.triggeredEvents;
+  return this.apiService.createDocument(modele)
+  .pipe(map(response => this.apiService.documentId(response)))
+  .pipe(switchMap((idModele:string)=>{
+    this.nodeService.createGraph(new Graph({template:true,name:'root'})).subscribe()
+    return of(idModele)
+  }));
+}
 }

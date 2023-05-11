@@ -55,7 +55,6 @@ export class AccueilComponent implements OnInit {
 
     this.modeleService.createModele(modele, true).subscribe(id =>{
       this.router.navigate(['/modele/' + id]);
-
       this.dialog.closeAll();
     })
     

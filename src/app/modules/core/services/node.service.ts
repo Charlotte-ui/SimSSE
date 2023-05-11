@@ -40,6 +40,8 @@ export class NodeService {
       'true'
     );
 
+
+
     /*      let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
     let trend2 = new Trend("2",15,60,'acc respi','FR',1)
     let event:Event = new Event("3",40,50,EventType.action,'oxygénothérapie')
@@ -59,4 +61,22 @@ export class NodeService {
 
     return of ([graph]) */
   }
+
+
+    /**
+ * push a new Modele in the database
+ * return the id of the new Modele
+ * @param modele 
+ */
+createGraph(graph: Graph):Observable<string>{
+  graph["@class"] = "Graph";
+  delete graph.id;
+  delete graph.nodes;
+  delete graph.links;
+  console.log("createGraph")
+  console.log(graph)
+//  return this.apiService.createDocument(graph)
+//  .pipe(map(response => this.apiService.documentId(response)));
+  return this.apiService.createDocument(graph)
+}
 }

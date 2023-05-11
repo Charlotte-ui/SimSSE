@@ -67,6 +67,10 @@ export class ScenarioComponent implements OnInit {
         this.plastrons = [];
         this.initialisePlastron();
         this.scenario.tags = response[0];
+
+        console.log("tags scenraio")
+        console.log(response[0])
+
         this.oldTags = [...response[0]];
       });
   }
