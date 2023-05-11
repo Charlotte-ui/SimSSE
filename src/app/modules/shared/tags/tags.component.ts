@@ -57,7 +57,9 @@ export class TagsComponent {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.tags.push(new Tag({value:event.option.viewValue}));
+    console.log("selected")
+    console.log(event.option)
+    this.tags.push(new Tag(event.option.value));
     this.tagInput.nativeElement.value = '';
     this.newTags.emit(this.tags);
     console.log("tags")

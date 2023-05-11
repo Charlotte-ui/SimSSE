@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment.api';
-import { Observable, map } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { Vertex } from '../models/vertex/vertex';
 
@@ -117,5 +117,15 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
       .subscribe(() => {
         console.log('updateDocument ' + id);
       });
+  }
+
+  createRelationBetween(idIn:string,idOut:string,relation:string){
+      return of('bloup')
+
+  }
+
+ deleteRelationBetween(idIn:string,idOut:string,relation:string){
+      return of('bloup')
+
   }
 }

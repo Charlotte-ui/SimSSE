@@ -30,7 +30,7 @@ export class ScenarioComponent implements OnInit {
   changesToSave = false;
 
   newScenario!: Scenario;
-  newTags!: Tag[];
+  oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
 
   constructor(
     private route: ActivatedRoute,
@@ -67,6 +67,7 @@ export class ScenarioComponent implements OnInit {
         this.plastrons = [];
         this.initialisePlastron();
         this.scenario.tags = response[0];
+        this.oldTags = [...response[0]];
       });
   }
 
@@ -106,7 +107,6 @@ export class ScenarioComponent implements OnInit {
 
   updateTags(newTags: Tag[]) {
     this.changesToSave = true;
-    this.newTags = newTags;
   }
 
   save() {
@@ -115,17 +115,21 @@ export class ScenarioComponent implements OnInit {
     if (this.newScenario)
       requests.push(this.scenarioService.updateScenario(this.newScenario));
 
-    if (this.newTags){
-            let tagToDelete = this.scenario.tags.filter(item => this.newTags.indexOf(item) < 0)
-// TODO : dabug tag filter
-      this.newTags = this.newTags.filter(item => this.scenario.tags.indexOf(item) < 0)
-      console.log("true new tags")
-      console.log(this.newTags )
-            console.log("tagToDelete")
-      console.log(tagToDelete )
-      if(this.newTags.length>0) requests.push(this.tagService.updateTags(this.newTags,this.scenario.id));
+    // save the tags
 
-    }
+    let newTags = this.scenario.tags.filter(
+      (tag: Tag) => this.oldTags.indexOf(tag) < 0
+    );
+
+    let tagsToDelete = this.oldTags.filter(
+      (tag: Tag) => !tag.id || this.scenario.tags.indexOf(tag) < 0
+    );
+
+    if (newTags.length > 0)
+      requests.push(this.tagService.addTagsToSource(newTags, this.scenario.id,'scenario'));
+
+    if (tagsToDelete.length > 0)
+      requests.push(this.tagService.deleteTagsFromSource(tagsToDelete, this.scenario.id));
 
     forkJoin(requests).subscribe((value) => {
       this.changesToSave = false;
