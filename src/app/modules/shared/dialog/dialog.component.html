@@ -21,7 +21,6 @@
             *ngIf="getType(champ) == 'text' || getType(champ) == 'number'"
             matInput
             [formControlName]="champ"
-            [formControl]="getFormControl(champ)"
             [type]="getType(champ)"
           />
 
@@ -37,11 +36,12 @@
               ></mat-icon>
             </mat-option>
           </mat-select>
+                <mat-error>
+                  {{ getLabel(champ) }} est <strong>requis</strong>
+                </mat-error>
         </mat-form-field>
         
-        <mat-error *ngIf="getFormControl(champ).hasError('required')">
-          {{ getLabel(champ) }} est <strong>requis</strong>
-        </mat-error>
+  
 
         <div *ngIf="getType(champ) == 'boolean'" class="noOverflow">
           <mat-label>Effet</mat-label>

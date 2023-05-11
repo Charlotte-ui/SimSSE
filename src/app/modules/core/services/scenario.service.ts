@@ -31,7 +31,11 @@ getScenarioById(id:string): Observable<Scenario|undefined> {
  * @param scenario 
  */
 createScenario(scenario: Scenario):Observable<string>{
-    return of("34:2").pipe ( delay( 5000 ));
+  scenario["@class"] = "Scenario";
+  delete scenario.id;
+  delete scenario.tags;
+  return this.apiService.createDocument(scenario)
+  .pipe(map(response => this.apiService.documentId(response)));
 }
 
 /**

@@ -42,7 +42,7 @@ export class GeneralInfosComponent {
         this.scenario.EU + this.scenario.UA + this.scenario.UR;
       this.dataTotal[0].totalParticipant =
         this.dataTotal[0].totalPlastron +
-        this.scenario.impliques +
+        this.scenario.implique +
         this.scenario.psy;
       this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
     }

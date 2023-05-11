@@ -7,7 +7,7 @@ export class Scenario extends Vertex implements Listable {
   description: string;
   tags: Tag[];
   UA: number;
-  impliques: number;
+  implique: number;
   psy: number;
   UR: number;
   EU: number;
@@ -21,7 +21,7 @@ export class Scenario extends Vertex implements Listable {
     this.description = object?.description ? object.description : '';
     this.tags = object?.tags ? object.tags : [];
     this.UA = object?.UA ? object.UA : 0;
-    this.impliques = object?.impliques ? object.impliques : 0;
+    this.implique = object?.implique ? object.implique : 0;
     this.psy = object?.psy ? object.psy : 0;
     this.UR = object?.UR ? object.UR : 0;
     this.EU = object?.EU ? object.EU : 0;

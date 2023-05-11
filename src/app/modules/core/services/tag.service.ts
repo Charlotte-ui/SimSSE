@@ -78,7 +78,6 @@ export class TagService {
   deleteTagsFromSource(
     tags: Tag[],
     sourceId: string,
-    type: string
   ): Observable<string[]> {
     const requests = tags.map((tag: Tag) =>
       this.apiService.deleteRelationBetween(tag.id, sourceId, 'estTague')

@@ -41,16 +41,12 @@ export class AccueilComponent implements OnInit {
     });
   }
 
-  createScenario(scenario: Scenario) { // add to database with template = true
-   
+  createScenario(scenario: Scenario) {
     this.dialog.open(WaitComponent);
-  
     this.scenarioService.createScenario(scenario).subscribe(id =>{
       this.router.navigate(['/scenario/' + id]);
-
       this.dialog.closeAll();
     })
-    
   }
 
   createModele(modele: Modele) {

@@ -87,8 +87,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   required = ["title","triage"];
 
-  formControls = {}
-
   title!: string;
   edition!: boolean;
 
@@ -113,8 +111,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.champs = Object.keys(this.element) as Array<keyof T>;
 
     this.champs.map((champ:string)=>{
-      if (this.required.includes(champ)) this.formControls[champ] = new FormControl('', [Validators.required]);
-      else this.formControls[champ] = new FormControl('', []);
+      if (this.required.includes(champ)) this.form.controls[champ].addValidators(Validators.required)//this.formControls[champ] = new FormControl('', [Validators.required]);
     })
 
     this.hidden = this.hidden.concat(newHidden);
@@ -144,6 +141,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   save() {
+    console.log("this.form.value")
+    console.log(this.form.value)
     this.dialogRef.close(this.form.value);
   }
 
@@ -192,9 +191,5 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   getLabel(champ: string) {
     return this.champLabel[champ] ? this.champLabel[champ] : champ;
-  }
-
-  getFormControl(champ:string){
-    return this.formControls[champ];
   }
 }
