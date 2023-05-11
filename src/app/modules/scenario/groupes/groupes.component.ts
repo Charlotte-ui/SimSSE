@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../core/models/vertex/scenario';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { ScenarioService } from '../../core/services/scenario.service';
 
 @Component({
   selector: 'app-groupes',
@@ -18,15 +19,15 @@ export class GroupesComponent {
   PRV = [50, 10];
   CADI = [20, 50];
 
-  editable: string[] = ['psy', 'impliques'];
-  keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'impliques'];
+  editable: string[] = ['psy', 'implique'];
+  keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique'];
   displayedColumnsGroup: string[] = [
     'scene',
     'UR',
     'UA',
     'EU',
     'psy',
-    'impliques',
+    'implique',
     'delete',
   ];
   dataSourceGroup!: Groupe[];
@@ -46,18 +47,19 @@ export class GroupesComponent {
     }
   }
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog,private scenarioService:ScenarioService) {}
 
   addGroup() {
-    let newGroup: Partial<Groupe> = {
-      impliques: 0,
-      EU: 0,
-      UA: 0,
-      UR: 0,
-      psy: 0,
-    };
+    let newGroupe = new Groupe({scene:(this.dataSourceGroup.length+1),scenario:this.scenario.id}); 
 
-    this.openDialog(newGroup, -1);
+    this.scenarioService.createGroupe(newGroupe).subscribe(value=>{
+      this.dataSourceGroup.push(newGroupe);
+      console.log(this.dataSourceGroup);
+      this.dataSourceGroup = [...this.dataSourceGroup];
+    });
+      
+
+
   }
 
   initPosition() {
@@ -74,33 +76,9 @@ export class GroupesComponent {
     delete this.dataSourceGroup[id].scenario;
     delete this.dataSourceGroup[id].scene;
 
-    this.openDialog(this.dataSourceGroup[id], id);
   }
 
-  openDialog(element: Partial<Groupe>, id: number) {
-    const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element,Groupe, [], false],
-    });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
-
-      if (result == undefined) return;
-
-      if (Number(id) >= 0) {
-        result['scene'] = id + 1;
-        this.dataSourceGroup[Number(id)] = result; // TODO database add with scenario id
-      } else {
-        result['scene'] = this.dataSourceGroup.length + 1;
-        result['scenario'] = this.scenario.id;
-        this.dataSourceGroup.push(result);
-      }
-
-      console.log(this.dataSourceGroup);
-
-      this.dataSourceGroup = [...this.dataSourceGroup];
-    });
-  }
 
   getTotal(proprerty: string) {
     let res = 0;

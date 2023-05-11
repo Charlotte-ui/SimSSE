@@ -1,7 +1,7 @@
 import { Vertex } from "./vertex";
 
 export class Groupe extends Vertex{
-    impliques:number;
+    implique:number;
     psy:number;
     UA:number;
     UR:number;
@@ -20,7 +20,7 @@ export class Groupe extends Vertex{
         this.x = (object?.x)?object.x:50
         this.y = (object?.y)?object.y:50
         this.UA = (object?.UA)?object.UA:0;
-        this.impliques = (object?.impliques)?object.impliques:0;
+        this.implique = (object?.implique)?object.implique:0;
         this.psy = (object?.psy)?object.psy:0;
         this.UR = (object?.UR)?object.UR:0;
         this.EU = (object?.EU)?object.EU:0;

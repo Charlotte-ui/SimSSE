@@ -43,6 +43,19 @@ createScenario(scenario: Scenario):Observable<string>{
  * return the id of the new Scenario
  * @param scenario 
  */
+createGroupe(groupe: Groupe):Observable<string>{
+  groupe["@class"] = "Groupe";
+  delete groupe.id;
+  delete groupe.scenario;
+  return this.apiService.createDocument(groupe)
+  .pipe(map(response => this.apiService.documentId(response)));
+}
+
+/**
+ * push a new Scenario in the database
+ * return the id of the new Scenario
+ * @param scenario 
+ */
 updateScenario(scenario: Scenario):Observable<string>{
     return of("34:2").pipe ( delay( 5000 ));
 }

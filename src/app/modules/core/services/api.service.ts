@@ -16,16 +16,14 @@ export class ApiService {
     private authenticationService: AuthenticationService
   ) {}
 
- // return of("34:2").pipe ( delay( 5000 ));
-  documentId(document:any):string{
-    return document["@rid"].substring(1);
+  // return of("34:2").pipe ( delay( 5000 ));
+  documentId(document: any): string {
+    return document['@rid'].substring(1);
   }
-
 
   /**
    * GET
    */
-
 
   getClasseElements<T extends Vertex>(classe: typeof Vertex): Observable<T[]> {
     /*     this.token = this.authenticationService.currentUser?.token; 
@@ -108,13 +106,9 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
-
-
-
-    /**
+  /**
    * UPDATE
    */
-
 
   updateProprertyOfVertex(id: string, champ: string, value: string) {
     return this.http
@@ -138,36 +132,26 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
       });
   }
 
-
-    /**
+  /**
    * CREATE
    */
 
-    createDocument(document:Vertex){
-      return this.http
-      .post<any>(`${environment.urlAPI}/document/simsse/`, document)
-      
-    }
-
-
-  createRelationBetween(idIn:string,idOut:string,relation:string){
-      return of('bloup')
+  createDocument(document: Vertex) {
+    return this.http.post<any>(
+      `${environment.urlAPI}/document/simsse/`,
+      document
+    );
   }
 
+  createRelationBetween(idIn: string, idOut: string, relation: string) {
+    return of('bloup');
+  }
 
   /**
    * DELETE
    */
 
- deleteRelationBetween(idIn:string,idOut:string,relation:string){
-      return of('bloup')
-
+  deleteRelationBetween(idIn: string, idOut: string, relation: string) {
+    return of('bloup');
   }
-
-
-
-
-
-
-   
 }

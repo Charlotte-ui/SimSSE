@@ -34,8 +34,12 @@ export class TagService {
   }
 
   createTag(tag: Tag, type: string): Observable<string> {
+    tag["@class"] = "Tag";
+    tag["type"] = type;
+    delete tag.id;
     console.log('create tag');
-    return of('true');
+    console.log(tag);
+    return this.apiService.createDocument(tag);
   }
 
   /**
