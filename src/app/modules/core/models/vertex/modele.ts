@@ -45,6 +45,5 @@ export class Modele extends Vertex implements Listable{
 
     public static override getType(element):string{return "modele"}
 
-    
 
 }

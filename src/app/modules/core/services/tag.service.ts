@@ -37,8 +37,6 @@ export class TagService {
     tag["@class"] = "Tag";
     tag["type"] = type;
     delete tag.id;
-    console.log('create tag');
-    console.log(tag);
     return this.apiService.createDocument(tag);
   }
 

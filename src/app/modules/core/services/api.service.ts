@@ -182,6 +182,14 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * DELETE
    */
 
+
+  deleteDocument(id: string) {
+    return this.http.delete<any>(
+      `${environment.urlAPI}/document/simsse/${id}`
+    );
+  }
+
+
   deleteRelationBetween(idIn: string, idOut: string, relation: string) {
     return of('bloup');
   }

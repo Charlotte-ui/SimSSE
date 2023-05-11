@@ -35,8 +35,7 @@ import { WaitComponent } from '../shared/wait/wait.component';
 export class PlastronComponent implements OnInit {
   plastron!: Plastron;
   scenario: Scenario;
-
-
+  
   variablesTemplate: VariablePhysioTemplate[] = [];
 
   allTags!: Tag[];

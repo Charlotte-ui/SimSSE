@@ -173,7 +173,10 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   getName(elem: Node | any) {
     if(typeof elem === "string") return elem;
-    if (elem instanceof Node) return Node.getName(elem);
+    if (elem instanceof Node) {
+      console.log("elem instance of node")
+      return Node.getName(elem);
+    }
     else if ('name' in elem) return elem.name;
     return elem.template ? elem.template.name : elem.event;
     //TODO rendre plus propre

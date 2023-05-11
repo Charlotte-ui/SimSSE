@@ -10,14 +10,16 @@ export abstract class VariablePhysio extends Vertex implements Nameable{
     min:number;
     max:number;
     color:string;
+    defaultValue:number;
 
     constructor(object?: any) {
       super(object);
-      this.rand=object?.rand ? object.rand : 1;
+      this.rand=object?.rand ? object.rand : 0;
       this.name=object?.name ? object.name : "";
       this.min=object?.min ? object.min : 0;
       this.max=object?.max ? object.max : 100;
       this.color=object?.color ? object.color : "";
+      this.defaultValue=object?.defaultValue ? object.defaultValue : 50;
     }
 
     public getName(): string {

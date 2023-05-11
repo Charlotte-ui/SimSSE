@@ -195,7 +195,7 @@ export class Timer extends Node {
     if (object) object['type'] = NodeType.timer;
     else object = {type:NodeType.timer};
     super(object);
-    this.name = 'Timer ' + this.id; // TODO : pq le getName() ne fonctionne pas ?
+    this.name = object?.name ? object.name :'Timer';
     this.duration = 0;
     this.counter = 0;
   }
@@ -234,15 +234,25 @@ export class Action extends Vertex {
 
 export class BioEvent extends Vertex {
   public static override className = 'BioEvent';
+  public static bioevents: BioEvent[] = [];
 
   name: string;
 
   constructor(object?: any) {
     super(object);
     this.name = object?.name ? object.name : '';
+    BioEvent.bioevents.push(this);
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
     return list.map(element => new BioEvent(element) as T)
+  }
+
+    public static getBioEventByID(id: string): Action {
+    let result = undefined;
+    BioEvent.bioevents.forEach((bioevent: BioEvent) => {
+      if (bioevent.id == id) result = bioevent;
+    });
+    return result;
   }
 }

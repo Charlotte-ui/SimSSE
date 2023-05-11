@@ -8,9 +8,10 @@
 <mat-tab-group>
   <mat-tab label="Cas clinique">
     <app-editeur
+    *ngIf="modele"
+      [modele]="modele"
       [targetVariable]="targetVariable"
       [variablesTemplate]="variablesTemplate"
-      [modele]="modele"
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Tags et descriptions">

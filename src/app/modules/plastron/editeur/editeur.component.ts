@@ -41,7 +41,7 @@ export class EditeurComponent implements OnInit {
     if (value) {
       // if value isnt undefined
       this._targetVariable = value;
-      this.initCurves();
+      if(this.modele.graph) this.initCurves();
     }
   }
 
@@ -121,7 +121,7 @@ export class EditeurComponent implements OnInit {
   /**
    * courbes des data simulées
    */
-  curves: Curve[] = [];
+  curves: Curve[] ;
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
@@ -195,6 +195,9 @@ export class EditeurComponent implements OnInit {
         variable.color
       );
       this.curves.push(curve);
+      console.log("this.modele")
+      console.log(this.modele)
+
       curve.calculCurve(structuredClone(this.modele));
     });
 
@@ -203,19 +206,23 @@ export class EditeurComponent implements OnInit {
 
   initTrendsEventsRecursive(graph: Graph) {
     graph.nodes.forEach((node, i) => {
-      switch (node.type) {
-        case 'event':
-          //this.events.push([node as Event, i, Number(graph.id)]); // if the node is an event TODO i is redandant with id ?
-          graph.nodes[i]['template'] = Action.getActionByID(
+      switch (Node.getType(node)) {
+        case EventType.action:
+          node['template'] = Action.getActionByID(
             (node as Event).event
           );
-
           this.events.push(node as Event);
           break;
-        case 'trend':
+        case EventType.bio:
+          node['template'] = BioEvent.getBioEventByID(
+            (node as Event).event
+          );
+          this.events.push(node as Event);
+          break;
+        case NodeType.trend:
           this.trends.push(node as Trend);
           break;
-        case 'graph':
+        case NodeType.graph:
           this.initTrendsEventsRecursive(node as Graph);
           break;
       }
@@ -263,7 +270,6 @@ export class EditeurComponent implements OnInit {
 
   addElement(element: Node | Link) {
     if (element.type == NodeType.link) {
-      // TODO element instanceof Node doesn't work
       let indice = this.modele.graph.links.length.toString();
       (element as Link).id = indice;
       this.modele.graph.links.push(element as Link);

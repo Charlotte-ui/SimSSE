@@ -21,23 +21,27 @@ export class ProfilComponent implements OnInit {
       this._profil = value;
       this.form = this.fb.group(value);
 
-      this.form.get('age').valueChanges.subscribe((newAge:number) => {
-        console.log("newAge "+newAge)
-        //this.apiService.updateProprertyOfVertex(value.id,"age",newAge.toString())
-        this.apiService.updateDocument(value.id,value,"Profil")
-    })
+      this.form.get('age').valueChanges.subscribe((newAge: number) => {
+        this.save(newAge);
+      });
     }
   }
 
   @Output() newChange = new EventEmitter<boolean>();
 
-  constructor(private fb: FormBuilder, public profilService: ProfilService, public apiService:ApiService) {}
+  constructor(
+    private fb: FormBuilder,
+    public profilService: ProfilService,
+    public apiService: ApiService
+  ) {}
 
   ngOnInit(): void {}
 
-  save() {
+  // TODO emit change plutot que d'enregister sur place ?
+  save(newAge: number) {
     this.profilService.updateProfil(this.form.value);
-
-    // TODO emit change plutot que d'enregister sur place
+    console.log('newAge ' + newAge);
+    //this.apiService.updateProprertyOfVertex(value.id,"age",newAge.toString())
+    this.apiService.updateDocument(this.profil.id, this.profil, 'Profil');
   }
 }

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { List } from 'echarts';
 import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { Listable } from 'src/app/modules/core/models/interfaces/listable';
+import { ApiService } from 'src/app/modules/core/services/api.service';
 
 @Component({
   selector: 'app-list-box-element',
@@ -22,7 +23,7 @@ export class ListBoxElementComponent<T extends Listable> {
 
   @Input() type: string;
 
-  constructor(private router: Router, public dialog: MatDialog) {}
+  constructor(private router: Router, public dialog: MatDialog, private apiService:ApiService) {}
 
   removeElement() {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
@@ -33,6 +34,12 @@ export class ListBoxElementComponent<T extends Listable> {
       console.log(result);
 
       if (result) {
+        this.apiService.deleteDocument(this.element.id).subscribe(()=>{
+          this.element = undefined;
+        }
+          
+        )
+
         // delete element from database
       }
     });
