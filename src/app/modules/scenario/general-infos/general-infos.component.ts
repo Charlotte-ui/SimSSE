@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ScenarioService } from '../../core/services/scenario.service';
+import { ScenarioService } from '../../../services/scenario.service';
 import { FormBuilder } from '@angular/forms';
-import { Scenario } from '../../core/models/vertex/scenario';
-import { TagService } from '../../core/services/tag.service';
-import { Tag } from '../../core/models/vertex/tag';
+import { Scenario } from '../../../models/vertex/scenario';
+import { TagService } from '../../../services/tag.service';
+import { Tag } from '../../../models/vertex/tag';
 
 @Component({
   selector: 'app-general-infos',

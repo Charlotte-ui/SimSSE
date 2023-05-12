@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { FirebaseService } from '../services/firebase.service';
+import { FirebaseService } from '../../services/firebase.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { ApiService } from '../services/api.service';
-import { AuthenticationService } from '../services/authentication.service';
+import { ApiService } from '../../services/api.service';
+import { AuthenticationService } from '../../services/authentication.service';
 
 @Component({
   selector: 'app-connexion',

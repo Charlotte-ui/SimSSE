@@ -1,17 +1,17 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Listable } from '../../core/models/interfaces/listable';
-import { FirebaseService } from '../../core/services/firebase.service';
+import { Listable } from '../../../models/interfaces/listable';
+import { FirebaseService } from '../../../services/firebase.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DialogComponent } from '../dialog/dialog.component';
-import { ApiService } from '../../core/services/api.service';
-import { Scenario } from '../../core/models/vertex/scenario';
-import { Vertex } from '../../core/models/vertex/vertex';
-import { TagService } from '../../core/services/tag.service';
+import { ApiService } from '../../../services/api.service';
+import { Scenario } from '../../../models/vertex/scenario';
+import { Vertex } from '../../../models/vertex/vertex';
+import { TagService } from '../../../services/tag.service';
 import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../../core/models/vertex/tag';
-import { Triage } from '../../core/models/vertex/modele';
+import { Tag } from '../../../models/vertex/tag';
+import { Triage } from '../../../models/vertex/modele';
 
 @Component({
   selector: 'app-list-box',

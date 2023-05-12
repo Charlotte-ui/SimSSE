@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { Scenario } from '../core/models/vertex/scenario';
-import { ScenarioService } from '../core/services/scenario.service';
+import { Scenario } from '../../models/vertex/scenario';
+import { ScenarioService } from '../../services/scenario.service';
 import { Router } from '@angular/router';
-import { Modele } from '../core/models/vertex/modele';
-import { ModeleService } from '../core/services/modele.service';
-import { RegleService } from '../core/services/regle.service';
-import { TagService } from '../core/services/tag.service';
-import { Tag } from '../core/models/vertex/tag';
+import { Modele } from '../../models/vertex/modele';
+import { ModeleService } from '../../services/modele.service';
+import { RegleService } from '../../services/regle.service';
+import { TagService } from '../../services/tag.service';
+import { Tag } from '../../models/vertex/tag';
 import { MatDialog } from '@angular/material/dialog';
 import { WaitComponent } from '../shared/wait/wait.component';
 

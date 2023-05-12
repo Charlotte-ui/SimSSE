@@ -1,20 +1,20 @@
 import { Component } from '@angular/core';
-import { Modele } from '../core/models/vertex/modele';
-import { Scenario } from '../core/models/vertex/scenario';
+import { Modele } from '../../models/vertex/modele';
+import { Scenario } from '../../models/vertex/scenario';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from '../core/models/vertex/variablePhysio';
-import { Graph, Event } from '../core/models/vertex/node';
+} from '../../models/vertex/variablePhysio';
+import { Graph, Event } from '../../models/vertex/node';
 import { ActivatedRoute } from '@angular/router';
-import { ModeleService } from '../core/services/modele.service';
-import { Tag } from '../core/models/vertex/tag';
-import { TagService } from '../core/services/tag.service';
+import { ModeleService } from '../../services/modele.service';
+import { Tag } from '../../models/vertex/tag';
+import { TagService } from '../../services/tag.service';
 import { Observable, forkJoin, switchMap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { WaitComponent } from '../shared/wait/wait.component';
-import { RegleService } from '../core/services/regle.service';
-import { Trigger } from '../core/models/trigger';
+import { RegleService } from '../../services/regle.service';
+import { Trigger } from '../../models/trigger';
 
 @Component({
   selector: 'app-modele',

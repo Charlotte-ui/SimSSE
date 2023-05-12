@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AccueilComponent } from './modules/accueil/accueil.component';
-import { ConnexionComponent } from './modules/core/connexion/connexion.component';
-import { AuthGuard } from './modules/core/helpers/auth.guard';
+import { ConnexionComponent } from './modules/connexion/connexion.component';
+import { AuthGuard } from './helpers/auth.guard';
 import { ScenarioComponent } from './modules/scenario/scenario.component';
 import { ScenarioResolver } from './modules/scenario/scenario.resolver';
 import { PlastronComponent } from './modules/plastron/plastron.component';

@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Profil } from '../../core/models/vertex/profil';
-import { ProfilService } from '../../core/services/profil.service';
-import { ApiService } from '../../core/services/api.service';
+import { Profil } from '../../../models/vertex/profil';
+import { ProfilService } from '../../../services/profil.service';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-profil',

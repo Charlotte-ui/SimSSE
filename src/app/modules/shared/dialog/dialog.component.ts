@@ -12,11 +12,11 @@ import {
   Link,
   NodeType,
   EventType,
-} from 'src/app/modules/core/models/vertex/node';
-import { Button } from 'src/app/modules/core/models/buttons';
-import { Scenario } from '../../core/models/vertex/scenario';
-import { Modele } from '../../core/models/vertex/modele';
-import { Vertex } from '../../core/models/vertex/vertex';
+} from 'src/app/models/vertex/node';
+import { Button } from 'src/app/models/buttons';
+import { Scenario } from '../../../models/vertex/scenario';
+import { Modele } from '../../../models/vertex/modele';
+import { Vertex } from '../../../models/vertex/vertex';
 
 @Component({
   selector: 'app-dialog',

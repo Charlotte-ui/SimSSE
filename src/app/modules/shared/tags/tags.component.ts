@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { Observable, map, startWith } from 'rxjs';
-import { Tag } from '../../core/models/vertex/tag';
+import { Tag } from '../../../models/vertex/tag';
 
 @Component({
   selector: 'app-tags',

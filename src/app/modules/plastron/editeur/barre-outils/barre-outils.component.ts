@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Button, IButton } from 'src/app/modules/core/models/buttons';
+import { Button, IButton } from 'src/app/models/buttons';
 import {
   EventType,
   Graph,
@@ -11,12 +11,12 @@ import {
   Action,
   BioEvent,
   Link,
-} from 'src/app/modules/core/models/vertex/node';
+} from 'src/app/models/vertex/node';
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
+} from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({

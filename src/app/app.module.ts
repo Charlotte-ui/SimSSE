@@ -6,8 +6,8 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { JwtInterceptor } from './modules/core/helpers/jwt.interceptor';
-import { ErrorInterceptor } from './modules/core/helpers/error.interceptor';
+import { JwtInterceptor } from './helpers/jwt.interceptor';
+import { ErrorInterceptor } from './helpers/error.interceptor';
 
 import { initializeApp,provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
@@ -18,7 +18,6 @@ import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 
 
 import { NgxEchartsModule } from 'ngx-echarts';
-
 
 import {MatCardModule} from '@angular/material/card';
 import {MatListModule} from '@angular/material/list';
@@ -46,8 +45,8 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatSnackBarModule} from '@angular/material/snack-bar'; 
  import {MatProgressSpinnerModule} from '@angular/material/progress-spinner'; 
 
-import { ConnexionComponent } from './modules/core/connexion/connexion.component';
-import { HeaderComponent } from './modules/core/header/header.component';
+import { ConnexionComponent } from './modules/connexion/connexion.component';
+import { HeaderComponent } from './modules/shared/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
 import { ScenarioComponent } from './modules/scenario/scenario.component';
 import { PlastronComponent } from './modules/plastron/plastron.component';

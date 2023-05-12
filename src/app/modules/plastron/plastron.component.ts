@@ -1,30 +1,30 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
-import { Plastron } from '../core/models/vertex/plastron';
-import { ModeleService } from '../core/services/modele.service';
-import { Modele } from '../core/models/vertex/modele';
-import { Graph, Node, Event, Link } from '../core/models/vertex/node';
+import { Plastron } from '../../models/vertex/plastron';
+import { ModeleService } from '../../services/modele.service';
+import { Modele } from '../../models/vertex/modele';
+import { Graph, Node, Event, Link } from '../../models/vertex/node';
 
-import { ProfilService } from '../core/services/profil.service';
+import { ProfilService } from '../../services/profil.service';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from '../core/models/vertex/variablePhysio';
-import { RegleService } from '../core/services/regle.service';
-import { Profil } from '../core/models/vertex/profil';
-import { PlastronService } from '../core/services/plastron.service';
-import { Scenario } from '../core/models/vertex/scenario';
+} from '../../models/vertex/variablePhysio';
+import { RegleService } from '../../services/regle.service';
+import { Profil } from '../../models/vertex/profil';
+import { PlastronService } from '../../services/plastron.service';
+import { Scenario } from '../../models/vertex/scenario';
 import { MatDialog } from '@angular/material/dialog';
 import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ScenarioService } from '../core/services/scenario.service';
-import { Groupe } from '../core/models/vertex/groupe';
-import { TagService } from '../core/services/tag.service';
-import { Trigger } from '../core/models/trigger';
+import { ScenarioService } from '../../services/scenario.service';
+import { Groupe } from '../../models/vertex/groupe';
+import { TagService } from '../../services/tag.service';
+import { Trigger } from '../../models/trigger';
 import { Observable, concat, forkJoin, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../core/models/vertex/tag';
-import { Pdf } from '../core/models/pdf';
-import { Curve } from '../core/models/curve';
+import { Tag } from '../../models/vertex/tag';
+import { Pdf } from '../../models/pdf';
+import { Curve } from '../../models/curve';
 import { WaitComponent } from '../shared/wait/wait.component';
 
 @Component({

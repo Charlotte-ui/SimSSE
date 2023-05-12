@@ -5,9 +5,9 @@ import {
   ActivatedRouteSnapshot
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { Plastron } from '../core/models/vertex/plastron';
-import { FirebaseService } from '../core/services/firebase.service';
-import { PlastronService } from '../core/services/plastron.service';
+import { Plastron } from '../../models/vertex/plastron';
+import { FirebaseService } from '../../services/firebase.service';
+import { PlastronService } from '../../services/plastron.service';
 
 @Injectable({
   providedIn: 'root'

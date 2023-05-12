@@ -1,9 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Modele } from '../../core/models/vertex/modele';
+import { Modele } from '../../../models/vertex/modele';
 import { ModeleResolver } from '../modele.resolver';
-import { Tag } from '../../core/models/vertex/tag';
+import { Tag } from '../../../models/vertex/tag';
 
 @Component({
   selector: 'app-modele-dialog',

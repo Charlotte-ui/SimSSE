@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { Event, Node } from 'src/app/modules/core/models/vertex/node';
-import { Button } from 'src/app/modules/core/models/buttons';
+import { Event, Node } from 'src/app/models/vertex/node';
+import { Button } from 'src/app/models/buttons';
 
 @Component({
   selector: 'app-trigger-dialog',

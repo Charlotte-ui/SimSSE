@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { VariablePhysio, VariablePhysioTemplate } from '../core/models/vertex/variablePhysio';
-import { RegleService } from '../core/services/regle.service';
-import { Action, BioEvent, Event } from '../core/models/vertex/node';
+import { VariablePhysio, VariablePhysioTemplate } from '../../models/vertex/variablePhysio';
+import { RegleService } from '../../services/regle.service';
+import { Action, BioEvent, Event } from '../../models/vertex/node';
 
 
 @Component({

@@ -8,17 +8,17 @@ import {
 } from '@angular/core';
 import { MatSort, Sort } from '@angular/material/sort';
 import { MatTable } from '@angular/material/table';
-import { Groupe } from '../../core/models/vertex/groupe';
-import { Triage, Modele } from '../../core/models/vertex/modele';
-import { Statut, Plastron } from '../../core/models/vertex/plastron';
+import { Groupe } from '../../../models/vertex/groupe';
+import { Triage, Modele } from '../../../models/vertex/modele';
+import { Statut, Plastron } from '../../../models/vertex/plastron';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { ModeleService } from '../../core/services/modele.service';
-import { ProfilService } from '../../core/services/profil.service';
-import { RegleService } from '../../core/services/regle.service';
-import { ScenarioService } from '../../core/services/scenario.service';
-import { Scenario } from '../../core/models/vertex/scenario';
+import { ModeleService } from '../../../services/modele.service';
+import { ProfilService } from '../../../services/profil.service';
+import { RegleService } from '../../../services/regle.service';
+import { ScenarioService } from '../../../services/scenario.service';
+import { Scenario } from '../../../models/vertex/scenario';
 import {
   trigger,
   state,
@@ -26,8 +26,8 @@ import {
   transition,
   animate,
 } from '@angular/animations';
-import { TagService } from '../../core/services/tag.service';
-import { Tag } from '../../core/models/vertex/tag';
+import { TagService } from '../../../services/tag.service';
+import { Tag } from '../../../models/vertex/tag';
 import { WaitComponent } from '../../shared/wait/wait.component';
 
 interface tableElementPlastron {

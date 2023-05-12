@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Trend } from 'src/app/modules/core/models/vertex/node';
-import { VariablePhysio, VariablePhysioInstance } from 'src/app/modules/core/models/vertex/variablePhysio';
+import { Trend } from 'src/app/models/vertex/node';
+import { VariablePhysio, VariablePhysioInstance } from 'src/app/models/vertex/variablePhysio';
 
 @Component({
   selector: 'app-inspecteur',

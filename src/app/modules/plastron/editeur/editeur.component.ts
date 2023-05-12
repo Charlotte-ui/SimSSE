@@ -10,17 +10,17 @@ import {
   Action,
   NodeType,
   EventType,
-} from '../../core/models/vertex/node';
+} from '../../../models/vertex/node';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from '../../core/models/vertex/variablePhysio';
-import { RegleService } from '../../core/services/regle.service';
-import { NodeService } from '../../core/services/node.service';
+} from '../../../models/vertex/variablePhysio';
+import { RegleService } from '../../../services/regle.service';
+import { NodeService } from '../../../services/node.service';
 import { Observable, concat, forkJoin, of, switchMap, zipAll } from 'rxjs';
-import { Modele } from '../../core/models/vertex/modele';
-import { Curve } from '../../core/models/curve';
-import { ModeleService } from '../../core/services/modele.service';
+import { Modele } from '../../../models/vertex/modele';
+import { Curve } from '../../../models/curve';
+import { ModeleService } from '../../../services/modele.service';
 
 @Component({
   selector: 'app-editeur',

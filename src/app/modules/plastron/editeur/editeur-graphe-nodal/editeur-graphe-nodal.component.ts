@@ -26,17 +26,17 @@ import {
   BioEvent,
   Action,
   Timer,
-} from 'src/app/modules/core/models/vertex/node';
+} from 'src/app/models/vertex/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
-import { NodeType } from 'src/app/modules/core/models/vertex/node';
-import { EventType } from 'src/app/modules/core/models/vertex/node';
+import { NodeType } from 'src/app/models/vertex/node';
+import { EventType } from 'src/app/models/vertex/node';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
-import { Button } from 'src/app/modules/core/models/buttons';
+} from 'src/app/models/vertex/variablePhysio';
+import { Button } from 'src/app/models/buttons';
 
 const GREEN = '#2E933C';
 const RED = '#DE1A1A';

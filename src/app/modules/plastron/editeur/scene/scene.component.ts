@@ -9,15 +9,15 @@ import {
   Graph,
   NodeType,
   Timer,
-} from 'src/app/modules/core/models/vertex/node';
+} from 'src/app/models/vertex/node';
 import {
   VariablePhysio,
   VariablePhysioInstance,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
+} from 'src/app/models/vertex/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
-import { Modele } from 'src/app/modules/core/models/vertex/modele';
-import { Curve } from 'src/app/modules/core/models/curve';
-import { Trigger } from 'src/app/modules/core/models/trigger';
+import { Modele } from 'src/app/models/vertex/modele';
+import { Curve } from 'src/app/models/curve';
+import { Trigger } from 'src/app/models/trigger';
 
 @Component({
   selector: 'app-scene',
