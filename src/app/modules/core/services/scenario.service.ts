@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, map, of } from 'rxjs';
+import { Observable, delay, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Scenario } from '../models/vertex/scenario';
@@ -44,11 +44,16 @@ createScenario(scenario: Scenario):Observable<string>{
  * @param scenario 
  */
 createGroupe(groupe: Groupe):Observable<string>{
+  let idScenario = groupe.scenario;
   groupe["@class"] = "Groupe";
   delete groupe.id;
   delete groupe.scenario;
   return this.apiService.createDocument(groupe)
-  .pipe(map(response => this.apiService.documentId(response)));
+  .pipe(map(response => this.apiService.documentId(response)))
+  .pipe(switchMap((idGroupe:string)=>{
+    return this.apiService.createRelationBetween(idGroupe,idScenario,'seComposeDe ')
+    .pipe(map(response => response.result[0].in))
+  }));
 }
 
 /**
@@ -56,9 +61,33 @@ createGroupe(groupe: Groupe):Observable<string>{
  * return the id of the new Scenario
  * @param scenario 
  */
-updateScenario(scenario: Scenario):Observable<string>{
-    return of("34:2").pipe ( delay( 5000 ));
+updateScenario(newScenario: Scenario,oldScenario:Scenario):Observable<any>{
+  let requests:Observable<any>[] = [];
+  delete newScenario.tags;
+  Object.keys(newScenario).forEach(key => {
+    if (newScenario[key] != oldScenario[key]) requests.push(this.apiService.updateDocumentChamp(newScenario.id,key,"'"+newScenario[key]+"'"))
+  });
+  return forkJoin(requests);
+  //  return of("34:2").pipe ( delay( 5000 ));
 }
+
+
+/**
+ * update a list of group
+ * @param scenario 
+ */
+updateGroupes(newGroupes: Groupe[],oldGroupes:Groupe[]):Observable<any>{
+  let requests:Observable<any>[] = [];
+
+  newGroupes.forEach((groupe:Groupe,index:number) => {
+    let groupeJustCReate:boolean = oldGroupes[index] === undefined;
+    if(groupeJustCReate || groupe.implique != oldGroupes[index].implique) requests.push(this.apiService.updateDocumentChamp(groupe.id,'implique',"'"+groupe.implique+"'"))
+    if(groupeJustCReate || groupe.psy != oldGroupes[index].psy) requests.push(this.apiService.updateDocumentChamp(groupe.id,'psy',"'"+groupe.psy+"'"))
+  });
+  return forkJoin(requests);
+  //  return of("34:2").pipe ( delay( 5000 ));
+}
+
 
 /**
  * renvoi les groupes liés à un scenario
@@ -92,6 +121,12 @@ getGroupePlastrons(id:string): Observable<Plastron[]> {
 
 setScenario(scenario:Scenario) {
 
+}
+
+
+deleteGroupe(groupe:Groupe): Observable<any>{
+  console.log("delete groupe ",groupe)
+  return this.apiService.deleteDocument(groupe.id)
 }
 
 }

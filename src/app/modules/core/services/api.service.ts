@@ -147,6 +147,13 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
       });
   }
 
+  updateDocumentChamp(id:string,champ:string,value:string){
+    return this.http.post<any>(
+      `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/${value}`,
+      {}
+    );
+  }
+
   /**
    * CREATE
    */
@@ -158,23 +165,11 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
+
   createRelationBetween(idIn: string, idOut: string, relation: string) {
-    let link = {
-      "@class":relation,
-      'in':idIn,
-      'out':idOut
-    }
-    return this.createDocument(link)
-  }
-
-    createRelationBetween2(idIn: string, idOut: string, relation: string) {
-    let link = {"@class":relation,
-      'in':idIn,
-      'out':idOut}
-
     return this.http.post<any>(
-      `${environment.urlAPI}/query/simsse/sql/CREATE EDGE ${relation} FROM ${idOut} TO ${idIn}`,
-      link
+      `${environment.urlAPI}/function/simsse/createEdge/${idOut}/${idIn}/${relation}`,
+      {}
     );
   }
 
@@ -189,6 +184,11 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
+  deleteDocument2(id: string,classe:string) {
+    return this.http.delete<any>(
+      `${environment.urlAPI}/query/simsse/DELETE VERTEX ${id}`
+    );
+  }
 
   deleteRelationBetween(idIn: string, idOut: string, relation: string) {
     return of('bloup');

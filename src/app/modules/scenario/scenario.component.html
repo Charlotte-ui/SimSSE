@@ -17,6 +17,7 @@
       *ngIf="groupes"
       [groupes]="groupes"
       [scenario]="scenario"
+      (updateGroupes)="updateGroupes($event)"
     ></app-groupes>
   </mat-tab>
   <mat-tab label="Plastrons et modèles">

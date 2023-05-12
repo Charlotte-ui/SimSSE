@@ -28,9 +28,12 @@ export class ScenarioComponent implements OnInit {
   totalPlastron!: number;
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
   changesToSave = false;
+  groupesToSave = false;
 
   newScenario!: Scenario;
   oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
+  oldScenario!:Scenario; // scenario before changes, use to define wich champ update after changes
+  oldGroupes!:Groupe[]; // scenario before changes, use to define wich champ update after changes
 
   constructor(
     private route: ActivatedRoute,
@@ -48,6 +51,7 @@ export class ScenarioComponent implements OnInit {
       .pipe(
         switchMap((response: Data) => {
           this.scenario = response['data'];
+          this.oldScenario = {...response['data']}
           this.scenario.tags = [];
 
           const requestTag = this.tagService.getTags(
@@ -64,6 +68,7 @@ export class ScenarioComponent implements OnInit {
       )
       .subscribe((response: [Tag[], Groupe[]]) => {
         this.groupes = response[1];
+        this.oldGroupes = structuredClone(response[1])
         this.plastrons = [];
         this.initialisePlastron();
         this.scenario.tags = response[0];
@@ -113,11 +118,25 @@ export class ScenarioComponent implements OnInit {
     this.changesToSave = true;
   }
 
+  updateGroupes(newGroupes: boolean) {
+    console.log("updateGroupes")
+    console.log(this.groupes)
+    this.changesToSave = true;
+    this.groupesToSave = true;
+  }
+
   save() {
     let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
+
+    console.log("oldscenario")
+    console.log(this.oldScenario)
+
+    console.log("newScenario")
+    console.log(this.newScenario)
+
     if (this.newScenario)
-      requests.push(this.scenarioService.updateScenario(this.newScenario));
+      requests.push(this.scenarioService.updateScenario(this.newScenario,this.oldScenario));
 
     // save the tags
 
@@ -135,9 +154,17 @@ export class ScenarioComponent implements OnInit {
     if (tagsToDelete.length > 0)
       requests.push(this.tagService.deleteTagsFromSource(tagsToDelete, this.scenario.id));
 
+    console.log("oldGroupes ",this.oldGroupes)
+    console.log("groupes ",this.groupes)
+
+    if(this.groupesToSave){
+      requests.push(this.scenarioService.updateGroupes(this.groupes,this.oldGroupes));
+    }
+
     forkJoin(requests).subscribe((value) => {
       this.changesToSave = false;
       this.dialog.closeAll();
+      this.groupesToSave = false;
     });
   }
 
