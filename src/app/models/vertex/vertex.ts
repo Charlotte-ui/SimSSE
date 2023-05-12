@@ -8,6 +8,7 @@ export class Vertex {
         this.id = object?.id ? object.id : '';
     }
 
+    
     public static instanciateListe<T>(list:any[]):T[]{return undefined}
 
     public static getType(element):string{return "vertex"}

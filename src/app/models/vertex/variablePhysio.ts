@@ -1,59 +1,71 @@
-import { number } from "echarts";
-import { Collection } from "../../services/firebase.service";
-import { Nameable } from "../interfaces/nameable";
-import { Vertex } from "./vertex";
+import { number } from 'echarts';
+import { Collection } from '../../services/firebase.service';
+import { Nameable } from '../interfaces/nameable';
+import { Vertex } from './vertex';
 
+export abstract class VariablePhysio extends Vertex implements Nameable {
+  name: string;
+  rand: number;
+  min: number;
+  max: number;
+  color: string;
+  defaultValue: number;
 
-export abstract class VariablePhysio extends Vertex implements Nameable{
-    rand:number;
-    name:string;
-    min:number;
-    max:number;
-    color:string;
-    defaultValue:number;
-
-    constructor(object?: any) {
-      super(object);
-      this.rand=object?.rand ? object.rand : 0;
-      this.name=object?.name ? object.name : "";
-      this.min=object?.min ? object.min : 0;
-      this.max=object?.max ? object.max : 100;
-      this.color=object?.color ? object.color : "";
-      this.defaultValue=object?.defaultValue ? object.defaultValue : 50;
-    }
-
-    public getName(): string {
-      return this.name;
-    }
-
-}
-
-export class VariablePhysioTemplate extends VariablePhysio{
-  moyennesAge:[number,number,number,number,number,number,number,number,number,number]
-  sdAge:number
-
-    public static override className = 'VariablePhysioTemplate';
-
-  constructor(object?:any) {
+  constructor(object?: any) {
     super(object);
-    this.moyennesAge = object?.moyennesAge?object.moyennesAge:[50,50,50,50,50,50,50,50,50,50];
-    this.sdAge = object?.sdAge?object.sdAge:1;
+    this.rand = object?.rand ? object.rand : 0;
+    this.name = object?.name ? object.name : '';
+    this.min = object?.min ? object.min : 0;
+    this.max = object?.max ? object.max : 100;
+    this.color = object?.color ? object.color : '';
+    this.defaultValue = object?.defaultValue ? object.defaultValue : 50;
   }
 
-    public static override instanciateListe<T>(list: any[]): T[] {
-    return list.map(element => new VariablePhysioTemplate(element) as T)
+  public getName(): string {
+    return this.name;
   }
 }
 
-export class VariablePhysioInstance extends VariablePhysio{
-  cible:number;
-  template:string; // id of the variable template
+export class VariablePhysioTemplate extends VariablePhysio {
+  moyennesAge: [
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number,
+    number
+  ];
+  sdAge: number;
 
-  constructor(object?:any) {
+  public static override className = 'VariablePhysioTemplate';
+
+  constructor(object?: any) {
     super(object);
-    this.cible = object?.cible?object.cible:50;
-    this.template = object?.template?object.template:"";
+    this.moyennesAge = object?.moyennesAge
+      ? object.moyennesAge
+      : [50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
+    this.sdAge = object?.sdAge ? object.sdAge : 1;
   }
 
+  public static override instanciateListe<T>(list: any[]): T[] {
+    return list.map((element) => new VariablePhysioTemplate(element) as T);
+  }
 
+  public static override getType(element):string{return "variable physiologique"}
+
+}
+
+export class VariablePhysioInstance extends VariablePhysio {
+  cible: number;
+  template: string; // id of the variable template
+
+  constructor(object?: any) {
+    super(object);
+    this.cible = object?.cible ? object.cible : 50;
+    this.template = object?.template ? object.template : '';
+  }
 }

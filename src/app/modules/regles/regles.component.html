@@ -4,13 +4,13 @@
 
   <div class="row">
     <div class="col-4">
-      <app-tab-regles [elements]="variablesDetails" title="Variables" (newElement)="addVariable($event)" description="bla bla bla"></app-tab-regles>
+      <app-tab-regles [elements]="variablesDetails" title="Variables" [classe]="VariablePhysioTemplate" (newElement)="addVariable($event)" description="bla bla bla"></app-tab-regles>
     </div>
     <div class="col-4">
-      <app-tab-regles [elements]="events" title="Événements" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
+      <app-tab-regles [elements]="events" title="Événements" [classe]="BioEvent" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
     </div>
       <div class="col-4">
-        <app-tab-regles [elements]="actions" title="Actions" (newElement)="addAction($event)"
+        <app-tab-regles [elements]="actions" title="Actions" [classe]="Action" (newElement)="addAction($event)"
           description="bla bla bla"></app-tab-regles>
       </div>
   </div>

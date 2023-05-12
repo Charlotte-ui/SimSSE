@@ -18,7 +18,7 @@
           <mat-label>{{ getLabel(champ) }}</mat-label>
 
           <input
-            *ngIf="getType(champ) == 'text' || getType(champ) == 'number'"
+            *ngIf="getType(champ) == 'text' || getType(champ) == 'number' || getType(champ) == 'color'"
             matInput
             [formControlName]="champ"
             [type]="getType(champ)"

@@ -82,7 +82,12 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     UA:"Nombre d'urgence absolue (UA)",
     UR:"Nombre d'urgence relative (UR)",
     EU:"Nombre d'extrême urgence (EU)",
-    triage:"Triage"
+    triage:"Triage",
+    rand:"Ecart-type",
+    defaultValue:"Valeur par défaut",
+    min:"Valeur minimum",
+    max:"Valeur maximum",
+    color:"Couleur",
   };
 
   required = ["title","triage"];
@@ -152,7 +157,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   public getType(champ: string) {
     if (this.numbers.includes(champ)) return 'number';
-    if (champ == 'couleur') return 'color';
+    if (champ == 'color') return 'color';
     if (this.listable.includes(champ)) return 'liste';
     if (this.booleans.includes(champ)) return 'boolean';
     return 'text';

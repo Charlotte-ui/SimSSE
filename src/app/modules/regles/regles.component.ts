@@ -21,6 +21,11 @@ export class ReglesComponent {
   events!: BioEvent[];
   actions!: Action[];
 
+  VariablePhysioTemplate =VariablePhysioTemplate;
+  Action =Action;
+  BioEvent =BioEvent;
+
+
   constructor(public regleService:RegleService){}
 
   ngOnInit(): void {

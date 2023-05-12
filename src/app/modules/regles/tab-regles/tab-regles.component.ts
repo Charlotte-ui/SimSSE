@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { VariablePhysio } from '../../../models/vertex/variablePhysio';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { Vertex } from '../../../models/vertex/vertex';
+import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
+import { Action, BioEvent } from 'src/app/models/vertex/node';
 
 @Component({
   selector: 'app-tab-regles',
@@ -22,11 +23,13 @@ export class TabReglesComponent<T> {
   displayedColumns;
   dataSource!: T[];
 
+  @Input() classe: typeof Vertex|Action|BioEvent ;
+
   get elements(): T[] {
     return this._elements;
   }
   @Input() set elements(value: T[]) {
-    if (value != undefined) {
+    if (value?.length>0) {
       this._elements = value;
       this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
       this.displayedColumns = [...this.keys];
@@ -51,20 +54,20 @@ export class TabReglesComponent<T> {
       newElement[proprety] = '';
     });
 
-    this.openDialog(newElement, -1);
+    this.openDialog(newElement, -1,false);
   }
 
   editElement(element: T) {
     let id = this.elements.indexOf(element);
-    this.openDialog(element, id);
+    this.openDialog(element, id,true);
   }
 
-  openDialog(element: T, id: number) {
+  openDialog(element: T, id: number,edit:boolean) {
     console.log('openDialog');
 
     console.log(element);
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, Vertex,[], false],
+      data: [element, this.classe,[], edit],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -98,7 +101,7 @@ export class TabReglesComponent<T> {
 
   isColor(column: string) {
     //S console.log("isColor "+column)
-    if (column == 'couleur') return true;
+    if (column == 'color') return true;
     return false;
   }
 }

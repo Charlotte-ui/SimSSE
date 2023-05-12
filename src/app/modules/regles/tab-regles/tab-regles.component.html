@@ -3,7 +3,7 @@
     <div class="container">
       <h1>{{title}}</h1>
       {{description}}
-      <button mat-mini-fab (click)="addElement()">
+      <button mat-icon-button (click)="addElement()">
         <mat-icon>add</mat-icon>
       </button>
     </div>
@@ -27,7 +27,7 @@
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let element">
             <button
-              mat-mini-fab
+            mat-icon-button
               (click)="editElement(element)">
               <mat-icon>edit</mat-icon>
             </button>
@@ -38,7 +38,7 @@
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let element">
             <button
-              mat-mini-fab
+            mat-icon-button
               (click)="removeElement(element.id)">
               <mat-icon>delete</mat-icon>
             </button>
