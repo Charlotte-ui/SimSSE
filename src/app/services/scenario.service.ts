@@ -31,17 +31,27 @@ getScenarioById(id:string): Observable<Scenario|undefined> {
  * @param scenario 
  */
 createScenario(scenario: Scenario):Observable<string>{
+
   scenario["@class"] = "Scenario";
   delete scenario.id;
   delete scenario.tags;
+
   return this.apiService.createDocument(scenario)
-  .pipe(map(response => this.apiService.documentId(response)));
+  .pipe(map(response => this.apiService.documentId(response)))
+  .pipe(switchMap((idScenario:string) => 
+
+    this.createGroupe(new Groupe({scenario:idScenario,scene:1}))
+    .pipe(map(idGroupe => idScenario))
+
+  ))
+
 }
 
 /**
- * push a new Scenario in the database
- * return the id of the new Scenario
- * @param scenario 
+ * push a new Groupe in the database
+ * link the groupe to the scenario 
+ * return the id of the new Groupe
+ * @param groupe 
  */
 createGroupe(groupe: Groupe):Observable<string>{
   let idScenario = groupe.scenario;
@@ -117,10 +127,6 @@ getScenarioByLink(link,direction): Observable<Scenario|undefined> {
 getGroupePlastrons(id:string): Observable<Plastron[]> {
   return this.apiService.getRelationFrom(id,"seComposeDe",'Groupe')
   .pipe(map(response => (Plastron.instanciateListe<Plastron>(response.result))))
-}
-
-setScenario(scenario:Scenario) {
-
 }
 
 

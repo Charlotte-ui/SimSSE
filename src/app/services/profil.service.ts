@@ -27,4 +27,17 @@ export class ProfilService {
     .pipe(map((response) => new VariablePhysioInstance(response.result[0]["intersect($a, $b)"][0])));
   }
 
+        /**
+   * push a new Profil in the database
+   * return the id of the new Profil
+   * @param profil 
+   */
+    createProfil(profil: Profil):Observable<Profil>{
+      profil["@class"] = "Profil";
+      delete profil.id;
+      delete profil.targetVariable;
+      return this.apiService.createDocument(profil)
+      .pipe(map(response => new Profil(response)));
+    }
+
 }

@@ -29,6 +29,8 @@ import {
 import { TagService } from '../../../services/tag.service';
 import { Tag } from '../../../models/vertex/tag';
 import { WaitComponent } from '../../shared/wait/wait.component';
+import { PlastronService } from 'src/app/services/plastron.service';
+import { Profil } from 'src/app/models/vertex/profil';
 
 interface tableElementPlastron {
   title: string;
@@ -107,7 +109,8 @@ export class LotPlastronsComponent {
     private _snackBar: MatSnackBar,
     public regleService: RegleService,
     public modeleService: ModeleService,
-    public tagSetvice: TagService
+    public tagSetvice: TagService,
+    public plastronService:PlastronService
   ) {
     this.defaultElementPlastron = new Object() as tableElementPlastron;
     this.defaultElementPlastron.description = '';
@@ -126,7 +129,20 @@ export class LotPlastronsComponent {
     let index = event.currentIndex;
     let modele = event.previousContainer.data[event.previousIndex] as Modele;
     if (this.dataSourcePlastron[index].triage == modele.triage) {
-      this.dataSourcePlastron[index].title = modele.title;
+      let newPlastron = new Plastron({statut:Statut.Doing});
+      let defaultGroupe = this.groupes[0]
+      this.plastronService.createPlastron(newPlastron,defaultGroupe.id,modele.id).subscribe((response:[string,Profil]) => {
+        newPlastron.id = response[0];
+        newPlastron.modele = modele;
+        newPlastron.profil = response[1];
+        newPlastron.groupe = defaultGroupe
+        this.plastrons.push(newPlastron)
+        console.log("plastrons ",this.plastrons)
+        this.addPlastronToDatasource(newPlastron,index);
+        this.groupes[0][newPlastron.modele.triage] ++;
+      })
+
+      
     } else {
       this._snackBar.open(
         'Attention, le modèle et le plastron doivent avoir le même triage',
@@ -221,7 +237,7 @@ export class LotPlastronsComponent {
     this.dataSourcePlastron[index].statut = Statut.Doing;
     this.dataSourcePlastron[index].id = index;
     this.dataSourcePlastron[index].idPlastron = plastron.id;
-    this.dataSourcePlastron[index].groupe = plastron.groupe.scene;
+    this.dataSourcePlastron[index].groupe = plastron.groupe?.scene;
     this.dataSourcePlastron[index].age = plastron.profil.age;
   }
 
