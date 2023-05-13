@@ -1,33 +1,41 @@
-mat-form-field{
-    width: 300px;
-  }
-  
-  
-  ::ng-deep .mat-mdc-dialog-content{
-    padding: 0 !important;
-    padding-left: 3% !important;
-    padding-right: 3% !important;
-  }
-  
+mat-form-field {
+  width: 300px;
+}
 
+::ng-deep .mat-mdc-dialog-content {
+  padding: 0 !important;
+  padding-left: 3% !important;
+  padding-right: 3% !important;
+}
 
-  ::ng-deep .mat-mdc-text-field-wrapper{
-    background-color: white !important;
-  }
-  
-  
-  mat-option{
-    font-weight: lighter;
-  }
-  
-  input{
-    font-weight: lighter !important;
-  }
-  
-  ::ng-deep .mat-mdc-select-value{
-    font-weight: lighter !important;
-  
-  }
-  
-  
-       
+::ng-deep .mat-mdc-text-field-wrapper {
+  background-color: white !important;
+}
+
+mat-option {
+  font-weight: lighter;
+}
+
+input {
+  font-weight: lighter !important;
+}
+
+::ng-deep .mat-mdc-select-value {
+  font-weight: lighter !important;
+}
+
+::ng-deep app-header {
+  position: fixed;
+  width: 100%;
+  z-index: 2;
+  top: 0;
+}
+
+::ng-deep app-header + div {
+  margin-top: 70px !important;
+}
+
+::ng-deep app-header + mat-tab-group {
+  margin-top: 70px !important;
+}
+
