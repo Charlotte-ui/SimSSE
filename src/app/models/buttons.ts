@@ -67,6 +67,30 @@ export class Button {
       outils: false,
       symbol: 'rect',
     },
+    {
+      name: 'Modele',
+      type: 'modele',
+      icon: 'folder_shared',
+      color: '#FFFFFF',
+      outils: false,
+      symbol: 'rect',
+    },
+    {
+      name: 'Scenario',
+      type: 'scenario',
+      icon: 'ballot',
+      color: '#FFFFFF',
+      outils: false,
+      symbol: 'rect',
+    },
+    {
+      name: 'Plastron',
+      type: 'plastron',
+      icon: 'accessibility_new',
+      color: '#FFFFFF',
+      outils: false,
+      symbol: 'rect',
+    }
     //  {name:"End",type:EventType.start,icon:'output',color:'#FFFFFF',outils:false},
   ];
 

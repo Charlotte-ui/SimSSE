@@ -3,8 +3,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { Vertex } from '../../../models/vertex/vertex';
-import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 import { Action, BioEvent } from 'src/app/models/vertex/node';
+import { Button } from 'src/app/models/buttons';
 
 @Component({
   selector: 'app-tab-regles',
@@ -23,7 +23,10 @@ export class TabReglesComponent<T> {
   displayedColumns;
   dataSource!: T[];
 
-  @Input() classe: typeof Vertex|Action|BioEvent ;
+  button = new Button();
+
+
+  @Input() classe: typeof Vertex|typeof Action|typeof BioEvent ;
 
   get elements(): T[] {
     return this._elements;
@@ -103,5 +106,14 @@ export class TabReglesComponent<T> {
     //S console.log("isColor "+column)
     if (column == 'color') return true;
     return false;
+  }
+
+  getColor() {
+    return this.button.getButtonByType(
+      this.classe.getType({})).color;
+  }
+
+  getIcon() {
+    return this.button.getButtonByType(this.classe.getType({}))?.icon;
   }
 }

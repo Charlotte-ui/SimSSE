@@ -190,7 +190,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   getColor(element: T) {
     return this.button.getButtonByType(
       element instanceof Event ? element.typeEvent : Node.getType(element)
-    ).color;
+    )?.color;
   }
 
   getIcon(element: T) {

@@ -12,6 +12,7 @@ import { TagService } from '../../../services/tag.service';
 import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../../models/vertex/tag';
 import { Triage } from '../../../models/vertex/modele';
+import { Button } from 'src/app/models/buttons';
 
 @Component({
   selector: 'app-list-box',
@@ -29,6 +30,8 @@ export class ListBoxComponent<T extends Listable> {
 
   filterTagElement!: string[];
   filterTriageElement!: string[];
+  
+  button = new Button();
 
   @Input() chips!: Tag[];
   @Input() title!: string;
@@ -160,5 +163,14 @@ export class ListBoxComponent<T extends Listable> {
       this.filterTriageElement.push(element.title);
     });
     this.filtreActif = false;
+  }
+
+  getColor() {
+    return this.button.getButtonByType(
+      this.classe.getType({})).color;
+  }
+
+  getIcon() {
+    return this.button.getButtonByType(this.classe.getType({}))?.icon;
   }
 }

@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Scenario } from '../../../models/vertex/scenario';
+import { Button } from 'src/app/models/buttons';
 
 @Component({
   selector: 'app-header',
@@ -8,8 +9,11 @@ import { Scenario } from '../../../models/vertex/scenario';
   styleUrls: ['./header.component.less'],
 })
 export class HeaderComponent implements OnInit {
+  button = new Button();
+
   @Input() scenario: Scenario;
   @Input() plastron: string;
+  @Input() modele: string;
   @Input() triage: string;
   @Input() changesToSave: boolean;
 

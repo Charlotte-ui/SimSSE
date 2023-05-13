@@ -32,19 +32,19 @@ export abstract class Node extends Vertex {
     this.state = false;
   }
 
-  static getName(element):string{
-
+  static getName(element): string {
     switch (element.type) {
       case NodeType.event:
-        return Event.getName(element)
+        return Event.getName(element);
       case NodeType.trend:
-        return Trend.getName(element)
+        return Trend.getName(element);
       case NodeType.graph:
-        return Graph.getName(element)
+        return Graph.getName(element);
       case NodeType.timer:
-        return Timer.getName(element)
+        return Timer.getName(element);
     }
-    return ""};
+    return '';
+  }
 
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
@@ -67,11 +67,10 @@ export abstract class Node extends Vertex {
     return res;
   }
 
-  public static override getType(element):string{
-    if (element.type == NodeType.event) return Event.getType(element)
+  public static override getType(element): string {
+    if (element.type == NodeType.event) return Event.getType(element);
     return element.type;
   }
-
 }
 
 export class Trend extends Node {
@@ -80,8 +79,8 @@ export class Trend extends Node {
   name: string;
 
   constructor(object?: any) {
-    if (object) object["type"]=NodeType.trend;
-    else object = {type:NodeType.trend};
+    if (object) object['type'] = NodeType.trend;
+    else object = { type: NodeType.trend };
     super(object);
     this.name = object?.name ? object.name : 'Tendance';
     this.target = object?.target ? object.target : undefined;
@@ -91,7 +90,6 @@ export class Trend extends Node {
   static override getName(element): string {
     return element.name;
   }
-
 }
 
 export class Event extends Node {
@@ -100,8 +98,8 @@ export class Event extends Node {
   template: Action | BioEvent;
 
   constructor(object?: any) {
-    if (object) object["type"]=NodeType.event;
-    else object = {type:NodeType.event};
+    if (object) object['type'] = NodeType.event;
+    else object = { type: NodeType.event };
     super(object);
     this.event = object?.event ? object.event : undefined;
     this.typeEvent = object?.typeEvent ? object.typeEvent : undefined;
@@ -112,8 +110,8 @@ export class Event extends Node {
     return element.event;
   }
 
-  public static override getType(element):string{
-    return element.typeEvent
+  public static override getType(element): string {
+    return element.typeEvent;
   }
 }
 
@@ -124,8 +122,8 @@ export class Link extends Edge {
   start: boolean;
 
   constructor(object?: any) {
-    if (object) object["type"]=NodeType.link;
-    else object = {type:NodeType.link};
+    if (object) object['type'] = NodeType.link;
+    else object = { type: NodeType.link };
     super(object);
     this.out = object?.out ? object.out.substring(1) : undefined;
     this.in = object?.in ? object.in.substring(1) : undefined;
@@ -134,11 +132,12 @@ export class Link extends Edge {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    return list.map(element => new Link(element) as T)
+    return list.map((element) => new Link(element) as T);
   }
 
-  public static override getType(element):string{return "link"}
-
+  public static override getType(element): string {
+    return 'link';
+  }
 }
 
 export class Graph extends Node {
@@ -151,8 +150,8 @@ export class Graph extends Node {
   public static override className = 'Graph';
 
   constructor(object?: any) {
-    if (object) object["type"]=NodeType.graph;
-    else object = {type:NodeType.graph};
+    if (object) object['type'] = NodeType.graph;
+    else object = { type: NodeType.graph };
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
     this.nodes = object?.nodes ? object.nodes : [];
@@ -161,11 +160,9 @@ export class Graph extends Node {
     Graph.graphs.push(this);
   }
 
- 
   static override getName(element): string {
     return element.name;
   }
-
 
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
@@ -193,18 +190,16 @@ export class Timer extends Node {
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.timer;
-    else object = {type:NodeType.timer};
+    else object = { type: NodeType.timer };
     super(object);
-    this.name = object?.name ? object.name :'Timer';
+    this.name = object?.name ? object.name : 'Timer';
     this.duration = 0;
     this.counter = 0;
   }
 
-
   static override getName(element): string {
     return element.name;
   }
-
 }
 
 export class Action extends Vertex {
@@ -220,7 +215,7 @@ export class Action extends Vertex {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    return list.map(element => new Action(element) as T)
+    return list.map((element) => new Action(element) as T);
   }
 
   public static getActionByID(id: string): Action {
@@ -229,6 +224,10 @@ export class Action extends Vertex {
       if (action.id == id) result = action;
     });
     return result;
+  }
+
+  public static override getType(element): string {
+    return EventType.action;
   }
 }
 
@@ -245,14 +244,18 @@ export class BioEvent extends Vertex {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    return list.map(element => new BioEvent(element) as T)
+    return list.map((element) => new BioEvent(element) as T);
   }
 
-    public static getBioEventByID(id: string): Action {
+  public static getBioEventByID(id: string): Action {
     let result = undefined;
     BioEvent.bioevents.forEach((bioevent: BioEvent) => {
       if (bioevent.id == id) result = bioevent;
     });
     return result;
+  }
+
+  public static override getType(element): string {
+    return EventType.bio;
   }
 }
