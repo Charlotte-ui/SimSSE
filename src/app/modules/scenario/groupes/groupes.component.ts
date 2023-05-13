@@ -3,7 +3,6 @@ import { Groupe } from '../../../models/vertex/groupe';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../../models/vertex/scenario';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
-import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { ScenarioService } from '../../../services/scenario.service';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 
@@ -13,7 +12,7 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
   styleUrls: ['./groupes.component.less'],
 })
 export class GroupesComponent {
-  form :FormGroup;
+  form: FormGroup;
   groupPositions!: any[];
 
   PMA = [15, 15];
@@ -42,34 +41,20 @@ export class GroupesComponent {
   @Input() set groupes(value: Groupe[]) {
     if (value) {
       this._groupes = value;
-      this.form= this.fb.group({
-        groupes: this.fb.array([])
-    })
-    this.setForm();
-    this.form.get('groupes').valueChanges.subscribe((groupes:Groupe[]) => {
-
-      groupes.forEach((groupe:Groupe,index:number) => {
-        if(this.groupes[index]){
-          this.groupes[index].implique = groupe.implique;
-        this.groupes[index].psy = groupe.psy;
-        }
-
+      this.form = this.fb.group({
+        groupes: this.fb.array([]),
       });
-      
-      console.log('groupes', groupes)
+      this.setForm();
+      this.form.get('groupes').valueChanges.subscribe((groupes: Groupe[]) => {
+        groupes.forEach((groupe: Groupe, index: number) => {
+          if (this.groupes[index]) {
+            this.groupes[index].implique = groupe.implique;
+            this.groupes[index].psy = groupe.psy;
+          }
+        });
 
-
-      this.updateGroupes.emit(true)
-    });
-    
-/*     let formSource = {}
-      value.forEach((groupe:Groupe) => {
-        formSource[groupe.id+"_implique"]=groupe.implique;
-        formSource[groupe.id+"_psy"]=groupe.psy;
+        this.updateGroupes.emit(true);
       });
-
-      this.form = this.fb.group(value.map((groupe:Groupe)=>
-      {groupe.id+""})); */
 
       this.initPosition();
     }
@@ -84,18 +69,14 @@ export class GroupesComponent {
   ) {}
 
   addGroup() {
-
     let newGroupe = new Groupe({
       scene: this.groupes.length + 1,
       scenario: this.scenario.id,
     });
 
     this.scenarioService.createGroupe(newGroupe).subscribe((value) => {
-      console.log("newGroupe ",newGroupe)
-      console.log("value ",value)
-      newGroupe['@rid']=value;
+      newGroupe['@rid'] = value;
       this.groupes.push(new Groupe(newGroupe));
-      console.log(this.groupes);
       this.groupes = [...this.groupes];
       this.setForm();
     });
@@ -111,6 +92,11 @@ export class GroupesComponent {
     this.groupPositions.push(this.PRV);
     this.groupPositions.push(this.PMA);
     this.groupPositions.push(this.CADI);
+/*  TODO replace when change in bdd
+    this.groupPositions.push([this.scenario.PRVx,this.scenario.PRVy]);
+    this.groupPositions.push([this.scenario.PMAx,this.scenario.PMAy]);
+    this.groupPositions.push([this.scenario.CADIx,this.scenario.CADIy]);
+ */
   }
 
   editGroup(id: number) {
@@ -127,7 +113,6 @@ export class GroupesComponent {
   }
 
   public deleteGroup(groupId: number) {
-
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
       data: 'groupe ' + this.groupes[groupId]['scene'],
     });
@@ -136,13 +121,13 @@ export class GroupesComponent {
       console.log(result);
 
       if (result) {
+        this.scenarioService
+          .deleteGroupe(this.groupes[groupId])
+          .subscribe(() => {
+            this.groupes.splice(groupId, 1);
 
-        this.scenarioService.deleteGroupe(this.groupes[groupId]).subscribe(()=>{
-          this.groupes.splice(groupId, 1);
-
-          this.groupes = [...this.groupes];
-        })
-      
+            this.groupes = [...this.groupes];
+          });
       }
     });
   }
@@ -152,21 +137,36 @@ export class GroupesComponent {
     return false;
   }
 
-  updatePosition(event) {
+  updatePosition(event:any[]) {
     console.log('updatePosition');
     console.log(event);
+    let i = 0;
+    this.groupes.forEach((groupe:Groupe,index:number) => {
+      groupe.x = Math.round(event[index][0])
+      groupe.y = Math.round(event[index][1])
+      i = index;
+    });
+    i++;
+    this.scenario.PRVx = event[i][0]
+    this.scenario.PRVy = event[i][1]
+    i++;
+    this.scenario.PMAx = event[i][0]
+    this.scenario.PMAy = event[i][1]
+    i++;
+    this.scenario.CADIx = event[i][0]
+    this.scenario.CADIy = event[i][1]
+
+    this.updateGroupes.emit(true)
   }
 
-  private setForm(){
+  private setForm() {
     const groupeCtrl = this.form.get('groupes') as FormArray;
-    this.groupes.forEach((groupe:Groupe)=>{
+    this.groupes.forEach((groupe: Groupe) => {
       let formGroupe = this.fb.group({
-        implique:[groupe.implique],
-        psy:[groupe.psy],
+        implique: [groupe.implique],
+        psy: [groupe.psy],
+      });
+      groupeCtrl.push(formGroupe);
     });
-      groupeCtrl.push(formGroupe)
-    })
-  };
-
-
+  }
 }

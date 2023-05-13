@@ -137,7 +137,6 @@ export class LotPlastronsComponent {
         newPlastron.profil = response[1];
         newPlastron.groupe = defaultGroupe
         this.plastrons.push(newPlastron)
-        console.log("plastrons ",this.plastrons)
         this.addPlastronToDatasource(newPlastron,index);
         this.groupes[0][newPlastron.modele.triage] ++;
       })
@@ -208,8 +207,6 @@ export class LotPlastronsComponent {
   }
 
   public completePlastrons() {
-    console.log('this.totalPlastron');
-    console.log(this.totalPlastron);
     this.dataSourcePlastron = new Array<tableElementPlastron>(
       this.totalPlastron
     )

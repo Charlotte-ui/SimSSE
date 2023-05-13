@@ -72,10 +72,6 @@ export class ScenarioComponent implements OnInit {
         this.plastrons = [];
         this.initialisePlastron();
         this.scenario.tags = response[0];
-
-        console.log("tags scenraio")
-        console.log(response[0])
-
         this.oldTags = [...response[0]];
       });
   }
@@ -119,8 +115,7 @@ export class ScenarioComponent implements OnInit {
   }
 
   updateGroupes(newGroupes: boolean) {
-    console.log("updateGroupes")
-    console.log(this.groupes)
+    console.log("updateGroupes scenario")
     this.changesToSave = true;
     this.groupesToSave = true;
   }
@@ -129,11 +124,6 @@ export class ScenarioComponent implements OnInit {
     let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
 
-    console.log("oldscenario")
-    console.log(this.oldScenario)
-
-    console.log("newScenario")
-    console.log(this.newScenario)
 
     if (this.newScenario)
       requests.push(this.scenarioService.updateScenario(this.newScenario,this.oldScenario));
@@ -154,10 +144,9 @@ export class ScenarioComponent implements OnInit {
     if (tagsToDelete.length > 0)
       requests.push(this.tagService.deleteTagsFromSource(tagsToDelete, this.scenario.id));
 
-    console.log("oldGroupes ",this.oldGroupes)
-    console.log("groupes ",this.groupes)
 
     if(this.groupesToSave){
+      console.log(this.groupes)
       requests.push(this.scenarioService.updateGroupes(this.groupes,this.oldGroupes));
     }
 

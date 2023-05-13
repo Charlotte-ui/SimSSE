@@ -19,14 +19,16 @@ export class CarteComponent implements OnDestroy{
 
   @Input() set data(value: (string | number)[][]) {
     if (value) { // if value isnt undefined
+      console.log("carte data ",value)
       Data =  value;
       SceneNb = value.length - 3 ; // le nombre de groupe est le nombre de data  sauf PRV et PMA et CADI
       this.updateChart();
     }
   } 
 
-  @Output() static newPosition = new EventEmitter<any[]>();
-  @Output() newPosition2 ;
+  @Output() static positionsChange = new EventEmitter<any[]>();
+  @Output()  positionsChange2 ; // use this one 
+
 
   updatePosition: () => void;
   initialChartOption: EChartsOption = {
@@ -37,20 +39,20 @@ export class CarteComponent implements OnDestroy{
         'X: ' + params.data[0].toFixed(2) + '<br>Y: ' + params.data[1].toFixed(2),
     },
     grid:{
-      show:true,
+      show:false,
       right:'0',
       bottom:'0',
       top:'0',
       left:'0',
     },
     xAxis: {
-      show:true,
+      show:false,
       min: 0,
       max: MAX_POSITION,
       type: 'value',
     },
     yAxis: {
-      show:true,
+      show:false,
       min: 0,
       max: MAX_POSITION,
       type: 'value',
@@ -61,7 +63,7 @@ export class CarteComponent implements OnDestroy{
   mergeOptions = {};
 
   constructor() {
-    this.newPosition2 = CarteComponent.newPosition;
+    this.positionsChange2 = CarteComponent.positionsChange;
   }
 
   ngOnDestroy() {
@@ -73,8 +75,11 @@ export class CarteComponent implements OnDestroy{
   onChartReady(myChart: any) {
 
     const onPointDragging = function (dataIndex) {
-      Data[dataIndex] = myChart.convertFromPixel({ gridIndex: 0 }, this.position) as number[];
-      Data[dataIndex].push(String(dataIndex+1));
+
+      let newPosition = myChart.convertFromPixel({ gridIndex: 0 }, this.position) as number[];
+
+      Data[dataIndex][0] = newPosition[0]
+      Data[dataIndex][1] = newPosition[1]
 
       // Update data
       myChart.setOption({
@@ -142,7 +147,7 @@ export class CarteComponent implements OnDestroy{
         ],
       });
 
-      CarteComponent.newPosition.emit(Data);
+      CarteComponent.positionsChange.emit(Data);
     };
 
     const showTooltip = (dataIndex) => {

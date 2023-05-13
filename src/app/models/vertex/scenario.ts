@@ -12,6 +12,12 @@ export class Scenario extends Vertex implements Listable {
   UR: number;
   EU: number;
   image: string;
+  PMAx:number;
+  PMAy:number;
+  CADIx:number;
+  CADIy:number;
+  PRVx:number;
+  PRVy:number;
 
   public static override className = 'Scenario';
 
@@ -26,6 +32,12 @@ export class Scenario extends Vertex implements Listable {
     this.UR = object?.UR ? object.UR : 0;
     this.EU = object?.EU ? object.EU : 0;
     this.image = object?.image ? object.image : '';
+    this.PMAx = object?.PMAx ? object.PMAx : 50;
+    this.PMAy = object?.PMAy ? object.PMAy : 50;
+    this.CADIx = object?.CADIx ? object.CADIx : 50;
+    this.CADIy = object?.CADIy ? object.CADIy : 50;
+    this.PRVx = object?.PRVx ? object.PRVx : 50;
+    this.PRVy = object?.PRVy ? object.PRVy : 50;
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {

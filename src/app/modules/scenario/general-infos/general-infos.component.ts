@@ -28,13 +28,7 @@ export class GeneralInfosComponent {
       this._scenario = value;
       this.scenarioFormGroup = this.form.group(this.scenario);
 
-      console.log("scenario")
-      console.log(value)
-
- 
       this.scenarioFormGroup.valueChanges.subscribe((newScenario:Scenario) => {
-          console.log('form value changed')
-          console.log(newScenario)
           this.updateScenario.emit(newScenario)
       })
 

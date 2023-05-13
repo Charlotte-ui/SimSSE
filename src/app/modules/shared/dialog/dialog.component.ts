@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, Validators } from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -119,6 +119,9 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
       if (this.required.includes(champ)) this.form.controls[champ].addValidators(Validators.required)//this.formControls[champ] = new FormControl('', [Validators.required]);
     })
 
+    
+
+
     this.hidden = this.hidden.concat(newHidden);
   }
 
@@ -146,8 +149,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   save() {
-    console.log("this.form.value")
-    console.log(this.form.value)
+
+    this.isErrorInForm()
     this.dialogRef.close(this.form.value);
   }
 
@@ -200,4 +203,17 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   getLabel(champ: string) {
     return this.champLabel[champ] ? this.champLabel[champ] : champ;
   }
+
+  // Get all Form Controls keys and loop them
+  isErrorInForm():boolean{
+    let res=false;
+    Object.keys(this.form.controls).forEach(key => {
+      // Get errors of every form control
+      if(this.form.get(key).errors) res = true;
+    });
+    return res;
+  }
+
+
+
 }

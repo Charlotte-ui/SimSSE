@@ -23,6 +23,29 @@ export class TabReglesComponent<T> {
   displayedColumns;
   dataSource!: T[];
 
+  champLabel = {
+    name: 'Nom',
+    title: 'Titre',
+    target: 'Cible',
+    parameter: 'Paramètre',
+    event: 'Évènement',
+    duration: 'Durée',
+    out: 'Depuis',
+    in: 'Vers',
+    description:'Description',
+    psy:'Nombre de cas psy',
+    impliques:"Nombre d'impliqués sans cas clinique",
+    UA:"Nombre d'urgence absolue (UA)",
+    UR:"Nombre d'urgence relative (UR)",
+    EU:"Nombre d'extrême urgence (EU)",
+    triage:"Triage",
+    rand:"Ecart-type",
+    defaultValue:"Valeur par défaut",
+    min:"Valeur minimum",
+    max:"Valeur maximum",
+    color:"Couleur",
+  };
+
   button = new Button();
 
 
@@ -115,5 +138,9 @@ export class TabReglesComponent<T> {
 
   getIcon() {
     return this.button.getButtonByType(this.classe.getType({}))?.icon;
+  }
+
+  getLabel(champ: string) {
+    return this.champLabel[champ] ? this.champLabel[champ] : champ;
   }
 }

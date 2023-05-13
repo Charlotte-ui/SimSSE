@@ -1,24 +1,34 @@
 <app-header></app-header>
 
 <div class="container">
+  <app-tab-regles
+    [elements]="variablesDetails"
+    title="Variables"
+    [classe]="VariablePhysioTemplate"
+    (newElement)="addVariable($event)"
+    description="bla bla bla"
+  ></app-tab-regles>
 
-  <div class="row">
-    <div class="col-4">
-      <app-tab-regles [elements]="variablesDetails" title="Variables" [classe]="VariablePhysioTemplate" (newElement)="addVariable($event)" description="bla bla bla"></app-tab-regles>
-    </div>
-    <div class="col-4">
-      <app-tab-regles [elements]="events" title="Événements" [classe]="BioEvent" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
-    </div>
-      <div class="col-4">
-        <app-tab-regles [elements]="actions" title="Actions" [classe]="Action" (newElement)="addAction($event)"
-          description="bla bla bla"></app-tab-regles>
-      </div>
-  </div>
-  <div class="row">
-    <app-tab-regles [elements]="moyennesAge" title="Moyenne par âge" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
-  </div>
-  <div class="row">
-    <app-tab-regles [elements]="moyennesSexe" title="Moyenne par sexe" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
-  </div>
+  <app-tab-regles
+    [elements]="events"
+    title="Événements"
+    [classe]="BioEvent"
+    (newElement)="addBioEvent($event)"
+    description="bla bla bla"
+  ></app-tab-regles>
 
+  <app-tab-regles
+    [elements]="actions"
+    title="Actions"
+    [classe]="Action"
+    (newElement)="addAction($event)"
+    description="bla bla bla"
+  ></app-tab-regles>
+
+  <app-tab-regles
+    [elements]="moyennesAge"
+    title="Moyenne par âge"
+    (newElement)="addBioEvent($event)"
+    description="bla bla bla"
+  ></app-tab-regles>
 </div>

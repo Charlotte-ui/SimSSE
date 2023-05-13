@@ -93,6 +93,9 @@ updateGroupes(newGroupes: Groupe[],oldGroupes:Groupe[]):Observable<any>{
     let groupeJustCReate:boolean = oldGroupes[index] === undefined;
     if(groupeJustCReate || groupe.implique != oldGroupes[index].implique) requests.push(this.apiService.updateDocumentChamp(groupe.id,'implique',"'"+groupe.implique+"'"))
     if(groupeJustCReate || groupe.psy != oldGroupes[index].psy) requests.push(this.apiService.updateDocumentChamp(groupe.id,'psy',"'"+groupe.psy+"'"))
+    if(groupeJustCReate || groupe.x != oldGroupes[index].x) requests.push(this.apiService.updateDocumentChamp(groupe.id,'x',"'"+groupe.x+"'"))
+    if(groupeJustCReate || groupe.y != oldGroupes[index].y) requests.push(this.apiService.updateDocumentChamp(groupe.id,'y',"'"+groupe.y+"'"))
+
   });
   return forkJoin(requests);
   //  return of("34:2").pipe ( delay( 5000 ));
