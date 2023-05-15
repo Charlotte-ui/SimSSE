@@ -35,23 +35,20 @@ import { WaitComponent } from '../shared/wait/wait.component';
 export class PlastronComponent implements OnInit {
   plastron!: Plastron;
   scenario: Scenario;
-  
+
   variablesTemplate: VariablePhysioTemplate[] = [];
 
   allTags!: Tag[];
 
   curves!: Curve[];
 
-
   /**
    * save the changes
    */
 
-
   changesToSave: boolean = false;
-  newTags:Tag[];
-  tagsToDelete:Tag[];
-
+  newTags: Tag[];
+  tagsToDelete: Tag[];
 
   constructor(
     private route: ActivatedRoute,
@@ -201,12 +198,9 @@ export class PlastronComponent implements OnInit {
 
         if (result == undefined) return;
 
-        
-        this.modelService.createModele(result, true).subscribe((id:string) =>{
+        this.modelService.createModele(result, true).subscribe((id: string) => {
           this.plastronService.changeModelRef(this.plastron, id);
-        })
-
-        
+        });
       });
     }
   }
@@ -217,16 +211,26 @@ export class PlastronComponent implements OnInit {
 
     // save the tags
     if (this.newTags.length > 0)
-      requests.push(this.tagService.addTagsToSource(this.newTags, this.plastron.modele.id,'modele'));
+      requests.push(
+        this.tagService.addTagsToSource(
+          this.newTags,
+          this.plastron.modele.id,
+          'modele'
+        )
+      );
 
     if (this.tagsToDelete.length > 0)
-      requests.push(this.tagService.deleteTagsFromSource(this.tagsToDelete, this.plastron.modele.id));
+      requests.push(
+        this.tagService.deleteTagsFromSource(
+          this.tagsToDelete,
+          this.plastron.modele.id
+        )
+      );
 
     forkJoin(requests).subscribe((value) => {
       this.changesToSave = false;
       this.dialog.closeAll();
     });
-
 
     if (event) {
       console.log('savePlastron');
@@ -244,13 +248,7 @@ export class PlastronComponent implements OnInit {
         }
       );
     }
-
-
-
   }
-
-
-
 
   exportAsPdf(event: boolean) {
     if (event) {

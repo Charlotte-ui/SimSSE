@@ -106,8 +106,13 @@ export class Event extends Node {
     this.template = object?.template ? object.template : undefined;
   }
 
-  static createStart():Event{
-    return new Event({event:EventType.start,typeEvent:EventType.start,x:5,y:95})
+  static createStart(): Event {
+    return new Event({
+      event: EventType.start,
+      typeEvent: EventType.start,
+      x: 5,
+      y: 95,
+    });
   }
 
   static override getName(element): string {
@@ -140,7 +145,8 @@ export class Link extends Edge {
   }
 
   public static override getType(element): string {
-    return 'link';
+    if (element['type'] === NodeType.link) return 'link';
+    else return Node.getType(element)
   }
 }
 

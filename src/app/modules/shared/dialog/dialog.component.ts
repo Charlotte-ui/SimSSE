@@ -104,7 +104,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     color: 'Couleur',
   };
 
-  required = ['title', 'triage'];
+  required = ['title', 'triage','name','target','parameter','event','duration','in','out'];
 
   title!: string;
   edition!: boolean;
@@ -194,7 +194,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   getName(elem: Node | any) {
     if (typeof elem === 'string') return elem;
     if (elem instanceof Node) {
-      console.log('elem instance of node');
       return Node.getName(elem);
     } else if ('name' in elem) return elem.name;
     return elem.template ? elem.template.name : elem.event;

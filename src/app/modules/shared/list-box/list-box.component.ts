@@ -30,7 +30,7 @@ export class ListBoxComponent<T extends Listable> {
 
   filterTagElement!: string[];
   filterTriageElement!: string[];
-  
+
   button = new Button();
 
   @Input() chips!: Tag[];
@@ -92,16 +92,16 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   addElement() {
-    let newElement = new this.classe()
- 
+    let newElement = new this.classe();
+
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newElement,this.classe,this.triages, false,['template']],
+      data: [newElement, this.classe, this.triages, false, ['template']],
     });
 
     dialogRef.afterClosed().subscribe((result: T) => {
       if (result) {
         this.newElement.emit(result);
-        this.elements.push(result); 
+        this.elements.push(result);
 
         console.log(this.elements);
       }
@@ -121,7 +121,8 @@ export class ListBoxComponent<T extends Listable> {
     this.filterTagElement = [];
     this.elements.forEach((element) => {
       if (
-        element.tags.filter((tag: Tag) => this.filterTag.includes(tag.value)).length > 0
+        element.tags.filter((tag: Tag) => this.filterTag.includes(tag.value))
+          .length > 0
       ) {
         this.filterTagElement.push(element.title);
       }
@@ -166,8 +167,7 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   getColor() {
-    return this.button.getButtonByType(
-      this.classe.getType({})).color;
+    return this.button.getButtonByType(this.classe.getType({})).color;
   }
 
   getIcon() {

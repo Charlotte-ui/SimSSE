@@ -54,7 +54,7 @@ export class BarreOutilsComponent implements OnInit {
         return this.createNode(bioevent, this.allBioevents);
       case EventType.action:
         let action = new Event({ typeEvent: EventType.action });
-        return this.createNode(action, this.allActions);
+        return this.createNode(action, this.allActions,['template']);
       case NodeType.trend:
         let trend = new Trend();
         return this.createNode(trend, this.variables);
@@ -83,9 +83,9 @@ export class BarreOutilsComponent implements OnInit {
     });
   }
 
-  createNode(newNode: Node, liste: any[]) {
+  createNode(newNode: Node, liste: any[],hidden?:string[]) {
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newNode,Node, liste, false],
+      data: [newNode,Node, liste, false,hidden],
     });
 
     dialogRef.afterClosed().subscribe((newNode: Node) => {
