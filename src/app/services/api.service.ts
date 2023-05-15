@@ -191,13 +191,17 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
-  deleteDocument2(id: string,classe:string) {
-    return this.http.delete<any>(
-      `${environment.urlAPI}/query/simsse/DELETE VERTEX ${id}`
+  deleteRelationBetween(idIn: string, idOut: string,relation:string) {
+     return this.http.post<any>(
+      `${environment.urlAPI}/function/simsse/deleteEdge/${idOut}/${idIn}`,
+      {}
     );
   }
 
-  deleteRelationBetween(idIn: string, idOut: string, relation: string) {
-    return of('bloup');
+    deleteEdge(idEdge: string) {
+     return this.http.post<any>(
+      `${environment.urlAPI}/function/simsse/deleteEdge/${idEdge}`,
+      {}
+    );
   }
 }

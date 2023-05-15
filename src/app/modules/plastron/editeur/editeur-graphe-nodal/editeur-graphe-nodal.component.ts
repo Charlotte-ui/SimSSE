@@ -38,8 +38,8 @@ import {
 } from 'src/app/models/vertex/variablePhysio';
 import { Button } from 'src/app/models/buttons';
 
-const GREEN = '#2E933C';
-const RED = '#DE1A1A';
+const GREEN = '#45C456';
+const RED = '#A41313';
 
 let DataName = [];
 
@@ -236,12 +236,12 @@ export class EditeurGrapheNodalComponent implements OnInit {
         break;
       case EventType.bio:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node,Event, this.allBioevents, true],
+          data: [node,Event, this.allBioevents, true,['template']],
         });
         break;
       case EventType.action:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, Event,this.allActions, true],
+          data: [node, Event,this.allActions, true,['template']],
         });
         break;
       case NodeType.trend:
@@ -283,11 +283,13 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
+        console.log("onEdgeClick ",result)
         if (result.delete) {
           this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);
         } else {
-          this.graphLink[index] = this.parseLinkIntoGraphLink(this.graph.links[index])
+          this.graphLink[index] = this.parseLinkIntoGraphLink(result as Link)
+          this.graph.links[index].start = result.start;
         }
         this.updateChart();
         this.updateLink.emit([result, index]);
