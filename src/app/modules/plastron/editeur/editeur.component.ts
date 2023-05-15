@@ -41,19 +41,18 @@ export class EditeurComponent implements OnInit {
     if (value) {
       // if value isnt undefined
       this._targetVariable = value;
-      console.log("this.modele.graph ",this.modele.graph.toString())
-      if(this.modele.graph) this.initCurves();
+      console.log('this.modele.graph ', this.modele.graph.toString());
+      if (this.modele.graph) this.initCurves();
     }
   }
 
-  
   _modele!: Modele;
   get modele(): Modele {
     return this._modele;
   }
   @Input() set modele(value: Modele) {
     if (value) {
-      console.log("editeur input modele ",value)
+      console.log('editeur input modele ', value);
 
       this._modele = value;
       this.modelService
@@ -87,7 +86,7 @@ export class EditeurComponent implements OnInit {
           });
 
           // if the initialized graph is the root graph
-          console.log("this.targetVariable ",this.targetVariable.toString())
+          console.log('this.targetVariable ', this.targetVariable.toString());
           if (this.targetVariable) {
             this.initCurves();
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
@@ -101,7 +100,7 @@ export class EditeurComponent implements OnInit {
     }
   }
 
-  @Input() disabledInspecteur:boolean=false;
+  @Input() disabledInspecteur: boolean = false;
 
   @Input() duration: number = 100;
   @Input() variablesTemplate: VariablePhysioTemplate[];
@@ -125,13 +124,18 @@ export class EditeurComponent implements OnInit {
   /**
    * courbes des data simulées
    */
-  curves: Curve[] ;
+  curves: Curve[];
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
    */
   @Output() newChange = new EventEmitter<boolean>();
 
+  @Output() updateNode = new EventEmitter<string>();
+  @Output() deleteNode = new EventEmitter<string>();
+
+  @Output() updateLink = new EventEmitter<string>();
+  @Output() deleteLink = new EventEmitter<string>();
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
    */
@@ -190,7 +194,7 @@ export class EditeurComponent implements OnInit {
    * initialize all curves
    */
   initCurves() {
-    console.log("initCurves")
+    console.log('initCurves');
     this.curves = [];
     this.targetVariable.forEach((variable, index) => {
       let curve = new Curve(
@@ -200,8 +204,8 @@ export class EditeurComponent implements OnInit {
         variable.color
       );
       this.curves.push(curve);
-      console.log("this.modele")
-      console.log(this.modele)
+      console.log('this.modele');
+      console.log(this.modele);
 
       curve.calculCurve(structuredClone(this.modele));
     });
@@ -213,15 +217,11 @@ export class EditeurComponent implements OnInit {
     graph.nodes.forEach((node, i) => {
       switch (Node.getType(node)) {
         case EventType.action:
-          node['template'] = Action.getActionByID(
-            (node as Event).event
-          );
+          node['template'] = Action.getActionByID((node as Event).event);
           this.events.push(node as Event);
           break;
         case EventType.bio:
-          node['template'] = BioEvent.getBioEventByID(
-            (node as Event).event
-          );
+          node['template'] = BioEvent.getBioEventByID((node as Event).event);
           this.events.push(node as Event);
           break;
         case NodeType.trend:
@@ -258,9 +258,6 @@ export class EditeurComponent implements OnInit {
           if (nodeSource.type == NodeType.event)
             link.out = (nodeSource as Event).event;
         });
-
-
-
 
         // TODO : créer de nouveaux node and links avec de nouveaux id ?
         group.links = structuredClone(graphTemplate.links);
@@ -300,33 +297,22 @@ export class EditeurComponent implements OnInit {
             1
           );
       });
+      this.deleteNode.emit(idNodeToDelete)
     } else {
       let node = event[0] as Node;
-      let index = event[1];
+      this.updateNode.emit(node.id);
 
-      if (node.type == NodeType.event){
-
+      if (node.type == NodeType.event) {
         let oldEvent = (node as Event).template.id;
 
         // update template
-        (node as Event).template = Action.getActionByID((node as Event).event)
+        (node as Event).template = Action.getActionByID((node as Event).event);
 
-          this.modele.graph.links.forEach((link) => {
-            if (link.in == oldEvent) link.in = (node as Event).event
-            if (link.out == oldEvent) link.out = (node as Event).event
-          });
-
- 
-        // TODO update template
+        this.modele.graph.links.forEach((link) => {
+          if (link.in == oldEvent) link.in = (node as Event).event;
+          if (link.out == oldEvent) link.out = (node as Event).event;
+        });
       }
-    //  this.modele.graph.nodes[index] = node;
-      /*       if (node.type == 'trend') {
-        // si seule une trend est modifiée on ne change qu'une courbe, sinon tout le graph change
-        let trend = node as Trend; // TODO ; pour le moment pas util à cause du this.graph = structuredClone(this.graph);, nécessaire pour l'emplacement des nodes
-        let variable = this.getVariableByTemplate(trend.target);
-        this.curves[index].calculCurve(this.modele);
-      } 
-      else */
     }
     this.updateCurve();
     this.modele.graph = structuredClone(this.modele.graph);
@@ -334,6 +320,13 @@ export class EditeurComponent implements OnInit {
   }
 
   updateLinks(event) {
+    let idLink = event[0].id;
+    if (event[0].delete) {
+      this.deleteLink.emit(idLink)
+    }
+    else{
+      this.updateLink.emit(idLink)
+    }
     // let index = Number(event[1])
     this.updateCurve();
     this.newChange.emit(true);

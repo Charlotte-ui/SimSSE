@@ -20,10 +20,6 @@ import { NodeService } from './node.service';
   providedIn: 'root',
 })
 export class ModeleService {
-  updateModele(modele: Modele): Observable<any> {
-    throw new Error('Method not implemented.');
-  }
-
   constructor(
     public firebaseService: FirebaseService,
     public apiService: ApiService,
@@ -95,15 +91,17 @@ export class ModeleService {
                   .createRelationBetween(idGraph, idModele, 'rootGraph')
                   .pipe(
                     switchMap(() => {
-                      console.log("idModele ",idModele)
-                       console.log("idStart ",idStart)
-                      this.apiService.createRelationBetweenWithProperty(
-                        idStart,
-                        idModele,
-                        'triggeredAt',
-                        'time',
-                        '0'
-                      ).subscribe();
+                      console.log('idModele ', idModele);
+                      console.log('idStart ', idStart);
+                      this.apiService
+                        .createRelationBetweenWithProperty(
+                          idStart,
+                          idModele,
+                          'triggeredAt',
+                          'time',
+                          '0'
+                        )
+                        .subscribe();
                       return of(idModele);
                     })
                   );
@@ -111,5 +109,17 @@ export class ModeleService {
             )
         )
       );
+  }
+
+  /**
+   * update a  Modele in the database
+   * @param modele
+   */
+  updateModele(modele: Modele): Observable<any> {
+    return this.apiService.updateDocumentChamp(
+      modele.id,
+      'description',
+      "'" + modele.description + "'"
+    );
   }
 }

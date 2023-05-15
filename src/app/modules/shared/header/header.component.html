@@ -29,28 +29,35 @@
   </ng-container>
 
   <ng-container *ngIf="plastron || modele">
-  <span >
-    <mat-icon id="arrow">arrow_forward_ios</mat-icon>
-  </span>
+    <span>
+      <mat-icon id="arrow">arrow_forward_ios</mat-icon>
+    </span>
 
-  <div >
-    <button
-      mat-mini-fab
-      [style.background]="button.getButtonByType(plastron?'plastron':'modele').color"
-      disabled
-    >
-      <mat-icon [fontIcon]="button.getButtonByType(plastron?'plastron':'modele').icon"></mat-icon>
+    <div>
+      <button
+        mat-mini-fab
+        [style.background]="
+          button.getButtonByType(plastron ? 'plastron' : 'modele').color
+        "
+        disabled
+      >
+        <mat-icon
+          [fontIcon]="
+            button.getButtonByType(plastron ? 'plastron' : 'modele').icon
+          "
+        ></mat-icon>
+      </button>
+    </div>
+
+    <button mat-button>
+      <span>{{ plastron ? plastron : modele }}</span>
     </button>
-  </div>
 
-  <button mat-button>
-    <span>{{ plastron?plastron:modele }}</span>
-  </button>
-
-  <app-triage *ngIf="triage" [triage]="triage"></app-triage>
-
+    <app-triage *ngIf="triage" [triage]="triage"></app-triage>
+  </ng-container>
 
   <button
+    *ngIf="plastron || scenario || modele"
     mat-icon-button
     [matTooltip]="
       plastron
@@ -65,13 +72,13 @@
   </button>
 
   <button
+    *ngIf="plastron"
     mat-icon-button
     matTooltip="Enregister le plastron actuel en tant que nouveau modele"
     (click)="saveAsNewModele()"
   >
     <mat-icon>note_add</mat-icon>
   </button>
-</ng-container>
 
   <button
     *ngIf="plastron"

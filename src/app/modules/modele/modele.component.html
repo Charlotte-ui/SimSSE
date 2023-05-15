@@ -13,6 +13,12 @@
       [targetVariable]="targetVariable"
       [variablesTemplate]="variablesTemplate"
       [disabledInspecteur]="true"
+      (newChange)="changesToSave = true"
+      (updateNode)="changesToSave = true; nodeToUpdate.push($event)"
+      (deleteNode)="changesToSave = true; nodeToDelete.push($event)"
+      (updateLink)="changesToSave = true; linkToUpdate.push($event)"
+      (deleteLink)="changesToSave = true; linkToDelete.push($event)"
+
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Tags et descriptions">
@@ -21,7 +27,7 @@
       [modele]="modele"
       [allTags]="allTags"
       (newModel)="changeModeleRef($event)"
-      (newModele)="changesToSave = true"
+      (newDescription)="changesToSave = true ; newModele = $event"
       (newTags)="changesToSave = true ; newTags = $event.newTags; tagsToDelete = $event.tagsToDelete"
     ></app-tags-descriptions>
   </mat-tab>

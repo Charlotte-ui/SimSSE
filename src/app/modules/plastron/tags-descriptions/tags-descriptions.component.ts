@@ -34,17 +34,15 @@ export class TagsDescriptionsComponent {
 
       })
 
-
-
-      this.form = this.fb.group(this.wrapArray(value));
+      this.form = this.fb.group(value);
 
       this.form.valueChanges.subscribe(value=>{
-        this.newModele.emit(this.form.value)
+        this.newDescription.emit(value)
       })
     }
   }
 
-  @Output() newModele = new EventEmitter<Modele>();
+  @Output() newDescription = new EventEmitter<Modele>();
 
   @Input() allTags!:Tag[];
 
