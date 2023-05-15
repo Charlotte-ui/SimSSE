@@ -15,7 +15,7 @@ export class GeneralInfosComponent {
   allTags;
   displayedColumns: string[] = ['total', 'totalParticipant', 'totalPlastron'];
 
-  dataTotal = [{ toal: '', totalPlastron: 0, totalParticipant: 0 }];
+  dataTotal = [{ total: '', totalPlastron: 0, totalParticipant: 0 }];
 
   _scenario: Scenario;
 
@@ -28,16 +28,13 @@ export class GeneralInfosComponent {
       this._scenario = value;
       this.scenarioFormGroup = this.form.group(this.scenario);
 
-      this.scenarioFormGroup.valueChanges.subscribe((newScenario:Scenario) => {
-          this.updateScenario.emit(newScenario)
-      })
+      this.calculTotalPlastron(value);
 
-      this.dataTotal[0].totalPlastron =
-        this.scenario.EU + this.scenario.UA + this.scenario.UR;
-      this.dataTotal[0].totalParticipant =
-        this.dataTotal[0].totalPlastron +
-        this.scenario.implique +
-        this.scenario.psy;
+      this.scenarioFormGroup.valueChanges.subscribe((newScenario: Scenario) => {
+        this.updateScenario.emit(newScenario);
+        this.calculTotalPlastron(newScenario);
+      });
+
       this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
     }
   }
@@ -45,7 +42,6 @@ export class GeneralInfosComponent {
   @Output() newTotalPlastron = new EventEmitter<number>();
   @Output() updateScenario = new EventEmitter<Scenario>();
   @Output() updateTags = new EventEmitter<Tag[]>();
-
 
   constructor(
     private form: FormBuilder,
@@ -55,5 +51,11 @@ export class GeneralInfosComponent {
     this.tagService.getAllTags('scenario').subscribe((response) => {
       this.allTags = response;
     });
+  }
+
+  calculTotalPlastron(scenario: Scenario) {
+    this.dataTotal[0].totalPlastron = scenario.EU + scenario.UA + scenario.UR;
+    this.dataTotal[0].totalParticipant =
+      this.dataTotal[0].totalPlastron + scenario.implique + scenario.psy;
   }
 }

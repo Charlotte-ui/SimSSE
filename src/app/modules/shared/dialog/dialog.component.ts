@@ -1,5 +1,13 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, ValidationErrors, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -62,9 +70,15 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     'tags',
     'graph',
     'triggeredEvents',
-    'timeStamps'
+    'timeStamps',
+    'PMAx',
+    'PMAy',
+    'CADIx',
+    'CADIy',
+    'PRVx',
+    'PRVy',
   ];
-  listable = ['source', 'target', 'event', 'template', 'in', 'out','triage'];
+  listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage'];
   booleans = ['start'];
 
   champLabel = {
@@ -76,21 +90,21 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     duration: 'Durée',
     out: 'Depuis',
     in: 'Vers',
-    description:'Description',
-    psy:'Nombre de cas psy',
-    impliques:"Nombre d'impliqués sans cas clinique",
-    UA:"Nombre d'urgence absolue (UA)",
-    UR:"Nombre d'urgence relative (UR)",
-    EU:"Nombre d'extrême urgence (EU)",
-    triage:"Triage",
-    rand:"Ecart-type",
-    defaultValue:"Valeur par défaut",
-    min:"Valeur minimum",
-    max:"Valeur maximum",
-    color:"Couleur",
+    description: 'Description',
+    psy: 'Nombre de cas psy',
+    implique: "Nombre d'impliqué sans cas clinique",
+    UA: "Nombre d'urgence absolue (UA)",
+    UR: "Nombre d'urgence relative (UR)",
+    EU: "Nombre d'extrême urgence (EU)",
+    triage: 'Triage',
+    rand: 'Ecart-type',
+    defaultValue: 'Valeur par défaut',
+    min: 'Valeur minimum',
+    max: 'Valeur maximum',
+    color: 'Couleur',
   };
 
-  required = ["title","triage"];
+  required = ['title', 'triage'];
 
   title!: string;
   edition!: boolean;
@@ -100,7 +114,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<DialogComponent<T>>,
-    @Inject(MAT_DIALOG_DATA) public data: [T, typeof Vertex,any[], boolean,string[]]
+    @Inject(MAT_DIALOG_DATA)
+    public data: [T, typeof Vertex, any[], boolean, string[]]
   ) {}
 
   ngOnInit() {
@@ -108,19 +123,17 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.classe = this.data[1];
     this.liste = this.data[2];
     this.edition = this.data[3];
-    let newHidden = this.data.length>4?this.data[4]:[]; // les nouveaux hidden sont optionnels
-    
+    let newHidden = this.data.length > 4 ? this.data[4] : []; // les nouveaux hidden sont optionnels
+
     this.title = this.completeTitle(this.classe.getType(this.element));
     this.form = this.fb.group(this.element);
 
     this.champs = Object.keys(this.element) as Array<keyof T>;
 
-    this.champs.map((champ:string)=>{
-      if (this.required.includes(champ)) this.form.controls[champ].addValidators(Validators.required)//this.formControls[champ] = new FormControl('', [Validators.required]);
-    })
-
-    
-
+    this.champs.map((champ: string) => {
+      if (this.required.includes(champ))
+        this.form.controls[champ].addValidators(Validators.required); //this.formControls[champ] = new FormControl('', [Validators.required]);
+    });
 
     this.hidden = this.hidden.concat(newHidden);
   }
@@ -141,7 +154,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
       case NodeType.timer:
         return start + ' le timer';
     }
-    return start +" un " + type;
+    return start + ' un ' + type;
   }
 
   onNoClick(): void {
@@ -149,8 +162,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   save() {
-
-    this.isErrorInForm()
+    this.isErrorInForm();
     this.dialogRef.close(this.form.value);
   }
 
@@ -172,7 +184,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   getValue(elem) {
-    if(typeof elem === "string") return elem;
+    if (typeof elem === 'string') return elem;
     if ('event' in elem) return elem.event;
     if ('couleur' in elem)
       return elem.name; // si varible TODO trouver une soluce plus propre
@@ -180,12 +192,11 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   getName(elem: Node | any) {
-    if(typeof elem === "string") return elem;
+    if (typeof elem === 'string') return elem;
     if (elem instanceof Node) {
-      console.log("elem instance of node")
+      console.log('elem instance of node');
       return Node.getName(elem);
-    }
-    else if ('name' in elem) return elem.name;
+    } else if ('name' in elem) return elem.name;
     return elem.template ? elem.template.name : elem.event;
     //TODO rendre plus propre
   }
@@ -205,15 +216,12 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   // Get all Form Controls keys and loop them
-  isErrorInForm():boolean{
-    let res=false;
-    Object.keys(this.form.controls).forEach(key => {
+  isErrorInForm(): boolean {
+    let res = false;
+    Object.keys(this.form.controls).forEach((key) => {
       // Get errors of every form control
-      if(this.form.get(key).errors) res = true;
+      if (this.form.get(key).errors) res = true;
     });
     return res;
   }
-
-
-
 }

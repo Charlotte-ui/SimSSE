@@ -155,6 +155,12 @@ export class ScenarioComponent implements OnInit {
       this.dialog.closeAll();
       this.groupesToSave = false;
     });
+
+    if(requests.length === 0){
+       this.changesToSave = false;
+      this.dialog.closeAll();
+      this.groupesToSave = false;
+    }
   }
 
   reloadPlastron(event) {}

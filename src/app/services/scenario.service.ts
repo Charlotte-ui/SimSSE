@@ -77,7 +77,8 @@ updateScenario(newScenario: Scenario,oldScenario:Scenario):Observable<any>{
   Object.keys(newScenario).forEach(key => {
     if (newScenario[key] != oldScenario[key]) requests.push(this.apiService.updateDocumentChamp(newScenario.id,key,"'"+newScenario[key]+"'"))
   });
-  return forkJoin(requests);
+  if(requests.length >0) return forkJoin(requests);
+  else return of(true)
   //  return of("34:2").pipe ( delay( 5000 ));
 }
 

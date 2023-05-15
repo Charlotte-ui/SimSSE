@@ -128,6 +128,11 @@ export class LotPlastronsComponent {
   drop(event: CdkDragDrop<string, any, any[]>) {
     let index = event.currentIndex;
     let modele = event.previousContainer.data[event.previousIndex] as Modele;
+   // let modele = this.sortedDataSourcePlastron[event.previousIndex] as Modele;
+
+    console.log("triage plastron ",this.dataSourcePlastron[index].triage)
+    console.log("triage modele ",modele.triage)
+    console.log(modele)
     if (this.dataSourcePlastron[index].triage == modele.triage) {
       let newPlastron = new Plastron({statut:Statut.Doing});
       let defaultGroupe = this.groupes[0]

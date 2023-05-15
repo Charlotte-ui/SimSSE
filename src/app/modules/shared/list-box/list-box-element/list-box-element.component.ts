@@ -23,7 +23,11 @@ export class ListBoxElementComponent<T extends Listable> {
 
   @Input() type: string;
 
-  constructor(private router: Router, public dialog: MatDialog, private apiService:ApiService) {}
+  constructor(
+    private router: Router,
+    public dialog: MatDialog,
+    private apiService: ApiService
+  ) {}
 
   removeElement() {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
@@ -34,13 +38,9 @@ export class ListBoxElementComponent<T extends Listable> {
       console.log(result);
 
       if (result) {
-        this.apiService.deleteDocument(this.element.id).subscribe(()=>{
+        this.apiService.deleteDocument(this.element.id).subscribe(() => {
           this.element = undefined;
-        }
-          
-        )
-
-        // delete element from database
+        });
       }
     });
   }
