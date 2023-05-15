@@ -106,6 +106,10 @@ export class Event extends Node {
     this.template = object?.template ? object.template : undefined;
   }
 
+  static createStart():Event{
+    return new Event({event:EventType.start,typeEvent:EventType.start,x:5,y:95})
+  }
+
   static override getName(element): string {
     return element.event;
   }

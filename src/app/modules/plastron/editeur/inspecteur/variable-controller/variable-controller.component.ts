@@ -36,6 +36,8 @@ export class VariableControllerComponent implements OnInit {
     this._tendances = value;
   }
 
+  @Input() disabled:boolean=false;
+
   @Output() newVariable = new EventEmitter<VariablePhysioInstance>();
 
   constructor(private fb: FormBuilder) {}

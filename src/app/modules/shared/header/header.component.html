@@ -48,15 +48,14 @@
   </button>
 
   <app-triage *ngIf="triage" [triage]="triage"></app-triage>
-</ng-container>
+
 
   <button
-    *ngIf="plastron || scenario"
     mat-icon-button
     [matTooltip]="
       plastron
         ? 'Enregister le plastron ' + plastron
-        : 'Enregister le scenario' + scenario.title
+        : 'Enregister le scenario' + scenario?.title
     "
     (click)="save()"
     [ngClass]="{ activate: changesToSave }"
@@ -66,13 +65,13 @@
   </button>
 
   <button
-    *ngIf="plastron"
     mat-icon-button
     matTooltip="Enregister le plastron actuel en tant que nouveau modele"
     (click)="saveAsNewModele()"
   >
     <mat-icon>note_add</mat-icon>
   </button>
+</ng-container>
 
   <button
     *ngIf="plastron"

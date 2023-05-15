@@ -41,6 +41,7 @@ export class EditeurComponent implements OnInit {
     if (value) {
       // if value isnt undefined
       this._targetVariable = value;
+      console.log("this.modele.graph ",this.modele.graph.toString())
       if(this.modele.graph) this.initCurves();
     }
   }
@@ -52,7 +53,7 @@ export class EditeurComponent implements OnInit {
   }
   @Input() set modele(value: Modele) {
     if (value) {
-            console.log("input modele")
+      console.log("editeur input modele ",value)
 
       this._modele = value;
       this.modelService
@@ -86,6 +87,7 @@ export class EditeurComponent implements OnInit {
           });
 
           // if the initialized graph is the root graph
+          console.log("this.targetVariable ",this.targetVariable.toString())
           if (this.targetVariable) {
             this.initCurves();
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
@@ -98,6 +100,8 @@ export class EditeurComponent implements OnInit {
         });
     }
   }
+
+  @Input() disabledInspecteur:boolean=false;
 
   @Input() duration: number = 100;
   @Input() variablesTemplate: VariablePhysioTemplate[];
@@ -186,6 +190,7 @@ export class EditeurComponent implements OnInit {
    * initialize all curves
    */
   initCurves() {
+    console.log("initCurves")
     this.curves = [];
     this.targetVariable.forEach((variable, index) => {
       let curve = new Curve(

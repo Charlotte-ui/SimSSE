@@ -173,6 +173,13 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
+    createRelationBetweenWithProperty(idIn: string, idOut: string, relation: string,champ:string,value:string) {
+    return this.http.post<any>(
+      `${environment.urlAPI}/function/simsse/createEdgeWithProprety/${idOut}/${idIn}/${relation}/${champ}/${value}`,
+      {}
+    );
+  }
+
   /**
    * DELETE
    */

@@ -92,6 +92,7 @@ export class ModeleComponent {
           console.log(variablesTemplates)
           console.log("varInst")
           console.log(this.targetVariable)
+          this.targetVariable = [... this.targetVariable]
         });
   }
 

@@ -9,7 +9,7 @@ import {
   Action,
   BioEvent,
 } from '../models/vertex/node';
-import { Observable, map, of } from 'rxjs';
+import { Observable, map, of, switchMap } from 'rxjs';
 import { ApiService } from './api.service';
 
 @Injectable({
@@ -40,8 +40,6 @@ export class NodeService {
       'true'
     );
 
-
-
     /*      let trend1 = new Trend("1",30,80,'chute sat','SpO2',-1)
     let trend2 = new Trend("2",15,60,'acc respi','FR',1)
     let event:Event = new Event("3",40,50,EventType.action,'oxygénothérapie')
@@ -62,21 +60,39 @@ export class NodeService {
     return of ([graph]) */
   }
 
-
-    /**
- * push a new Modele in the database
- * return the id of the new Modele
- * @param modele 
- */
-createGraph(graph: Graph):Observable<string>{
-  graph["@class"] = "Graph";
-  delete graph.id;
-  delete graph.nodes;
-  delete graph.links;
-  console.log("createGraph")
-  console.log(graph)
-//  return this.apiService.createDocument(graph)
-//  .pipe(map(response => this.apiService.documentId(response)));
-  return this.apiService.createDocument(graph)
-}
+  /**
+   * push a new Graph in the database
+   * return the id of the new Graph and the id of the first node in an array
+   * @param graph
+   */
+  createGraph(graph: Graph): Observable<string[]> {
+    graph['@class'] = 'Graph';
+    delete graph.id;
+    delete graph.nodes;
+    delete graph.links;
+    console.log('createGraph');
+    console.log(graph);
+    //  return this.apiService.createDocument(graph)
+    //
+    return this.apiService
+      .createDocument(graph)
+      .pipe(map((response) => this.apiService.documentId(response)))
+      .pipe(
+        switchMap((idGraph: string) => {
+          let start = Event.createStart();
+          start['@class'] = 'Event';
+          delete start.id;
+          return this.apiService
+            .createDocument(start)
+            .pipe(map((response) => this.apiService.documentId(response)))
+            .pipe(
+              switchMap((idStart: string) => 
+                this.apiService
+                  .createRelationBetween(idStart, idGraph, 'aNode')
+                  .pipe(map(response => [response.result[0].out,response.result[0].in]))
+              )
+            );
+        })
+      );
+  }
 }

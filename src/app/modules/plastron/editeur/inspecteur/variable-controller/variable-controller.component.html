@@ -11,7 +11,7 @@
   </mat-expansion-panel-header>
   <div *ngIf="variable" [formGroup]="form">
 
-    <div class="row">
+    <div class="row" [ngClass]="{'disabled': disabled}">
       <div class="col-6">
 
         <div mat-dialog-content>

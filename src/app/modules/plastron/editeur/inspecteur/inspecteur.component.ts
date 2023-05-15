@@ -11,6 +11,8 @@ export class InspecteurComponent implements OnInit {
 
   @Input() variables:VariablePhysioInstance[];
   @Input() trends:Trend[];
+  @Input() disabled:boolean=false;
+
 
   @Output() updateVariable = new EventEmitter<[VariablePhysioInstance,number]>();
 
