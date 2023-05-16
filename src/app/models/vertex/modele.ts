@@ -4,6 +4,8 @@ import { Tag } from "./tag";
 import { Trigger } from "../trigger";
 import { VariablePhysioTemplate } from "./variablePhysio";
 import { Vertex } from "./vertex";
+import { ApiService } from "src/app/services/api.service";
+import { Observable } from "rxjs";
 
 
 export enum Triage {
@@ -42,6 +44,12 @@ export class Modele extends Vertex implements Listable{
     }
 
     public static override getType(element):string{return "modele"}
+
+    public static override getListTemplate<T extends Vertex>(apiService:ApiService):Observable<T[]>{
+
+    return apiService.getClasseElementsWhithMatchingChamp<T>(Modele,'template',true)
+
+  }
 
 
 }

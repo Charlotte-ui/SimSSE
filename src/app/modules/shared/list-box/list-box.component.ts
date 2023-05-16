@@ -11,7 +11,7 @@ import { Vertex } from '../../../models/vertex/vertex';
 import { TagService } from '../../../services/tag.service';
 import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../../models/vertex/tag';
-import { Triage } from '../../../models/vertex/modele';
+import { Modele, Triage } from '../../../models/vertex/modele';
 import { Button } from 'src/app/models/buttons';
 
 @Component({
@@ -36,8 +36,9 @@ export class ListBoxComponent<T extends Listable> {
   @Input() chips!: Tag[];
   @Input() title!: string;
   @Input() subTitle!: string;
+  @Input() template!: boolean;
 
-  _classe: typeof Vertex;
+  _classe: typeof Vertex | typeof Scenario | typeof Modele;
   get classe(): typeof Vertex {
     return this._classe;
   }
@@ -45,8 +46,7 @@ export class ListBoxComponent<T extends Listable> {
     if (value) {
       this._classe = value;
 
-      this.apiService
-        .getClasseElements<T>(value)
+      value.getListTemplate<T>(this.apiService)
         .pipe(
           switchMap((elements: T[]) => {
             const requests = elements.map((element: T) =>

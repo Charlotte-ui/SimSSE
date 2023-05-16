@@ -1,6 +1,9 @@
+import { ScenarioService } from 'src/app/services/scenario.service';
 import { Listable } from '../interfaces/listable';
 import { Tag } from './tag';
 import { Vertex } from './vertex';
+import { ApiService } from 'src/app/services/api.service';
+import { Observable } from 'rxjs';
 
 export class Scenario extends Vertex implements Listable {
   title: string;
@@ -47,4 +50,10 @@ export class Scenario extends Vertex implements Listable {
   }
 
   public static override getType(element):string{return "scenario"}
+
+  public static override getListTemplate<T extends Vertex>(apiService:ApiService):Observable<T[]>{
+
+    return apiService.getClasseElements<T>(Scenario)
+
+  }
 }
