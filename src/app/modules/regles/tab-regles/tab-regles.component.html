@@ -1,6 +1,6 @@
 <mat-card>
   <div class="container">
-    <div  class="row" >
+    <div class="row">
       <div class="title">
         <h1>{{ title }}</h1>
       </div>
@@ -21,14 +21,15 @@
       </button>
     </div>
 
-    {{ description }}
-
+    <div id="description">
+      {{ description }}
+    </div>
   </div>
   <div class="container">
     <table
-      *ngIf="dataSource"
+      *ngIf="elements"
       mat-table
-      [dataSource]="dataSource"
+      [dataSource]="elements"
       class="mat-elevation-z8"
     >
       <ng-container *ngFor="let column of displayedColumns">
@@ -40,6 +41,7 @@
         >
           <th mat-header-cell *matHeaderCellDef>{{ getLabel(column) }}</th>
           <td
+            class="cell"
             mat-cell
             *matCellDef="let element"
             [ngStyle]="{
@@ -62,8 +64,8 @@
 
       <ng-container matColumnDef="delete">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-icon-button (click)="removeElement(element.id)">
+        <td mat-cell *matCellDef="let element; let i = index">
+          <button mat-icon-button (click)="removeElement(i)">
             <mat-icon>delete</mat-icon>
           </button>
         </td>

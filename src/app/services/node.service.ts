@@ -115,17 +115,7 @@ export class NodeService {
    * @param node
    */
   updateNode(node: Node): Observable<string[]> {
-    let requests: Observable<any>[] = [];
-    Object.keys(node).forEach((key) => {
-      requests.push(
-        this.apiService.updateDocumentChamp(node.id, key, "'" + node[key] + "'")
-      );
-    });
-    if (requests.length > 0)
-      return from(requests).pipe(
-        concatMap((request: Observable<any>) => request)
-      );
-    else return of([]);
+    return this.apiService.updateAllDocumentChamp(node)
   }
 
   /**

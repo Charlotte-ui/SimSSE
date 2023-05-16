@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment.api';
-import { Observable, map, of } from 'rxjs';
+import { Observable, concatMap, from, map, of } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { Vertex } from '../models/vertex/vertex';
 
@@ -110,21 +110,6 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * UPDATE
    */
 
-/* 
-  $scope.update = function(){
-
-		$http({
-			method:'POST',
-			url:'http://localhost:2480/command/ApplicationData/sql/INSERT INTO details SET name = \''+ $scope.name + '\', age= \'' + $scope.age + '\', mobile = \'' + $scope.mobile + '\'',
-			headers: {
-				'Authorization':'Basic cm9vdDowMzMyMjIwNTU5'
-			}  
-		})
-		.then(function(response){
-			console.log("updated");
-			alert('record added')
-		}); */
-
   updateProprertyOfVertex(id: string, champ: string, value: string) {
     return this.http
       .put<any>(
@@ -136,22 +121,25 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
       });
   }
 
-  updateDocument(id: string, document, classe: string) {
-    let content = document;
-    content['@class'] = classe;
-
-    return this.http
-      .patch<any>(`${environment.urlAPI}/document/simsse/${id}`, content)
-      .subscribe(() => {
-        console.log('updateDocument ' + id);
-      });
-  }
-
   updateDocumentChamp(id:string,champ:string,value:string){
     return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/${value}`,
       {}
     );
+  }
+
+  updateAllDocumentChamp(document:any){
+    let requests: Observable<any>[] = [];
+    Object.keys(document).forEach((key) => {
+      requests.push(
+        this.updateDocumentChamp(document.id, key, "'" + document[key] + "'")
+      );
+    });
+    if (requests.length > 0)
+      return from(requests).pipe(
+        concatMap((request: Observable<any>) => request)
+      );
+    else return of([]);
   }
 
   /**

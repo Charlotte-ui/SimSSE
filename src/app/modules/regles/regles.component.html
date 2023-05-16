@@ -5,30 +5,26 @@
     [elements]="variablesDetails"
     title="Variables"
     [classe]="VariablePhysioTemplate"
-    (newElement)="addVariable($event)"
-    description="bla bla bla"
+    description="Ensemble des variables physiologiques qui caractèrisent un modèle traumato-physiologique. L'écart-type et les valeurs maximum et minimum renseignées ici font références à ceux de l'appareil de mesure. La couleur désigne celle de la courbe, et la valeur par défaut est celle utilisée à titre d'exemple lors de la création de nouveaux modèles."
   ></app-tab-regles>
 
   <app-tab-regles
     [elements]="events"
     title="Événements"
     [classe]="BioEvent"
-    (newElement)="addBioEvent($event)"
-    description="bla bla bla"
+    description="Les Événements se déclenchent lorsque des conditions sont requises, en particulier lorsqu'une variable atteint une certaine valeur."
   ></app-tab-regles>
 
   <app-tab-regles
     [elements]="actions"
     title="Actions"
     [classe]="Action"
-    (newElement)="addAction($event)"
-    description="bla bla bla"
+    description="Les actions que les intervenants peuvent faire sur un plastron."
   ></app-tab-regles>
 
   <app-tab-regles
     [elements]="moyennesAge"
     title="Moyenne par âge"
-    (newElement)="addBioEvent($event)"
     description="bla bla bla"
   ></app-tab-regles>
 </div>

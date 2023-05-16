@@ -46,7 +46,7 @@ export class VariablePhysioTemplate extends VariablePhysio {
   constructor(object?: any) {
     super(object);
     this.moyennesAge = object?.moyennesAge
-      ? object.moyennesAge
+      ? object.moyennesAge.split(',')
       : [50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
     this.sdAge = object?.sdAge ? object.sdAge : 1;
   }

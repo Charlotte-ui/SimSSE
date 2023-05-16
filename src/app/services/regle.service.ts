@@ -3,7 +3,7 @@ import {
   VariablePhysio,
   VariablePhysioTemplate,
 } from '../models/vertex/variablePhysio';
-import { Observable, of } from 'rxjs';
+import { Observable, map, of } from 'rxjs';
 import { FirebaseService } from './firebase.service';
 import {
   Trend,
@@ -15,6 +15,7 @@ import {
   Graph,
 } from '../models/vertex/node';
 import { ApiService } from './api.service';
+import { Vertex } from '../models/vertex/vertex';
 
 @Injectable({
   providedIn: 'root',
@@ -31,78 +32,36 @@ export class RegleService {
   getBioEvents(): Observable<BioEvent[]> {
     return this.apiService.getClasseElements(BioEvent)
 
-    /* let oxy: BioEvent = {
-      name: 'mort',
-      id: 'mort',
-    };
-
-    let garrot: BioEvent = {
-      name: 'arrêt cardio-vasculaire',
-      id: 'arrêt cardio-vasculaire',
-    };
-
-    let hypox: BioEvent = {
-      name: 'hypoxémie',
-      id: 'hypoxémie',
-    };
-
-    let events = [oxy, garrot, hypox];
-
-    return of(events);
-    //return this.firebaseService.getCollectionById<Scenario>("Scenario"); */
   }
 
   getActions(): Observable<Action[]> {
     return this.apiService.getClasseElements(Action)
-
-   /*  let oxy: Action = {
-      name: 'oxygénothérapie',
-      id: 'oxygénothérapie',
-    };
-
-    let garrot: Action = {
-      name: 'garrot',
-      id: 'garrot',
-    };
-
-    let pls: Action = {
-      name: 'pls',
-      id: 'pls',
-    }; 
-
-    let events = [oxy, garrot, pls];
-
-    return of(events); */
-    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
 
-  getAllTagsPlastron(): Observable<string[]> {
-    let tags = [
-      'UA',
-      'EU',
-      'UR',
-      'respiratoire',
-      'arme de guerre',
-      'polytraumatisme',
-      'trauma fermé',
-      'trauma ouvert',
-    ];
-    return of(tags);
+
+  createRegle(regle: Vertex,classe:string):Observable<any> {
+    regle['@class'] = classe;
+    delete regle.id;
+    return this.apiService.createDocument(regle)
+    .pipe(map((response) => this.apiService.documentId(response)))
+;
   }
 
-  getAllTagsScenario(): Observable<string[]> {
-    let tags = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
-    return of(tags);
+  updateRegle(regle: Vertex):Observable<any> {
+    return this.apiService.updateAllDocumentChamp(regle)
+
   }
 
-  createVariable(variable: VariablePhysio) {}
+  deleteRegle(id):Observable<any> {
+    return this.apiService.deleteDocument(id)
+  }
+
+
 
   createEvent(event: Event) {}
 
   createAction(event: any) {
     throw new Error('Method not implemented.');
   }
-  createBioEvent(event: any) {
-    throw new Error('Method not implemented.');
-  }
+
 }

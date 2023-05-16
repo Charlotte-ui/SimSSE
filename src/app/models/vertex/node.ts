@@ -257,7 +257,7 @@ export class BioEvent extends Vertex {
     return list.map((element) => new BioEvent(element) as T);
   }
 
-  public static getBioEventByID(id: string): Action {
+  public static getBioEventByID(id: string): BioEvent {
     let result = undefined;
     BioEvent.bioevents.forEach((bioevent: BioEvent) => {
       if (bioevent.id == id) result = bioevent;

@@ -31,8 +31,7 @@ export class ModeleComponent implements Graphable {
   graph!: Graph;
   allTags!: Tag[];
 
-  changesToSave = false;
-  newModele: Modele;
+
   newTags: Tag[];
   tagsToDelete: Tag[];
 
@@ -41,6 +40,8 @@ export class ModeleComponent implements Graphable {
   nodeToDelete: string[] = [];
   linkToUpdate: string[] = [];
   linkToDelete: string[] = [];
+  changesToSave = false;
+  newModele: Modele;
 
   constructor(
     private route: ActivatedRoute,
