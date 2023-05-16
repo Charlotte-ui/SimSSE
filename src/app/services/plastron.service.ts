@@ -49,23 +49,15 @@ export class PlastronService {
       .duplicateModele(structuredClone(plastron.modele))
       .pipe(
         switchMap((newModeleId: string) =>
-          this.apiService
-            .createRelationBetween(newModeleId, plastron.id, 'aModele')
-            .pipe(
-              switchMap(() =>
-                this.apiService
-                  .deleteRelationBetween(plastron.modele.id, plastron.id)
-                  .pipe(
-                    switchMap(() =>
-                      this.apiService.createRelationBetween(
-                        oldModelId,
-                        newModeleId,
-                        'aTemplate'
-                      )
-                    )
-                  )
+          this.assignNewModel(plastron, newModeleId).pipe(
+            switchMap(() =>
+              this.apiService.createRelationBetween(
+                oldModelId,
+                newModeleId,
+                'aTemplate'
               )
             )
+          )
         )
       );
   }
@@ -128,6 +120,19 @@ export class PlastronService {
     return this.apiService
       .getRelationTo(idPlastron, 'seComposeDe', 'Plastron')
       .pipe(map((response) => new Groupe(response.result[0])));
+  }
+
+  /***
+   * assigne a new modele to the plastron
+   */
+  assignNewModel(plastron: Plastron, modeleId: string): Observable<any> {
+    return this.apiService
+      .createRelationBetween(modeleId, plastron.id, 'aModele')
+      .pipe(
+        switchMap(() =>
+          this.apiService.deleteRelationBetween(plastron.modele.id, plastron.id)
+        )
+      );
   }
 
   /**

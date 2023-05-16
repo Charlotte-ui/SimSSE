@@ -110,7 +110,7 @@ export class LotPlastronsComponent {
     public regleService: RegleService,
     public modeleService: ModeleService,
     public tagSetvice: TagService,
-    public plastronService:PlastronService
+    public plastronService: PlastronService
   ) {
     this.defaultElementPlastron = new Object() as tableElementPlastron;
     this.defaultElementPlastron.description = '';
@@ -128,25 +128,37 @@ export class LotPlastronsComponent {
   drop(event: CdkDragDrop<string, any, any[]>) {
     let index = event.currentIndex;
     let modele = event.previousContainer.data[event.previousIndex] as Modele;
-   // let modele = this.sortedDataSourcePlastron[event.previousIndex] as Modele;
+    // let modele = this.sortedDataSourcePlastron[event.previousIndex] as Modele;
 
-    console.log("triage plastron ",this.dataSourcePlastron[index].triage)
-    console.log("triage modele ",modele.triage)
-    console.log(modele)
+    console.log('triage plastron ', this.dataSourcePlastron[index].triage);
+    console.log('triage modele ', modele.triage);
+    console.log(modele);
     if (this.dataSourcePlastron[index].triage == modele.triage) {
-      let newPlastron = new Plastron({statut:Statut.Doing});
-      let defaultGroupe = this.groupes[0]
-      this.plastronService.createPlastron(newPlastron,defaultGroupe.id,modele.id).subscribe((response:[string,Profil]) => {
-        newPlastron.id = response[0];
-        newPlastron.modele = modele;
-        newPlastron.profil = response[1];
-        newPlastron.groupe = defaultGroupe
-        this.plastrons.push(newPlastron)
-        this.addPlastronToDatasource(newPlastron,index);
-        this.groupes[0][newPlastron.modele.triage] ++;
-      })
+      let defaultGroupe = this.groupes[0];
+      // si le plastron n'existe pas encore
+      if (this.dataSourcePlastron[index].id === -1) {
+        let newPlastron = new Plastron({ statut: Statut.Doing });
+        this.plastronService
+          .createPlastron(newPlastron, defaultGroupe.id, modele.id)
+          .subscribe((response: [string, Profil]) => {
+            newPlastron.id = response[0];
+            newPlastron.modele = modele;
+            newPlastron.profil = response[1];
+            newPlastron.groupe = defaultGroupe;
+            this.plastrons.push(newPlastron);
+            this.addPlastronToDatasource(newPlastron, index);
+            this.groupes[0][newPlastron.modele.triage]++;
+          });
+      } else {
+        this.plastronService
+          .assignNewModel(this.plastrons[index], modele.id)
+          .subscribe(() => {
+            console.log('updateplastron');
+            this.plastrons[index].modele = modele ;
+            this.addPlastronToDatasource(this.plastrons[index], index);
 
-      
+          });
+      }
     } else {
       this._snackBar.open(
         'Attention, le modèle et le plastron doivent avoir le même triage',
@@ -280,11 +292,13 @@ export class LotPlastronsComponent {
   createModele(modele: Modele) {
     this.dialog.open(WaitComponent);
 
-    this.modeleService.createModele(modele, true).subscribe((idexes:string[]) => {
-      this.router.navigate(['/modele/' + idexes[0]]);
+    this.modeleService
+      .createModele(modele, true)
+      .subscribe((idexes: string[]) => {
+        this.router.navigate(['/modele/' + idexes[0]]);
 
-      this.dialog.closeAll();
-    });
+        this.dialog.closeAll();
+      });
   }
 
   expandElement(event, element: tableElementPlastron) {
