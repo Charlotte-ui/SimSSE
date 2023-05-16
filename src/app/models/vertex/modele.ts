@@ -13,13 +13,11 @@ export enum Triage {
 }
 
 export class Modele extends Vertex implements Listable{
-    createVariableCible(varTemp: VariablePhysioTemplate) {
-      throw new Error('Method not implemented.');
-    }
+
     title: string;
     description: string;
     triage:Triage;
-    template:boolean;
+    template:boolean|string;
     graph:Graph;
     triggeredEvents:Trigger[];
     tags:Tag[];

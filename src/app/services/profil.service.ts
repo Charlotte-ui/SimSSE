@@ -3,41 +3,94 @@ import { Observable } from 'rxjs/internal/Observable';
 import { FirebaseService } from './firebase.service';
 import { Profil } from '../models/vertex/profil';
 import { ApiService } from './api.service';
-import { map } from 'rxjs';
-import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
+import { map, of, switchMap } from 'rxjs';
+import {
+  VariablePhysioInstance,
+  VariablePhysioTemplate,
+} from '../models/vertex/variablePhysio';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ProfilService {
-
-  constructor(public firebaseService:FirebaseService,public apiService:ApiService) { }
-  getProfilById(id:string): Observable<Profil|undefined> {
-    return this.apiService.getDocument(id)
-    .pipe(map(response => (new Profil(response))))
-  //  return this.firebaseService.getElementInCollectionByIds("Profil",id);
+  constructor(
+    public firebaseService: FirebaseService,
+    public apiService: ApiService
+  ) {}
+  getProfilById(id: string): Observable<Profil | undefined> {
+    return this.apiService
+      .getDocument(id)
+      .pipe(map((response) => new Profil(response)));
+    //  return this.firebaseService.getElementInCollectionByIds("Profil",id);
   }
 
-  updateProfil(profil:Profil){
+  updateProfil(profil: Profil) {
     // TODO update bdd
   }
 
-    getVariable(idProfil, idVariableTemplate) : Observable<VariablePhysioInstance | undefined> {
-    return this.apiService.getVariable(idProfil, idVariableTemplate)
-    .pipe(map((response) => new VariablePhysioInstance(response.result[0]["intersect($a, $b)"][0])));
+  getVariable(
+    idProfil,
+    idVariableTemplate
+  ): Observable<VariablePhysioInstance | undefined> {
+    return this.apiService
+      .getVariable(idProfil, idVariableTemplate)
+      .pipe(
+        map(
+          (response) =>
+            new VariablePhysioInstance(
+              response.result[0]['intersect($a, $b)'][0]
+            )
+        )
+      );
   }
 
-        /**
+  /**
    * push a new Profil in the database
    * return the id of the new Profil
-   * @param profil 
+   * @param profil
    */
-    createProfil(profil: Profil):Observable<Profil>{
-      profil["@class"] = "Profil";
-      delete profil.id;
-      delete profil.targetVariable;
-      return this.apiService.createDocument(profil)
-      .pipe(map(response => new Profil(response)));
-    }
+  createProfil(profil: Profil): Observable<Profil> {
+    profil['@class'] = 'Profil';
+    delete profil.id;
+    delete profil.targetVariable;
+    return this.apiService
+      .createDocument(profil)
+      .pipe(map((response) => new Profil(response)));
+  }
 
+  createVariableCible(
+    varTemp: VariablePhysioTemplate,
+    profil: Profil
+  ): Observable<any> {
+    let variable = new VariablePhysioInstance(varTemp);
+    variable.cible = varTemp.defaultValue; // TODO ; replace by age moyen
+    variable.template = varTemp.id; // TODO ; replace by age moyen
+
+    let variableToSave = structuredClone(variable);
+    variableToSave['@class'] = 'VariablePhysio';
+    delete variableToSave.id;
+    return this.apiService
+      .createDocument(variableToSave)
+      .pipe(map((response) => this.apiService.documentId(response)))
+      .pipe(
+        switchMap((idVariable: string) =>
+          this.apiService
+            .createRelationBetween(varTemp.id, idVariable, 'aTemplate')
+            .pipe(
+              switchMap(() => {
+                this.apiService.createRelationBetween(
+                  idVariable,
+                  profil.id,
+                  'aVariableCible'
+                ).subscribe();
+                variable.id = idVariable;
+
+                return of (variable)
+
+
+              })
+            )
+        )
+      );
+  }
 }

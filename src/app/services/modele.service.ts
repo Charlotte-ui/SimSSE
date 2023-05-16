@@ -63,10 +63,10 @@ export class ModeleService {
 
   /**
    * push a new Modele in the database
-   * return the id of the new Modele
+   * return the id of the new Modele,  the id of the graph and the id 
    * @param modele
    */
-  createModele(modele: Modele, template: boolean): Observable<string> {
+  createModele(modele: Modele, template: boolean|string): Observable<string[]> {
     modele['@class'] = 'Modele';
     modele['template'] = template;
     delete modele.id;
@@ -84,15 +84,12 @@ export class ModeleService {
               switchMap((indexes: string[]) => {
                 let idGraph = indexes[0].substring(1);
                 let idStart = indexes[1].substring(1);
-                console.log('id graph ', idGraph);
-                console.log('idStart ', idStart);
 
                 return this.apiService
                   .createRelationBetween(idGraph, idModele, 'rootGraph')
                   .pipe(
                     switchMap(() => {
-                      console.log('idModele ', idModele);
-                      console.log('idStart ', idStart);
+                 
                       this.apiService
                         .createRelationBetweenWithProperty(
                           idStart,
@@ -102,13 +99,31 @@ export class ModeleService {
                           '0'
                         )
                         .subscribe();
-                      return of(idModele);
+                      return of([idModele,idGraph,idStart]);
                     })
                   );
               })
             )
         )
       );
+  }
+
+
+  /**
+   * create a deep copy of a model
+   * @param modele 
+   */
+  duplicateModele(modele:Modele):Observable<string>{
+    let graphToCopy = structuredClone(modele.graph);
+
+    return this.createModele(modele,modele.id).pipe(switchMap((indexes:string[])=>{
+      let idnewModele = indexes[0]
+      let idnewGraph = indexes[1]
+      let idnewStart = indexes[2]
+      this.nodeService.duplicateGraph(graphToCopy,idnewGraph,idnewStart).subscribe()
+      return of(idnewModele)
+    }))
+
   }
 
   /**

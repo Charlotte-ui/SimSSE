@@ -16,13 +16,14 @@ import { WaitComponent } from '../shared/wait/wait.component';
 import { RegleService } from '../../services/regle.service';
 import { Trigger } from '../../models/trigger';
 import { NodeService } from 'src/app/services/node.service';
+import { Graphable } from 'src/app/models/interfaces/graphable';
 
 @Component({
   selector: 'app-modele',
   templateUrl: './modele.component.html',
   styleUrls: ['./modele.component.less'],
 })
-export class ModeleComponent {
+export class ModeleComponent implements Graphable {
   modele!: Modele;
   scenario: Scenario;
   targetVariable!: VariablePhysioInstance[];
@@ -34,6 +35,8 @@ export class ModeleComponent {
   newModele: Modele;
   newTags: Tag[];
   tagsToDelete: Tag[];
+
+  // implement Graphable
   nodeToUpdate: string[] = [];
   nodeToDelete: string[] = [];
   linkToUpdate: string[] = [];
@@ -121,7 +124,13 @@ export class ModeleComponent {
       );
 
     requests.push(
-      this.nodeService.updateGraph(this.modele.graph, this.nodeToUpdate, this.nodeToDelete, this.linkToUpdate, this.linkToDelete)
+      this.nodeService.updateGraph(
+        this.modele.graph,
+        this.nodeToUpdate,
+        this.nodeToDelete,
+        this.linkToUpdate,
+        this.linkToDelete
+      )
     );
 
     forkJoin(requests).subscribe((value) => {

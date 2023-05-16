@@ -188,6 +188,45 @@ export class NodeService {
   }
 
   /**
+   * create a duplicate of all the node and link of the graph
+   * @param graph 
+   * @returns 
+   */
+  duplicateGraph(
+    graphToCopy: Graph,
+    idNewGraph:string,
+    idNewStart:string
+  ): Observable<any> {
+
+      graphToCopy.id = idNewGraph;
+
+      let nodeIds = []
+
+
+      graphToCopy.nodes.forEach((node:Node)=>{
+        if(Node.getType(node) === EventType.start) node.id = idNewStart ;
+        else {
+          nodeIds.push(node.id)
+          node.id = node.id.replace(':', '');
+        }
+      })
+
+      graphToCopy.links.forEach((link:Link)=>{
+        link.in = (nodeIds.includes(link.in))? link.in.replace(':', '') : link.in ;
+        link.out = (nodeIds.includes(link.out))? link.out.replace(':', ''): link.out ;
+        link.id = link.id.replace(':', '');
+      })
+  
+    // create new nodes and links
+    return this.updateGraphNodes(graphToCopy).pipe(
+      switchMap((indexesNode: string[]) => {
+        console.log('indexesNode ', indexesNode);
+        return this.updateGraphLinks(graphToCopy, indexesNode);
+      })
+    );
+  }
+
+  /**
    * create the new nodes of a graph and add them to it
    * return an array of all the graph nodes
    * @param graph
@@ -201,7 +240,7 @@ export class NodeService {
 
     // add new nodes
     graph.nodes.forEach((node) => {
-      if (this.isNew(node.id))
+      if (this.isNew(node.id) )
         requestsNode.push(
           this.createNode(
             structuredClone(node),
@@ -232,9 +271,7 @@ export class NodeService {
         return from(requestLink).pipe(
           concatMap((request: Observable<any>) => request),
           reduce((acc, cur) => [...acc, cur], []),
-          map((res: any[]) => {
-            console.log('Response is ', res);
-
+          map(() => {
             return oldNodeInddexes.concat(newNodeIndexes);
           })
           // map(([first, second]) => [first, second])
@@ -254,7 +291,7 @@ export class NodeService {
     let requestsLinks: Observable<string>[] = [];
 
     graph.links.forEach((link) => {
-      if (this.isNew(link.id))
+      if (this.isNew(link.id) )
         requestsLinks.push(
           this.apiService.createRelationBetweenWithProperty(
             this.getNodeId(link.in, graph.nodes, indexesNode),
@@ -283,6 +320,7 @@ export class NodeService {
     indexesNode: string[]
   ): string {
     let res = '';
+    console.log('getNodeId ');
     console.log('value ', value);
     nodes.forEach((node: Node, index: number) => {
       console.log('node ', node);

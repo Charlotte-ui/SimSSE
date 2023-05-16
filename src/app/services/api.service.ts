@@ -159,6 +159,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    */
 
   createDocument(document: Vertex|any) {
+    console.log("createDocument ",document)
     return this.http.post<any>(
       `${environment.urlAPI}/document/simsse/`,
       document
@@ -191,9 +192,9 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
-  deleteRelationBetween(idIn: string, idOut: string,relation:string) {
+  deleteRelationBetween(idIn: string, idOut: string) {
      return this.http.post<any>(
-      `${environment.urlAPI}/function/simsse/deleteEdge/${idOut}/${idIn}`,
+      `${environment.urlAPI}/function/simsse/deleteEdgeBetween/${idOut}/${idIn}`,
       {}
     );
   }

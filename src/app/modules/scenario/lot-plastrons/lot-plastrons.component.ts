@@ -280,8 +280,8 @@ export class LotPlastronsComponent {
   createModele(modele: Modele) {
     this.dialog.open(WaitComponent);
 
-    this.modeleService.createModele(modele, true).subscribe((id) => {
-      this.router.navigate(['/modele/' + id]);
+    this.modeleService.createModele(modele, true).subscribe((idexes:string[]) => {
+      this.router.navigate(['/modele/' + idexes[0]]);
 
       this.dialog.closeAll();
     });

@@ -53,8 +53,8 @@ export class AccueilComponent implements OnInit {
 
     this.dialog.open(WaitComponent);
 
-    this.modeleService.createModele(modele, true).subscribe(id =>{
-      this.router.navigate(['/modele/' + id]);
+    this.modeleService.createModele(modele, true).subscribe((indexes:string[]) =>{
+      this.router.navigate(['/modele/' + indexes[0]]);
       this.dialog.closeAll();
     })
     
