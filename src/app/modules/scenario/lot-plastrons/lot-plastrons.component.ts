@@ -42,6 +42,7 @@ interface tableElementPlastron {
   idPlastron: string;
   numero: number;
   age: number;
+  variant:boolean;
 }
 
 @Component({
@@ -119,6 +120,7 @@ export class LotPlastronsComponent {
     this.defaultElementPlastron.statut = Statut.Todo;
     this.defaultElementPlastron.triage = Triage.UR;
     this.defaultElementPlastron.id = -1;
+    this.defaultElementPlastron.variant = false;
 
     this.tagSetvice.getAllTags('modele').subscribe((response) => {
       this.allTags = response;
@@ -259,6 +261,7 @@ export class LotPlastronsComponent {
     this.dataSourcePlastron[index].idPlastron = plastron.id;
     this.dataSourcePlastron[index].groupe = plastron.groupe?.scene;
     this.dataSourcePlastron[index].age = plastron.profil.age;
+    this.dataSourcePlastron[index].variant = plastron.modele.template === true ? false:true;
   }
 
   private updateDataSourceTriage(indexStart: number) {

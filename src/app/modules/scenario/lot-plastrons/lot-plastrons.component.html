@@ -127,10 +127,12 @@
                   element == expandedElement ? 'expanded' : 'collapsed'
                 "
               >
-                <div class="col-3 profil">
+                
                   <div class="age">Âge : {{ element.age }}</div>
-                </div>
-                <div class="col-9 description">
+                
+                  <div id="variant">{{ element.variant?"Variante du modèle":"Modèle standard" }}</div>
+                
+                <div id="description">
                   {{ element.description }}
                 </div>
               </div>
