@@ -37,7 +37,8 @@ export class TagService {
     tag["@class"] = "Tag";
     tag["type"] = type;
     delete tag.id;
-    return this.apiService.createDocument(tag);
+    return this.apiService.createDocument(tag)
+    .pipe(map((response) => this.apiService.documentId(response)));
   }
 
   /**

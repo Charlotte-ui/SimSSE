@@ -26,7 +26,13 @@ export class GeneralInfosComponent {
     if (value) {
       // if value isnt undefined
       this._scenario = value;
-      this.scenarioFormGroup = this.form.group(this.scenario);
+
+      let scenarioGenalInfo = structuredClone(value)
+      delete scenarioGenalInfo.coordPMA // les coordonnées sont gérées dans groupes
+      delete scenarioGenalInfo.coordCADI
+      delete scenarioGenalInfo.coordPRV
+
+      this.scenarioFormGroup = this.form.group(scenarioGenalInfo);
 
       this.calculTotalPlastron(value);
 

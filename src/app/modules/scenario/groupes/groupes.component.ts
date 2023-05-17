@@ -147,14 +147,11 @@ export class GroupesComponent {
       i = index;
     });
     i++;
-    this.scenario.PRVx = event[i][0]
-    this.scenario.PRVy = event[i][1]
+    this.scenario.coordPRV = event[i]
     i++;
-    this.scenario.PMAx = event[i][0]
-    this.scenario.PMAy = event[i][1]
+    this.scenario.coordPMA = event[i]
     i++;
-    this.scenario.CADIx = event[i][0]
-    this.scenario.CADIy = event[i][1]
+    this.scenario.coordCADI = event[i]
 
     this.updateGroupes.emit(true)
   }

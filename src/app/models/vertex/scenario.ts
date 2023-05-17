@@ -15,13 +15,9 @@ export class Scenario extends Vertex implements Listable {
   UR: number;
   EU: number;
   image: string;
-  PMAx:number;
-  PMAy:number;
-  CADIx:number;
-  CADIy:number;
-  PRVx:number;
-  PRVy:number;
-
+  coordPMA:[number,number]
+  coordCADI:[number,number]
+  coordPRV:[number,number]
   public static override className = 'Scenario';
 
   constructor(object?: any) {
@@ -35,12 +31,10 @@ export class Scenario extends Vertex implements Listable {
     this.UR = object?.UR ? object.UR : 0;
     this.EU = object?.EU ? object.EU : 0;
     this.image = object?.image ? object.image : '';
-    this.PMAx = object?.PMAx ? object.PMAx : 50;
-    this.PMAy = object?.PMAy ? object.PMAy : 50;
-    this.CADIx = object?.CADIx ? object.CADIx : 50;
-    this.CADIy = object?.CADIy ? object.CADIy : 50;
-    this.PRVx = object?.PRVx ? object.PRVx : 50;
-    this.PRVy = object?.PRVy ? object.PRVy : 50;
+    this.coordPMA = object?.coordPMA ? object.coordPMA.split(',') : [45,55];
+    this.coordPRV = object?.coordPRV ? object.coordPRV.split(',') : [55,45];
+    this.coordCADI = object?.coordCADI ? object.coordCADI.split(',') : [45,45];
+
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
