@@ -15,8 +15,8 @@
   <mat-tab label="Groupes">
     <app-groupes
       *ngIf="groupes"
-      [groupes]="groupes"
       [scenario]="scenario"
+      [groupes]="groupes"
       (updateGroupes)="updateGroupes($event)"
     ></app-groupes>
   </mat-tab>

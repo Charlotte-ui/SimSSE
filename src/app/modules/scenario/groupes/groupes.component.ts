@@ -88,15 +88,11 @@ export class GroupesComponent {
       groupe.y,
       groupe.scene,
     ]);
-
-    this.groupPositions.push(this.PRV);
-    this.groupPositions.push(this.PMA);
-    this.groupPositions.push(this.CADI);
-/*  TODO replace when change in bdd
-    this.groupPositions.push([this.scenario.PRVx,this.scenario.PRVy]);
-    this.groupPositions.push([this.scenario.PMAx,this.scenario.PMAy]);
-    this.groupPositions.push([this.scenario.CADIx,this.scenario.CADIy]);
- */
+    
+    this.groupPositions.push(this.scenario.coordPRV);
+    this.groupPositions.push(this.scenario.coordPMA);
+    this.groupPositions.push(this.scenario.coordCADI);
+ 
   }
 
   editGroup(id: number) {

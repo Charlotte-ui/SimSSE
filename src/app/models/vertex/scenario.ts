@@ -31,9 +31,9 @@ export class Scenario extends Vertex implements Listable {
     this.UR = object?.UR ? object.UR : 0;
     this.EU = object?.EU ? object.EU : 0;
     this.image = object?.image ? object.image : '';
-    this.coordPMA = object?.coordPMA ? object.coordPMA.split(',') : [45,55];
-    this.coordPRV = object?.coordPRV ? object.coordPRV.split(',') : [55,45];
-    this.coordCADI = object?.coordCADI ? object.coordCADI.split(',') : [45,45];
+    this.coordPMA = object?.coordPMA ? object.coordPMA.split(',') : [48,52];
+    this.coordPRV = object?.coordPRV ? object.coordPRV.split(',') : [52,48];
+    this.coordCADI = object?.coordCADI ? object.coordCADI.split(',') : [48,48];
 
   }
 

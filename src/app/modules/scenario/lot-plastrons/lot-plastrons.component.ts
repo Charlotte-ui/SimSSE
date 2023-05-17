@@ -231,6 +231,8 @@ export class LotPlastronsComponent {
     this.newChange.emit(true);
   }
 
+
+
   public completePlastrons() {
     this.dataSourcePlastron = new Array<tableElementPlastron>(
       this.totalPlastron
@@ -243,10 +245,11 @@ export class LotPlastronsComponent {
 
     this.plastrons.forEach((plastron, index) => {
       if (plastron.modele) this.addPlastronToDatasource(plastron, index);
-      // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
-      if (index == this.plastrons.length - 1)
-        this.updateDataSourceTriage(index);
+      plastron.groupe[plastron.modele.triage] ++;
     });
+
+    // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
+    this.updateDataSourceTriage(this.plastrons.length - 1);
 
     //this.dataSourcePlastron = this.plastrons;
   }
