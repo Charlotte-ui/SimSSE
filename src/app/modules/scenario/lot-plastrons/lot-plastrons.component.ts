@@ -126,18 +126,25 @@ export class LotPlastronsComponent {
   }
 
   drop(event: CdkDragDrop<string, any, any[]>) {
-    let index = event.currentIndex;
-    let modele = event.previousContainer.data[event.previousIndex] as Modele;
-    // let modele = this.sortedDataSourcePlastron[event.previousIndex] as Modele;
 
-    console.log('triage plastron ', this.dataSourcePlastron[index].triage);
-    console.log('triage modele ', modele.triage);
-    console.log(modele);
-    if (this.dataSourcePlastron[index].triage == modele.triage) {
-      let defaultGroupe = this.groupes[0];
+    let index = event.currentIndex;
+
+    // Get modele and plastron from drop event taking account of the filtered elements not showing in the arrays
+    let data: Modele[] = event.previousContainer.data ;
+    let filteredData = data.filter(element => element["show"] || element["show"]===undefined);
+    let modele = filteredData[event.previousIndex] as Modele;
+    let currentPlastron = this.sortedDataSourcePlastron[index] ; 
+    let datasourceIndex = this.dataSourcePlastron.indexOf(currentPlastron) ;
+    let filteredDataSource = this.dataSourcePlastron.filter(element => element.id !== -1);
+    let realIndex = filteredDataSource.indexOf(currentPlastron) ;
+
+
+    if (this.sortedDataSourcePlastron[index].triage == modele.triage  ) { 
+      
       // si le plastron n'existe pas encore
-      if (this.dataSourcePlastron[index].id === -1) {
+      if (this.sortedDataSourcePlastron[index].id === -1 ) {
         let newPlastron = new Plastron({ statut: Statut.Doing });
+        let defaultGroupe = this.groupes[0];
         this.plastronService
           .createPlastron(newPlastron, defaultGroupe.id, modele.id)
           .subscribe((response: [string, Profil]) => {
@@ -146,16 +153,15 @@ export class LotPlastronsComponent {
             newPlastron.profil = response[1];
             newPlastron.groupe = defaultGroupe;
             this.plastrons.push(newPlastron);
-            this.addPlastronToDatasource(newPlastron, index);
+            this.addPlastronToDatasource(newPlastron, datasourceIndex); 
             this.groupes[0][newPlastron.modele.triage]++;
           });
       } else {
         this.plastronService
-          .assignNewModel(this.plastrons[index], modele.id)
+          .assignNewModel(this.plastrons[realIndex], modele.id)
           .subscribe(() => {
-            console.log('updateplastron');
-            this.plastrons[index].modele = modele ;
-            this.addPlastronToDatasource(this.plastrons[index], index);
+            this.plastrons[realIndex].modele = modele ;
+            this.addPlastronToDatasource(this.plastrons[realIndex], datasourceIndex);
 
           });
       }
