@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, map, of, switchMap } from 'rxjs';
+import { Observable, concatMap, delay, from, map, of, switchMap } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Modele } from '../models/vertex/modele';
@@ -20,6 +20,7 @@ import { NodeService } from './node.service';
   providedIn: 'root',
 })
 export class ModeleService {
+
   constructor(
     public firebaseService: FirebaseService,
     public apiService: ApiService,
@@ -135,6 +136,30 @@ export class ModeleService {
       modele.id,
       'description',
       "'" + modele.description + "'"
+    );
+  }
+
+/**
+ * delete a modele from bdd
+ * @param modele 
+ */
+    deleteModele(modele: Modele): Observable<any> {
+
+    let requests:Observable<any>[] = [] ; 
+    
+    requests.push(this.apiService
+      .getRelationFrom(modele.id, 'rootGraph', 'Modele')
+      .pipe(map((response) => new Graph(response.result[0])))
+      .pipe(
+        switchMap((graph:Graph) =>
+          this.nodeService.deleteGraph(graph)
+        )
+      ))
+      
+      requests.push(this.apiService.deleteDocument(modele.id))
+
+      return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
     );
   }
 }

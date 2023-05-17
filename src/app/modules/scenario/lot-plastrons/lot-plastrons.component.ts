@@ -31,6 +31,7 @@ import { Tag } from '../../../models/vertex/tag';
 import { WaitComponent } from '../../shared/wait/wait.component';
 import { PlastronService } from 'src/app/services/plastron.service';
 import { Profil } from 'src/app/models/vertex/profil';
+import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 
 interface tableElementPlastron {
   title: string;
@@ -42,7 +43,7 @@ interface tableElementPlastron {
   idPlastron: string;
   numero: number;
   age: number;
-  variant:boolean;
+  variant: boolean;
 }
 
 @Component({
@@ -128,23 +129,24 @@ export class LotPlastronsComponent {
   }
 
   drop(event: CdkDragDrop<string, any, any[]>) {
-
     let index = event.currentIndex;
 
     // Get modele and plastron from drop event taking account of the filtered elements not showing in the arrays
-    let data: Modele[] = event.previousContainer.data ;
-    let filteredData = data.filter(element => element["show"] || element["show"]===undefined);
+    let data: Modele[] = event.previousContainer.data;
+    let filteredData = data.filter(
+      (element) => element['show'] || element['show'] === undefined
+    );
     let modele = filteredData[event.previousIndex] as Modele;
-    let currentPlastron = this.sortedDataSourcePlastron[index] ; 
-    let datasourceIndex = this.dataSourcePlastron.indexOf(currentPlastron) ;
-    let filteredDataSource = this.dataSourcePlastron.filter(element => element.id !== -1);
-    let realIndex = filteredDataSource.indexOf(currentPlastron) ;
+    let currentPlastron = this.sortedDataSourcePlastron[index];
+    let datasourceIndex = this.dataSourcePlastron.indexOf(currentPlastron);
+    let filteredDataSource = this.dataSourcePlastron.filter(
+      (element) => element.id !== -1
+    );
+    let realIndex = filteredDataSource.indexOf(currentPlastron);
 
-
-    if (this.sortedDataSourcePlastron[index].triage == modele.triage  ) { 
-      
+    if (this.sortedDataSourcePlastron[index].triage == modele.triage) {
       // si le plastron n'existe pas encore
-      if (this.sortedDataSourcePlastron[index].id === -1 ) {
+      if (this.sortedDataSourcePlastron[index].id === -1) {
         let newPlastron = new Plastron({ statut: Statut.Doing });
         let defaultGroupe = this.groupes[0];
         this.plastronService
@@ -155,16 +157,18 @@ export class LotPlastronsComponent {
             newPlastron.profil = response[1];
             newPlastron.groupe = defaultGroupe;
             this.plastrons.push(newPlastron);
-            this.addPlastronToDatasource(newPlastron, datasourceIndex); 
+            this.addPlastronToDatasource(newPlastron, datasourceIndex);
             this.groupes[0][newPlastron.modele.triage]++;
           });
       } else {
         this.plastronService
           .assignNewModel(this.plastrons[realIndex], modele.id)
           .subscribe(() => {
-            this.plastrons[realIndex].modele = modele ;
-            this.addPlastronToDatasource(this.plastrons[realIndex], datasourceIndex);
-
+            this.plastrons[realIndex].modele = modele;
+            this.addPlastronToDatasource(
+              this.plastrons[realIndex],
+              datasourceIndex
+            );
           });
       }
     } else {
@@ -231,7 +235,34 @@ export class LotPlastronsComponent {
     this.newChange.emit(true);
   }
 
+  deletePlastron(event, element: tableElementPlastron) {
+    console.log('event ', event);
+    console.log('element ', element);
 
+    console.log('id plastron ', element.idPlastron);
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      data: [
+        'Supprimer le plastron ' + element.title,
+        `Voulez-vous supprimer le plastron N° ${element.numero} ? Cela supprimera aussi le cas clinique associé à ce plastron s'il n'a pas été enregistré en tant que modèle.`,
+      ],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.dialog.open(WaitComponent);
+        this.plastronService
+          .deletePlastron(this.getPlastronById(element.idPlastron))
+          .subscribe(() => {
+            this.dialog.closeAll();
+            const indexSort = this.sortedDataSourcePlastron.indexOf(element, 0);
+            let notAPlastron = structuredClone(this.defaultElementPlastron);
+            this.dataSourcePlastron[element.id] = notAPlastron;
+            this.sortedDataSourcePlastron[indexSort] = notAPlastron;
+            this.sortedDataSourcePlastron = [...this.sortedDataSourcePlastron];
+          });
+      }
+    });
+  }
 
   public completePlastrons() {
     this.dataSourcePlastron = new Array<tableElementPlastron>(
@@ -245,7 +276,7 @@ export class LotPlastronsComponent {
 
     this.plastrons.forEach((plastron, index) => {
       if (plastron.modele) this.addPlastronToDatasource(plastron, index);
-      plastron.groupe[plastron.modele.triage] ++;
+      plastron.groupe[plastron.modele.triage]++;
     });
 
     // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
@@ -255,7 +286,6 @@ export class LotPlastronsComponent {
   }
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
-    //  this.dataSourcePlastron[index] = this.defaultElementPlastron;
     this.dataSourcePlastron[index].title = plastron.modele.title;
     this.dataSourcePlastron[index].description = plastron.modele.description;
     this.dataSourcePlastron[index].triage = plastron.modele.triage;
@@ -264,7 +294,8 @@ export class LotPlastronsComponent {
     this.dataSourcePlastron[index].idPlastron = plastron.id;
     this.dataSourcePlastron[index].groupe = plastron.groupe?.scene;
     this.dataSourcePlastron[index].age = plastron.profil.age;
-    this.dataSourcePlastron[index].variant = plastron.modele.template === true ? false:true;
+    this.dataSourcePlastron[index].variant =
+      plastron.modele.template === true ? false : true;
   }
 
   private updateDataSourceTriage(indexStart: number) {
@@ -316,5 +347,15 @@ export class LotPlastronsComponent {
   expandElement(event, element: tableElementPlastron) {
     this.expandedElement = this.expandedElement === element ? null : element;
     event.stopPropagation();
+  }
+
+  getPlastronById(idPlastron: string): Plastron {
+    let res: Plastron;
+
+    this.plastrons.forEach((plastron) => {
+      if (plastron.id == idPlastron) res = plastron;
+    });
+
+    return res;
   }
 }

@@ -13,7 +13,6 @@ export enum Statut {
 }
 
 export class Plastron extends Vertex {
-  tags: string[];
   groupe: Groupe;
   modele: Modele;
   profil: Profil;
@@ -23,7 +22,6 @@ export class Plastron extends Vertex {
 
   constructor(object?: any) {
     super(object);
-    this.tags = object?.tags ? object.tags : [];
     this.groupe = object?.groupe ? object.groupe : undefined;
     this.modele = object?.modele ? object.modele : new Modele();
     this.profil = object?.profil ? object.profil : new Profil();

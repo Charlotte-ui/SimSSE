@@ -68,4 +68,8 @@ export class VariablePhysioInstance extends VariablePhysio {
     this.cible = object?.cible ? object.cible : 50;
     this.template = object?.template ? object.template : '';
   }
+
+   public static override instanciateListe<T>(list: any[]): T[] {
+    return list.map((element) => new VariablePhysioInstance(element) as T);
+  }
 }

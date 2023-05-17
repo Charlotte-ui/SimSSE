@@ -1,5 +1,13 @@
 import { Injectable } from '@angular/core';
-import { Observable, forkJoin, map, of, switchMap } from 'rxjs';
+import {
+  Observable,
+  concatMap,
+  forkJoin,
+  from,
+  map,
+  of,
+  switchMap,
+} from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Plastron } from '../models/vertex/plastron';
@@ -24,19 +32,6 @@ export class PlastronService {
     public modeleService: ModeleService,
     public profilService: ProfilService
   ) {}
-  getVariablesCibles(plastron: Plastron): Observable<VariablePhysioInstance[]> {
-    //  let SpO2 = new VariablePhysioTemplate({"0",1,"SpO2",0,100,"#5470c5",98})
-    //    let FR = new VariablePhysioTemplate({"1",1,"FR",0,100,"#5470c5",16})
-    //  let FC = new VariablePhysioTemplate({"2",1,"FC",0,100,"#5470c5",80})
-    //    let HemoCue = new VariablePhysioTemplate({"3",1,"HemoCue",0,100,"#5470c5",36})
-    //  let PAD = new VariablePhysioTemplate({"4",1,"PAD",0,100,"#5470c5",80})
-    //   let PAS = new VariablePhysioTemplate({"5",1,"PAS",0,100,"#5470c5",130})
-    //  let Temp = new VariablePhysioTemplate({"6",1,"Temp",0,100,"#5470c5",27})
-
-    //  let variables = [SpO2,FR,FC,HemoCue,Temp,PAD,PAS];
-
-    return of([]);
-  }
 
   /**
    * create a new model and change the plastron model to this one
@@ -60,15 +55,6 @@ export class PlastronService {
           )
         )
       );
-  }
-
-  getScenario(plastron: Plastron): Observable<Scenario> {
-    let scenario = {
-      title: 'Incendie à la clinique des Chaumes',
-      id: '5WHFhoZFHCodDPvKqi62',
-    } as Scenario;
-
-    return of(scenario);
   }
 
   updatePlastron(plastron: Plastron): Modele {
@@ -151,7 +137,6 @@ export class PlastronService {
 
     plastron['@class'] = 'Plastron';
     delete plastron.id;
-    delete plastron.tags;
     delete plastron.profil;
     delete plastron.modele;
     delete plastron.groupe;
@@ -192,5 +177,20 @@ export class PlastronService {
       })
     );
     //  ;
+  }
+
+  deletePlastron(plastron: Plastron): Observable<any> {
+    let requests: Observable<any>[] = [];
+
+    requests.push(this.profilService.deleteProfil(plastron.profil));
+
+    if (!plastron.modele.template)
+      requests.push(this.modeleService.deleteModele(plastron.modele));
+
+    requests.push(this.apiService.deleteDocument(plastron.id));
+
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
+    );
   }
 }

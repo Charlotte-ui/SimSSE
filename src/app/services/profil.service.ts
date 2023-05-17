@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { FirebaseService } from './firebase.service';
 import { Profil } from '../models/vertex/profil';
 import { ApiService } from './api.service';
-import { map, of, switchMap } from 'rxjs';
+import { concat, concatMap, from, map, of, switchMap, zipAll } from 'rxjs';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
@@ -78,19 +78,48 @@ export class ProfilService {
             .createRelationBetween(varTemp.id, idVariable, 'aTemplate')
             .pipe(
               switchMap(() => {
-                this.apiService.createRelationBetween(
-                  idVariable,
-                  profil.id,
-                  'aVariableCible'
-                ).subscribe();
+                this.apiService
+                  .createRelationBetween(
+                    idVariable,
+                    profil.id,
+                    'aVariableCible'
+                  )
+                  .subscribe();
                 variable.id = idVariable;
 
-                return of (variable)
-
-
+                return of(variable);
               })
             )
         )
       );
+  }
+
+  deleteProfil(profil: Profil): Observable<any> {
+    let requests:Observable<any>[] = [] ; 
+    
+    requests.push(this.apiService
+      .getRelationFrom(profil.id, 'aVariableCible', 'Profil')
+      .pipe(
+        map((response) =>
+          VariablePhysioInstance.instanciateListe<VariablePhysioInstance>(
+            response.result
+          )
+        )
+      )
+      .pipe(
+        switchMap((variables: VariablePhysioInstance[]) =>
+          concat(
+            variables.map((variable: VariablePhysioInstance) =>
+              this.apiService.deleteDocument(variable.id)
+            )
+          ).pipe(zipAll())
+        )
+      ))
+
+      requests.push(this.apiService.deleteDocument(profil.id))
+
+      return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
+    );
   }
 }

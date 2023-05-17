@@ -20,6 +20,7 @@ import {
   of,
   reduce,
   switchMap,
+  zipAll,
 } from 'rxjs';
 import { ApiService } from './api.service';
 
@@ -27,6 +28,7 @@ import { ApiService } from './api.service';
   providedIn: 'root',
 })
 export class NodeService {
+
   constructor(private apiService: ApiService) {}
 
   getEventTemplate(
@@ -318,5 +320,40 @@ export class NodeService {
         res = indexesNode[index];
     });
     return res;
+  }
+
+    deleteGraph(graph: Graph): any {
+
+    let requests:Observable<any>[] = [] ; 
+    
+    requests.push(this.apiService
+      .getRelationFrom(graph.id, 'aNode', 'Graph')
+      .pipe(
+        map((response) =>
+          Node.instanciateListe<Node>(
+            response.result
+          )
+        )
+      )
+      .pipe(
+        switchMap((nodes: Node[]) =>{
+
+            let requestsNode  =nodes.map((node: Node) =>
+              this.apiService.deleteDocument(node.id)
+            )
+
+            return from(requestsNode).pipe(
+            concatMap((request: Observable<any>) => request))
+
+
+        }
+          
+      )))
+
+      requests.push(this.apiService.deleteDocument(graph.id))
+
+      return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
+    );
   }
 }
