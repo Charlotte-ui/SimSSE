@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { Groupe } from '../../../models/vertex/groupe';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../../models/vertex/scenario';
@@ -65,8 +65,13 @@ export class GroupesComponent {
   constructor(
     public dialog: MatDialog,
     private scenarioService: ScenarioService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private cdRef: ChangeDetectorRef   
   ) {}
+
+  ngAfterViewInit(): void {
+    this.cdRef.detectChanges(); 
+  }
 
   addGroup() {
     let newGroupe = new Groupe({

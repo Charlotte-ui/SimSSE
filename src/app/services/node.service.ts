@@ -129,7 +129,7 @@ export class NodeService {
     return this.apiService.updateDocumentChamp(
       link.id,
       'start',
-      "'" + link.start + "'"
+      link.start.toString() 
     );
   }
 

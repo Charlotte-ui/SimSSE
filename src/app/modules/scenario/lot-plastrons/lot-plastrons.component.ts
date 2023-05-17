@@ -100,8 +100,6 @@ export class LotPlastronsComponent {
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
   @ViewChild(MatSort) sort: MatSort;
 
-  @Output() newChange = new EventEmitter<boolean>();
-
   constructor(
     public scenarioService: ScenarioService,
     public modelService: ModeleService,
@@ -128,92 +126,6 @@ export class LotPlastronsComponent {
     });
   }
 
-  drop(event: CdkDragDrop<string, any, any[]>) {
-    let index = event.currentIndex;
-
-    // Get modele and plastron from drop event taking account of the filtered elements not showing in the arrays
-    let data: Modele[] = event.previousContainer.data;
-    let filteredData = data.filter(
-      (element) => element['show'] || element['show'] === undefined
-    );
-    let modele = filteredData[event.previousIndex] as Modele;
-    let currentPlastron = this.sortedDataSourcePlastron[index];
-    let datasourceIndex = this.dataSourcePlastron.indexOf(currentPlastron);
-    let filteredDataSource = this.dataSourcePlastron.filter(
-      (element) => element.id !== -1
-    );
-    let realIndex = filteredDataSource.indexOf(currentPlastron);
-
-    if (this.sortedDataSourcePlastron[index].triage == modele.triage) {
-      // si le plastron n'existe pas encore
-      if (this.sortedDataSourcePlastron[index].id === -1) {
-        let newPlastron = new Plastron({ statut: Statut.Doing });
-        let defaultGroupe = this.groupes[0];
-        this.plastronService
-          .createPlastron(newPlastron, defaultGroupe.id, modele.id)
-          .subscribe((response: [string, Profil]) => {
-            newPlastron.id = response[0];
-            newPlastron.modele = modele;
-            newPlastron.profil = response[1];
-            newPlastron.groupe = defaultGroupe;
-            this.plastrons.push(newPlastron);
-            this.addPlastronToDatasource(newPlastron, datasourceIndex);
-            this.groupes[0][newPlastron.modele.triage]++;
-          });
-      } else {
-        this.plastronService
-          .assignNewModel(this.plastrons[realIndex], modele.id)
-          .subscribe(() => {
-            this.plastrons[realIndex].modele = modele;
-            this.addPlastronToDatasource(
-              this.plastrons[realIndex],
-              datasourceIndex
-            );
-          });
-      }
-    } else {
-      this._snackBar.open(
-        'Attention, le modèle et le plastron doivent avoir le même triage',
-        'Ok',
-        {
-          duration: 3000,
-        }
-      );
-    }
-  }
-
-  sortData(sort: any) {
-    const data = this.dataSourcePlastron.slice();
-    sort = sort as Sort;
-
-    if (!sort.active || sort.direction === '') {
-      this.sortedDataSourcePlastron = data;
-      return;
-    }
-
-    this.sortedDataSourcePlastron = data.sort((a, b) => {
-      const isAsc = sort.direction === 'asc';
-      switch (sort.active) {
-        case 'id':
-          return this.compare(Number(a.numero), Number(b.numero), isAsc);
-        case 'title':
-          return this.compare(a.title, b.title, isAsc);
-        case 'triage':
-          return this.compare(a.triage, b.triage, isAsc);
-        case 'groupe':
-          return this.compare(a.groupe, b.groupe, isAsc);
-        case 'statut':
-          return this.compare(a.statut, b.statut, isAsc);
-        default:
-          return 0;
-      }
-    });
-  }
-
-  compare(a: number | string, b: number | string, isAsc: boolean) {
-    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-  }
-
   goToPlastron(plastronId: string) {
     this.router.navigate(['/plastron/' + plastronId]);
   }
@@ -231,8 +143,18 @@ export class LotPlastronsComponent {
       } else if (groupe.scene == oldScene) groupe[element.triage]--;
     });
 
-    plastron.groupe = newGroupe;
-    this.newChange.emit(true);
+
+    this.plastronService.updatePlastronGroupe(plastron,newGroupe).subscribe(()=>{
+          plastron.groupe = newGroupe;
+    })
+  }
+
+    updateSelection(event,element: tableElementPlastron) {
+    let plastron = this.plastrons[element.id];
+    let newStatut = event.value;
+    this.plastronService.updatePlastronStatut(plastron,newStatut).subscribe(()=>{
+      plastron.statut = newStatut
+    })
   }
 
   deletePlastron(event, element: tableElementPlastron) {
@@ -347,6 +269,93 @@ export class LotPlastronsComponent {
   expandElement(event, element: tableElementPlastron) {
     this.expandedElement = this.expandedElement === element ? null : element;
     event.stopPropagation();
+  }
+
+
+    drop(event: CdkDragDrop<string, any, any[]>) {
+    let index = event.currentIndex;
+
+    // Get modele and plastron from drop event taking account of the filtered elements not showing in the arrays
+    let data: Modele[] = event.previousContainer.data;
+    let filteredData = data.filter(
+      (element) => element['show'] || element['show'] === undefined
+    );
+    let modele = filteredData[event.previousIndex] as Modele;
+    let currentPlastron = this.sortedDataSourcePlastron[index];
+    let datasourceIndex = this.dataSourcePlastron.indexOf(currentPlastron);
+    let filteredDataSource = this.dataSourcePlastron.filter(
+      (element) => element.id !== -1
+    );
+    let realIndex = filteredDataSource.indexOf(currentPlastron);
+
+    if (this.sortedDataSourcePlastron[index].triage == modele.triage) {
+      // si le plastron n'existe pas encore
+      if (this.sortedDataSourcePlastron[index].id === -1) {
+        let newPlastron = new Plastron({ statut: Statut.Doing });
+        let defaultGroupe = this.groupes[0];
+        this.plastronService
+          .createPlastron(newPlastron, defaultGroupe.id, modele.id)
+          .subscribe((response: [string, Profil]) => {
+            newPlastron.id = response[0];
+            newPlastron.modele = modele;
+            newPlastron.profil = response[1];
+            newPlastron.groupe = defaultGroupe;
+            this.plastrons.push(newPlastron);
+            this.addPlastronToDatasource(newPlastron, datasourceIndex);
+            this.groupes[0][newPlastron.modele.triage]++;
+          });
+      } else {
+        this.plastronService
+          .assignNewModel(this.plastrons[realIndex], modele.id)
+          .subscribe(() => {
+            this.plastrons[realIndex].modele = modele;
+            this.addPlastronToDatasource(
+              this.plastrons[realIndex],
+              datasourceIndex
+            );
+          });
+      }
+    } else {
+      this._snackBar.open(
+        'Attention, le modèle et le plastron doivent avoir le même triage',
+        'Ok',
+        {
+          duration: 3000,
+        }
+      );
+    }
+  }
+
+  sortData(sort: any) {
+    const data = this.dataSourcePlastron.slice();
+    sort = sort as Sort;
+
+    if (!sort.active || sort.direction === '') {
+      this.sortedDataSourcePlastron = data;
+      return;
+    }
+
+    this.sortedDataSourcePlastron = data.sort((a, b) => {
+      const isAsc = sort.direction === 'asc';
+      switch (sort.active) {
+        case 'id':
+          return this.compare(Number(a.numero), Number(b.numero), isAsc);
+        case 'title':
+          return this.compare(a.title, b.title, isAsc);
+        case 'triage':
+          return this.compare(a.triage, b.triage, isAsc);
+        case 'groupe':
+          return this.compare(a.groupe, b.groupe, isAsc);
+        case 'statut':
+          return this.compare(a.statut, b.statut, isAsc);
+        default:
+          return 0;
+      }
+    });
+  }
+
+  compare(a: number | string, b: number | string, isAsc: boolean) {
+    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
   getPlastronById(idPlastron: string): Plastron {

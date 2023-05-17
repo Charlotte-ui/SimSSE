@@ -1,4 +1,4 @@
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, map, of } from 'rxjs';
 import { Groupe } from './groupe';
 import { Listable } from '../interfaces/listable';
 import { Modele } from './modele';
@@ -37,6 +37,20 @@ export class Plastron extends Vertex {
 
     const requestsProfil = plastronService.getPlastronProfil(this.id);
 
-    return forkJoin([requestsModele, requestsProfil]);
+    return forkJoin([requestsModele, requestsProfil])
+   
+  }
+
+  initModeleProfil2(plastronService:PlastronService):Observable<Plastron> {
+    const requestsModele = plastronService.getPlastronModele(this.id);
+
+    const requestsProfil = plastronService.getPlastronProfil(this.id);
+
+    return forkJoin([requestsModele, requestsProfil])
+    .pipe(map((modeleProfil:[Modele,Profil]) =>{
+      this.modele = modeleProfil[0]
+      this.profil = modeleProfil[1]
+      return this
+    }));
   }
 }

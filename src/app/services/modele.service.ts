@@ -135,7 +135,7 @@ export class ModeleService {
     return this.apiService.updateDocumentChamp(
       modele.id,
       'description',
-      "'" + modele.description + "'"
+      modele.description
     );
   }
 

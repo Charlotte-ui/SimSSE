@@ -12,7 +12,7 @@ import { TagService } from '../../services/tag.service';
 import { PlastronService } from '../../services/plastron.service';
 import { Modele } from '../../models/vertex/modele';
 import { Profil } from '../../models/vertex/profil';
-import { Observable, concat, forkJoin, switchMap, zipAll } from 'rxjs';
+import { Observable, concat, forkJoin, map, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../models/vertex/tag';
 import { WaitComponent } from '../shared/wait/wait.component';
 
@@ -32,8 +32,8 @@ export class ScenarioComponent implements OnInit {
 
   newScenario!: Scenario;
   oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
-  oldScenario!:Scenario; // scenario before changes, use to define wich champ update after changes
-  oldGroupes!:Groupe[]; // scenario before changes, use to define wich champ update after changes
+  oldScenario!: Scenario; // scenario before changes, use to define wich champ update after changes
+  oldGroupes!: Groupe[]; // scenario before changes, use to define wich champ update after changes
 
   constructor(
     private route: ActivatedRoute,
@@ -51,82 +51,58 @@ export class ScenarioComponent implements OnInit {
       .pipe(
         switchMap((response: Data) => {
           this.scenario = response['data'];
-          this.oldScenario = {...response['data']}
+          this.oldScenario = { ...response['data'] };
           this.scenario.tags = [];
 
-          const requestTag = this.tagService.getTags(
-            this.scenario.id,
-            'Scenario'
-          );
-
-          const requestGroupe = this.scenarioService.getScenarioGroupes(
-            this.scenario.id
-          );
-
-          return forkJoin([requestTag, requestGroupe]);
-        })
-      )
-      .subscribe((response: [Tag[], Groupe[]]) => {
-        this.groupes = response[1];
-        this.oldGroupes = structuredClone(response[1])
-        this.plastrons = [];
-        this.initialisePlastron();
-        this.scenario.tags = response[0];
-        this.oldTags = [...response[0]];
-      });
-  }
-
-  private initialisePlastron() {
-    this.groupes.forEach((groupe) => {
-      let groupePlastron: Plastron[] = [];
-
-      this.scenarioService
-        .getGroupePlastrons(groupe.id)
-        .pipe(
-          switchMap((plastrons: Plastron[]) => {
-            groupePlastron = plastrons;
-
-            const requests = plastrons.map((plastron: Plastron) => {
-              plastron.groupe = groupe;
-              return plastron.initModeleProfil(this.plastronService);
+          this.scenarioService
+            .initTags(this.scenario)
+            .subscribe((tags: Tag[]) => {
+              this.scenario.tags = tags;
+              this.oldTags = [...tags];
             });
 
-            return concat(requests).pipe(zipAll());
-          })
-        )
-        .subscribe((result: [Modele, Profil][]) => {
-          groupePlastron.map((plastron: Plastron, index: number) => {
-            plastron.modele = result[index][0];
-            plastron.profil = result[index][1];
+          return this.scenarioService.initGroupe(this.scenario).pipe(
+            switchMap((groupes: Groupe[]) => {
+              this.groupes = groupes;
+              const requestsGroupes = this.groupes.map((groupe: Groupe) => {
+                return this.scenarioService.getGroupePlastrons(groupe.id).pipe(
+                  map((plastrons: Plastron[]) => {
+                    plastrons.map((plastron: Plastron) => {
+                      plastron.groupe = groupe;
+                    });
+                    return plastrons;
+                  })
+                );
+              });
+              return concat(requestsGroupes).pipe(zipAll());
+            })
+          );
+        })
+      )
+      .pipe(map((plastronss: Plastron[][]) => plastronss.flat(1)))
+      .pipe(
+        switchMap((plastrons: Plastron[]) => {
+          const requests = plastrons.map((plastron: Plastron) => {
+            return plastron.initModeleProfil2(this.plastronService);
           });
 
-          this.plastrons = [...this.plastrons.concat(groupePlastron)]; // forced update
-        });
-    });
-  }
-
-  updateScenario(newScenario: Scenario) {
-    this.changesToSave = true;
-    this.newScenario = newScenario;
-  }
-
-  updateTags(newTags: Tag[]) {
-    this.changesToSave = true;
-  }
-
-  updateGroupes(newGroupes: boolean) {
-    console.log("updateGroupes scenario")
-    this.changesToSave = true;
-    this.groupesToSave = true;
+          return concat(requests).pipe(zipAll());
+        })
+      )
+      .subscribe((plastrons: Plastron[]) => {
+        console.log('plastrons ', plastrons);
+        this.plastrons = plastrons;
+      });
   }
 
   save() {
     let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
 
-
     if (this.newScenario)
-      requests.push(this.scenarioService.updateScenario(this.newScenario,this.oldScenario));
+      requests.push(
+        this.scenarioService.updateScenario(this.newScenario, this.oldScenario)
+      );
 
     // save the tags
 
@@ -139,15 +115,20 @@ export class ScenarioComponent implements OnInit {
     );
 
     if (newTags.length > 0)
-      requests.push(this.tagService.addTagsToSource(newTags, this.scenario.id,'scenario'));
+      requests.push(
+        this.tagService.addTagsToSource(newTags, this.scenario.id, 'scenario')
+      );
 
     if (tagsToDelete.length > 0)
-      requests.push(this.tagService.deleteTagsFromSource(tagsToDelete, this.scenario.id));
+      requests.push(
+        this.tagService.deleteTagsFromSource(tagsToDelete, this.scenario.id)
+      );
 
-
-    if(this.groupesToSave){
-      console.log(this.groupes)
-      requests.push(this.scenarioService.updateGroupes(this.groupes,this.oldGroupes));
+    if (this.groupesToSave) {
+      console.log(this.groupes);
+      requests.push(
+        this.scenarioService.updateGroupes(this.groupes, this.oldGroupes)
+      );
     }
 
     forkJoin(requests).subscribe((value) => {
@@ -156,8 +137,8 @@ export class ScenarioComponent implements OnInit {
       this.groupesToSave = false;
     });
 
-    if(requests.length === 0){
-       this.changesToSave = false;
+    if (requests.length === 0) {
+      this.changesToSave = false;
       this.dialog.closeAll();
       this.groupesToSave = false;
     }

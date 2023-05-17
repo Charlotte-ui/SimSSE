@@ -27,6 +27,7 @@ import { ProfilService } from './profil.service';
   providedIn: 'root',
 })
 export class PlastronService {
+
   constructor(
     public apiService: ApiService,
     public modeleService: ModeleService,
@@ -177,6 +178,27 @@ export class PlastronService {
       })
     );
     //  ;
+  }
+
+  updatePlastronGroupe(plastron: Plastron, newGroupe: Groupe): Observable<any> {
+    return this.apiService
+      .deleteRelationBetween(plastron.id, plastron.groupe.id)
+      .pipe(
+        switchMap(() =>
+          this.apiService.createRelationBetween(
+            plastron.id,
+            newGroupe.id,
+            'seComposeDe'
+          )
+        )
+      );
+  }
+
+  updatePlastronStatut(plastron: Plastron, newStatut:string) {
+    console.log("plastron ",plastron)
+     return this.apiService
+      .updateDocumentChamp(plastron.id, 'statut',newStatut)
+     
   }
 
   deletePlastron(plastron: Plastron): Observable<any> {

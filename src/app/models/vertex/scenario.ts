@@ -4,6 +4,7 @@ import { Tag } from './tag';
 import { Vertex } from './vertex';
 import { ApiService } from 'src/app/services/api.service';
 import { Observable } from 'rxjs';
+import { TagService } from 'src/app/services/tag.service';
 
 export class Scenario extends Vertex implements Listable {
   title: string;
@@ -50,4 +51,6 @@ export class Scenario extends Vertex implements Listable {
     return apiService.getClasseElements<T>(Scenario)
 
   }
+
+
 }

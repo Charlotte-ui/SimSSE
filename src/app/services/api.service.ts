@@ -110,20 +110,13 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * UPDATE
    */
 
-  updateProprertyOfVertex(id: string, champ: string, value: string) {
-    return this.http
-      .put<any>(
-        `${environment.urlAPI}/command/simsse/sql/UPDATE ${id} SET ${champ}='${value}'`,
-        {}
-      )
-      .subscribe(() => {
-        console.log('updateProprertyOfVertex ' + id);
-      });
-  }
-
   updateDocumentChamp(id:string,champ:string,value:string){
+    console.log("value ",value)
+    value =  value.split('#').join('%23');
+    console.log("value ",value)
+
     return this.http.post<any>(
-      `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/${value}`,
+      `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/"${value}"`,
       {}
     );
   }
@@ -131,8 +124,9 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
   updateAllDocumentChamp(document:any){
     let requests: Observable<any>[] = [];
     Object.keys(document).forEach((key) => {
+      console.log('update ',key,' value ',document[key])
       requests.push(
-        this.updateDocumentChamp(document.id, key, "'" + document[key] + "'")
+        this.updateDocumentChamp(document.id, key,  document[key].toString())
       );
     });
     if (requests.length > 0)

@@ -40,14 +40,18 @@
           <!-- Title Column -->
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Modèle</th>
-            <td id="title" mat-cell *matCellDef="let element ; let i = index">
+            <td id="title" mat-cell *matCellDef="let element; let i = index">
               <div class="container">
-              <button mat-button (click)="goToPlastron(element.idPlastron)">
-                {{ element.title }}
-              </button>
-              <button mat-icon-button (click)="deletePlastron(i,element)">
-                <mat-icon >clear</mat-icon>
-              </button>
+                <button mat-button (click)="goToPlastron(element.idPlastron)">
+                  {{ element.title }}
+                </button>
+                <button
+                  mat-icon-button
+                  (click)="deletePlastron(i, element)"
+                  [disabled]="element.id == -1"
+                >
+                  <mat-icon>clear</mat-icon>
+                </button>
               </div>
             </td>
           </ng-container>
@@ -91,6 +95,7 @@
                 <mat-select
                   [(value)]="element.statut"
                   [disabled]="element.id == -1"
+                  (selectionChange)="updateSelection($event, element)"
                 >
                   <mat-option value="En cours">En cours</mat-option>
                   <mat-option value="A faire">A faire</mat-option>
@@ -107,7 +112,7 @@
               <button
                 mat-icon-button
                 aria-label="expand row"
-                (click)="expandElement($event,element)"
+                (click)="expandElement($event, element)"
               >
                 <mat-icon *ngIf="expandedElement !== element"
                   >keyboard_arrow_down</mat-icon
@@ -132,11 +137,14 @@
                   element == expandedElement ? 'expanded' : 'collapsed'
                 "
               >
-                
-                  <div class="age">Âge : {{ element.age }}</div>
-                
-                  <div id="variant">{{ element.variant?"Variante du modèle":"Modèle standard" }}</div>
-                
+                <div class="age">Âge : {{ element.age }}</div>
+
+                <div id="variant">
+                  {{
+                    element.variant ? "Variante du modèle" : "Modèle standard"
+                  }}
+                </div>
+
                 <div id="description">
                   {{ element.description }}
                 </div>

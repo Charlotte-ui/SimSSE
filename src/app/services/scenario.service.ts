@@ -6,6 +6,8 @@ import { Scenario } from '../models/vertex/scenario';
 import { Groupe } from '../models/vertex/groupe';
 import { Plastron } from '../models/vertex/plastron';
 import { ApiService } from './api.service';
+import { TagService } from './tag.service';
+import { Tag } from '../models/vertex/tag';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +15,8 @@ import { ApiService } from './api.service';
 export class ScenarioService {
   constructor(
     public firebaseService: FirebaseService,
-    public apiService: ApiService
+    public apiService: ApiService,
+    public tagService: TagService
   ) {}
 
   getScenarios(): Observable<Scenario[]> {
@@ -25,6 +28,14 @@ export class ScenarioService {
     return this.apiService
       .getDocument(id)
       .pipe(map((response) => new Scenario(response)));
+  }
+
+  initTags(scenario: Scenario): Observable<Tag[]> {
+    return this.tagService.getTags(scenario.id, 'Scenario');
+  }
+
+  initGroupe(scenario: Scenario): Observable<any> {
+    return this.getScenarioGroupes(scenario.id);
   }
 
   /**
@@ -88,7 +99,7 @@ export class ScenarioService {
           this.apiService.updateDocumentChamp(
             newScenario.id,
             key,
-            "'" + newScenario[key] + "'"
+            newScenario[key].toString()
           )
         );
     });
@@ -111,7 +122,7 @@ export class ScenarioService {
           this.apiService.updateDocumentChamp(
             groupe.id,
             'implique',
-            "'" + groupe.implique + "'"
+            groupe.implique.toString()
           )
         );
       if (groupeJustCReate || groupe.psy != oldGroupes[index].psy)
@@ -119,7 +130,7 @@ export class ScenarioService {
           this.apiService.updateDocumentChamp(
             groupe.id,
             'psy',
-            "'" + groupe.psy + "'"
+            groupe.psy.toString()
           )
         );
       if (groupeJustCReate || groupe.x != oldGroupes[index].x)
@@ -127,7 +138,7 @@ export class ScenarioService {
           this.apiService.updateDocumentChamp(
             groupe.id,
             'x',
-            "'" + groupe.x + "'"
+            groupe.x.toString()
           )
         );
       if (groupeJustCReate || groupe.y != oldGroupes[index].y)
@@ -135,7 +146,7 @@ export class ScenarioService {
           this.apiService.updateDocumentChamp(
             groupe.id,
             'y',
-            "'" + groupe.y + "'"
+            groupe.y.toString()
           )
         );
     });
