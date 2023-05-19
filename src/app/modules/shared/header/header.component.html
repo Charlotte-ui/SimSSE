@@ -6,7 +6,7 @@
   >
     <mat-icon>menu</mat-icon>
   </button>
-  <button mat-button>
+  <button mat-button matTooltip="Retour à l'acceuil">
     <span (click)="goToAccueil()">SimSSE Editeur</span>
   </button>
 
@@ -91,7 +91,7 @@
 
   <span class="example-spacer"></span>
 
-  <button mat-icon-button (click)="goToRules()">
+  <button mat-icon-button (click)="goToRules()" matTooltip="Voir les règles">
     <mat-icon>assignment</mat-icon>
   </button>
   <button mat-icon-button>

@@ -43,6 +43,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import {MatCheckboxModule} from '@angular/material/checkbox'; 
 
 import { ConnexionComponent } from './modules/connexion/connexion.component';
 import { HeaderComponent } from './modules/shared/header/header.component';
@@ -157,6 +158,7 @@ import { WaitComponent } from './modules/shared/wait/wait.component';
     MatTooltipModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

@@ -1,5 +1,6 @@
 import { Collection } from '../../services/firebase.service';
 import { Nameable } from '../interfaces/nameable';
+import { Action, BioEvent } from './event';
 import { Edge, Vertex } from './vertex';
 
 export enum NodeType {
@@ -15,6 +16,8 @@ export enum EventType {
   bio = 'bio',
   action = 'action',
 }
+
+
 
 export abstract class Node extends Vertex {
   x: number;
@@ -212,60 +215,3 @@ export class Timer extends Node {
   }
 }
 
-export class Action extends Vertex {
-  public static override className = 'Action';
-  public static actions: Action[] = [];
-
-  name: string;
-
-  constructor(object?: any) {
-    super(object);
-    this.name = object?.name ? object.name : '';
-    Action.actions.push(this);
-  }
-
-  public static override instanciateListe<T>(list: any[]): T[] {
-    return list.map((element) => new Action(element) as T);
-  }
-
-  public static getActionByID(id: string): Action {
-    let result = undefined;
-    Action.actions.forEach((action: Action) => {
-      if (action.id == id) result = action;
-    });
-    return result;
-  }
-
-  public static override getType(element): string {
-    return EventType.action;
-  }
-}
-
-export class BioEvent extends Vertex {
-  public static override className = 'BioEvent';
-  public static bioevents: BioEvent[] = [];
-
-  name: string;
-
-  constructor(object?: any) {
-    super(object);
-    this.name = object?.name ? object.name : '';
-    BioEvent.bioevents.push(this);
-  }
-
-  public static override instanciateListe<T>(list: any[]): T[] {
-    return list.map((element) => new BioEvent(element) as T);
-  }
-
-  public static getBioEventByID(id: string): BioEvent {
-    let result = undefined;
-    BioEvent.bioevents.forEach((bioevent: BioEvent) => {
-      if (bioevent.id == id) result = bioevent;
-    });
-    return result;
-  }
-
-  public static override getType(element): string {
-    return EventType.bio;
-  }
-}

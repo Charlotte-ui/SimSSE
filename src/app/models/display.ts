@@ -9,6 +9,57 @@ export interface IButton {
   symbol: string;
 }
 
+
+export const champLabel = {
+  name: 'Nom',
+  title: 'Titre',
+  target: 'Cible',
+  parameter: 'Paramètre',
+  event: 'Évènement',
+  duration: 'Durée',
+  out: 'Depuis',
+  in: 'Vers',
+  description: 'Description',
+  psy: 'Nombre de cas psy',
+  impliques: "Nombre d'impliqués sans cas clinique",
+  UA: "Nombre d'urgence absolue (UA)",
+  UR: "Nombre d'urgence relative (UR)",
+  EU: "Nombre d'extrême urgence (EU)",
+  triage: 'Triage',
+  rand: 'Ecart-type',
+  defaultValue: 'Valeur par défaut',
+  min: 'Valeur minimum',
+  max: 'Valeur maximum',
+  color: 'Couleur',
+  category:'Catégorie',
+  med:'Med',
+  paraMed:"Paramed",
+  start:"Activation"
+
+};
+
+const numbers = [
+  'rand',
+  'min',
+  'max',
+  'cible',
+  'impliques',
+  'psy',
+  'UR',
+  'EU',
+  'UA',
+  'x',
+  'y',
+  'parameter',
+  'duration',
+];
+
+const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage','category'];
+
+const listableWithGroupe = ['event'];
+
+const booleans = ['start','med','paraMed'];
+
 export class Button {
   static buttons: IButton[] = [
     {
@@ -103,5 +154,14 @@ export class Button {
       if (type == button.type) res = button;
     });
     return res;
+  }
+
+  public static getType(champ: string) {
+    if (numbers.includes(champ)) return 'number';
+    if (champ == 'color') return 'color';
+    if (listableWithGroupe.includes(champ)) return 'listeGroupe';
+    if (listable.includes(champ)) return 'liste';
+    if (booleans.includes(champ)) return 'boolean';
+    return 'text';
   }
 }

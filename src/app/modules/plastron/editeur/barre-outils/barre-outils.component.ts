@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Button, IButton } from 'src/app/models/buttons';
+import { Button, IButton } from 'src/app/models/display';
 import {
   EventType,
   Graph,
@@ -8,8 +8,6 @@ import {
   Trend,
   Event,
   Node,
-  Action,
-  BioEvent,
   Link,
 } from 'src/app/models/vertex/node';
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
@@ -18,6 +16,7 @@ import {
   VariablePhysioTemplate,
 } from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
+import { Action, BioEvent } from 'src/app/models/vertex/event';
 
 @Component({
   selector: 'app-barre-outils',
@@ -25,12 +24,16 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./barre-outils.component.less'],
 })
 export class BarreOutilsComponent implements OnInit {
+
+  actionByCategories ;
   // liste de tout les modèles d'événements et de graphs existant
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
   @Input() allGraphs!: Graph[];
   @Input() variables!: VariablePhysioTemplate[];
   @Input() nodes!: Node[];
+
+
 
   @Output() newElement = new EventEmitter<Node | Link>();
 
@@ -40,9 +43,15 @@ export class BarreOutilsComponent implements OnInit {
     this.buttons = Button.buttons;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+
+  }
+
+
 
   addElement(element: string) {
+    this.actionByCategories= Action.getListByCategory()
+
     let x = 50; // l'element est ajouter au milieu
     let y = 50;
 
@@ -53,8 +62,11 @@ export class BarreOutilsComponent implements OnInit {
         let bioevent = new Event({ typeEvent: EventType.bio });
         return this.createNode(bioevent, this.allBioevents);
       case EventType.action:
+
+      
+
         let action = new Event({ typeEvent: EventType.action });
-        return this.createNode(action, this.allActions,['template']);
+        return this.createNode(action, this.actionByCategories,['template']);
       case NodeType.trend:
         let trend = new Trend();
         return this.createNode(trend, this.variables);

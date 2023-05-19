@@ -21,7 +21,7 @@ import {
   NodeType,
   EventType,
 } from 'src/app/models/vertex/node';
-import { Button } from 'src/app/models/buttons';
+import { Button, champLabel } from 'src/app/models/display';
 import { Scenario } from '../../../models/vertex/scenario';
 import { Modele } from '../../../models/vertex/modele';
 import { Vertex } from '../../../models/vertex/vertex';
@@ -40,21 +40,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   classe: typeof Vertex;
   champs;
 
-  numbers = [
-    'rand',
-    'min',
-    'max',
-    'cible',
-    'impliques',
-    'psy',
-    'UR',
-    'EU',
-    'UA',
-    'x',
-    'y',
-    'parameter',
-    'duration',
-  ];
   hidden = [
     'x',
     'y',
@@ -78,31 +63,9 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     'PRVx',
     'PRVy',
   ];
-  listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage'];
-  booleans = ['start'];
 
-  champLabel = {
-    name: 'Nom',
-    title: 'Titre',
-    target: 'Cible',
-    parameter: 'Paramètre',
-    event: 'Évènement',
-    duration: 'Durée',
-    out: 'Depuis',
-    in: 'Vers',
-    description: 'Description',
-    psy: 'Nombre de cas psy',
-    implique: "Nombre d'impliqué sans cas clinique",
-    UA: "Nombre d'urgence absolue (UA)",
-    UR: "Nombre d'urgence relative (UR)",
-    EU: "Nombre d'extrême urgence (EU)",
-    triage: 'Triage',
-    rand: 'Ecart-type',
-    defaultValue: 'Valeur par défaut',
-    min: 'Valeur minimum',
-    max: 'Valeur maximum',
-    color: 'Couleur',
-  };
+
+  champLabel = champLabel;
 
   required = ['title', 'triage','name','target','parameter','event','duration','in','out'];
 
@@ -110,6 +73,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   edition!: boolean;
 
   button = new Button();
+
+  getType = Button.getType ;
 
   constructor(
     private fb: FormBuilder,
@@ -133,6 +98,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     });
 
     console.log("this.element ",this.element)
+    console.log("this.liste ",this.liste)
+
     this.form = this.fb.group(this.element);
 
     this.champs = Object.keys(this.element) as Array<keyof T>;
@@ -177,13 +144,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.dialogRef.close({ delete: true, id: this.element.id });
   }
 
-  public getType(champ: string) {
-    if (this.numbers.includes(champ)) return 'number';
-    if (champ == 'color') return 'color';
-    if (this.listable.includes(champ)) return 'liste';
-    if (this.booleans.includes(champ)) return 'boolean';
-    return 'text';
-  }
+  
 
   public isHidden(champ: string) {
     if (this.hidden.includes(champ)) return true;

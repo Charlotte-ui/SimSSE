@@ -23,8 +23,6 @@ import {
   Link,
   Graph,
   Node,
-  BioEvent,
-  Action,
   Timer,
 } from 'src/app/models/vertex/node';
 import * as echarts from 'echarts/types/dist/echarts';
@@ -36,7 +34,8 @@ import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
 } from 'src/app/models/vertex/variablePhysio';
-import { Button } from 'src/app/models/buttons';
+import { Button } from 'src/app/models/display';
+import { Action, BioEvent } from 'src/app/models/vertex/event';
 
 const GREEN = '#45C456';
 const RED = '#A41313';

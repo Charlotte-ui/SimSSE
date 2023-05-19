@@ -1,28 +1,21 @@
 import { Injectable } from '@angular/core';
 import {
-  VariablePhysio,
   VariablePhysioTemplate,
 } from '../models/vertex/variablePhysio';
 import { Observable, map, of } from 'rxjs';
-import { FirebaseService } from './firebase.service';
 import {
-  Trend,
   Event,
-  Node,
-  Link,
-  BioEvent,
-  Action,
-  Graph,
 } from '../models/vertex/node';
 import { ApiService } from './api.service';
 import { Vertex } from '../models/vertex/vertex';
+import { Action, BioEvent } from '../models/vertex/event';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RegleService {
 
-  constructor(firebaseService: FirebaseService, private apiService:ApiService) {}
+  constructor(private apiService:ApiService) {}
 
   getVariableTemplate(): Observable<VariablePhysioTemplate[]> {
     return this.apiService.getClasseElements<VariablePhysioTemplate>(VariablePhysioTemplate);

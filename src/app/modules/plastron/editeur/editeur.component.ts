@@ -6,8 +6,6 @@ import {
   Node,
   Link,
   Graph,
-  BioEvent,
-  Action,
   NodeType,
   EventType,
 } from '../../../models/vertex/node';
@@ -21,6 +19,7 @@ import { Observable, concat, forkJoin, of, switchMap, zipAll } from 'rxjs';
 import { Modele } from '../../../models/vertex/modele';
 import { Curve } from '../../../models/curve';
 import { ModeleService } from '../../../services/modele.service';
+import { Action, BioEvent } from 'src/app/models/vertex/event';
 
 @Component({
   selector: 'app-editeur',

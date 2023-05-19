@@ -3,9 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { Vertex } from '../../../models/vertex/vertex';
-import { Action, BioEvent } from 'src/app/models/vertex/node';
-import { Button } from 'src/app/models/buttons';
+import { Button, champLabel } from 'src/app/models/display';
 import { RegleService } from 'src/app/services/regle.service';
+import { CategoryAction } from 'src/app/models/vertex/event';
 
 @Component({
   selector: 'app-tab-regles',
@@ -23,30 +23,12 @@ export class TabReglesComponent<T extends Vertex> {
   keys;
   displayedColumns;
 
-  champLabel = {
-    name: 'Nom',
-    title: 'Titre',
-    target: 'Cible',
-    parameter: 'Paramètre',
-    event: 'Évènement',
-    duration: 'Durée',
-    out: 'Depuis',
-    in: 'Vers',
-    description: 'Description',
-    psy: 'Nombre de cas psy',
-    impliques: "Nombre d'impliqués sans cas clinique",
-    UA: "Nombre d'urgence absolue (UA)",
-    UR: "Nombre d'urgence relative (UR)",
-    EU: "Nombre d'extrême urgence (EU)",
-    triage: 'Triage',
-    rand: 'Ecart-type',
-    defaultValue: 'Valeur par défaut',
-    min: 'Valeur minimum',
-    max: 'Valeur maximum',
-    color: 'Couleur',
-  };
+  champLabel = champLabel;
 
   button = new Button();
+
+  getType = Button.getType ;
+
 
   @Input() classe: typeof Vertex;
 
@@ -91,7 +73,7 @@ export class TabReglesComponent<T extends Vertex> {
 
     console.log(element);
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, this.classe, [], edit],
+      data: [element, this.classe, Object.values(CategoryAction), edit],
     });
 
     dialogRef.afterClosed().subscribe((result) => {

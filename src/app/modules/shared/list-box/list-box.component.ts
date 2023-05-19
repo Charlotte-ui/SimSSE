@@ -12,7 +12,7 @@ import { TagService } from '../../../services/tag.service';
 import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../../models/vertex/tag';
 import { Modele, Triage } from '../../../models/vertex/modele';
-import { Button } from 'src/app/models/buttons';
+import { Button } from 'src/app/models/display';
 import { WaitComponent } from '../wait/wait.component';
 
 @Component({

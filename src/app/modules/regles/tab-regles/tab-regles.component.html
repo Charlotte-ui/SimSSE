@@ -48,7 +48,14 @@
               'background-color': isColor(column) ? element[column] : '#FFFFFF'
             }"
           >
-            {{ element[column] }}
+            <div *ngIf="getType(column) == 'boolean'; else text">
+
+              <mat-checkbox disabled [checked]="element[column]">
+              </mat-checkbox>
+            </div>
+            <ng-template #text>
+              {{ element[column] }}
+            </ng-template>
           </td>
         </ng-container>
       </ng-container>

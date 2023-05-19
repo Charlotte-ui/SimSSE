@@ -166,6 +166,7 @@ export class SceneComponent implements OnInit {
             name = (node as Trend | Graph).name;
         }
 
+        // TODO replace by ref
         let color = 'event' in node ? '#FEEA00' : '#C8FFBE';
 
         markline.push({

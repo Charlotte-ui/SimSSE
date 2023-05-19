@@ -6,8 +6,6 @@ import {
   Graph,
   NodeType,
   EventType,
-  Action,
-  BioEvent,
   Node,
 } from '../models/vertex/node';
 import {
@@ -23,6 +21,7 @@ import {
   zipAll,
 } from 'rxjs';
 import { ApiService } from './api.service';
+import { Action, BioEvent } from '../models/vertex/event';
 
 @Injectable({
   providedIn: 'root',
