@@ -29,6 +29,7 @@ export class Modele extends Vertex implements Listable{
 
     constructor(object?:any) {
         super(object);
+        console.log("object ",object)
         this.title = (object?.title)?object.title:"";
         this.description = (object?.description)?object.description:"";
         this.tags = (object?.tags)?object.tags:[];

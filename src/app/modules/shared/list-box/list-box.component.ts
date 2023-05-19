@@ -13,6 +13,7 @@ import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../../models/vertex/tag';
 import { Modele, Triage } from '../../../models/vertex/modele';
 import { Button } from 'src/app/models/buttons';
+import { WaitComponent } from '../wait/wait.component';
 
 @Component({
   selector: 'app-list-box',
@@ -33,10 +34,14 @@ export class ListBoxComponent<T extends Listable> {
 
   button = new Button();
 
+
+
   @Input() chips!: Tag[];
   @Input() title!: string;
-  @Input() subTitle!: string;
-  @Input() template!: boolean;
+
+
+  @Input() service;
+
 
   _classe: typeof Vertex | typeof Scenario | typeof Modele;
   get classe(): typeof Vertex {
@@ -45,6 +50,10 @@ export class ListBoxComponent<T extends Listable> {
   @Input() set classe(value: typeof Vertex) {
     if (value) {
       this._classe = value;
+
+      this.tagService.getAllTags(this.classe.className.toLowerCase()).subscribe((response) => {
+        this.chips = response;
+      });
 
       value.getListTemplate<T>(this.apiService)
         .pipe(
@@ -74,12 +83,19 @@ export class ListBoxComponent<T extends Listable> {
   constructor(
     public apiService: ApiService,
     public dialog: MatDialog,
-    public tagService: TagService
+    public tagService: TagService,
+    private router: Router,
   ) {
     this.elements = [];
     this.filterTagElement = [];
     this.filterTriageElement = [];
   }
+
+  
+  ngOnInit(): void {
+ 
+  }
+
 
   intElements(elements: T[]) {
     this.elements = elements;
@@ -92,7 +108,9 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   addElement() {
-    let newElement = new this.classe();
+    let newElement = new this.classe({template:true});
+
+    console.log("newElement ",newElement)
 
     const dialogRef = this.dialog.open(DialogComponent, {
       data: [newElement, this.classe, this.triages, false, ['template']],
@@ -100,12 +118,22 @@ export class ListBoxComponent<T extends Listable> {
 
     dialogRef.afterClosed().subscribe((result: T) => {
       if (result) {
-        this.newElement.emit(result);
-        this.elements.push(result);
-
-        console.log(this.elements);
+        this.createElement(result)
       }
     });
+  }
+
+  createElement(element: T) {
+    console.log("createElement ",element)
+
+    this.dialog.open(WaitComponent);
+    this.service.createElement(element).subscribe(id =>{
+
+      if (Array.isArray(id)) id = id[0]
+      this.elements.push(element);
+      this.router.navigate([`/${this.classe.className.toLowerCase()}/` + id]);
+      this.dialog.closeAll();
+    })
   }
 
   drop(event: CdkDragDrop<T[]>) {

@@ -254,18 +254,6 @@ export class LotPlastronsComponent {
     this.sortedDataSourcePlastron = this.dataSourcePlastron.slice();
   }
 
-  createModele(modele: Modele) {
-    this.dialog.open(WaitComponent);
-
-    this.modeleService
-      .createModele(modele, true)
-      .subscribe((idexes: string[]) => {
-        this.router.navigate(['/modele/' + idexes[0]]);
-
-        this.dialog.closeAll();
-      });
-  }
-
   expandElement(event, element: tableElementPlastron) {
     this.expandedElement = this.expandedElement === element ? null : element;
     event.stopPropagation();

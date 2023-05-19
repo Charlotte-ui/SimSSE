@@ -20,17 +20,15 @@
     <div class="col-6">
       <app-list-box
         title="Scenarios"
+        [service]="scenarioService"
         [classe]="Scenario"
-        (newElement)="createScenario($event)"
-        [chips]="allTagsScenario"
       ></app-list-box>
     </div>
     <div class="col-6">
       <app-list-box
         title="Modèles traumato-physiologiques"
+        [service]="modeleService"
         [classe]="Modele"
-        (newElement)="createModele($event)"
-        [chips]="allTagsPlastron"
       ></app-list-box>
     </div>
   </div>

@@ -174,9 +174,8 @@
     <div class="col-5 modele">
       <app-list-box
         title="Modèles traumato-physiologiques"
+        [service]="modeleService"
         [classe]="Modele"
-        (newElement)="createModele($event)"
-        [chips]="allTags"
       ></app-list-box>
     </div>
   </div>

@@ -119,13 +119,20 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   ) {}
 
   ngOnInit() {
-    this.element = this.data[0];
+    this.element = structuredClone(this.data[0]);
     this.classe = this.data[1];
     this.liste = this.data[2];
     this.edition = this.data[3];
     let newHidden = this.data.length > 4 ? this.data[4] : []; // les nouveaux hidden sont optionnels
 
     this.title = this.completeTitle(this.classe.getType(this.element));
+
+
+    Object.keys(this.element).forEach(key => { // avoid the error  this.validator is not a function
+      if (Array.isArray(this.element[key])) delete this.element[key];
+    });
+
+    console.log("this.element ",this.element)
     this.form = this.fb.group(this.element);
 
     this.champs = Object.keys(this.element) as Array<keyof T>;

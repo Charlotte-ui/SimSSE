@@ -12,12 +12,10 @@ import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
   styleUrls: ['./groupes.component.less'],
 })
 export class GroupesComponent {
-  form: FormGroup;
+  form: FormGroup = this.fb.group({
+    groupes: this.fb.array([]),
+  });
   groupPositions!: any[];
-
-  PMA = [15, 15];
-  PRV = [50, 10];
-  CADI = [20, 50];
 
   editable: string[] = ['psy', 'implique'];
   keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique'];
@@ -41,9 +39,6 @@ export class GroupesComponent {
   @Input() set groupes(value: Groupe[]) {
     if (value) {
       this._groupes = value;
-      this.form = this.fb.group({
-        groupes: this.fb.array([]),
-      });
       this.setForm();
       this.form.get('groupes').valueChanges.subscribe((groupes: Groupe[]) => {
         groupes.forEach((groupe: Groupe, index: number) => {
@@ -69,7 +64,7 @@ export class GroupesComponent {
     private cdRef: ChangeDetectorRef   
   ) {}
 
-  ngAfterViewInit(): void {
+  ngOnInit(): void {
     this.cdRef.detectChanges(); 
   }
 
@@ -114,8 +109,9 @@ export class GroupesComponent {
   }
 
   public deleteGroup(groupId: number) {
+    let grpScene = this.groupes[groupId]['scene'];
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-      data: 'groupe ' + this.groupes[groupId]['scene'],
+      data: ['Supprimer le groupe ' + grpScene, "Voulez-vous supprimer le groupe "+grpScene],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -123,7 +119,7 @@ export class GroupesComponent {
 
       if (result) {
         this.scenarioService
-          .deleteGroupe(this.groupes[groupId],this.groupes[0])
+          .removeGroupe(this.groupes[groupId],this.groupes[0])
           .subscribe(() => {
             this.groupes.splice(groupId, 1);
 

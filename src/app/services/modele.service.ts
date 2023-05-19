@@ -27,6 +27,9 @@ export class ModeleService {
     public nodeService: NodeService
   ) {}
 
+  createElement = this.createModele;
+  deleteElement = this.deleteModele;
+
   getModeleById(id: string): Observable<Modele | undefined> {
     return this.apiService
       .getDocument(id)
@@ -67,9 +70,9 @@ export class ModeleService {
    * return the id of the new Modele,  the id of the graph and the id 
    * @param modele
    */
-  createModele(modele: Modele, template: boolean|string): Observable<string[]> {
+  createModele(modele: Modele, template?: boolean|string): Observable<string[]> {
     modele['@class'] = 'Modele';
-    modele['template'] = template;
+    if(template) modele['template'] = template;
     delete modele.id;
     delete modele.tags;
     delete modele.graph;

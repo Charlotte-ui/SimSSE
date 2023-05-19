@@ -19,6 +19,7 @@ import { Plastron } from '../models/vertex/plastron';
 import { ApiService } from './api.service';
 import { TagService } from './tag.service';
 import { Tag } from '../models/vertex/tag';
+import { PlastronService } from './plastron.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,8 +28,12 @@ export class ScenarioService {
   constructor(
     public firebaseService: FirebaseService,
     public apiService: ApiService,
-    public tagService: TagService
+    public tagService: TagService,
+    public plastronService: PlastronService
   ) {}
+
+  createElement = this.createScenario;
+  deleteElement = this.deleteScenario;
 
   getScenarios(): Observable<Scenario[]> {
     return this.apiService.getClasseElements<Scenario>(Scenario);
@@ -205,7 +210,13 @@ export class ScenarioService {
       );
   }
 
-  deleteGroupe(groupe: Groupe, defaultGroupe: Groupe): Observable<any> {
+  /**
+   * delete a groupe and tilt all this plastrons to the default group
+   * @param groupe
+   * @param defaultGroupe
+   * @returns
+   */
+  removeGroupe(groupe: Groupe, defaultGroupe: Groupe): Observable<any> {
     console.log('delete groupe ', groupe);
     console.log('defaultGroupe ', defaultGroupe);
 
@@ -230,5 +241,64 @@ export class ScenarioService {
           );
         })
       );
+  }
+
+  /**
+   * delete a groupe and all this plastrons
+   * @param groupe
+   * @returns
+   */
+  deleteGroupe(groupe: Groupe): Observable<any> {
+    return this.apiService
+      .getRelationFrom(groupe.id, 'seComposeDe', 'Groupe')
+      .pipe(
+        map((response) => Plastron.instanciateListe<Plastron>(response.result))
+      )
+      .pipe(
+        switchMap((plastrons: Plastron[]) => {
+          let requests = plastrons.map((plastron: Plastron) =>
+            this.plastronService.deletePlastron(plastron)
+          );
+          let deleteRequest = this.apiService.deleteDocument(groupe.id);
+          requests.push(deleteRequest);
+          return from(requests).pipe(
+            concatMap((request: Observable<any>) => request)
+          );
+        })
+      );
+  }
+
+  /**
+   * delete a scenario from bdd
+   * @param scenario
+   */
+  deleteScenario(scenario: Scenario): Observable<any> {
+    console.log("deleteScenario ",scenario)
+    let requests: Observable<any>[] = [];
+
+    requests.push(
+      this.apiService
+        .getRelationFrom(scenario.id, 'seComposeDe', 'Scenario')
+        .pipe(
+          map((response) => Groupe.instanciateListe<Groupe>(response.result))
+        )
+        .pipe(
+          switchMap((groupes: Groupe[]) => {
+            const requests = groupes.map((groupe: Groupe) =>
+              this.deleteGroupe(groupe)
+            );
+
+            return from(requests).pipe(
+              concatMap((request: Observable<any>) => request)
+            );
+          })
+        )
+    );
+
+    requests.push(this.apiService.deleteDocument(scenario.id));
+
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
+    );
   }
 }
