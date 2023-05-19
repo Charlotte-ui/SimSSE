@@ -27,7 +27,6 @@ import { Action, BioEvent } from '../models/vertex/event';
   providedIn: 'root',
 })
 export class NodeService {
-
   constructor(private apiService: ApiService) {}
 
   getEventTemplate(
@@ -45,7 +44,12 @@ export class NodeService {
     return undefined;
   }
 
-  getGraphTemplate(): Observable<Graph[]> {
+  getGraphTemplate(graph: Graph): Observable<Graph> {
+    return this.apiService.getRelationFrom(graph.id,'aTemplate','Graph')
+    .pipe(map((response) => new Graph(response.result[0])));
+  }
+
+  getAllGraphTemplate(): Observable<Graph[]> {
     return this.apiService.getClasseElementsWhithMatchingChamp<Graph>(
       Graph,
       'template',
@@ -102,13 +106,30 @@ export class NodeService {
   createNode(node: Node, classe: string): Observable<string> {
     node['@class'] = classe;
     delete node.id;
-
-    console.log('create node');
-    console.log(node);
-
     return this.apiService
       .createDocument(node)
       .pipe(map((response) => this.apiService.documentId(response)));
+  }
+
+  /**
+   * push a new Graph in the database
+   * link the graph to his template
+   * return the id of the new Graph
+   * @param node
+   */
+  createGraphNode(node: Node): Observable<string> {
+    node['@class'] = 'Graph';
+    delete node.id;
+    return this.apiService
+      .createDocument(node)
+      .pipe(map((response) => this.apiService.documentId(response)))
+      .pipe(
+        switchMap((idNode: string) =>
+          this.apiService
+            .createRelationBetween(node['template'], idNode, 'aTemplate')
+            .pipe(map(() => idNode))
+        )
+      );
   }
 
   /**
@@ -116,7 +137,8 @@ export class NodeService {
    * @param node
    */
   updateNode(node: Node): Observable<string[]> {
-    return this.apiService.updateAllDocumentChamp(node)
+    console.log('updateNode ', node);
+    return this.apiService.updateAllDocumentChamp(node);
   }
 
   /**
@@ -124,11 +146,11 @@ export class NodeService {
    * @param node
    */
   updateLink(link: Link): Observable<string[]> {
-    console.log("updateLink ",link)
+    console.log('updateLink ', link);
     return this.apiService.updateDocumentChamp(
       link.id,
       'start',
-      link.start.toString() 
+      link.start.toString()
     );
   }
 
@@ -180,34 +202,34 @@ export class NodeService {
 
   /**
    * create a duplicate of all the node and link of the graph
-   * @param graph 
-   * @returns 
+   * @param graph
+   * @returns
    */
   duplicateGraph(
     graphToCopy: Graph,
-    idNewGraph:string,
-    idNewStart:string
+    idNewGraph: string,
+    idNewStart: string
   ): Observable<any> {
+    graphToCopy.id = idNewGraph;
 
-      graphToCopy.id = idNewGraph;
+    let nodeIds = [];
 
-      let nodeIds = []
+    graphToCopy.nodes.forEach((node: Node) => {
+      if (Node.getType(node) === EventType.start) node.id = idNewStart;
+      else {
+        nodeIds.push(node.id);
+        node.id = node.id.replace(':', '');
+      }
+    });
 
+    graphToCopy.links.forEach((link: Link) => {
+      link.in = nodeIds.includes(link.in) ? link.in.replace(':', '') : link.in;
+      link.out = nodeIds.includes(link.out)
+        ? link.out.replace(':', '')
+        : link.out;
+      link.id = link.id.replace(':', '');
+    });
 
-      graphToCopy.nodes.forEach((node:Node)=>{
-        if(Node.getType(node) === EventType.start) node.id = idNewStart ;
-        else {
-          nodeIds.push(node.id)
-          node.id = node.id.replace(':', '');
-        }
-      })
-
-      graphToCopy.links.forEach((link:Link)=>{
-        link.in = (nodeIds.includes(link.in))? link.in.replace(':', '') : link.in ;
-        link.out = (nodeIds.includes(link.out))? link.out.replace(':', ''): link.out ;
-        link.id = link.id.replace(':', '');
-      })
-  
     // create new nodes and links
     return this.updateGraphNodes(graphToCopy).pipe(
       switchMap((indexesNode: string[]) => {
@@ -224,21 +246,27 @@ export class NodeService {
    * @returns
    */
   updateGraphNodes(graph: Graph): Observable<string[]> {
-    console.log('updateGraphNodes');
+    console.log('updateGraphNodes ', graph);
     let indexGraph = graph.id;
     let requestsNode: Observable<any>[] = [];
     let oldNodeInddexes = [];
 
     // add new nodes
     graph.nodes.forEach((node) => {
-      if (this.isNew(node.id) )
-        requestsNode.push(
-          this.createNode(
-            structuredClone(node),
-            node.type == NodeType.trend ? 'Trend' : 'Event'
-          )
-        );
-      else {
+      if (this.isNew(node.id)) {
+        if (node.type === NodeType.graph) {
+          // create a graph node
+          requestsNode.push(this.createGraphNode(structuredClone(node)));
+        } else {
+          // create a trend or event node
+          requestsNode.push(
+            this.createNode(
+              structuredClone(node),
+              node.type === NodeType.trend ? 'Trend' : 'Event'
+            )
+          );
+        }
+      } else {
         // si le node est déjà présent
         oldNodeInddexes.push(node.id);
       }
@@ -282,7 +310,7 @@ export class NodeService {
     let requestsLinks: Observable<string>[] = [];
 
     graph.links.forEach((link) => {
-      if (this.isNew(link.id) )
+      if (this.isNew(link.id))
         requestsLinks.push(
           this.apiService.createRelationBetweenWithProperty(
             this.getNodeId(link.in, graph.nodes, indexesNode),
@@ -321,37 +349,29 @@ export class NodeService {
     return res;
   }
 
-    deleteGraph(graph: Graph): any {
+  deleteGraph(graph: Graph): any {
+    let requests: Observable<any>[] = [];
 
-    let requests:Observable<any>[] = [] ; 
-    
-    requests.push(this.apiService
-      .getRelationFrom(graph.id, 'aNode', 'Graph')
-      .pipe(
-        map((response) =>
-          Node.instanciateListe<Node>(
-            response.result
-          )
-        )
-      )
-      .pipe(
-        switchMap((nodes: Node[]) =>{
-
-            let requestsNode  =nodes.map((node: Node) =>
+    requests.push(
+      this.apiService
+        .getRelationFrom(graph.id, 'aNode', 'Graph')
+        .pipe(map((response) => Node.instanciateListe<Node>(response.result)))
+        .pipe(
+          switchMap((nodes: Node[]) => {
+            let requestsNode = nodes.map((node: Node) =>
               this.apiService.deleteDocument(node.id)
-            )
+            );
 
             return from(requestsNode).pipe(
-            concatMap((request: Observable<any>) => request))
+              concatMap((request: Observable<any>) => request)
+            );
+          })
+        )
+    );
 
+    requests.push(this.apiService.deleteDocument(graph.id));
 
-        }
-          
-      )))
-
-      requests.push(this.apiService.deleteDocument(graph.id))
-
-      return from(requests).pipe(
+    return from(requests).pipe(
       concatMap((request: Observable<any>) => request)
     );
   }

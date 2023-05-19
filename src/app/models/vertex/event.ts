@@ -52,21 +52,14 @@ export class Action extends Vertex {
     let categories = Object.values(CategoryAction);
 
     categories.forEach((category) => {
-
-        console.log("filter ",category,' ',this.actions.filter(
-            (action: Action) => action.category === category
-          )) ; 
       actions.push({
         category: category,
-        disabled: (category === CategoryAction.eval),
+        disabled: category === CategoryAction.eval,
         elements: this.actions.filter(
           (action: Action) => action.category === category
         ),
       });
     });
-    console.log("this.actions ",this.actions)
-
-    console.log("getListByCategory ",actions)
 
     return actions;
   }

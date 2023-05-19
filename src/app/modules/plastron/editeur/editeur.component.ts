@@ -15,7 +15,7 @@ import {
 } from '../../../models/vertex/variablePhysio';
 import { RegleService } from '../../../services/regle.service';
 import { NodeService } from '../../../services/node.service';
-import { Observable, concat, forkJoin, of, switchMap, zipAll } from 'rxjs';
+import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
 import { Modele } from '../../../models/vertex/modele';
 import { Curve } from '../../../models/curve';
 import { ModeleService } from '../../../services/modele.service';
@@ -50,6 +50,7 @@ export class EditeurComponent implements OnInit {
   }
   @Input() set modele(value: Modele) {
     if (value) {
+      console.log('editeur modele ', value);
       this._modele = value;
       this.modelService
         .getGraph(this.modele.id)
@@ -59,29 +60,10 @@ export class EditeurComponent implements OnInit {
             return this.initGraph(this.modele.graph);
           })
         )
-        .subscribe((result: [(BioEvent | Action)[], Link[]]) => {
-          let getNodeByID = (id: string): Node => {
-            let result = undefined;
-            this.modele.graph.nodes.forEach((node: Node) => {
-              if (node.id == id) result = node;
-            });
-            return result;
-          };
+        .subscribe((result: [(BioEvent | Action | Graph)[], Link[]]) => {
+          this.initTemplateAndLinks(result, this.modele.graph);
 
-          this.modele.graph.nodes.map((node: Node, index: number) => {
-            if (node['template']) node['template'] = result[0][index];
-          });
-
-          this.modele.graph.links = result[1];
-
-          // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-          this.modele.graph.links.map((link: Link) => {
-            let nodeSource = getNodeByID(link.out);
-            if (nodeSource.type == NodeType.event)
-              link.out = (nodeSource as Event).event;
-          });
-
-          // if the initialized graph is the root graph
+          // after the model graph initialization, the curves are generated
           if (this.targetVariable) {
             this.initCurves();
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
@@ -154,16 +136,17 @@ export class EditeurComponent implements OnInit {
       this.allActions = response as Action[];
     });
 
-    this.nodeService.getGraphTemplate().subscribe((response) => {
+    this.nodeService.getAllGraphTemplate().subscribe((response) => {
       this.allGraphs = response;
     });
   }
 
   /**
    * init all the nodes and links of a graph
+   * recursive
    * @param graphId
    */
-  initGraph(graph: Graph): Observable<[(BioEvent | Action)[], Link[]]> {
+  initGraph(graph: Graph): Observable<[(BioEvent | Action | Graph)[], Link[]]> {
     return this.modelService.getGraphNodes(graph.id).pipe(
       switchMap((nodes: Node[]) => {
         graph.nodes = nodes;
@@ -177,12 +160,55 @@ export class EditeurComponent implements OnInit {
               (node as Event).event,
               (node as Event).typeEvent
             );
-          } else return of(undefined);
+          } else if (node.type == NodeType.graph)
+            return this.nodeService.getGraphTemplate(node as Graph).pipe(
+              switchMap((graphTemplate: Graph) =>
+                this.initGraph(graphTemplate).pipe(
+                  map((result: [(BioEvent | Action | Graph)[], Link[]]) => {
+                    this.initTemplateAndLinks(result, graphTemplate);
+                    return graphTemplate;
+                  })
+                )
+              )
+            );
+          else return of(undefined);
         });
         const requestLink = this.modelService.getGraphLinks(nodeIDArray);
         return forkJoin([concat(requestsTemplate).pipe(zipAll()), requestLink]);
       })
     );
+  }
+
+  initTemplateAndLinks(
+    result: [(BioEvent | Action | Graph)[], Link[]],
+    graph: Graph
+  ) {
+    let getNodeByID = (id: string): Node => {
+      let result = undefined;
+      graph.nodes.forEach((node: Node) => {
+        if (node.id == id) result = node;
+      });
+      return result;
+    };
+
+    // on attribiut leur template aux events et aux graph
+    graph.nodes.map((node: Node, index: number) => {
+      if (node['template']) node['template'] = result[0][index];
+      if (node.type == NodeType.graph) {
+        node['nodes'] = (result[0][index] as Graph).nodes;
+        node['links'] = (result[0][index] as Graph).links;
+      }
+      console.log('node ', node, ' template ', result[0][index]);
+    });
+
+    graph.links = result[1];
+
+    // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
+    graph.links.map((link: Link) => {
+      let nodeSource = getNodeByID(link.out);
+      if (nodeSource.type == NodeType.event)
+        link.out = (nodeSource as Event).event;
+    });
   }
 
   /**
