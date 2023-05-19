@@ -1,5 +1,6 @@
 import { Collection } from '../../services/firebase.service';
 import { Nameable } from '../interfaces/nameable';
+import { Template } from '../interfaces/templatable';
 import { Action, BioEvent } from './event';
 import { Edge, Vertex } from './vertex';
 
@@ -153,7 +154,7 @@ export class Link extends Edge {
   }
 }
 
-export class Graph extends Node {
+export class Graph extends Node implements Template {
   name: string; // le graph est a la racine du modele, son nom est root
   nodes: Node[];
   links: Link[];

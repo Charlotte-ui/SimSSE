@@ -1,3 +1,4 @@
+import { Template } from '../interfaces/templatable';
 import { EventType } from './node';
 import { Vertex } from './vertex';
 
@@ -12,7 +13,7 @@ export enum CategoryAction {
   medicaments = 'Administration de médicaments',
 }
 
-export class Action extends Vertex {
+export class Action extends Vertex implements Template {
   public static override className = 'Action';
   public static actions: Action[] = [];
 
@@ -65,7 +66,7 @@ export class Action extends Vertex {
   }
 }
 
-export class BioEvent extends Vertex {
+export class BioEvent extends Vertex implements Template {
   public static override className = 'BioEvent';
   public static bioevents: BioEvent[] = [];
 

@@ -20,6 +20,7 @@ import { Modele } from '../../../models/vertex/modele';
 import { Curve } from '../../../models/curve';
 import { ModeleService } from '../../../services/modele.service';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
+import { Template } from 'src/app/models/interfaces/templatable';
 
 @Component({
   selector: 'app-editeur',
@@ -38,7 +39,6 @@ export class EditeurComponent implements OnInit {
   }
   @Input() set targetVariable(value: VariablePhysioInstance[]) {
     if (value) {
-      // if value isnt undefined
       this._targetVariable = value;
       if (this.modele.graph) this.initCurves();
     }
@@ -60,7 +60,7 @@ export class EditeurComponent implements OnInit {
             return this.initGraph(this.modele.graph);
           })
         )
-        .subscribe((result: [(BioEvent | Action | Graph)[], Link[]]) => {
+        .subscribe((result: [Template[], Link[]]) => {
           this.initTemplateAndLinks(result, this.modele.graph);
 
           // after the model graph initialization, the curves are generated
@@ -78,7 +78,6 @@ export class EditeurComponent implements OnInit {
   }
 
   @Input() disabledInspecteur: boolean = false;
-
   @Input() duration: number = 100;
   @Input() variablesTemplate: VariablePhysioTemplate[];
 
@@ -107,10 +106,8 @@ export class EditeurComponent implements OnInit {
    * préviens le plastron quand un changement a besoin d'être enregistré
    */
   @Output() newChange = new EventEmitter<boolean>();
-
   @Output() updateNode = new EventEmitter<string>();
   @Output() deleteNode = new EventEmitter<string>();
-
   @Output() updateLink = new EventEmitter<string>();
   @Output() deleteLink = new EventEmitter<string>();
   /**
@@ -144,9 +141,10 @@ export class EditeurComponent implements OnInit {
   /**
    * init all the nodes and links of a graph
    * recursive
-   * @param graphId
+   * take a graph in paramater and return a list of template to add to the node and a list of links to add to the graph
+   * @param graph
    */
-  initGraph(graph: Graph): Observable<[(BioEvent | Action | Graph)[], Link[]]> {
+  initGraph(graph: Graph): Observable<[Template[], Link[]]> {
     return this.modelService.getGraphNodes(graph.id).pipe(
       switchMap((nodes: Node[]) => {
         graph.nodes = nodes;
@@ -164,7 +162,7 @@ export class EditeurComponent implements OnInit {
             return this.nodeService.getGraphTemplate(node as Graph).pipe(
               switchMap((graphTemplate: Graph) =>
                 this.initGraph(graphTemplate).pipe(
-                  map((result: [(BioEvent | Action | Graph)[], Link[]]) => {
+                  map((result: [Template[], Link[]]) => {
                     this.initTemplateAndLinks(result, graphTemplate);
                     return graphTemplate;
                   })
@@ -179,18 +177,15 @@ export class EditeurComponent implements OnInit {
     );
   }
 
+  /**
+   * take a list of template, a liste of link, and a graph and bind the templates to the nodes and the links to the graph
+   * @param result 
+   * @param graph 
+   */
   initTemplateAndLinks(
-    result: [(BioEvent | Action | Graph)[], Link[]],
+    result: [Template[], Link[]],
     graph: Graph
   ) {
-    let getNodeByID = (id: string): Node => {
-      let result = undefined;
-      graph.nodes.forEach((node: Node) => {
-        if (node.id == id) result = node;
-      });
-      return result;
-    };
-
     // on attribiut leur template aux events et aux graph
     graph.nodes.map((node: Node, index: number) => {
       if (node['template']) node['template'] = result[0][index];
@@ -205,7 +200,7 @@ export class EditeurComponent implements OnInit {
 
     // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
     graph.links.map((link: Link) => {
-      let nodeSource = getNodeByID(link.out);
+      let nodeSource = graph.nodes.filter((node:Node) => node.id === link.out)[0];
       if (nodeSource.type == NodeType.event)
         link.out = (nodeSource as Event).event;
     });
@@ -254,32 +249,13 @@ export class EditeurComponent implements OnInit {
 
   initGroup(group: Graph) {
     let graphTemplate = Graph.getGraphByID(group.template.toString());
+    // TODO : créer de nouveaux node and links avec de nouveaux id ?
 
     this.initGraph(graphTemplate).subscribe(
-      (result: [(BioEvent | Action)[], Link[]]) => {
-        let getNodeByID = function (id: string): Node {
-          let result = undefined;
-          graphTemplate.nodes.forEach((node: Node) => {
-            if (node.id == id) result = node;
-          });
-          return result;
-        };
-        graphTemplate.nodes.map((node: Node, index: number) => {
-          if (node['template']) node['template'] = result[0][index];
-        });
-
-        graphTemplate.links = result[1];
-
-        // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-        graphTemplate.links.map((link: Link) => {
-          let nodeSource = getNodeByID(link.out);
-          if (nodeSource.type == NodeType.event)
-            link.out = (nodeSource as Event).event;
-        });
-
-        // TODO : créer de nouveaux node and links avec de nouveaux id ?
-        group.links = structuredClone(graphTemplate.links);
+      (result: [Template[], Link[]]) => {
+   //     group.links = structuredClone(graphTemplate.links);
         group.nodes = structuredClone(graphTemplate.nodes);
+        this.initTemplateAndLinks(result,group)
         this.modele.graph.nodes.push(group);
         this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
       }
@@ -359,13 +335,13 @@ export class EditeurComponent implements OnInit {
     let index = Number(event[1]);
     let variable = event[0] as VariablePhysioInstance;
     this.targetVariable[index] = variable;
+    // TODO
     // comme targetVariable est un tableau donc un objet, changer la valeur d'un élement de modifie pas le pointeur
     // et donc le @Input: targetVariable du composant Scene n'est pas trigger
     // on peut utiliser this.targetVariable = [...this.targetVariable] pour forcer l'update
     // mais alors toutes les courbes sont recalculées
     // pour ne recalculer qu'une seule courbe, on utilise la variable varToUpdate
     // ce qui trigger le @Input: varToUpdate du composant Scene
-
     this.curves[index].variable = variable;
     this.curves[index].calculCurve(this.modele);
     this.curves = [...this.curves];
@@ -385,13 +361,4 @@ export class EditeurComponent implements OnInit {
     this.curves = [...this.curves];
   }
 
-  // --- TOOLS -----------------------------------------
-
-  getVariableByTemplate(idTemplate: string): VariablePhysioInstance {
-    let res = undefined;
-    this.targetVariable.forEach((variable) => {
-      if (variable.template == idTemplate) res = variable;
-    });
-    return res;
-  }
 }
