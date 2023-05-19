@@ -1,5 +1,16 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
+import {
+  Observable,
+  concat,
+  concatMap,
+  delay,
+  forkJoin,
+  from,
+  map,
+  of,
+  switchMap,
+  zipAll,
+} from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Scenario } from '../models/vertex/scenario';
@@ -150,7 +161,10 @@ export class ScenarioService {
           )
         );
     });
-    return forkJoin(requests);
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
+    );
+
     //  return of("34:2").pipe ( delay( 5000 ));
   }
 
@@ -191,8 +205,30 @@ export class ScenarioService {
       );
   }
 
-  deleteGroupe(groupe: Groupe): Observable<any> {
+  deleteGroupe(groupe: Groupe, defaultGroupe: Groupe): Observable<any> {
     console.log('delete groupe ', groupe);
-    return this.apiService.deleteDocument(groupe.id);
+    console.log('defaultGroupe ', defaultGroupe);
+
+    return this.apiService
+      .getRelationFrom(groupe.id, 'seComposeDe', 'Groupe')
+      .pipe(
+        map((response) => Plastron.instanciateListe<Plastron>(response.result))
+      )
+      .pipe(
+        switchMap((plastrons: Plastron[]) => {
+          let requests = plastrons.map((plastron: Plastron) =>
+            this.apiService.createRelationBetween(
+              plastron.id,
+              defaultGroupe.id,
+              'seComposeDe'
+            )
+          );
+          let deleteRequest = this.apiService.deleteDocument(groupe.id);
+          requests.push(deleteRequest);
+          return from(requests).pipe(
+            concatMap((request: Observable<any>) => request)
+          );
+        })
+      );
   }
 }

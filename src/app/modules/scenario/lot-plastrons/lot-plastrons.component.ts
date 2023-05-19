@@ -211,7 +211,7 @@ export class LotPlastronsComponent {
     this.dataSourcePlastron[index].title = plastron.modele.title;
     this.dataSourcePlastron[index].description = plastron.modele.description;
     this.dataSourcePlastron[index].triage = plastron.modele.triage;
-    this.dataSourcePlastron[index].statut = Statut.Doing;
+    this.dataSourcePlastron[index].statut = plastron.statut;
     this.dataSourcePlastron[index].id = index;
     this.dataSourcePlastron[index].idPlastron = plastron.id;
     this.dataSourcePlastron[index].groupe = plastron.groupe?.scene;

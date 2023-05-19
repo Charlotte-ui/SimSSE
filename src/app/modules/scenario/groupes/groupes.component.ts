@@ -123,7 +123,7 @@ export class GroupesComponent {
 
       if (result) {
         this.scenarioService
-          .deleteGroupe(this.groupes[groupId])
+          .deleteGroupe(this.groupes[groupId],this.groupes[0])
           .subscribe(() => {
             this.groupes.splice(groupId, 1);
 

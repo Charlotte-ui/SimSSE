@@ -64,6 +64,7 @@ export class ScenarioComponent implements OnInit {
           return this.scenarioService.initGroupe(this.scenario).pipe(
             switchMap((groupes: Groupe[]) => {
               this.groupes = groupes;
+              this.oldGroupes = structuredClone(groupes)
               const requestsGroupes = this.groupes.map((groupe: Groupe) => {
                 return this.scenarioService.getGroupePlastrons(groupe.id).pipe(
                   map((plastrons: Plastron[]) => {
@@ -125,7 +126,9 @@ export class ScenarioComponent implements OnInit {
       );
 
     if (this.groupesToSave) {
-      console.log(this.groupes);
+      console.log("this.groupes ",this.groupes);
+      console.log("this.oldGroupes ",this.oldGroupes);
+
       requests.push(
         this.scenarioService.updateGroupes(this.groupes, this.oldGroupes)
       );
