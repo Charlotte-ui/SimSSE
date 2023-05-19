@@ -134,8 +134,10 @@
               <div
                 class="expanded row"
                 [@descriptionExpand]="
-                  element == expandedElement ? 'expanded' : 'collapsed'
+                  element === expandedElement ? 'expanded' : 'collapsed'
                 "
+
+                [ngClass]="{'collapsed': element !== expandedElement}"
               >
                 <div class="age">Âge : {{ element.age }}</div>
 

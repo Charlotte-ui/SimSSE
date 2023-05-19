@@ -131,7 +131,11 @@ export class LotPlastronsComponent {
   }
 
   updateGroup(event, element: tableElementPlastron) {
-    let plastron = this.plastrons[element.id];
+    console.log("this.plastrons ",this.plastrons)
+    console.log("element ",element)
+    let plastron = this.getPlastronById(element.idPlastron);
+    console.log("plastron ",plastron)
+
     let newScene = event.value;
     let oldScene = plastron.groupe.scene;
     let newGroupe;

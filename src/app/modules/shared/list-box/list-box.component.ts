@@ -34,7 +34,7 @@ export class ListBoxComponent<T extends Listable> {
 
   button = new Button();
 
-
+  selectAll:boolean = false;
 
   @Input() chips!: Tag[];
   @Input() title!: string;
@@ -184,6 +184,9 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   deleteFilter() {
+    this.selectAll = true;
+    this.filterTriage = []
+    this.filterTag = []
     this.filterTriageElement = [];
     this.filterTagElement = [];
     this.elements.map((element) => {
@@ -192,6 +195,7 @@ export class ListBoxComponent<T extends Listable> {
       this.filterTriageElement.push(element.title);
     });
     this.filtreActif = false;
+    this.selectAll = false;
   }
 
   getColor() {

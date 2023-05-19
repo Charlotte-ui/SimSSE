@@ -41,7 +41,7 @@
             <div id="noFiltre" *ngIf="!filtreActif">Aucun filtre actif</div>
           </mat-panel-description>
         </mat-expansion-panel-header>
-        <button mat-button color="primary" (click)="deleteFilter()">
+        <button mat-button color="primary" (click)="deleteFilter()" [disabled]="!filtreActif">
           Effacer les filtres
         </button>
         <div class="container row filtre" *ngIf="keys?.indexOf('triage') > 0">
@@ -50,8 +50,9 @@
             <mat-chip-listbox
               multiple="true"
               (change)="changeFilterTriage($event)"
+              [value]="filterTriage"
             >
-              <mat-chip-option *ngFor="let triage of triages" selected>{{
+              <mat-chip-option *ngFor="let triage of triages" >{{
                 triage
               }}</mat-chip-option>
             </mat-chip-listbox>
@@ -63,10 +64,10 @@
             <mat-chip-listbox
               multiple="true"
               (change)="changeFilterTag($event)"
+              [value]="filterTag"
             >
               <mat-chip-option
                 *ngFor="let chip of chips; index as i"
-                selected
                 >{{ chip.value }}</mat-chip-option
               >
             </mat-chip-listbox>
