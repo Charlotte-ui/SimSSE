@@ -93,6 +93,7 @@ export class ModeleComponent implements Graphable {
             let variable = new VariablePhysioInstance(varTemp);
             variable.cible = varTemp.defaultValue;
             variable.template = varTemp.id;
+            variable.rand = 0;
 
             return variable;
           }
@@ -137,7 +138,15 @@ export class ModeleComponent implements Graphable {
     forkJoin(requests).subscribe((value) => {
       console.log(value);
       this.changesToSave = false;
+
       this.dialog.closeAll();
+      this.nodeToDelete = []; 
+      this.nodeToUpdate = []; 
+      this.linkToUpdate = []; 
+      this.linkToDelete = []; 
+      this.newModele = undefined;
+      this.newTags = [] ;
+      this.tagsToDelete = [] ;
     });
   }
 

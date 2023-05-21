@@ -110,6 +110,8 @@ export class EditeurComponent implements OnInit {
   @Output() deleteNode = new EventEmitter<string>();
   @Output() updateLink = new EventEmitter<string>();
   @Output() deleteLink = new EventEmitter<string>();
+  @Output() updateLink = new EventEmitter<string>();
+
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
    */
@@ -327,6 +329,12 @@ export class EditeurComponent implements OnInit {
 
   updateTriggers(event) {
     // let index = Number(event[1])
+    console.log('updateTriggers ',event)
+    this.modele.triggeredEvents = event;
+
+    this.
+
+
     this.modele.triggeredEvents = event;
     this.updateCurve();
   }

@@ -50,6 +50,7 @@ let DataName = [];
 export class EditeurGrapheNodalComponent implements OnInit {
   echartsInstance;
   mergeOptions = {};
+  actionByCategories ;
 
   _graph!: Graph;
   get graph(): Graph {
@@ -224,6 +225,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     // update the coordinate ; if not is reset to start coordinates
     this.updateNodeCoordinate(event.event.offsetX, event.event.offsetY, node);
+    this.actionByCategories= Action.getListByCategory()
 
     let dialogRef;
 
@@ -240,7 +242,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         break;
       case EventType.action:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, Event,this.allActions, true,['template']],
+          data: [node, Event,this.actionByCategories, true,['template']],
         });
         break;
       case NodeType.trend:

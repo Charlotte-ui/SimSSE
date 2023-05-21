@@ -2,7 +2,6 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import {
-  Link,
   Trend,
   Event,
   Node,
@@ -10,10 +9,6 @@ import {
   NodeType,
   Timer,
 } from 'src/app/models/vertex/node';
-import {
-  VariablePhysio,
-  VariablePhysioInstance,
-} from 'src/app/models/vertex/variablePhysio';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 import { Modele } from 'src/app/models/vertex/modele';
 import { Curve } from 'src/app/models/curve';
@@ -78,7 +73,7 @@ export class SceneComponent implements OnInit {
         lineStyle: { color: '#FEEA00' },
       },
     ];
-    this.variableSelected = {}; 
+    this.variableSelected = {};
 
     this.curves.forEach((curve) => {
       this.legend.push(curve.name);
@@ -206,15 +201,13 @@ export class SceneComponent implements OnInit {
   }
 
   updateChart() {
-    let series:any[] = this.curves.map(curve => (
-      {
-        name: curve.name,
-        type: 'line',
-        data: this.graphData[curve.name],
-        lineStyle: { color: curve.color },
-        itemStyle: { color: curve.color },
-      }
-    ));
+    let series: any[] = this.curves.map((curve) => ({
+      name: curve.name,
+      type: 'line',
+      data: this.graphData[curve.name],
+      lineStyle: { color: curve.color },
+      itemStyle: { color: curve.color },
+    }));
 
     // add triggers (markline)
     series.push({
@@ -228,7 +221,7 @@ export class SceneComponent implements OnInit {
     });
 
     // add timeStamp (markline)
-/*     series.push({
+    /*     series.push({
       name: 'timeStamp',
       type: 'line',
       //  stack: 'x',
@@ -292,43 +285,47 @@ export class SceneComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if(result){
-      if (isTrigger) {
-        let event = this.getTriggerAtTime(result.coord);
-        if (result.delete) {
-          const index = this.modele.triggeredEvents.indexOf(event);
-          if (index > -1) this.modele.triggeredEvents.splice(index, 1);
-        } else if (result) {
-          // update the time of the trigger
-          if (edition)
-            event.time = Number(result.xAxis);
-          else {
-            let event = new Trigger({
-              time: Number(result.xAxis),
-              id: result.event,
-            });
-            this.modele.triggeredEvents.push(event);
+      if (result) {
+        if (isTrigger) {
+          let event = this.getTriggerAtTime(result.coord);
+          if (result.delete) {
+            const index = this.modele.triggeredEvents.indexOf(event);
+            if (index > -1) this.modele.triggeredEvents.splice(index, 1);
+          } else if (result) {
+            if (edition)
+              // update the time of the trigger
+              event.time = Number(result.xAxis);
+            else {
+              // add the trigger
+              let trigger = new Trigger({
+                time: Number(result.xAxis),
+                id: result.id,
+              });
+              console.log(' result ', result);
+
+              console.log('new trigger ', trigger);
+              this.modele.triggeredEvents.push(trigger);
+              console.log('this.modele.triggeredEvents ', this.modele.triggeredEvents);
+            }
+            this.updateTrigger.emit(this.modele.triggeredEvents);
           }
-          this.updateTrigger.emit(this.modele.triggeredEvents);
-        }
-      } else {
-        if (result.delete) {
-          let index = this.modele.timeStamps.indexOf(result.coord);
-          if (index > -1) this.modele.timeStamps.splice(index, 1);
-        } else if (result) {
-          if (edition) {
+        } else {
+          if (result.delete) {
             let index = this.modele.timeStamps.indexOf(result.coord);
-            if (index > -1)
-              this.modele.timeStamps[index] = Number(result.xAxis);
-          } else {
-            this.modele.timeStamps.push(result.xAxis);
+            if (index > -1) this.modele.timeStamps.splice(index, 1);
+          } else if (result) {
+            if (edition) {
+              let index = this.modele.timeStamps.indexOf(result.coord);
+              if (index > -1)
+                this.modele.timeStamps[index] = Number(result.xAxis);
+            } else {
+              this.modele.timeStamps.push(result.xAxis);
+            }
           }
         }
+        this.initGraphData();
       }
-      this.initGraphData();
-    }
     });
-  
   }
 
   // tools

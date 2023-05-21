@@ -62,9 +62,6 @@ export class BarreOutilsComponent implements OnInit {
         let bioevent = new Event({ typeEvent: EventType.bio });
         return this.createNode(bioevent, this.allBioevents);
       case EventType.action:
-
-      
-
         let action = new Event({ typeEvent: EventType.action });
         return this.createNode(action, this.actionByCategories,['template']);
       case NodeType.trend:
