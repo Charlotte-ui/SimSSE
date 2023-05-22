@@ -161,11 +161,13 @@ export class ModeleService {
    * update a  Modele in the database
    * @param modele
    */
-  updateModele(modele: Modele): Observable<any> {
-    return this.apiService.updateDocumentChamp(
-      modele.id,
-      'description',
-      modele.description
+  updateModele(modele: Modele, champToUpdate: string[]): Observable<any> {
+    champToUpdate = champToUpdate.filter((value, index) => champToUpdate.indexOf(value) === index); // remove duplicates
+    const requests = champToUpdate.map((champ: string) =>
+      this.apiService.updateDocumentChamp(modele.id, champ, modele[champ])
+    );
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
     );
   }
 
@@ -213,8 +215,9 @@ export class ModeleService {
       this.apiService.deleteEdge(trigger.id)
     );
 
-
-    return concat(createRequests,updateRequests, deleteRequests).pipe(zipAll());
+    return concat(createRequests, updateRequests, deleteRequests).pipe(
+      zipAll()
+    );
   }
 
   /**

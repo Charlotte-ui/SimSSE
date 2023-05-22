@@ -74,6 +74,7 @@ export class PlastronComponent implements OnInit, Graphable {
     private profilService: ProfilService,
     private nodeService: NodeService
   ) {}
+  champToUpdate: string[];
   newTrigger: boolean;
 
   ngOnInit(): void {
@@ -260,7 +261,7 @@ export class PlastronComponent implements OnInit, Graphable {
           this.newModele &&
           this.plastron.modele.description != this.newModele.description
         )
-          requests.push(this.modelService.updateModele(this.newModele));
+          requests.push(this.modelService.updateModele(this.newModele,this.champToUpdate));
 
         requests.push(
           this.nodeService.updateGraph(

@@ -30,9 +30,10 @@
     <app-tags-descriptions
       *ngIf="allTags"
       [modele]="modele"
+      [chooseTitle]="true"    
       [allTags]="allTags"
       (newModel)="changeModeleRef($event)"
-      (newDescription)="changesToSave = true; newModele = $event"
+      (updateModele)="changesToSave = true; champToUpdate.push($event)"
       (newTags)="
         changesToSave = true;
         newTags = $event.newTags;

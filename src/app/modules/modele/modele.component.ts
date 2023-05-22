@@ -43,7 +43,7 @@ export class ModeleComponent implements Graphable {
   triggerToUpdate: Trigger[] = [];
   triggerToDelete: Trigger[] = [];
   changesToSave = false;
-  newModele: Modele;
+  champToUpdate:string[] = []
   newTrigger: boolean = false;
 
   constructor(
@@ -115,9 +115,8 @@ export class ModeleComponent implements Graphable {
     let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
 
-    console.log('this.modele ', this.modele);
-    if (this.newModele && this.newModele.description != this.modele.description)
-      requests.push(this.modelService.updateModele(this.newModele));
+    if (this.champToUpdate.length >0)
+      requests.push(this.modelService.updateModele(this.modele,this.champToUpdate));
 
     // save the tags
     if (this.newTags && this.newTags.length > 0)
@@ -151,7 +150,7 @@ export class ModeleComponent implements Graphable {
       this.nodeToUpdate = []; 
       this.linkToUpdate = []; 
       this.linkToDelete = []; 
-      this.newModele = undefined;
+      this.champToUpdate = [];
       this.newTags = [] ;
       this.tagsToDelete = [] ;
     });

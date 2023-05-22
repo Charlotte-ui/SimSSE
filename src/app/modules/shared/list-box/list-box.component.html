@@ -45,18 +45,7 @@
           Effacer les filtres
         </button>
         <div class="container row filtre" *ngIf="keys?.indexOf('triage') > 0">
-          <div class="col-1">Triage</div>
-          <div class="col-11">
-            <mat-chip-listbox
-              multiple="true"
-              (change)="changeFilterTriage($event)"
-              [value]="filterTriage"
-            >
-              <mat-chip-option *ngFor="let triage of triages" >{{
-                triage
-              }}</mat-chip-option>
-            </mat-chip-listbox>
-          </div>
+          <app-triage-filter [multiple]="true" (change)="changeFilterTriage($event)" [filterTriage]="filterTriage"></app-triage-filter>
         </div>
         <div class="container row filtre">
           <div class="col-1">Tags</div>

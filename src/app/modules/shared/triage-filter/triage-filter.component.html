@@ -1,0 +1,14 @@
+<div class="container">
+  <div>Triage</div>
+  <div>
+    <mat-chip-listbox
+      [multiple]="multiple"
+      (change)="change.emit($event)"
+      [value]="filterTriage"
+    >
+      <mat-chip-option *ngFor="let triage of triages">
+        <app-triage [triage]="triage"></app-triage>
+      </mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+</div>

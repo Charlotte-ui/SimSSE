@@ -6,7 +6,6 @@ mat-divider {
     width: 100%;
 }
 
-
 mat-list-item{
   height: fit-content !important;
   margin-bottom: 2%;
@@ -20,6 +19,26 @@ mat-card-header{
   flex-direction: column;
 }
 
+mat-expansion-panel {
+  border: 0 !important;
+  box-shadow: none !important;
+  margin-top: 15px;
+}
+
+mat-card-title {
+  display: flex !important;
+  align-items: center;
+}
+
+mat-chip-option {
+  font-weight: lighter !important;
+}
+
+button {
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
 .cdk-drag-preview{
   box-sizing: border-box;
   border-radius: 4px;
@@ -30,8 +49,6 @@ mat-card-header{
   opacity:0;
   height: 0px!important;
 }
-
-
 
 .cdk-drag-animating{
   transition: transform 250ms cubic-bezier(0,0,0.2,1);
@@ -52,22 +69,7 @@ mat-card-header{
   flex-grow: 10;
 }
 
-mat-expansion-panel{
-  border:0 !important;
-  box-shadow:none !important;
-  margin-top: 15px;
-}
 
-mat-card-title{
-  display: flex !important;
-    align-items: center;
-}
-
-
-button{
-  margin-left: 1%;
-  margin-right: 1%;
-}
 
 #noFiltre{
   font-style: italic;
@@ -77,6 +79,3 @@ button{
   font-weight: lighter !important;
 }
 
-mat-chip-option{
-    font-weight: lighter !important;
-}

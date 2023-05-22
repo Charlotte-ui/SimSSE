@@ -77,6 +77,7 @@ import { GeneralInfosComponent } from './modules/scenario/general-infos/general-
 import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dialog.component';
 import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plastrons.component';
 import { WaitComponent } from './modules/shared/wait/wait.component';
+import { TriageFilterComponent } from './modules/shared/triage-filter/triage-filter.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -114,6 +115,7 @@ import { WaitComponent } from './modules/shared/wait/wait.component';
     ModeleDialogComponent,
     LotPlastronsComponent,
     WaitComponent,
+    TriageFilterComponent,
   ],
   imports: [
     BrowserModule,
