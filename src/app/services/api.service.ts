@@ -18,6 +18,7 @@ export class ApiService {
 
   // return of("34:2").pipe ( delay( 5000 ));
   documentId(document: any): string {
+    console.log("document ",document," id ",document['@rid'])
     return document['@rid'].substring(1);
   }
 

@@ -7,6 +7,7 @@ export interface Graphable {
   linkToDelete: string[];
   changesToSave:boolean;
   newModele: Modele;
+  newTrigger: boolean;
 
   save: () => void;
 }

@@ -29,6 +29,17 @@ import { Action, BioEvent } from '../models/vertex/event';
 export class NodeService {
   constructor(private apiService: ApiService) {}
 
+
+ /**
+  * READ
+  */
+
+  /**
+   * get the template of an event
+   * @param id 
+   * @param eventType 
+   * @returns 
+   */
   getEventTemplate(
     id: string,
     eventType: EventType
@@ -56,6 +67,11 @@ export class NodeService {
       'true'
     );
   }
+
+
+  /**
+   * CREATE
+   */
 
   /**
    * push a new Graph in the database
@@ -117,89 +133,30 @@ export class NodeService {
    * return the id of the new Graph
    * @param node
    */
-  createGraphNode(node: Node): Observable<string> {
-    node['@class'] = 'Graph';
-    delete node.id;
+  createGraphNode(graph: Graph): Observable<string> {
+    console.log("createGraphNode ",graph)
+    graph['@class'] = 'Graph';
+    delete graph.id;
+    delete graph.links;
+    delete graph.nodes;
+    let templateId = graph.template;
+    graph.template = false;
     return this.apiService
-      .createDocument(node)
+      .createDocument(graph)
       .pipe(map((response) => this.apiService.documentId(response)))
       .pipe(
         switchMap((idNode: string) =>
           this.apiService
-            .createRelationBetween(node['template'], idNode, 'aTemplate')
-            .pipe(map(() => idNode))
+            .createRelationBetween(templateId.toString(), idNode, 'aTemplate')
+            .pipe(map((res) => {
+              console.log("res ",res)
+             return idNode
+            }))
         )
       );
   }
 
-  /**
-   * push a  Node in the database
-   * @param node
-   */
-  updateNode(node: Node): Observable<string[]> {
-    console.log('updateNode ', node);
-    return this.apiService.updateAllDocumentChamp(node);
-  }
-
-  /**
-   * push a  Node in the database
-   * @param node
-   */
-  updateLink(link: Link): Observable<string[]> {
-    console.log('updateLink ', link);
-    return this.apiService.updateDocumentChamp(
-      link.id,
-      'start',
-      link.start.toString()
-    );
-  }
-
-  updateGraph(
-    graph: Graph,
-    nodeToUpdate: string[],
-    nodeToDelete: string[],
-    linkToUpdate: string[],
-    linkToDelete: string[]
-  ): Observable<any> {
-    let requests = [];
-
-    // create new nodes and links
-    let requestCreate = this.updateGraphNodes(graph).pipe(
-      switchMap((indexesNode: string[]) => {
-        console.log('indexesNode ', indexesNode);
-        return this.updateGraphLinks(graph, indexesNode);
-      })
-    );
-
-    requests.push(requestCreate);
-
-    //update old nodes
-    graph.nodes.forEach((node) => {
-      if (!this.isNew(node.id) && nodeToUpdate.includes(node.id))
-        requests.push(this.updateNode(node));
-    });
-
-    //delete nodes
-    nodeToDelete.forEach((nodeId) => {
-      requests.push(this.apiService.deleteDocument(nodeId));
-    });
-
-    //update old links
-    graph.links.forEach((link) => {
-      if (!this.isNew(link.id) && linkToUpdate.includes(link.id))
-        requests.push(this.updateLink(link));
-    });
-
-    //delete  links
-    linkToDelete.forEach((linkId) => {
-      requests.push(this.apiService.deleteEdge(linkId));
-    });
-
-    return from(requests).pipe(
-      concatMap((request: Observable<any>) => request)
-    );
-  }
-
+  
   /**
    * create a duplicate of all the node and link of the graph
    * @param graph
@@ -239,6 +196,86 @@ export class NodeService {
     );
   }
 
+
+  /**
+   * UPDATE
+   */
+
+  /**
+   * push a  Node in the database
+   * @param node
+   */
+  updateNode(node: Node): Observable<string[]> {
+    console.log('updateNode ', node);
+    return this.apiService.updateAllDocumentChamp(node);
+  }
+
+  /**
+   * push a  Node in the database
+   * @param node
+   */
+  updateLink(link: Link): Observable<string[]> {
+    console.log('updateLink ', link);
+    return this.apiService.updateDocumentChamp(
+      link.id,
+      'start',
+      link.start.toString()
+    );
+  }
+
+  updateGraph(
+    graph: Graph,
+    nodeToUpdate: string[],
+    nodeToDelete: string[],
+    linkToUpdate: string[],
+    linkToDelete: string[]
+  ): Observable<any> {
+    let requests: Observable<any>[] = [];
+
+    console.log("updateGraph")
+    console.log("nodeToUpdate ",nodeToUpdate)
+    console.log("linkToUpdate ",linkToUpdate)
+    console.log("nodeToDelete ",nodeToDelete)
+    console.log("linkToDelete ",linkToDelete)
+    // create new nodes and links
+    let requestCreate = this.updateGraphNodes(graph).pipe(
+      switchMap((indexesNode: string[]) => {
+        console.log('indexesNode ', indexesNode);
+        return this.updateGraphLinks(graph, indexesNode);
+      })
+    );
+
+    console.log("requests ",requests)
+
+    requests.push(requestCreate);
+
+    //update old nodes
+    graph.nodes.forEach((node) => {
+      if (!this.isNew(node.id) && nodeToUpdate.includes(node.id))
+        requests.push(this.updateNode(node));
+    });
+
+    //delete nodes
+    nodeToDelete.forEach((nodeId) => {
+      requests.push(this.apiService.deleteDocument(nodeId));
+    });
+
+    //update old links
+    graph.links.forEach((link) => {
+      if (!this.isNew(link.id) && linkToUpdate.includes(link.id))
+        requests.push(this.updateLink(link));
+    });
+
+    //delete  links
+    linkToDelete.forEach((linkId) => {
+      requests.push(this.apiService.deleteEdge(linkId));
+    });
+
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request)
+    );
+  }
+
   /**
    * create the new nodes of a graph and add them to it
    * return an array of all the graph nodes
@@ -248,7 +285,7 @@ export class NodeService {
   updateGraphNodes(graph: Graph): Observable<string[]> {
     console.log('updateGraphNodes ', graph);
     let indexGraph = graph.id;
-    let requestsNode: Observable<any>[] = [];
+    let requestsNode: Observable<string>[] = [];
     let oldNodeInddexes = [];
 
     // add new nodes
@@ -256,7 +293,7 @@ export class NodeService {
       if (this.isNew(node.id)) {
         if (node.type === NodeType.graph) {
           // create a graph node
-          requestsNode.push(this.createGraphNode(structuredClone(node)));
+          requestsNode.push(this.createGraphNode(structuredClone(node as Graph)));
         } else {
           // create a trend or event node
           requestsNode.push(
@@ -271,6 +308,8 @@ export class NodeService {
         oldNodeInddexes.push(node.id);
       }
     });
+
+    console.log(" requestsNode ",requestsNode)
 
     if (requestsNode.length === 0) return of(oldNodeInddexes); // s'il n'y a pas de nouveaux nodes à ajouter
 
@@ -317,10 +356,13 @@ export class NodeService {
             this.getNodeId(link.out, graph.nodes, indexesNode),
             'link',
             'start',
-            "'" + link.start + "'"
+            link.start.toString()
           )
         );
     });
+
+    if (requestsLinks.length === 0) return of({}); // s'il n'y a pas de nouveaux nodes à ajouter
+
 
     return from(requestsLinks).pipe(
       concatMap((request: Observable<any>) => request),

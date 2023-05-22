@@ -44,6 +44,7 @@ export class ModeleComponent implements Graphable {
   triggerToDelete: Trigger[] = [];
   changesToSave = false;
   newModele: Modele;
+  newTrigger: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -139,8 +140,7 @@ export class ModeleComponent implements Graphable {
       )
     );
 
-
-    requests.push(this.modelService.updateTriggers(this.modele,this.triggerToUpdate,this.triggerToDelete))
+    if(this.newTrigger) requests.push(this.modelService.updateTriggers(this.modele,this.triggerToUpdate,this.triggerToDelete))
 
     forkJoin(requests).subscribe((value) => {
       console.log(value);

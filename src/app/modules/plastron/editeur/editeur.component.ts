@@ -70,10 +70,12 @@ export class EditeurComponent implements OnInit {
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           }
 
-          // TODO : find the rigth place foor that
+          // all the trends and all the event from the graph and the nested graphs
           this.trends = [];
           this.events = [];
           this.initTrendsEventsRecursive(this.modele.graph);
+          console.log("trends ",this.trends)
+          console.log("events ",this.events)
         });
     }
   }
@@ -231,14 +233,14 @@ export class EditeurComponent implements OnInit {
   }
 
   initTrendsEventsRecursive(graph: Graph) {
-    graph.nodes.forEach((node, i) => {
+    graph.nodes.forEach((node:Node) => {
       switch (Node.getType(node)) {
         case EventType.action:
-          node['template'] = Action.getActionByID((node as Event).event);
+          node['template'] = this.allActions.filter((action:Action) => action.id == (node as Event).event)[0]
           this.events.push(node as Event);
           break;
         case EventType.bio:
-          node['template'] = BioEvent.getBioEventByID((node as Event).event);
+          node['template'] = this.allBioevents.filter((bioevent:BioEvent) => bioevent.id == (node as Event).event)[0]
           this.events.push(node as Event);
           break;
         case NodeType.trend:
@@ -273,6 +275,7 @@ export class EditeurComponent implements OnInit {
       let indice = this.modele.graph.links.length.toString();
       (element as Link).id = indice;
       this.modele.graph.links.push(element as Link);
+      this.updateLink.emit(indice);
     } else {
       let indice = this.modele.graph.nodes.length.toString();
       element.id = indice;
@@ -322,6 +325,7 @@ export class EditeurComponent implements OnInit {
     if (event[0].delete) {
       this.deleteLink.emit(idLink);
     } else {
+      console.log("update link ",idLink)
       this.updateLink.emit(idLink);
     }
     // let index = Number(event[1])

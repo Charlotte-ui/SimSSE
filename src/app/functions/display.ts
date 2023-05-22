@@ -34,7 +34,8 @@ export const champLabel = {
   category:'Catégorie',
   med:'Med',
   paraMed:"Paramed",
-  start:"Activation"
+  start:"Activation",
+  template:'Groupe'
 
 };
 

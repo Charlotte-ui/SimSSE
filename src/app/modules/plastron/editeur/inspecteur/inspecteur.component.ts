@@ -27,14 +27,8 @@ export class InspecteurComponent implements OnInit {
     this.updateVariable.emit([newVar,index]);
   }
 
-  getTrendByCible(name:string):Trend[]{
-    let res = [];
-
-    this.trends.forEach(trend => {
-      if (trend.target == name) res.push(trend);
-    });
-
-    return res;
+  getTrendByCible(target:string):Trend[]{
+    return this.trends.filter((trend:Trend) => trend.target == target)
   }
 
 }

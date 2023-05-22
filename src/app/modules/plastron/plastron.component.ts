@@ -74,6 +74,7 @@ export class PlastronComponent implements OnInit, Graphable {
     private profilService: ProfilService,
     private nodeService: NodeService
   ) {}
+  newTrigger: boolean;
 
   ngOnInit(): void {
     this.route.data

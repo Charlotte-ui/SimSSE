@@ -174,12 +174,6 @@ export class ModeleService {
     triggerToUpdate: Trigger[],
     triggerToDelete: Trigger[]
   ): Observable<any> {
-    console.log('updateTriggers modele ', modele);
-    console.log('triggerToUpdate ', triggerToUpdate);
-    let testtrig = triggerToUpdate[0];
-
-    console.log('triggerToDelete ', triggerToDelete);
-
     let triggerToCreate = triggerToUpdate.filter(
       (trigger: Trigger) =>
         !triggerToDelete.includes(trigger) && trigger.id == ''
@@ -190,15 +184,6 @@ export class ModeleService {
       (trigger: Trigger) =>
         !triggerToDelete.includes(trigger) && trigger.id != ''
     );
-    console.log(
-      '!triggerToDelete.includes(trigger) ',
-      !triggerToDelete.includes(testtrig) && testtrig.id == ''
-    );
-
-    console.log('triggerToUpdate ', triggerToUpdate);
-
-    console.log('triggerToDelete ', triggerToDelete);
-    console.log('triggerToCreate ', triggerToCreate);
 
     const createRequests = triggerToCreate.map((trigger: Trigger) => {
       let events = modele.graph.nodes.filter(
@@ -227,6 +212,7 @@ export class ModeleService {
     const deleteRequests = triggerToDelete.map((trigger: Trigger) =>
       this.apiService.deleteEdge(trigger.id)
     );
+
 
     return concat(createRequests,updateRequests, deleteRequests).pipe(zipAll());
   }
