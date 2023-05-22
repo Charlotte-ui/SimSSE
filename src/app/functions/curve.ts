@@ -20,7 +20,7 @@ export class Curve {
     this.name = name;
     this.duration = duration ? duration : 0;
     this.variable = variable ? variable : undefined;
-    this.color = color ?  color : '#d5ceeb';
+    this.color = color ? color : '#d5ceeb';
     this.values = [];
     this.currentMax = 0;
   }
@@ -29,10 +29,9 @@ export class Curve {
    * generate the curve
    * @param size
    * @param variable
-   * @returns the new triggeredEvents with the events that have been triggered during the calcul of curve 
+   * @returns the new triggeredEvents with the events that have been triggered during the calcul of curve
    */
   public calculCurve(modele: Modele): Trigger[] {
-    //console.group("calculCurve "+this.name)
     //console.group("modele")
     //console.group(modele)
 
@@ -46,12 +45,16 @@ export class Curve {
       this.updateNodesStates(i, modele); // each minute that pass we updates the states of the nodes
       if (modele.graph.nodes) trend = this.calculTrend(modele); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
 
-      //  console.log(i+" "+trend)
       if (i > 0) prevValue = this.values[i - 1][1];
 
-      let newValue = Math.round(
-        prevValue + this.gaussianRandom(0, this.variable.rand) + trend
-      );
+      let newValue =
+        Math.round(
+          (prevValue +
+            this.gaussianRandom(0, this.variable.rand) +
+            trend +
+            Number.EPSILON) *
+            100
+        ) / 100; // the *100 /100 is the ensure 2 digit after . 
       //let newValue = variable.cible + i*trend + this.gaussianRandom(0, variable.rand) ;
 
       if (newValue > this.variable.max) newValue = this.variable.max;
@@ -85,12 +88,11 @@ export class Curve {
     triggeredEvents.forEach((trigger) => {
       if (trigger.time == t) {
         // event trigger at time t
-  
+
         graph.links.forEach((link) => {
           if (trigger.in == link.out) {
             let nodeTrigger = this.getNodeByID(link.in, graph);
 
-       
             if (nodeTrigger) {
               nodeTrigger.state = link.start;
               if (nodeTrigger.type == NodeType.graph) {
@@ -174,22 +176,19 @@ export class Curve {
   }
 
   private advanceTimer(timer: Timer, t: number, triggeredEvents: Trigger[]) {
-
     timer.counter++;
-    if (timer.counter == timer.duration) { // if the timer has ended
+    if (timer.counter == timer.duration) {
+      // if the timer has ended
 
       triggeredEvents.push(
-        new Trigger({ time: t+1, id: timer.id, editable: false })
+        new Trigger({ time: t + 1, id: timer.id, editable: false })
       );
       timer.state = false; // the timer end
     }
-
-    
   }
 
   private setAllNodesStatesToFalse(graph: Graph) {
-
-    graph.nodes.map((node:Node) => {
+    graph.nodes.map((node: Node) => {
       node.state = false;
       if (node.type == NodeType.graph)
         this.setAllNodesStatesToFalse(node as Graph);

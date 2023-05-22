@@ -351,6 +351,7 @@ export class EditeurComponent implements OnInit {
   }
 
   updateCurve() {
+    console.log("updateCurve ",this.modele)
     this.curves.forEach((curve) => {
       // clean the triggereds of all the curves-genereted triggerd
       this.modele.triggeredEvents = this.modele.triggeredEvents.filter(
