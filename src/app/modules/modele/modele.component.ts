@@ -6,7 +6,7 @@ import {
   VariablePhysioTemplate,
 } from '../../models/vertex/variablePhysio';
 import { Graph, Event } from '../../models/vertex/node';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Data } from '@angular/router';
 import { ModeleService } from '../../services/modele.service';
 import { Tag } from '../../models/vertex/tag';
 import { TagService } from '../../services/tag.service';
@@ -31,10 +31,6 @@ export class ModeleComponent implements Graphable {
   graph!: Graph;
   allTags!: Tag[];
 
-
-  newTags: Tag[];
-  tagsToDelete: Tag[];
-
   // implement Graphable
   nodeToUpdate: string[] = [];
   nodeToDelete: string[] = [];
@@ -43,8 +39,10 @@ export class ModeleComponent implements Graphable {
   triggerToUpdate: Trigger[] = [];
   triggerToDelete: Trigger[] = [];
   changesToSave = false;
-  champToUpdate:string[] = []
+  champToUpdate: string[] = [];
   newTrigger: boolean = false;
+  newTags: Tag[];
+  tagsToDelete: Tag[];
 
   constructor(
     private route: ActivatedRoute,
@@ -56,33 +54,29 @@ export class ModeleComponent implements Graphable {
   ) {}
 
   ngOnInit(): void {
-    this.route.data.subscribe((response) => {
-      this.modele = response['data'];
-      this.initTrigger();
-    });
-
-    this.initVariables();
-
-    /**
-     * init tags
-     */
-    this.tagService.getAllTags('modele').subscribe((response: Tag[]) => {
-      this.allTags = response;
-    });
+    this.route.data
+      .pipe(
+        switchMap((response: Data) => {
+          this.modele = response['data'];
+          this.initTrigger();
+          this.initVariables();
+          /**
+           * init tags
+           */
+          return this.tagService.getAllTags('modele');
+        })
+      )
+      .subscribe((tags: Tag[]) => {
+        this.allTags = tags;
+      });
   }
 
   initTrigger() {
-    this.modelService.getTrigger(this.modele.id).subscribe((result: any) => {
-      console.log("getTrigger ",result)
-      this.modele.triggeredEvents = result.$a.map(
-        (event: Event, index: number) =>
-          new Trigger({
-            '@rid':result.$b[index]['@rid'],
-            time: result.$b[index].time,
-            in: event.event,
-          })
-      );
-    });
+    this.modelService
+      .getTrigger(this.modele.id)
+      .subscribe((triggers: Trigger[]) => {
+        this.modele.triggeredEvents = triggers;
+      });
   }
 
   /**
@@ -99,14 +93,10 @@ export class ModeleComponent implements Graphable {
             variable.cible = varTemp.defaultValue;
             variable.template = varTemp.id;
             variable.rand = 0;
-
             return variable;
           }
         );
-        console.log('varTemp');
-        console.log(variablesTemplates);
-        console.log('varInst');
-        console.log(this.targetVariable);
+      
         this.targetVariable = [...this.targetVariable];
       });
   }
@@ -115,8 +105,10 @@ export class ModeleComponent implements Graphable {
     let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
 
-    if (this.champToUpdate.length >0)
-      requests.push(this.modelService.updateModele(this.modele,this.champToUpdate));
+    if (this.champToUpdate.length > 0)
+      requests.push(
+        this.modelService.updateModele(this.modele, this.champToUpdate)
+      );
 
     // save the tags
     if (this.newTags && this.newTags.length > 0)
@@ -139,20 +131,27 @@ export class ModeleComponent implements Graphable {
       )
     );
 
-    if(this.newTrigger) requests.push(this.modelService.updateTriggers(this.modele,this.triggerToUpdate,this.triggerToDelete))
+    if (this.newTrigger)
+      requests.push(
+        this.modelService.updateTriggers(
+          this.modele,
+          this.triggerToUpdate,
+          this.triggerToDelete
+        )
+      );
 
     forkJoin(requests).subscribe((value) => {
       console.log(value);
       this.changesToSave = false;
 
       this.dialog.closeAll();
-      this.nodeToDelete = []; 
-      this.nodeToUpdate = []; 
-      this.linkToUpdate = []; 
-      this.linkToDelete = []; 
+      this.nodeToDelete = [];
+      this.nodeToUpdate = [];
+      this.linkToUpdate = [];
+      this.linkToDelete = [];
       this.champToUpdate = [];
-      this.newTags = [] ;
-      this.tagsToDelete = [] ;
+      this.newTags = [];
+      this.tagsToDelete = [];
     });
   }
 

@@ -33,16 +33,9 @@ export class Plastron extends Vertex {
     return list.map(element => new Plastron(element) as T)
   }
 
-  initModeleProfil(plastronService:PlastronService):Observable<[Modele, Profil]> {
-    const requestsModele = plastronService.getPlastronModele(this.id);
 
-    const requestsProfil = plastronService.getPlastronProfil(this.id);
 
-    return forkJoin([requestsModele, requestsProfil])
-   
-  }
-
-  initModeleProfil2(plastronService:PlastronService):Observable<Plastron> {
+  initModeleProfil(plastronService:PlastronService):Observable<Plastron> {
     const requestsModele = plastronService.getPlastronModele(this.id);
 
     const requestsProfil = plastronService.getPlastronProfil(this.id);

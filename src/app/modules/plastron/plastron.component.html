@@ -30,6 +30,12 @@
       (deleteLink)="
         changesToSave = true; modeleToSave = true; linkToDelete.push($event)
       "
+      (updateTrigger)="
+        changesToSave = true; newTrigger = true; triggerToUpdate.push($event)
+      "
+      (deleteTrigger)="
+        changesToSave = true; newTrigger = true; triggerToDelete.push($event)
+      "
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Modèle - tags et descriptions">
@@ -37,8 +43,8 @@
       *ngIf="allTags"
       [modele]="plastron.modele"
       [allTags]="allTags"
-      (newChange)="changesToSave = true; modeleToSave = true"
-      (newDescription)="changesToSave = true ; modeleToSave = true "
+      (newModel)="changeModeleRef($event)"
+      (updateModele)="changesToSave = true; modeleToSave = true ; champToUpdate.push($event)"
       (newTags)="
         changesToSave = true;
         newTags = $event.newTags;

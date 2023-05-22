@@ -1,10 +1,9 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
 import { Plastron } from '../../models/vertex/plastron';
 import { ModeleService } from '../../services/modele.service';
 import { Modele } from '../../models/vertex/modele';
-import { Graph, Node, Event, Link } from '../../models/vertex/node';
-
+import {  Event } from '../../models/vertex/node';
 import { ProfilService } from '../../services/profil.service';
 import {
   VariablePhysioInstance,
@@ -38,16 +37,9 @@ import { NodeService } from 'src/app/services/node.service';
 export class PlastronComponent implements OnInit, Graphable {
   plastron!: Plastron;
   scenario: Scenario;
-
   variablesTemplate: VariablePhysioTemplate[] = [];
-
   allTags!: Tag[];
-
   curves!: Curve[];
-
-  /**
-   * save the changes
-   */
 
   /**
    * implement Graphable
@@ -61,6 +53,10 @@ export class PlastronComponent implements OnInit, Graphable {
   tagsToDelete: Tag[] = [];
   modeleToSave: boolean = false;
   newModele: Modele;
+  champToUpdate: string[];
+  newTrigger: boolean;
+  triggerToUpdate: Trigger[] = [];
+  triggerToDelete: Trigger[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -74,8 +70,7 @@ export class PlastronComponent implements OnInit, Graphable {
     private profilService: ProfilService,
     private nodeService: NodeService
   ) {}
-  champToUpdate: string[];
-  newTrigger: boolean;
+
 
   ngOnInit(): void {
     this.route.data
@@ -101,9 +96,7 @@ export class PlastronComponent implements OnInit, Graphable {
           return forkJoin([requestModelProfil, requestScenario]);
         })
       )
-      .subscribe((response: [[Modele, Profil], Scenario]) => {
-        this.plastron.modele = response[0][0];
-        this.plastron.profil = response[0][1];
+      .subscribe((response: [Plastron, Scenario]) => {
         this.scenario = response[1];
         this.initTrigger();
         this.initVariables();
@@ -120,14 +113,8 @@ export class PlastronComponent implements OnInit, Graphable {
   initTrigger() {
     this.modelService
       .getTrigger(this.plastron.modele.id)
-      .subscribe((result: any) => {
-        this.plastron.modele.triggeredEvents = result.$a.map(
-          (event: Event, index: number) =>
-            new Trigger({
-              time: result.$b[index].time,
-              id: event.event,
-            })
-        );
+      .subscribe((triggers: Trigger[]) => {
+        this.plastron.modele.triggeredEvents = triggers
       });
   }
 
@@ -342,5 +329,9 @@ export class PlastronComponent implements OnInit, Graphable {
 
       // Margins:
     }
+  }
+
+    changeModeleRef(newModele) {
+    // this.plastronService.changeModelRef(this.plastron,newModele);
   }
 }

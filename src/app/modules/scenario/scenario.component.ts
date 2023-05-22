@@ -84,7 +84,7 @@ export class ScenarioComponent implements OnInit {
       .pipe(
         switchMap((plastrons: Plastron[]) => {
           const requests = plastrons.map((plastron: Plastron) => {
-            return plastron.initModeleProfil2(this.plastronService);
+            return plastron.initModeleProfil(this.plastronService);
           });
 
           return concat(requests).pipe(zipAll());

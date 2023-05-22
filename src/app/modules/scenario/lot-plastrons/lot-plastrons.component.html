@@ -69,7 +69,6 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Groupe</th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field appearance="fill">
-                <mat-label>Groupe</mat-label>
                 <mat-select
                   [disabled]="element.id == -1"
                   [(value)]="element.groupe"
@@ -91,7 +90,6 @@
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field appearance="fill">
-                <mat-label>Statut</mat-label>
                 <mat-select
                   [(value)]="element.statut"
                   [disabled]="element.id == -1"

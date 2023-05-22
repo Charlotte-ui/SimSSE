@@ -68,10 +68,22 @@ export class ModeleService {
       .pipe(map((response) => Node.instanciateListe<Node>(response.result)));
   }
 
-  getTrigger(id: string): Observable<any | undefined> {
+  getTrigger(id: string): Observable<Trigger[]> {
     return this.apiService
       .getLinkAndRelationFrom(id, 'triggeredAt', 'Modele')
-      .pipe(map((response) => response.result[0]));
+      .pipe(
+        map((response) => {
+          let res = response.result[0];
+          return res.$a.map(
+            (event: Event, index: number) =>
+              new Trigger({
+                '@rid': res.$b[index]['@rid'],
+                time: res.$b[index].time,
+                in: event.event,
+              })
+          );
+        })
+      );
   }
 
   getGraphLinks(arrayId: string[]): Observable<Link[] | undefined> {
@@ -162,7 +174,9 @@ export class ModeleService {
    * @param modele
    */
   updateModele(modele: Modele, champToUpdate: string[]): Observable<any> {
-    champToUpdate = champToUpdate.filter((value, index) => champToUpdate.indexOf(value) === index); // remove duplicates
+    champToUpdate = champToUpdate.filter(
+      (value, index) => champToUpdate.indexOf(value) === index
+    ); // remove duplicates
     const requests = champToUpdate.map((champ: string) =>
       this.apiService.updateDocumentChamp(modele.id, champ, modele[champ])
     );
