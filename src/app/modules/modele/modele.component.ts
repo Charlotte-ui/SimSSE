@@ -40,6 +40,8 @@ export class ModeleComponent implements Graphable {
   nodeToDelete: string[] = [];
   linkToUpdate: string[] = [];
   linkToDelete: string[] = [];
+  triggerToUpdate: Trigger[] = [];
+  triggerToDelete: Trigger[] = [];
   changesToSave = false;
   newModele: Modele;
 
@@ -70,11 +72,13 @@ export class ModeleComponent implements Graphable {
 
   initTrigger() {
     this.modelService.getTrigger(this.modele.id).subscribe((result: any) => {
+      console.log("getTrigger ",result)
       this.modele.triggeredEvents = result.$a.map(
         (event: Event, index: number) =>
           new Trigger({
+            '@rid':result.$b[index]['@rid'],
             time: result.$b[index].time,
-            id: event.event,
+            in: event.event,
           })
       );
     });
@@ -134,6 +138,9 @@ export class ModeleComponent implements Graphable {
         this.linkToDelete
       )
     );
+
+
+    requests.push(this.modelService.updateTriggers(this.modele,this.triggerToUpdate,this.triggerToDelete))
 
     forkJoin(requests).subscribe((value) => {
       console.log(value);

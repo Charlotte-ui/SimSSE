@@ -40,7 +40,8 @@
           [events]="events"
           [curves]="curves"
           [duration]="duration"
-          (updateTrigger)="updateTriggers($event)"
+          (updateTrigger)="updateTrigger.emit($event) ; updateCurve();"
+          (deleteTrigger)="deleteTrigger.emit($event) ; updateCurve();"
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">

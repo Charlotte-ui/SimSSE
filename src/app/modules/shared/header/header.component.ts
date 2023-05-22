@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Scenario } from '../../../models/vertex/scenario';
-import { Button } from 'src/app/models/display';
+import { Button } from 'src/app/functions/display';
 
 @Component({
   selector: 'app-header',

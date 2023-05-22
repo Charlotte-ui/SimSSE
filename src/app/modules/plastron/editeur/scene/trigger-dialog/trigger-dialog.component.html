@@ -1,7 +1,7 @@
 <div class="container">
   <h1 mat-dialog-title>{{title}}
-    <button mat-mini-fab  disabled [id]="id">
-      <mat-icon  [fontIcon]="icon"></mat-icon>
+    <button *ngIf="element" mat-mini-fab  disabled [style.background]="getColor()">
+      <mat-icon  [fontIcon]="getIcon()"></mat-icon>
     </button>
   </h1>
 
@@ -10,7 +10,7 @@
     <div mat-dialog-content *ngIf="isTrigger">
       <mat-form-field appearance="fill">
         <mat-label>Évenement</mat-label>
-        <mat-select formControlName="id">
+        <mat-select formControlName="in">
           <mat-option *ngFor="let event of events" [value]="event.template?event.template.id:event.id">
             {{event.template?event.template.name:event.event}} <mat-icon  [fontIcon]="button.getButtonByType(event.typeEvent).icon"></mat-icon>
           </mat-option>

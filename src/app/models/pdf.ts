@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { Curve } from './curve';
+import { Curve } from '../functions/curve';
 import { Trigger } from './trigger';
 
 export class Pdf {

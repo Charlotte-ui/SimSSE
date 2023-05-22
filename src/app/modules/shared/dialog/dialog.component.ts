@@ -21,7 +21,7 @@ import {
   NodeType,
   EventType,
 } from 'src/app/models/vertex/node';
-import { Button, champLabel } from 'src/app/models/display';
+import { Button, champLabel } from 'src/app/functions/display';
 import { Scenario } from '../../../models/vertex/scenario';
 import { Modele } from '../../../models/vertex/modele';
 import { Vertex } from '../../../models/vertex/vertex';

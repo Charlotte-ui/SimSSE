@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Button, IButton } from 'src/app/models/display';
+import { Button, IButton } from 'src/app/functions/display';
 import {
   EventType,
   Graph,

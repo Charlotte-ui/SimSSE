@@ -1,7 +1,7 @@
 import { Nameable } from "./interfaces/nameable";
-import { Vertex } from "./vertex/vertex";
+import { Edge, Vertex } from "./vertex/vertex";
 
-export class Trigger extends Vertex {
+export class Trigger extends Edge {
     time:number;
     editable:boolean;
     name:string;
@@ -9,6 +9,7 @@ export class Trigger extends Vertex {
     yAxis:number;
     coord:[number,number];
     type:any;
+    in:string;
 
     public static override className = "Trigger"
 
@@ -21,6 +22,8 @@ export class Trigger extends Vertex {
         this.yAxis = (object?.yAxis)?object.yAxis:0;
         this.coord = (object?.coord)?object.coord:[0,0];
         this.type = (object?.type)?object.type:null;
+        this.in = (object?.in)?object.in:null;
+
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {  

@@ -1,7 +1,7 @@
-import { Modele } from './vertex/modele';
-import { Graph, NodeType, Timer, Node, Trend } from './vertex/node';
-import { Trigger } from './trigger';
-import { VariablePhysioInstance } from './vertex/variablePhysio';
+import { Modele } from '../models/vertex/modele';
+import { Graph, NodeType, Timer, Node, Trend } from '../models/vertex/node';
+import { Trigger } from '../models/trigger';
+import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
 
 export class Curve {
   name: string;
@@ -87,7 +87,7 @@ export class Curve {
         // event trigger at time t
   
         graph.links.forEach((link) => {
-          if (trigger.id == link.out) {
+          if (trigger.in == link.out) {
             let nodeTrigger = this.getNodeByID(link.in, graph);
 
        

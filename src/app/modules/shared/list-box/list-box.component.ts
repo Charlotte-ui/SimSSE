@@ -12,8 +12,9 @@ import { TagService } from '../../../services/tag.service';
 import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../../models/vertex/tag';
 import { Modele, Triage } from '../../../models/vertex/modele';
-import { Button } from 'src/app/models/display';
+import { Button } from 'src/app/functions/display';
 import { WaitComponent } from '../wait/wait.component';
+import { deleteElementFromArray } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-list-box',
@@ -34,14 +35,12 @@ export class ListBoxComponent<T extends Listable> {
 
   button = new Button();
 
-  selectAll:boolean = false;
+  selectAll: boolean = false;
 
   @Input() chips!: Tag[];
   @Input() title!: string;
 
-
   @Input() service;
-
 
   _classe: typeof Vertex | typeof Scenario | typeof Modele;
   get classe(): typeof Vertex {
@@ -51,11 +50,14 @@ export class ListBoxComponent<T extends Listable> {
     if (value) {
       this._classe = value;
 
-      this.tagService.getAllTags(this.classe.className.toLowerCase()).subscribe((response) => {
-        this.chips = response;
-      });
+      this.tagService
+        .getAllTags(this.classe.className.toLowerCase())
+        .subscribe((response) => {
+          this.chips = response;
+        });
 
-      value.getListTemplate<T>(this.apiService)
+      value
+        .getListTemplate<T>(this.apiService)
         .pipe(
           switchMap((elements: T[]) => {
             const requests = elements.map((element: T) =>
@@ -84,18 +86,14 @@ export class ListBoxComponent<T extends Listable> {
     public apiService: ApiService,
     public dialog: MatDialog,
     public tagService: TagService,
-    private router: Router,
+    private router: Router
   ) {
     this.elements = [];
     this.filterTagElement = [];
     this.filterTriageElement = [];
   }
 
-  
-  ngOnInit(): void {
- 
-  }
-
+  ngOnInit(): void {}
 
   intElements(elements: T[]) {
     this.elements = elements;
@@ -103,14 +101,14 @@ export class ListBoxComponent<T extends Listable> {
     this.filterTriageElement = [...elements.map((element) => element.title)];
 
     this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
-    const index = this.keys.indexOf('template', 0);
-    if (index > -1) this.keys.splice(index, 1);
+
+    deleteElementFromArray(this.keys, 'template');
   }
 
   addElement() {
-    let newElement = new this.classe({template:true});
+    let newElement = new this.classe({ template: true });
 
-    console.log("newElement ",newElement)
+    console.log('newElement ', newElement);
 
     const dialogRef = this.dialog.open(DialogComponent, {
       data: [newElement, this.classe, this.triages, false, ['template']],
@@ -118,22 +116,21 @@ export class ListBoxComponent<T extends Listable> {
 
     dialogRef.afterClosed().subscribe((result: T) => {
       if (result) {
-        this.createElement(result)
+        this.createElement(result);
       }
     });
   }
 
   createElement(element: T) {
-    console.log("createElement ",element)
+    console.log('createElement ', element);
 
     this.dialog.open(WaitComponent);
-    this.service.createElement(element).subscribe(id =>{
-
-      if (Array.isArray(id)) id = id[0]
+    this.service.createElement(element).subscribe((id) => {
+      if (Array.isArray(id)) id = id[0];
       this.elements.push(element);
       this.router.navigate([`/${this.classe.className.toLowerCase()}/` + id]);
       this.dialog.closeAll();
-    })
+    });
   }
 
   drop(event: CdkDragDrop<T[]>) {
@@ -185,8 +182,8 @@ export class ListBoxComponent<T extends Listable> {
 
   deleteFilter() {
     this.selectAll = true;
-    this.filterTriage = []
-    this.filterTag = []
+    this.filterTriage = [];
+    this.filterTag = [];
     this.filterTriageElement = [];
     this.filterTagElement = [];
     this.elements.map((element) => {

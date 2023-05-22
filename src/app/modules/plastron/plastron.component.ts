@@ -24,7 +24,7 @@ import { Trigger } from '../../models/trigger';
 import { Observable, concat, forkJoin, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../models/vertex/tag';
 import { Pdf } from '../../models/pdf';
-import { Curve } from '../../models/curve';
+import { Curve } from '../../functions/curve';
 import { WaitComponent } from '../shared/wait/wait.component';
 import { Graphable } from 'src/app/models/interfaces/graphable';
 import { ConfirmDeleteDialogComponent } from '../shared/confirm-delete-dialog/confirm-delete-dialog.component';

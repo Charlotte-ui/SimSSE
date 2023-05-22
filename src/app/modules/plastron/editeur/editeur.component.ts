@@ -17,10 +17,11 @@ import { RegleService } from '../../../services/regle.service';
 import { NodeService } from '../../../services/node.service';
 import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
 import { Modele } from '../../../models/vertex/modele';
-import { Curve } from '../../../models/curve';
+import { Curve } from '../../../functions/curve';
 import { ModeleService } from '../../../services/modele.service';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { Template } from 'src/app/models/interfaces/templatable';
+import { Trigger } from 'src/app/models/trigger';
 
 @Component({
   selector: 'app-editeur',
@@ -110,7 +111,8 @@ export class EditeurComponent implements OnInit {
   @Output() deleteNode = new EventEmitter<string>();
   @Output() updateLink = new EventEmitter<string>();
   @Output() deleteLink = new EventEmitter<string>();
-  @Output() updateLink = new EventEmitter<string>();
+  @Output() updateTrigger = new EventEmitter<Trigger>();
+  @Output() deleteTrigger = new EventEmitter<Trigger>();
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
@@ -325,18 +327,6 @@ export class EditeurComponent implements OnInit {
     // let index = Number(event[1])
     this.updateCurve();
     this.newChange.emit(true);
-  }
-
-  updateTriggers(event) {
-    // let index = Number(event[1])
-    console.log('updateTriggers ',event)
-    this.modele.triggeredEvents = event;
-
-    this.
-
-
-    this.modele.triggeredEvents = event;
-    this.updateCurve();
   }
 
   updateVariables(event: [VariablePhysioInstance, number]) {

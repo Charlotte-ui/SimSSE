@@ -1,4 +1,4 @@
-import { EventType, NodeType } from './vertex/node';
+import { EventType, NodeType } from '../models/vertex/node';
 
 export interface IButton {
   name: string;
@@ -141,6 +141,23 @@ export class Button {
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
+    },
+    {
+      name: 'Trigger',
+      type: 'trigger',
+      icon: 'flash_on',
+      color: '#FEEA00',
+      outils: false,
+      symbol: 'rect',
+    }
+    ,
+    {
+      name: 'TimeStamp',
+      type: 'timestamp',
+      icon: 'add_alarm',
+      color: '#ffffff',
+      outils: false,
+      symbol: 'rect',
     }
     //  {name:"End",type:EventType.start,icon:'output',color:'#FFFFFF',outils:false},
   ];
@@ -148,12 +165,8 @@ export class Button {
   constructor() {}
 
   public getButtonByType(type: string): IButton | undefined {
-    let res = undefined;
-    
-    Button.buttons.forEach((button) => {
-      if (type == button.type) res = button;
-    });
-    return res;
+    let array = Button.buttons.filter((button:IButton)=> button.type == type);
+    return array.length>0?array[0]:undefined;
   }
 
   public static getType(champ: string) {

@@ -34,7 +34,7 @@ import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
 } from 'src/app/models/vertex/variablePhysio';
-import { Button } from 'src/app/models/display';
+import { Button } from 'src/app/functions/display';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 
 const GREEN = '#45C456';

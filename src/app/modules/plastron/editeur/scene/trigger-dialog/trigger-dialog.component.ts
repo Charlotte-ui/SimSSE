@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Event, Node } from 'src/app/models/vertex/node';
-import { Button } from 'src/app/models/display';
+import { Button } from 'src/app/functions/display';
 
 @Component({
   selector: 'app-trigger-dialog',
@@ -16,8 +16,7 @@ export class TriggerDialogComponent {
   title!: string;
   validate!: string;
   noEditable: boolean = false;
-  icon = 'flash_on';
-  id;
+  element: string;
   trigger;
   isTrigger: boolean;
 
@@ -33,29 +32,24 @@ export class TriggerDialogComponent {
     this.trigger = this.data[0];
     this.isEdition = this.data[2];
     this.isTrigger = this.data[3];
-
-    this.form = this.fb.group(this.trigger);
-
+    this.element = this.isTrigger ? 'trigger' : 'timestamp';
+    console.log('edit trigger ', this.trigger);
+    this.form = this.fb.group(this.trigger,Validators.required);
     this.events = this.data[1];
 
-    this.icon = this.isTrigger ? 'flash_on' : 'add_alarm';
-    let element = this.isTrigger ? 'trigger' : 'time stamp';
-    this.id = this.isTrigger ? 'flash' : 'timeStamp';
-
+    
     if (this.isEdition) {
       if (this.trigger.editable) {
         // if the trigger is a event
-        this.form.get('id')?.disable();
-        this.title = `Modifier le ${element} ${this.data[0]['name']}`;
+        this.form.get('in')?.disable();
+        this.title = `Modifier le ${this.element} ${this.data[0]['name']}`;
         this.validate = 'Enregistrer les modifications';
       } else {
         this.noEditable = true;
-        this.icon = 'access_alarm';
-        this.id = 'timer';
         this.title = 'Vous ne pouvez pas déplacer la fin du timer';
       }
     } else {
-      this.title = `Ajouter un ${element}`;
+      this.title = `Ajouter un ${this.element}`;
       this.validate = 'Ajouter';
     }
   }
@@ -92,5 +86,13 @@ export class TriggerDialogComponent {
       },
       []
     );
+  }
+
+  getColor() {
+    return this.button.getButtonByType(this.element)?.color;
+  }
+
+  getIcon() {
+    return this.button.getButtonByType(this.element)?.icon;
   }
 }

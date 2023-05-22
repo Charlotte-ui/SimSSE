@@ -18,7 +18,8 @@
       (deleteNode)="changesToSave = true; nodeToDelete.push($event)"
       (updateLink)="changesToSave = true; linkToUpdate.push($event)"
       (deleteLink)="changesToSave = true; linkToDelete.push($event)"
-
+      (updateTrigger)="changesToSave = true; triggerToUpdate.push($event)"
+      (deleteTrigger)="changesToSave = true; triggerToDelete.push($event)"
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Tags et descriptions">

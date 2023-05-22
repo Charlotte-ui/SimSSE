@@ -3,9 +3,10 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { Vertex } from '../../../models/vertex/vertex';
-import { Button, champLabel } from 'src/app/models/display';
+import { Button, champLabel } from 'src/app/functions/display';
 import { RegleService } from 'src/app/services/regle.service';
 import { CategoryAction } from 'src/app/models/vertex/event';
+import { deleteElementFromArray } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-tab-regles',
@@ -40,10 +41,7 @@ export class TabReglesComponent<T extends Vertex> {
       this._elements = value;
       this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
       this.displayedColumns = [...this.keys];
-
-      const index = this.displayedColumns.indexOf('id', 0);
-      if (index > -1) this.displayedColumns.splice(index, 1);
-
+      deleteElementFromArray(this.displayedColumns,'id')
       this.displayedColumns.push('edit');
       this.displayedColumns.push('delete');
     }
