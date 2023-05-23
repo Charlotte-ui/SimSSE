@@ -24,6 +24,9 @@ export class AuthenticationService {
       .pipe(
         map((response: any) => {
           localStorage.setItem('currentUser', token);
+          localStorage.setItem('pseudo', login);
+          localStorage.setItem('role', 'editeur');
+
           return response
         })
       )
@@ -43,5 +46,6 @@ export class AuthenticationService {
   logout() {
     // remove user from local storage and set current user to null
     localStorage.clear();
+    location.reload();
   }
 }

@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { Scenario } from '../../../models/vertex/scenario';
 import { Button } from 'src/app/functions/display';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 
 @Component({
   selector: 'app-header',
@@ -10,6 +11,8 @@ import { Button } from 'src/app/functions/display';
 })
 export class HeaderComponent implements OnInit {
   button = new Button();
+  pseudo!:string;
+  role!:string;
 
   @Input() scenario: Scenario;
   @Input() plastron: string;
@@ -21,9 +24,13 @@ export class HeaderComponent implements OnInit {
   @Output() newSave = new EventEmitter<boolean>();
   @Output() newPDF = new EventEmitter<boolean>();
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authenticationService:AuthenticationService) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+  this.pseudo = localStorage.getItem('pseudo')
+  this.role = localStorage.getItem('role')
+
+  }
 
   goToRules() {
     this.router.navigate(['/regles/']);
@@ -50,5 +57,11 @@ export class HeaderComponent implements OnInit {
 
   saveAsPDF() {
     this.newPDF.emit(true);
+  }
+
+  logout(){
+
+    this.authenticationService.logout()
+
   }
 }

@@ -94,7 +94,13 @@
   <button mat-icon-button (click)="goToRules()" matTooltip="Voir les règles">
     <mat-icon>assignment</mat-icon>
   </button>
-  <button mat-icon-button>
+  <button mat-icon-button [matMenuTriggerFor]="accountMenu" matTooltip="Ma session">
     <mat-icon>account_circle</mat-icon>
   </button>
 </mat-toolbar>
+
+<mat-menu #accountMenu="matMenu" xPosition="before">
+  <div class="container">Vous êtes connecté en tant que {{pseudo}} ({{role}})</div>
+  
+  <button mat-menu-item (click)="logout()">Se déconnecter <mat-icon>arrow_right_alt</mat-icon></button>
+</mat-menu>
