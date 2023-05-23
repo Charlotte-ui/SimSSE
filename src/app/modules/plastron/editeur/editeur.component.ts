@@ -22,6 +22,7 @@ import { ModeleService } from '../../../services/modele.service';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { Template } from 'src/app/models/interfaces/templatable';
 import { Trigger } from 'src/app/models/trigger';
+import { getElementByChamp } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-editeur',
@@ -307,8 +308,7 @@ export class EditeurComponent implements OnInit {
         let oldEvent = (node as Event).template.id;
 
         // update template
-        (node as Event).template = Action.getActionByID((node as Event).event);
-
+        (node as Event).template = getElementByChamp<Action>(this.allActions,'id',(node as Event).event)
         this.modele.graph.links.forEach((link) => {
           if (link.in == oldEvent) link.in = (node as Event).event;
           if (link.out == oldEvent) link.out = (node as Event).event;

@@ -26,6 +26,8 @@ import { Action, BioEvent } from 'src/app/models/vertex/event';
 export class BarreOutilsComponent implements OnInit {
 
   actionByCategories ;
+  bioEventByCategories ;
+
   // liste de tout les modèles d'événements et de graphs existant
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
@@ -51,16 +53,17 @@ export class BarreOutilsComponent implements OnInit {
 
   addElement(element: string) {
     this.actionByCategories= Action.getListByCategory()
+    this.bioEventByCategories= BioEvent.getListByCategory()
 
-    let x = 50; // l'element est ajouter au milieu
-    let y = 50;
+     console.log("this.bioEventByCategories ",this.bioEventByCategories)
+
 
     switch (element) {
       case NodeType.link:
         return this.createLink();
       case EventType.bio:
         let bioevent = new Event({ typeEvent: EventType.bio });
-        return this.createNode(bioevent, this.allBioevents);
+        return this.createNode(bioevent, this.bioEventByCategories,['template']);
       case EventType.action:
         let action = new Event({ typeEvent: EventType.action });
         return this.createNode(action, this.actionByCategories,['template']);
