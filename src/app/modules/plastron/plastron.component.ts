@@ -25,7 +25,6 @@ import { Tag } from '../../models/vertex/tag';
 import { Pdf } from '../../models/pdf';
 import { Curve } from '../../functions/curve';
 import { WaitComponent } from '../shared/wait/wait.component';
-import { Graphable } from 'src/app/models/interfaces/graphable';
 import { ConfirmDeleteDialogComponent } from '../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { NodeService } from 'src/app/services/node.service';
 
@@ -42,8 +41,10 @@ export class PlastronComponent implements OnInit {
   curves!: Curve[];
 
   changesToSave: boolean = false;
+  variableToSave: string[] = [];
   modeleToSave: boolean = false;
   saver: ModeleSaverArrays;
+  oldVariables: VariablePhysioInstance[];
 
   constructor(
     private route: ActivatedRoute,
@@ -128,6 +129,7 @@ export class PlastronComponent implements OnInit {
       )
       .subscribe((variables: VariablePhysioInstance[]) => {
         this.plastron.profil.targetVariable = variables;
+        this.oldVariables = structuredClone(variables);
 
         variables.forEach((variable: VariablePhysioInstance, index: number) => {
           if (variable.id == '')
@@ -201,7 +203,9 @@ export class PlastronComponent implements OnInit {
 
   save() {
     this.dialog.open(WaitComponent);
-    let requests: Observable<any>[];
+    let requests: Observable<any>[] = [];
+    let requestsProfil: Observable<any>[] = [];
+
     if (this.modeleToSave) {
       if (this.plastron.modele.template) this.deriveFromModele();
       else
@@ -212,18 +216,17 @@ export class PlastronComponent implements OnInit {
           this.nodeService
         );
     }
-    console.log('save ', this.plastron.modele);
 
-    forkJoin(requests).subscribe((value) => {
+    if (this.variableToSave && this.variableToSave.length > 0)
+      requestsProfil = this.profilService.updateVariables(
+        this.plastron.profil,
+        this.oldVariables,
+        this.variableToSave
+      );
+
+    forkJoin(requests.concat(requestsProfil)).subscribe((value) => {
       this.changesToSave = false;
       this.dialog.closeAll();
-    });
-
-    if (event) {
-      console.log('savePlastron');
-      console.log(this.plastron);
-      this.plastronService.updatePlastron(this.plastron);
-      this.changesToSave = false;
 
       this._snackBar.open(
         'Modifications du plastron ' +
@@ -234,7 +237,7 @@ export class PlastronComponent implements OnInit {
           duration: 3000,
         }
       );
-    }
+    });
   }
 
   deriveFromModele() {

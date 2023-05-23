@@ -202,10 +202,6 @@ export class ModeleService {
         !triggerToDelete.includes(trigger) && trigger.id != ''
     );
 
-    console.log("triggerToUpdate ",triggerToUpdate)
-    console.log("triggerToCreate ",triggerToCreate)
-
-
     const createRequests = triggerToCreate.map((trigger: Trigger) => {
 
       let event = getNodeByID(modele.graph,trigger.in)

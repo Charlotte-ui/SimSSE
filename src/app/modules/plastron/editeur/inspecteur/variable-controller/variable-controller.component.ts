@@ -26,6 +26,12 @@ export class VariableControllerComponent implements OnInit {
   @Input() set variable(value: VariablePhysioInstance) {
     this._variable = value;
     this.form = this.fb.group(value);
+
+    this.form.valueChanges.subscribe((newVariable: VariablePhysioInstance) => {
+        console.log("new variable ",newVariable)
+        this.variable = newVariable;
+        this.newVariable.emit(newVariable);
+      });
   }
 
   get tendances(): Trend[] {
@@ -43,8 +49,4 @@ export class VariableControllerComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {}
-
-  changeValues() {
-    this.newVariable.emit(this.form.value);
-  }
 }

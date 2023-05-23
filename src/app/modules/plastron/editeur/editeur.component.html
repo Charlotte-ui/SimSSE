@@ -36,6 +36,7 @@
     >
       <div class="row">
         <app-scene
+        *ngIf="modele.graph.nodes"
           [modele]="modele"
           [events]="events"
           [curves]="curves"

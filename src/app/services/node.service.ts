@@ -207,6 +207,9 @@ export class NodeService {
    */
   updateNode(node: Node): Observable<string[]> {
     console.log('updateNode ', node);
+    delete node["nodes"]
+    delete node["links"]
+
     return this.apiService.updateAllDocumentChamp(node);
   }
 

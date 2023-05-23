@@ -58,9 +58,7 @@ export class PlastronService {
       );
   }
 
-  updatePlastron(plastron: Plastron): Modele {
-    return undefined;
-  }
+
 
   getPlastronByLink(link): Observable<Plastron | undefined> {
     return this.getPlastronById(link['in'].substring(1));

@@ -23,6 +23,9 @@ export function getElementByChamp<T>(array:T[],champ:string,value:any) : T|undef
    */
   export function getNodeByID(graph:Graph, id: string): Node {
     let result = undefined;
+    console.log(Array.isArray(graph.nodes))
+        console.log(graph)
+
     graph.nodes.forEach((node) => {
       // event are identified by evnt
 

@@ -116,6 +116,7 @@ export class EditeurComponent implements OnInit {
   @Output() deleteLink = new EventEmitter<string>();
   @Output() updateTrigger = new EventEmitter<Trigger>();
   @Output() deleteTrigger = new EventEmitter<Trigger>();
+  @Output() updateVariable = new EventEmitter<VariablePhysioInstance>();
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
@@ -333,21 +334,14 @@ export class EditeurComponent implements OnInit {
     this.newChange.emit(true);
   }
 
-  updateVariables(event: [VariablePhysioInstance, number]) {
-    let index = Number(event[1]);
-    let variable = event[0] as VariablePhysioInstance;
-    this.targetVariable[index] = variable;
-    // TODO
-    // comme targetVariable est un tableau donc un objet, changer la valeur d'un élement de modifie pas le pointeur
-    // et donc le @Input: targetVariable du composant Scene n'est pas trigger
-    // on peut utiliser this.targetVariable = [...this.targetVariable] pour forcer l'update
-    // mais alors toutes les courbes sont recalculées
-    // pour ne recalculer qu'une seule courbe, on utilise la variable varToUpdate
-    // ce qui trigger le @Input: varToUpdate du composant Scene
-    this.curves[index].variable = variable;
+  updateVariables(newVariable: VariablePhysioInstance) {
+    let variable = getElementByChamp<VariablePhysioInstance>(this.targetVariable,'template',newVariable.template)
+    let index  = this.targetVariable.indexOf(variable)
+    this.targetVariable[index] = newVariable;
+    this.curves[index].variable = newVariable;
     this.curves[index].calculCurve(this.modele);
     this.curves = [...this.curves];
-    this.newChange.emit(true);
+    this.updateVariable.emit(newVariable);
   }
 
   updateCurve() {

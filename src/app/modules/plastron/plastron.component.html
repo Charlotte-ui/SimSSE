@@ -36,6 +36,9 @@
       (deleteTrigger)="
         changesToSave = true;   saver.triggerToDelete.push($event)
       "
+      (updateVariable)="
+        changesToSave = true; variableToSave.push($event.id);
+      "
     ></app-editeur>
   </mat-tab>
   <mat-tab label="Modèle - tags et descriptions">

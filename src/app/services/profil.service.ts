@@ -28,6 +28,37 @@ export class ProfilService {
     // TODO update bdd
   }
 
+  updateVariables(
+    profil: Profil,
+    oldVariables: VariablePhysioInstance[],
+    idToSave: string[]
+  ): Observable<any>[] {
+    let requests: Observable<any>[] = [];
+
+    profil.targetVariable.forEach(
+      (variable: VariablePhysioInstance, index: number) => {
+        if (idToSave.includes(variable.id)) {
+          let keys = Object.keys(variable) as Array<
+            keyof VariablePhysioInstance
+          >;
+          keys.forEach((key) => {
+            if (variable[key] != oldVariables[index][key])
+              requests.push(
+                this.apiService.updateDocumentChamp(
+                  variable.id,
+                  key,
+                  variable[key].toString()
+                )
+              );
+          });
+        }
+      }
+    );
+
+  
+    return requests.length>0?requests:[of()];
+  }
+
   getVariable(
     idProfil,
     idVariableTemplate
@@ -95,30 +126,32 @@ export class ProfilService {
   }
 
   deleteProfil(profil: Profil): Observable<any> {
-    let requests:Observable<any>[] = [] ; 
-    
-    requests.push(this.apiService
-      .getRelationFrom(profil.id, 'aVariableCible', 'Profil')
-      .pipe(
-        map((response) =>
-          VariablePhysioInstance.instanciateListe<VariablePhysioInstance>(
-            response.result
+    let requests: Observable<any>[] = [];
+
+    requests.push(
+      this.apiService
+        .getRelationFrom(profil.id, 'aVariableCible', 'Profil')
+        .pipe(
+          map((response) =>
+            VariablePhysioInstance.instanciateListe<VariablePhysioInstance>(
+              response.result
+            )
           )
         )
-      )
-      .pipe(
-        switchMap((variables: VariablePhysioInstance[]) =>
-          concat(
-            variables.map((variable: VariablePhysioInstance) =>
-              this.apiService.deleteDocument(variable.id)
-            )
-          ).pipe(zipAll())
+        .pipe(
+          switchMap((variables: VariablePhysioInstance[]) =>
+            concat(
+              variables.map((variable: VariablePhysioInstance) =>
+                this.apiService.deleteDocument(variable.id)
+              )
+            ).pipe(zipAll())
+          )
         )
-      ))
+    );
 
-      requests.push(this.apiService.deleteDocument(profil.id))
+    requests.push(this.apiService.deleteDocument(profil.id));
 
-      return from(requests).pipe(
+    return from(requests).pipe(
       concatMap((request: Observable<any>) => request)
     );
   }

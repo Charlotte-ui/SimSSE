@@ -3,8 +3,8 @@
   <app-variable-controller *ngFor="let variable of variables"
                         [variable]="variable"
                         [disabled]="disabled"
-                        [tendances]="getTrendByCible(variable.id)"
-                        (newVariable)="setNewVariable(variable,$event)">
+                        [tendances]="getTrendByCible(variable.template)"
+                        (newVariable)="updateVariable.emit($event)">
   </app-variable-controller>
 </ng-container>
 
