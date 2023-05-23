@@ -1,34 +1,34 @@
-
-
-
 <div class="container">
-  <div *ngFor="let row of rows"  class="row">
-    <div *ngFor="let col of cols" class="col-3">
-      <img src="/assets/images/{{col}}{{row}}.jpg"/>
-    </div>
-  </div>
+  <ng-container *ngFor="let row of rows">
+    <ng-container *ngFor="let col of cols">
+      <img src="/assets/images/{{ col }}{{ row }}.jpg" />
+    </ng-container>
+  </ng-container>
 </div>
 
 <div class="firstPlan">
-
-<div class="connexion">
+  <div class="connexion">
     <h1>SimSSE Editeur</h1>
 
-  <form [formGroup]="loginFormGroup">
-    <table><tr>
-      <td><mat-form-field>
-        <mat-label>Pseudo</mat-label>
-        <input matInput  formControlName="pseudo">
-      </mat-form-field></td>
-      <td><mat-form-field>
-        <mat-label>Mot de passe</mat-label>
-        <input matInput type="password" formControlName="password">
-      </mat-form-field></td>
-    </tr></table>
-    <div >
-    <button mat-raised-button (click)="onSubmit()">Se connecter</button>
+    <form [formGroup]="loginFormGroup">
+      <div id="login">
+        <mat-form-field>
+          <mat-label>Pseudo</mat-label>
+          <input matInput formControlName="pseudo" />
+        </mat-form-field>
+      
+        <mat-form-field>
+          <mat-label>Mot de passe</mat-label>
+          <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+      </div>
+      <div>
+        <button mat-raised-button (click)="onSubmit()">Se connecter</button>
+       
+      </div>
+      <mat-error [hidden]="!error">
+        Pseudo ou mot de passe erroné
+      </mat-error>
+    </form>
   </div>
-  </form>
-
-</div>
 </div>

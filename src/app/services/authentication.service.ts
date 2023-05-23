@@ -12,19 +12,21 @@ interface User {
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
-  constructor(private http: HttpClient, private router: Router) {}
-  login(login: string, mdp: string) {
+  constructor(private http: HttpClient) {}
+  login(login: string, mdp: string) : Observable<any>{
     //http://localhost:2480/connect/simsse
     let token = btoa(login + ':' + mdp);
-    this.http
+    return this.http
       .get<any>(`${environment.urlAPI}/connect/simsse`, {
         headers: { Authorization: 'Basic ' + token },
         //   params: { userId: userId },
       })
-      .subscribe((response: any) => {
-        localStorage.setItem('currentUser', token);
-        this.router.navigate(['/accueil']);
-      });
+      .pipe(
+        map((response: any) => {
+          localStorage.setItem('currentUser', token);
+          return response
+        })
+      )
   }
 
   getUserInfo(u_login: string): Observable<User[]> {

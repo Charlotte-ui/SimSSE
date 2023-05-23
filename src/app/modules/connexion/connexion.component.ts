@@ -8,49 +8,44 @@ import { AuthenticationService } from '../../services/authentication.service';
 @Component({
   selector: 'app-connexion',
   templateUrl: './connexion.component.html',
-  styleUrls: ['./connexion.component.less']
+  styleUrls: ['./connexion.component.less'],
 })
 export class ConnexionComponent implements OnInit {
+  rows = [1, 2, 3, 4,5];
+  cols = [1, 2, 3, 4];
 
-  rows = [1,2,3,4];
-  cols = [1,2,3,4];
-
+  error: boolean = false;
 
   loginFormGroup = this.form.group({
     pseudo: ['', [Validators.required]],
     password: ['', Validators.required],
   });
 
+  constructor(
+    private form: FormBuilder,
+    public firebaseService: FirebaseService,
+    public authentificationService: AuthenticationService,
+    private router: Router
+  ) {}
 
-  constructor(private form: FormBuilder,public firebaseService: FirebaseService, public authentificationService:AuthenticationService) {}
-
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 
   onSubmit() {
-
     const pseudo = this.loginFormGroup.get('pseudo')?.value as string;
     const password = this.loginFormGroup.get('password')?.value as string;
 
-    console.log("connexion with :"+pseudo+", "+password)
+    console.log('connexion with :' + pseudo + ', ' + password);
 
     // root simsse
-    this.authentificationService.login(pseudo,password)
-
-   
-
-
-
-   /*  this.firebaseService.connexion(pseudo,password).then((success) => {
-      console.log("succes");
-      this.router.navigate(['/accueil']);
-    })
-    .catch((err) => {
-      console.log("fail");
-    }) */
-
+    this.authentificationService.login(pseudo, password).subscribe(
+      (response: any) => {
+        console.log('response ', response);
+        this.router.navigate(['/accueil']);
+      },
+      (error) => {
+        this.error = true;
+        console.log('error ', error);
+      }
+    );
   }
-
-
 }
