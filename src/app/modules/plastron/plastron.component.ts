@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
 import { Plastron } from '../../models/vertex/plastron';
 import { ModeleService } from '../../services/modele.service';
-import { Modele } from '../../models/vertex/modele';
-import {  Event } from '../../models/vertex/node';
+import { Modele, ModeleSaverArrays } from '../../models/vertex/modele';
+import { Event } from '../../models/vertex/node';
 import { ProfilService } from '../../services/profil.service';
 import {
   VariablePhysioInstance,
@@ -34,29 +34,16 @@ import { NodeService } from 'src/app/services/node.service';
   templateUrl: './plastron.component.html',
   styleUrls: ['./plastron.component.less'],
 })
-export class PlastronComponent implements OnInit, Graphable {
+export class PlastronComponent implements OnInit {
   plastron!: Plastron;
   scenario: Scenario;
   variablesTemplate: VariablePhysioTemplate[] = [];
   allTags!: Tag[];
   curves!: Curve[];
 
-  /**
-   * implement Graphable
-   */
-  nodeToUpdate: string[] = [];
-  nodeToDelete: string[] = [];
-  linkToUpdate: string[] = [];
-  linkToDelete: string[] = [];
   changesToSave: boolean = false;
-  newTags: Tag[] = [];
-  tagsToDelete: Tag[] = [];
   modeleToSave: boolean = false;
-  newModele: Modele;
-  champToUpdate: string[];
-  newTrigger: boolean;
-  triggerToUpdate: Trigger[] = [];
-  triggerToDelete: Trigger[] = [];
+  saver: ModeleSaverArrays;
 
   constructor(
     private route: ActivatedRoute,
@@ -69,8 +56,9 @@ export class PlastronComponent implements OnInit, Graphable {
     private tagService: TagService,
     private profilService: ProfilService,
     private nodeService: NodeService
-  ) {}
-
+  ) {
+    this.saver = Modele.initSaver();
+  }
 
   ngOnInit(): void {
     this.route.data
@@ -114,7 +102,7 @@ export class PlastronComponent implements OnInit, Graphable {
     this.modelService
       .getTrigger(this.plastron.modele.id)
       .subscribe((triggers: Trigger[]) => {
-        this.plastron.modele.triggeredEvents = triggers
+        this.plastron.modele.triggeredEvents = triggers;
       });
   }
 
@@ -212,55 +200,19 @@ export class PlastronComponent implements OnInit, Graphable {
   }
 
   save() {
-    let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
-    console.log('save ', this.plastron.modele);
-
-    /**
-     * Profil
-     */
-
-    // save the tags
-    if (this.newTags.length > 0)
-      requests.push(
-        this.tagService.addTagsToSource(
-          this.newTags,
-          this.plastron.modele.id,
-          'modele'
-        )
-      );
-
-    if (this.tagsToDelete.length > 0)
-      requests.push(
-        this.tagService.deleteTagsFromSource(
-          this.tagsToDelete,
-          this.plastron.modele.id
-        )
-      );
-
-    /**
-     * Modèle
-     */
+    let requests: Observable<any>[];
     if (this.modeleToSave) {
       if (this.plastron.modele.template) this.deriveFromModele();
-      else {
-        if (
-          this.newModele &&
-          this.plastron.modele.description != this.newModele.description
-        )
-          requests.push(this.modelService.updateModele(this.newModele,this.champToUpdate));
-
-        requests.push(
-          this.nodeService.updateGraph(
-            this.plastron.modele.graph,
-            this.nodeToUpdate,
-            this.nodeToDelete,
-            this.linkToUpdate,
-            this.linkToDelete
-          )
+      else
+        requests = this.plastron.modele.save(
+          this.saver,
+          this.tagService,
+          this.modelService,
+          this.nodeService
         );
-      }
     }
+    console.log('save ', this.plastron.modele);
 
     forkJoin(requests).subscribe((value) => {
       this.changesToSave = false;
@@ -331,7 +283,7 @@ export class PlastronComponent implements OnInit, Graphable {
     }
   }
 
-    changeModeleRef(newModele) {
+  changeModeleRef(newModele) {
     // this.plastronService.changeModelRef(this.plastron,newModele);
   }
 }

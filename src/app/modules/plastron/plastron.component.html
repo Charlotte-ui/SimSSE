@@ -19,22 +19,22 @@
       (newCurve)="changeCurves($event)"
       (newChange)="changesToSave = true; modeleToSave = true"
       (updateNode)="
-        changesToSave = true; modeleToSave = true; nodeToUpdate.push($event)
+        changesToSave = true; modeleToSave = true; saver.nodeToUpdate.push($event)
       "
       (deleteNode)="
-        changesToSave = true; modeleToSave = true; nodeToDelete.push($event)
+        changesToSave = true; modeleToSave = true; saver.nodeToDelete.push($event)
       "
       (updateLink)="
-        changesToSave = true; modeleToSave = true; linkToUpdate.push($event)
+        changesToSave = true; modeleToSave = true; saver.linkToUpdate.push($event)
       "
       (deleteLink)="
-        changesToSave = true; modeleToSave = true; linkToDelete.push($event)
+        changesToSave = true; modeleToSave = true; saver.linkToDelete.push($event)
       "
       (updateTrigger)="
-        changesToSave = true; newTrigger = true; triggerToUpdate.push($event)
+        changesToSave = true;  saver.triggerToUpdate.push($event)
       "
       (deleteTrigger)="
-        changesToSave = true; newTrigger = true; triggerToDelete.push($event)
+        changesToSave = true;   saver.triggerToDelete.push($event)
       "
     ></app-editeur>
   </mat-tab>
@@ -44,11 +44,11 @@
       [modele]="plastron.modele"
       [allTags]="allTags"
       (newModel)="changeModeleRef($event)"
-      (updateModele)="changesToSave = true; modeleToSave = true ; champToUpdate.push($event)"
+      (updateModele)="changesToSave = true; modeleToSave = true ; saver.champToUpdate.push($event)"
       (newTags)="
         changesToSave = true;
-        newTags = $event.newTags;
-        tagsToDelete = $event.tagsToDelete
+        saver.newTags = $event.newTags;
+        saver.tagsToDelete = $event.tagsToDelete
       "
     ></app-tags-descriptions>
   </mat-tab>

@@ -26,6 +26,7 @@ import { ApiService } from './api.service';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
 import { NodeService } from './node.service';
 import { Trigger } from '../models/trigger';
+import { getNodeByID } from '../functions/tools';
 
 @Injectable({
   providedIn: 'root',
@@ -201,14 +202,16 @@ export class ModeleService {
         !triggerToDelete.includes(trigger) && trigger.id != ''
     );
 
+    console.log("triggerToUpdate ",triggerToUpdate)
+    console.log("triggerToCreate ",triggerToCreate)
+
+
     const createRequests = triggerToCreate.map((trigger: Trigger) => {
-      let events = modele.graph.nodes.filter(
-        (node: Node) =>
-          node.type == NodeType.event && (node as Event).event == trigger.in
-      );
-      if (events.length > 0)
+
+      let event = getNodeByID(modele.graph,trigger.in)
+      if (event)
         return this.apiService.createRelationBetweenWithProperty(
-          events[0].id,
+          event.id,
           modele.id,
           'triggeredAt',
           'time',

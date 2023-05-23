@@ -1,3 +1,4 @@
+import { Graph, NodeType, Event, Node } from "../models/vertex/node";
 
 
 
@@ -12,3 +13,23 @@ export function getElementByChamp<T>(array:T[],champ:string,value:any) : T|undef
     let res = resArray.length > 0 ?  resArray[0] :  undefined;
     return res;
 }
+
+
+/**
+   * get a node by his id, looking recursivly 
+   * @param graph 
+   * @param id 
+   * @returns 
+   */
+  export function getNodeByID(graph:Graph, id: string): Node {
+    let result = undefined;
+    graph.nodes.forEach((node) => {
+      // event are identified by evnt
+
+      if (node.type == NodeType.event && (node as Event).event == id)
+        result = node;
+      else if (node.id == id) result = node;
+      else if (node.type == NodeType.graph) result = getNodeByID(node as Graph,id)
+    });
+    return result;
+  }

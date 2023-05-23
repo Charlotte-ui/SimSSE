@@ -13,7 +13,8 @@ import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.componen
 import { Modele } from 'src/app/models/vertex/modele';
 import { Curve } from 'src/app/functions/curve';
 import { Trigger } from 'src/app/models/trigger';
-import { deleteElementFromArray } from 'src/app/functions/tools';
+import { deleteElementFromArray, getNodeByID } from 'src/app/functions/tools';
+import { Button } from 'src/app/functions/display';
 
 @Component({
   selector: 'app-scene',
@@ -21,6 +22,8 @@ import { deleteElementFromArray } from 'src/app/functions/tools';
   styleUrls: ['./scene.component.less'],
 })
 export class SceneComponent implements OnInit {
+    button: Button = new Button();
+
   // Inputs
   @Input() duration: number;
   /**
@@ -146,7 +149,7 @@ export class SceneComponent implements OnInit {
     this.modele.triggeredEvents.map((trigger: Trigger) => {
       // time id
       let markline = [];
-      let node = this.getNodeByID(trigger.in);
+      let node = getNodeByID(this.modele.graph,trigger.in);
       if (node) {
         // si le node est présent sur le graph
         let name;
@@ -323,6 +326,7 @@ export class SceneComponent implements OnInit {
           in:result.in
         });
                 
+        console.log("add trigger ",trigger)
         this.modele.triggeredEvents.push(trigger);
       }
       this.updateTrigger.emit(trigger);
@@ -342,17 +346,4 @@ export class SceneComponent implements OnInit {
     }
   }
 
-  // tools
-
-  private getNodeByID(id: string): Node {
-    let result = undefined;
-    this.modele.graph.nodes.forEach((node) => {
-      // event are identified by evnt
-
-      if (node.type == NodeType.event && (node as Event).event == id)
-        result = node;
-      else if (node.id == id) result = node;
-    });
-    return result;
-  }
 }

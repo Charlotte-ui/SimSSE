@@ -1,4 +1,5 @@
 import { EventType, NodeType } from '../models/vertex/node';
+import { getElementByChamp } from './tools';
 
 export interface IButton {
   name: string;
@@ -146,7 +147,7 @@ export class Button {
     {
       name: 'Trigger',
       type: 'trigger',
-      icon: 'flash_on',
+      icon: 'add_alert',
       color: '#FEEA00',
       outils: false,
       symbol: 'rect',
@@ -166,8 +167,7 @@ export class Button {
   constructor() {}
 
   public getButtonByType(type: string): IButton | undefined {
-    let array = Button.buttons.filter((button:IButton)=> button.type == type);
-    return array.length>0?array[0]:undefined;
+    return getElementByChamp<IButton>(Button.buttons,'type',type)
   }
 
   public static getType(champ: string) {
