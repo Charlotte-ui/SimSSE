@@ -50,7 +50,6 @@ export class ReglesComponent {
 
     this.regleService.getActions().subscribe((response: Action[]) => {
       this.actions = response;
-      console.log("this.actions ",this.actions)
     });
   }
 

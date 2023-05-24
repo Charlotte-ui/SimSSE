@@ -172,8 +172,6 @@ export class PlastronComponent implements OnInit {
 
   saveAsNewModel(event: boolean) {
     if (event) {
-      console.log('saveAsNewModel');
-      console.log(this.plastron.modele);
       let newModel = structuredClone(this.plastron.modele);
       newModel.title = '';
       delete newModel.id;
@@ -190,12 +188,26 @@ export class PlastronComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe((result) => {
-        console.log(result);
+      
+        this.dialog.open(WaitComponent);
 
-        if (result == undefined) return;
 
-        this.plastronService.changeModeleRef(this.plastron).subscribe((res) => {
+        if (result == undefined) {
+          this.dialog.closeAll();
+          return;
+        }
+
+        // CAS OU IL N'Y A RIEN A ENREGISTRER 
+        // TODO ; disable le bt si il y a eu des modif
+        this.modelService.createNewModeleTemplate(this.plastron.modele,result).subscribe((res) => {
           console.log('res ', res);
+
+          this.saver = Modele.initSaver();
+
+          
+          //location.reload();
+          this.dialog.closeAll();
+
         });
       });
     }
@@ -227,6 +239,8 @@ export class PlastronComponent implements OnInit {
         this.oldVariables,
         this.variableToSave
       );
+
+      console.log("forkJoin ",requests.concat(requestsProfil))
 
     forkJoin(requests.concat(requestsProfil)).subscribe((value) => {
       this.changesToSave = false;
@@ -288,9 +302,5 @@ export class PlastronComponent implements OnInit {
 
       // Margins:
     }
-  }
-
-  changeModeleRef(newModele) {
-    // this.plastronService.changeModelRef(this.plastron,newModele);
   }
 }

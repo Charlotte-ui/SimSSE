@@ -39,12 +39,10 @@ export class ConnexionComponent implements OnInit {
     // root simsse
     this.authentificationService.login(pseudo, password).subscribe(
       (response: any) => {
-        console.log('response ', response);
         this.router.navigate(['/accueil']);
       },
       (error) => {
         this.error = true;
-        console.log('error ', error);
       }
     );
   }

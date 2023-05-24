@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
 import {
   Observable,
+  concat,
   concatMap,
   forkJoin,
   from,
   map,
   of,
   switchMap,
+  zipAll,
 } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
 import { Plastron } from '../models/vertex/plastron';
-import { Modele } from '../models/vertex/modele';
+import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
@@ -22,16 +24,19 @@ import { ApiService } from './api.service';
 import { ModeleService } from './modele.service';
 import { Profil } from '../models/vertex/profil';
 import { ProfilService } from './profil.service';
+import { TagService } from './tag.service';
+import { NodeService } from './node.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlastronService {
-
   constructor(
     public apiService: ApiService,
     public modeleService: ModeleService,
-    public profilService: ProfilService
+    public profilService: ProfilService,
+    public tagService: TagService,
+    public nodeService: NodeService
   ) {}
 
   /**
@@ -57,8 +62,6 @@ export class PlastronService {
         )
       );
   }
-
-
 
   getPlastronByLink(link): Observable<Plastron | undefined> {
     return this.getPlastronById(link['in'].substring(1));
@@ -152,7 +155,6 @@ export class PlastronService {
 
     return forkJoin(requests).pipe(
       switchMap((response: [string, Profil]) => {
-        console.log('createPlastron');
         let profil = response[1];
         let idPlastron = response[0];
         let idProfil = profil.id;
@@ -192,11 +194,12 @@ export class PlastronService {
       );
   }
 
-  updatePlastronStatut(plastron: Plastron, newStatut:string) {
-    console.log("plastron ",plastron)
-     return this.apiService
-      .updateDocumentChamp(plastron.id, 'statut',newStatut)
-     
+  updatePlastronStatut(plastron: Plastron, newStatut: string) {
+    return this.apiService.updateDocumentChamp(
+      plastron.id,
+      'statut',
+      newStatut
+    );
   }
 
   deletePlastron(plastron: Plastron): Observable<any> {

@@ -12,7 +12,7 @@ import {
 } from 'rxjs';
 
 import { FirebaseService } from './firebase.service';
-import { Modele } from '../models/vertex/modele';
+import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
 import {
   Trend,
   Event,
@@ -27,12 +27,17 @@ import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
 import { NodeService } from './node.service';
 import { Trigger } from '../models/trigger';
 import { getNodeByID } from '../functions/tools';
+import { TagService } from './tag.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModeleService {
-  constructor(public apiService: ApiService, public nodeService: NodeService) {}
+  constructor(
+    public apiService: ApiService,
+    public nodeService: NodeService,
+    public tagService: TagService
+  ) {}
 
   createElement = this.createModele;
   deleteElement = this.deleteModele;
@@ -203,8 +208,7 @@ export class ModeleService {
     );
 
     const createRequests = triggerToCreate.map((trigger: Trigger) => {
-
-      let event = getNodeByID(modele.graph,trigger.in)
+      let event = getNodeByID(modele.graph, trigger.in);
       if (event)
         return this.apiService.createRelationBetweenWithProperty(
           event.id,
@@ -231,6 +235,44 @@ export class ModeleService {
     return concat(createRequests, updateRequests, deleteRequests).pipe(
       zipAll()
     );
+  }
+
+  /**
+   * the plastron modele is now
+   * @param plastron
+   * @returns
+   */
+  createNewModeleTemplate(modele: Modele, newModele: Modele): Observable<any> {
+    console.log('createNewModeleTemplate ', modele);
+    console.log('newModele ', newModele);
+
+    let saver = Modele.initSaver();
+
+    modele.title = newModele.title;
+    saver.champToUpdate.push('title');
+
+    if (modele.description != newModele.description) {
+      modele.description = newModele.description;
+      saver.champToUpdate.push('description');
+    }
+
+    if (modele.triage != newModele.triage) {
+      modele.triage = newModele.triage;
+      saver.champToUpdate.push('triage');
+    }
+
+    modele.template = true;
+    saver.champToUpdate.push('template');
+
+    let requests = modele.save(saver, this.tagService, this, this.nodeService);
+
+    return concat(requests)
+      .pipe(zipAll())
+      .pipe(
+        switchMap(() =>
+          this.apiService.deleteOutRelation(modele.id, 'aTemplate')
+        )
+      );
   }
 
   /**

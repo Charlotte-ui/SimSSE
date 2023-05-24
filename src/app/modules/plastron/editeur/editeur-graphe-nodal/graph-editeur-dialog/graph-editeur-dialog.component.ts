@@ -18,18 +18,11 @@ export class GraphEditeurDialogComponent {
     }
 
     ngOnInit() {
-      console.log("GraphDialogComponent")
-
       this.graph = this.data;
-      console.log(this.graph)
-
   }
 
   updateNodes(event){
-    console.log("updateNodes")
-    console.log(event)
     this.graph.nodes = [...event]; //TODO link to database
-
   }
 
   onNoClick(): void {

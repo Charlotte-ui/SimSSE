@@ -284,7 +284,6 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
-        console.log("onEdgeClick ",result)
         if (result.delete) {
           this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);

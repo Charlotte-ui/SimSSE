@@ -67,15 +67,12 @@ export class TabReglesComponent<T extends Vertex> {
   }
 
   openDialog(element: T, id: number, edit: boolean) {
-    console.log('openDialog');
 
-    console.log(element);
     const dialogRef = this.dialog.open(DialogComponent, {
       data: [element, this.classe, Object.values(CategoryAction), edit],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
 
       if (result == undefined) return;
 
@@ -96,8 +93,6 @@ export class TabReglesComponent<T extends Vertex> {
           });
       }
 
-      console.log(this.elements);
-
       this.elements = [...this.elements]; // TODO : delete when bdd ok
     });
   }
@@ -111,8 +106,6 @@ export class TabReglesComponent<T extends Vertex> {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
-
       if (result) {
         this.regleService.deleteRegle(this.elements[id].id).subscribe(() => {
           this.elements.splice(id, 1);
@@ -123,7 +116,6 @@ export class TabReglesComponent<T extends Vertex> {
   }
 
   isColor(column: string) {
-    //S console.log("isColor "+column)
     if (column == 'color') return true;
     return false;
   }

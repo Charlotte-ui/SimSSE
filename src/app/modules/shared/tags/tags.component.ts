@@ -49,7 +49,6 @@ export class TagsComponent {
   }
 
   removeTag(index: number): void {
-    console.log("removeTag")
     if (index >= 0) {
       this.tags.splice(index, 1);
     }
@@ -57,17 +56,12 @@ export class TagsComponent {
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    console.log("selected")
-    console.log(event.option)
     this.tags.push(new Tag(event.option.value));
     this.tagInput.nativeElement.value = '';
     this.newTags.emit(this.tags);
-    console.log("tags")
-    console.log(this.tags)
   }
 
   private _filter(tag: Tag): Tag[] {
-    console.log("filter")
     const filterValue = tag.value;
     return this.allTags.filter((value:Tag) => value.value.indexOf(filterValue) === 0);
   }

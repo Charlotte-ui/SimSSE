@@ -91,7 +91,6 @@ export class ScenarioComponent implements OnInit {
         })
       )
       .subscribe((plastrons: Plastron[]) => {
-        console.log('plastrons ', plastrons);
         this.plastrons = plastrons;
       });
   }
@@ -126,9 +125,6 @@ export class ScenarioComponent implements OnInit {
       );
 
     if (this.groupesToSave) {
-      console.log("this.groupes ",this.groupes);
-      console.log("this.oldGroupes ",this.oldGroupes);
-
       requests.push(
         this.scenarioService.updateGroupes(this.groupes, this.oldGroupes)
       );

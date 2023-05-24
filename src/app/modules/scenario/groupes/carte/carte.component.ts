@@ -19,7 +19,6 @@ export class CarteComponent implements OnDestroy{
 
   @Input() set data(value: (string | number)[][]) {
     if (value) { // if value isnt undefined
-      console.log("carte data ",value)
       Data =  value;
       SceneNb = value.length - 3 ; // le nombre de groupe est le nombre de data  sauf PRV et PMA et CADI
       this.updateChart();

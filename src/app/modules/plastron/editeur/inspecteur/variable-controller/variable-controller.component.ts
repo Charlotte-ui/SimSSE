@@ -28,7 +28,6 @@ export class VariableControllerComponent implements OnInit {
     this.form = this.fb.group(value);
 
     this.form.valueChanges.subscribe((newVariable: VariablePhysioInstance) => {
-        console.log("new variable ",newVariable)
         this.variable = newVariable;
         this.newVariable.emit(newVariable);
       });

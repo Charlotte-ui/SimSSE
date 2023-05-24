@@ -96,8 +96,6 @@ export class Modele extends Vertex implements Listable {
   ): Observable<any>[] {
     let requests: Observable<any>[] = [];
 
-    console.log("save modele ",saver)
-
     // save the tags
     if (saver.newTags && saver.newTags.length > 0)
       requests.push(
@@ -114,21 +112,21 @@ export class Modele extends Vertex implements Listable {
       requests.push(modeleService.updateModele(this, saver.champToUpdate));
 
     // save the graph
-     if (
+    if (
       (saver.nodeToUpdate && saver.nodeToUpdate.length > 0) ||
       (saver.nodeToDelete && saver.nodeToDelete.length > 0) ||
       (saver.linkToUpdate && saver.linkToUpdate.length > 0) ||
       (saver.linkToDelete && saver.linkToDelete.length > 0)
     )
-    requests.push(
-      nodeService.updateGraph(
-        this.graph,
-        saver.nodeToUpdate,
-        saver.nodeToDelete,
-        saver.linkToUpdate,
-        saver.linkToDelete
-      )
-    );
+      requests.push(
+        nodeService.updateGraph(
+          this.graph,
+          saver.nodeToUpdate,
+          saver.nodeToDelete,
+          saver.linkToUpdate,
+          saver.linkToDelete
+        )
+      );
 
     // save the triggers
     if (
@@ -142,6 +140,8 @@ export class Modele extends Vertex implements Listable {
           saver.triggerToDelete
         )
       );
+
+    console.log('save ', requests);
 
     return requests;
   }

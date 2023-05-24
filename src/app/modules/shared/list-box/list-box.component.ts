@@ -107,9 +107,6 @@ export class ListBoxComponent<T extends Listable> {
 
   addElement() {
     let newElement = new this.classe({ template: true });
-
-    console.log('newElement ', newElement);
-
     const dialogRef = this.dialog.open(DialogComponent, {
       data: [newElement, this.classe, this.triages, false, ['template']],
     });
@@ -122,8 +119,6 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   createElement(element: T) {
-    console.log('createElement ', element);
-
     this.dialog.open(WaitComponent);
     this.service.createElement(element).subscribe((id) => {
       if (Array.isArray(id)) id = id[0];
@@ -134,10 +129,6 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   drop(event: CdkDragDrop<T[]>) {
-    console.log('origin');
-
-    console.log(event);
-
     moveItemInArray(this.elements, event.previousIndex, event.previousIndex);
   }
 

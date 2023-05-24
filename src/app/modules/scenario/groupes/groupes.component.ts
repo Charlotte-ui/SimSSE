@@ -115,8 +115,6 @@ export class GroupesComponent {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
-
       if (result) {
         this.scenarioService
           .removeGroupe(this.groupes[groupId],this.groupes[0])
@@ -135,8 +133,6 @@ export class GroupesComponent {
   }
 
   updatePosition(event:any[]) {
-    console.log('updatePosition');
-    console.log(event);
     let i = 0;
     this.groupes.forEach((groupe:Groupe,index:number) => {
       groupe.x = Math.round(event[index][0])

@@ -31,10 +31,10 @@
         changesToSave = true; modeleToSave = true; saver.linkToDelete.push($event)
       "
       (updateTrigger)="
-        changesToSave = true;  saver.triggerToUpdate.push($event)
+        changesToSave = true; modeleToSave = true;  saver.triggerToUpdate.push($event)
       "
       (deleteTrigger)="
-        changesToSave = true;   saver.triggerToDelete.push($event)
+        changesToSave = true; modeleToSave = true;   saver.triggerToDelete.push($event)
       "
       (updateVariable)="
         changesToSave = true; variableToSave.push($event.id);
@@ -46,10 +46,9 @@
       *ngIf="allTags"
       [modele]="plastron.modele"
       [allTags]="allTags"
-      (newModel)="changeModeleRef($event)"
       (updateModele)="changesToSave = true; modeleToSave = true ; saver.champToUpdate.push($event)"
       (newTags)="
-        changesToSave = true;
+        changesToSave = true;  modeleToSave = true; 
         saver.newTags = $event.newTags;
         saver.tagsToDelete = $event.tagsToDelete
       "

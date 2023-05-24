@@ -54,10 +54,6 @@ export class BarreOutilsComponent implements OnInit {
   addElement(element: string) {
     this.actionByCategories= Action.getListByCategory()
     this.bioEventByCategories= BioEvent.getListByCategory()
-
-     console.log("this.bioEventByCategories ",this.bioEventByCategories)
-
-
     switch (element) {
       case NodeType.link:
         return this.createLink();
@@ -88,8 +84,6 @@ export class BarreOutilsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: Link) => {
       if (result) {
-        console.log('create link ');
-        console.log(result);
         this.newElement.emit(result);
       }
     });
@@ -102,9 +96,6 @@ export class BarreOutilsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((newNode: Node) => {
       if (newNode) {
-        console.log('node created');
-        console.log(newNode);
-
         if (newNode.type == NodeType.event) {
           newNode['template'] = this.getTemplate(
             (newNode as Event).typeEvent == EventType.action

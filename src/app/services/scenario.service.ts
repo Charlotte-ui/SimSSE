@@ -217,9 +217,6 @@ export class ScenarioService {
    * @returns
    */
   removeGroupe(groupe: Groupe, defaultGroupe: Groupe): Observable<any> {
-    console.log('delete groupe ', groupe);
-    console.log('defaultGroupe ', defaultGroupe);
-
     return this.apiService
       .getRelationFrom(groupe.id, 'seComposeDe', 'Groupe')
       .pipe(
@@ -273,7 +270,6 @@ export class ScenarioService {
    * @param scenario
    */
   deleteScenario(scenario: Scenario): Observable<any> {
-    console.log("deleteScenario ",scenario)
     let requests: Observable<any>[] = [];
 
     requests.push(

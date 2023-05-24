@@ -25,8 +25,6 @@ export class ScenarioResolver implements Resolve<Scenario> {
         .getScenarioById(scenarioId)
         .subscribe((scenario: Scenario) => {
           scenario!.id = scenarioId;
-          console.log('scenario');
-          console.log(scenario);
           resolve(scenario as Scenario);
         });
     });

@@ -40,7 +40,6 @@ export class ProfilComponent implements OnInit {
   // TODO emit change plutot que d'enregister sur place ?
   save(newAge: number) {
     this.profilService.updateProfil(this.form.value);
-    console.log('newAge ' + newAge);
     //this.apiService.updateProprertyOfVertex(value.id,"age",newAge.toString())
   //  this.apiService.updateDocument(this.profil.id, this.profil, 'Profil');
   }

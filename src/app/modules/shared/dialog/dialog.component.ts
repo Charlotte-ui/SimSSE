@@ -97,9 +97,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
       if (Array.isArray(this.element[key])) delete this.element[key];
     });
 
-    console.log("this.element ",this.element)
-    console.log("this.liste ",this.liste)
-
     this.form = this.fb.group(this.element);
 
     this.champs = Object.keys(this.element) as Array<keyof T>;

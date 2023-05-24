@@ -100,7 +100,6 @@ export class ModeleComponent {
     );
 
     forkJoin(requests).subscribe((value) => {
-      console.log(value);
       this.changesToSave = false;
 
       this.dialog.closeAll();

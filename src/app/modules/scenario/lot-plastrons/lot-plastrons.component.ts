@@ -131,11 +131,7 @@ export class LotPlastronsComponent {
   }
 
   updateGroup(event, element: tableElementPlastron) {
-    console.log("this.plastrons ",this.plastrons)
-    console.log("element ",element)
     let plastron = this.getPlastronById(element.idPlastron);
-    console.log("plastron ",plastron)
-
     let newScene = event.value;
     let oldScene = plastron.groupe.scene;
     let newGroupe;
@@ -162,10 +158,6 @@ export class LotPlastronsComponent {
   }
 
   deletePlastron(event, element: tableElementPlastron) {
-    console.log('event ', event);
-    console.log('element ', element);
-
-    console.log('id plastron ', element.idPlastron);
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
       data: [
         'Supprimer le plastron ' + element.title,

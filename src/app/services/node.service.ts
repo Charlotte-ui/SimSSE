@@ -82,8 +82,6 @@ export class NodeService {
     delete graph.id;
     delete graph.nodes;
     delete graph.links;
-    console.log('createGraph');
-    console.log(graph);
     //  return this.apiService.createDocument(graph)
     //
     return this.apiService
@@ -133,10 +131,7 @@ export class NodeService {
    * @param node
    */
   createGraphNode(graph: Graph): Observable<string> {
-    console.log('createGraphNode ', graph);
     graph['@class'] = 'Graph';
-    let oldGraphId = graph.id;
-    console.log('oldGraphId ', oldGraphId);
     delete graph.id;
     delete graph.links;
     delete graph.nodes;
@@ -151,7 +146,6 @@ export class NodeService {
             .createRelationBetween(templateId.toString(), idNode, 'aTemplate')
             .pipe(
               map((res) => {
-                console.log('res ', res);
                 return idNode;
               })
             )
@@ -169,7 +163,6 @@ export class NodeService {
     idNewGraph: string,
     idNewStart: string
   ): Observable<any> {
-    console.log('graph to copy ', graphToCopy);
     graphToCopy.id = idNewGraph;
 
     let nodeIds = [];
@@ -193,7 +186,6 @@ export class NodeService {
     // create new nodes and links
     return this.updateGraphNodes(graphToCopy).pipe(
       switchMap((indexesNode: string[]) => {
-        console.log('indexesNode ', indexesNode);
         return this.updateGraphLinks(graphToCopy, indexesNode);
       })
     );
@@ -208,10 +200,10 @@ export class NodeService {
    * @param node
    */
   updateNode(node: Node): Observable<string[]> {
-    console.log('updateNode ', node);
     delete node['nodes'];
     delete node['links'];
-
+    if (node.type == NodeType.graph && typeof node['template'] === 'string')
+      node['template'] = false;
     return this.apiService.updateAllDocumentChamp(node);
   }
 
@@ -220,7 +212,6 @@ export class NodeService {
    * @param node
    */
   updateLink(link: Link): Observable<string[]> {
-    console.log('updateLink ', link);
     return this.apiService.updateDocumentChamp(
       link.id,
       'start',
@@ -236,28 +227,18 @@ export class NodeService {
     linkToDelete: string[]
   ): Observable<any> {
     let requests: Observable<any>[] = [];
-
-    console.log('updateGraph');
-    console.log('nodeToUpdate ', nodeToUpdate);
-    console.log('linkToUpdate ', linkToUpdate);
-    console.log('nodeToDelete ', nodeToDelete);
-    console.log('linkToDelete ', linkToDelete);
     // create new nodes and links
     let requestCreate = this.updateGraphNodes(graph).pipe(
       switchMap((indexesNode: string[]) => {
-        console.log('indexesNode ', indexesNode);
         return this.updateGraphLinks(graph, indexesNode);
       })
     );
-
-    console.log('requests ', requests);
-
     requests.push(requestCreate);
 
     //update old nodes
     graph.nodes.forEach((node) => {
       if (!this.isNew(node.id) && nodeToUpdate.includes(node.id))
-        requests.push(this.updateNode(node));
+        requests.push(this.updateNode(structuredClone(node)));
     });
 
     //delete nodes
@@ -288,7 +269,6 @@ export class NodeService {
    * @returns
    */
   updateGraphNodes(graph: Graph): Observable<string[]> {
-    console.log('updateGraphNodes ', graph);
     let indexGraph = graph.id;
     let requestsNode: Observable<string>[] = [];
     let oldNodeInddexes = [];
@@ -316,14 +296,10 @@ export class NodeService {
       }
     });
 
-    console.log(' requestsNode ', requestsNode);
-
     if (requestsNode.length === 0) return of(oldNodeInddexes); // s'il n'y a pas de nouveaux nodes à ajouter
 
     return forkJoin(requestsNode).pipe(
       switchMap((newNodeIndexes: string[]) => {
-        console.log('nodeIndexes ', newNodeIndexes);
-
         let requestLink: Observable<any>[] = newNodeIndexes.map(
           (indexNode: string) =>
             this.apiService.createRelationBetween(
@@ -351,8 +327,6 @@ export class NodeService {
    * @returns 
    */
   updateGraphLinks(graph: Graph, indexesNode: string[]): Observable<any> {
-    console.log('updateGraphLinks');
-
     let requestsLinks: Observable<string>[] = [];
 
     graph.links.forEach((link) => {
@@ -387,10 +361,7 @@ export class NodeService {
     indexesNode: string[]
   ): string {
     let res = '';
-    console.log('getNodeId ');
-    console.log('value ', value);
     nodes.forEach((node: Node, index: number) => {
-      console.log('node ', node);
       if (value == node.id || value == (node as Event).event)
         res = indexesNode[index];
     });

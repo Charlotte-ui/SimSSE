@@ -18,7 +18,6 @@ export class ApiService {
 
   // return of("34:2").pipe ( delay( 5000 ));
   documentId(document: any): string {
-    console.log("document ",document," id ",document['@rid'])
     return document['@rid'].substring(1);
   }
 
@@ -112,10 +111,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    */
 
   updateDocumentChamp(id:string,champ:string,value:string){
-    console.log("value ",value)
-    value =  value.split('#').join('%23');
-    console.log("value ",value)
-
+    if(typeof value === 'string') value =  value.split('#').join('%23');
     return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/"${value}"`,
       {}
@@ -125,7 +121,6 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
   updateAllDocumentChamp(document:any){
     let requests: Observable<any>[] = [];
     Object.keys(document).forEach((key) => {
-      console.log('update ',key,' value ',document[key])
       requests.push(
         this.updateDocumentChamp(document.id, key,  document[key].toString())
       );
@@ -142,7 +137,6 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    */
 
   createDocument(document: Vertex|any) {
-    console.log("createDocument ",document)
     return this.http.post<any>(
       `${environment.urlAPI}/document/simsse/`,
       document
@@ -188,4 +182,11 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
       {}
     );
   }
+
+  deleteOutRelation(idOut: string, relation: string) {
+    return this.http.post<any>(
+    `${environment.urlAPI}/function/simsse/deleteOutEdgeRelation/${idOut}/${relation}`,
+    {}
+  );
+}
 }

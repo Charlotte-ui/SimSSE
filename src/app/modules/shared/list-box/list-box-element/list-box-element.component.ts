@@ -38,8 +38,6 @@ export class ListBoxElementComponent<T extends Listable> {
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
-
       if (result) {
         this.dialog.open(WaitComponent);
         this.service.deleteElement(this.element).subscribe(() => {
@@ -51,7 +49,6 @@ export class ListBoxElementComponent<T extends Listable> {
   }
 
   goToElement(elementId: string) {
-    console.log(elementId);
     this.router.navigate(['/' + this.type.toLowerCase() + '/' + elementId]);
   }
 }

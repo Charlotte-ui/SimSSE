@@ -7,6 +7,10 @@ export function deleteElementFromArray (array:any[],element:any) {
     if (index > -1) array.splice(index, 1);
 }
 
+export function pushWithoutDuplicateByChamp<T>(array:T[],element:T,champ:string) {
+  return array.filter((arrayElem:T) => arrayElem[champ] !== element[champ]).concat([element])
+}
+
 
 export function getElementByChamp<T>(array:T[],champ:string,value:any) : T|undefined {
     let resArray = array.filter((element:T) => element[champ] == value) ;
@@ -22,17 +26,15 @@ export function getElementByChamp<T>(array:T[],champ:string,value:any) : T|undef
    * @returns 
    */
   export function getNodeByID(graph:Graph, id: string): Node {
-    let result = undefined;
-    console.log(Array.isArray(graph.nodes))
-        console.log(graph)
-
-    graph.nodes.forEach((node) => {
+    for (let node of graph.nodes){
       // event are identified by evnt
-
-      if (node.type == NodeType.event && (node as Event).event == id)
-        result = node;
-      else if (node.id == id) result = node;
-      else if (node.type == NodeType.graph) result = getNodeByID(node as Graph,id)
-    });
-    return result;
+      if (node.type == NodeType.event && (node as Event).event == id) return node;
+      
+      else if (node.id == id) return node;
+      else if (node.type == NodeType.graph) {
+        let deepNode = getNodeByID(node as Graph,id);
+        if(deepNode) return deepNode;
+      }
+    };
+    return undefined;
   }
