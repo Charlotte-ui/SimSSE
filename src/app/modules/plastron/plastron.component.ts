@@ -205,9 +205,13 @@ export class PlastronComponent implements OnInit {
     this.dialog.open(WaitComponent);
     let requests: Observable<any>[] = [];
     let requestsProfil: Observable<any>[] = [];
+    let waitBeforeClosing = false;
 
     if (this.modeleToSave) {
-      if (this.plastron.modele.template) this.deriveFromModele();
+      if (this.plastron.modele.template){
+        waitBeforeClosing = true;
+        this.deriveFromModele();
+      }
       else
         requests = this.plastron.modele.save(
           this.saver,
@@ -226,7 +230,7 @@ export class PlastronComponent implements OnInit {
 
     forkJoin(requests.concat(requestsProfil)).subscribe((value) => {
       this.changesToSave = false;
-      this.dialog.closeAll();
+      if (!waitBeforeClosing) this.dialog.closeAll();
 
       this._snackBar.open(
         'Modifications du plastron ' +

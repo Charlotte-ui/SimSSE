@@ -187,14 +187,6 @@ export class Graph extends Node implements Template {
 
     return res;
   }
-
-  public static getGraphByID(id: string): Graph {
-    let result = undefined;
-    Graph.graphs.forEach((graph: Graph) => {
-      if (graph.id == id) result = graph;
-    });
-    return result;
-  }
 }
 
 export class Timer extends Node {

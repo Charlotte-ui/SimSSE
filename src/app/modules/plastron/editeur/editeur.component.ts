@@ -149,7 +149,7 @@ export class EditeurComponent implements OnInit {
   /**
    * init all the nodes and links of a graph
    * recursive
-   * take a graph in paramater and return a list of template to add to the node and a list of links to add to the graph
+   * take a graph in paramater and return a list of template to add to the nodes and a list of links to add to the graph
    * @param graph
    */
   initGraph(graph: Graph): Observable<[Template[], Link[]]> {
@@ -200,6 +200,7 @@ export class EditeurComponent implements OnInit {
       if (node.type == NodeType.graph) {
         node['nodes'] = (result[0][index] as Graph).nodes;
         node['links'] = (result[0][index] as Graph).links;
+        node['template'] = (result[0][index] as Graph).id;
       }
       console.log('node ', node, ' template ', result[0][index]);
     });
@@ -256,7 +257,8 @@ export class EditeurComponent implements OnInit {
   }
 
   initGroup(group: Graph) {
-    let graphTemplate = Graph.getGraphByID(group.template.toString());
+    let graphTemplate = getElementByChamp<Graph>(Graph.graphs,'id',group.template.toString())
+    
     // TODO : créer de nouveaux node and links avec de nouveaux id ?
 
     this.initGraph(graphTemplate).subscribe(

@@ -29,16 +29,15 @@ import { Action, BioEvent } from '../models/vertex/event';
 export class NodeService {
   constructor(private apiService: ApiService) {}
 
-
- /**
-  * READ
-  */
+  /**
+   * READ
+   */
 
   /**
    * get the template of an event
-   * @param id 
-   * @param eventType 
-   * @returns 
+   * @param id
+   * @param eventType
+   * @returns
    */
   getEventTemplate(
     id: string,
@@ -56,8 +55,9 @@ export class NodeService {
   }
 
   getGraphTemplate(graph: Graph): Observable<Graph> {
-    return this.apiService.getRelationFrom(graph.id,'aTemplate','Graph')
-    .pipe(map((response) => new Graph(response.result[0])));
+    return this.apiService
+      .getRelationFrom(graph.id, 'aTemplate', 'Graph')
+      .pipe(map((response) => new Graph(response.result[0])));
   }
 
   getAllGraphTemplate(): Observable<Graph[]> {
@@ -67,7 +67,6 @@ export class NodeService {
       'true'
     );
   }
-
 
   /**
    * CREATE
@@ -134,8 +133,10 @@ export class NodeService {
    * @param node
    */
   createGraphNode(graph: Graph): Observable<string> {
-    console.log("createGraphNode ",graph)
+    console.log('createGraphNode ', graph);
     graph['@class'] = 'Graph';
+    let oldGraphId = graph.id;
+    console.log('oldGraphId ', oldGraphId);
     delete graph.id;
     delete graph.links;
     delete graph.nodes;
@@ -148,15 +149,16 @@ export class NodeService {
         switchMap((idNode: string) =>
           this.apiService
             .createRelationBetween(templateId.toString(), idNode, 'aTemplate')
-            .pipe(map((res) => {
-              console.log("res ",res)
-             return idNode
-            }))
+            .pipe(
+              map((res) => {
+                console.log('res ', res);
+                return idNode;
+              })
+            )
         )
       );
   }
 
-  
   /**
    * create a duplicate of all the node and link of the graph
    * @param graph
@@ -167,6 +169,7 @@ export class NodeService {
     idNewGraph: string,
     idNewStart: string
   ): Observable<any> {
+    console.log('graph to copy ', graphToCopy);
     graphToCopy.id = idNewGraph;
 
     let nodeIds = [];
@@ -196,7 +199,6 @@ export class NodeService {
     );
   }
 
-
   /**
    * UPDATE
    */
@@ -207,8 +209,8 @@ export class NodeService {
    */
   updateNode(node: Node): Observable<string[]> {
     console.log('updateNode ', node);
-    delete node["nodes"]
-    delete node["links"]
+    delete node['nodes'];
+    delete node['links'];
 
     return this.apiService.updateAllDocumentChamp(node);
   }
@@ -235,11 +237,11 @@ export class NodeService {
   ): Observable<any> {
     let requests: Observable<any>[] = [];
 
-    console.log("updateGraph")
-    console.log("nodeToUpdate ",nodeToUpdate)
-    console.log("linkToUpdate ",linkToUpdate)
-    console.log("nodeToDelete ",nodeToDelete)
-    console.log("linkToDelete ",linkToDelete)
+    console.log('updateGraph');
+    console.log('nodeToUpdate ', nodeToUpdate);
+    console.log('linkToUpdate ', linkToUpdate);
+    console.log('nodeToDelete ', nodeToDelete);
+    console.log('linkToDelete ', linkToDelete);
     // create new nodes and links
     let requestCreate = this.updateGraphNodes(graph).pipe(
       switchMap((indexesNode: string[]) => {
@@ -248,7 +250,7 @@ export class NodeService {
       })
     );
 
-    console.log("requests ",requests)
+    console.log('requests ', requests);
 
     requests.push(requestCreate);
 
@@ -296,7 +298,9 @@ export class NodeService {
       if (this.isNew(node.id)) {
         if (node.type === NodeType.graph) {
           // create a graph node
-          requestsNode.push(this.createGraphNode(structuredClone(node as Graph)));
+          requestsNode.push(
+            this.createGraphNode(structuredClone(node as Graph))
+          );
         } else {
           // create a trend or event node
           requestsNode.push(
@@ -312,7 +316,7 @@ export class NodeService {
       }
     });
 
-    console.log(" requestsNode ",requestsNode)
+    console.log(' requestsNode ', requestsNode);
 
     if (requestsNode.length === 0) return of(oldNodeInddexes); // s'il n'y a pas de nouveaux nodes à ajouter
 
@@ -365,7 +369,6 @@ export class NodeService {
     });
 
     if (requestsLinks.length === 0) return of({}); // s'il n'y a pas de nouveaux nodes à ajouter
-
 
     return from(requestsLinks).pipe(
       concatMap((request: Observable<any>) => request),
