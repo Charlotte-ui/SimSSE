@@ -140,9 +140,6 @@ export class Modele extends Vertex implements Listable {
           saver.triggerToDelete
         )
       );
-
-    console.log('save ', requests);
-
     return requests;
   }
 }

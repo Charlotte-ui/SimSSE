@@ -29,7 +29,6 @@ export class ModeleDialogComponent {
     this.title = this.edition
       ? 'Modifier le modele ' + this.modele.title
       : 'Créer un nouveau modèle';
-    console.log('modele ', this.modele);
     this.form = this.fb.group(this.wrapArray(this.modele));
     this.form.controls['title'].addValidators(Validators.required);
   }

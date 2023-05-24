@@ -22,7 +22,10 @@ import { ModeleService } from '../../../services/modele.service';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { Template } from 'src/app/models/interfaces/templatable';
 import { Trigger } from 'src/app/models/trigger';
-import { getElementByChamp, pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
+import {
+  getElementByChamp,
+  pushWithoutDuplicateByChamp,
+} from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-editeur',
@@ -33,6 +36,8 @@ export class EditeurComponent implements OnInit {
   // affichage dynamic des boites retractable
   barreOutilsOpened: boolean;
   inspecteurOpened: boolean;
+  graphInitialized: boolean = false;
+  curvesInitialized: boolean = false;
 
   _targetVariable!: VariablePhysioInstance[];
 
@@ -42,7 +47,7 @@ export class EditeurComponent implements OnInit {
   @Input() set targetVariable(value: VariablePhysioInstance[]) {
     if (value) {
       this._targetVariable = value;
-      if (this.modele.graph) this.initCurves();
+      if (this.graphInitialized) this.initCurves();
     }
   }
 
@@ -65,16 +70,18 @@ export class EditeurComponent implements OnInit {
         .subscribe((result: [Template[], Link[]]) => {
           this.initTemplateAndLinks(result, this.modele.graph);
 
+          // all the trends and all the event from the graph and the nested graphs
+          this.trends = [];
+          this.events = [];
+          this.initTrendsEventsRecursive(this.modele.graph);
+
+          this.graphInitialized = true;
+
           // after the model graph initialization, the curves are generated
           if (this.targetVariable) {
             this.initCurves();
             this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
           }
-
-          // all the trends and all the event from the graph and the nested graphs
-          this.trends = [];
-          this.events = [];
-          this.initTrendsEventsRecursive(this.modele.graph);
         });
     }
   }
@@ -185,13 +192,10 @@ export class EditeurComponent implements OnInit {
 
   /**
    * take a list of template, a liste of link, and a graph and bind the templates to the nodes and the links to the graph
-   * @param result 
-   * @param graph 
+   * @param result
+   * @param graph
    */
-  initTemplateAndLinks(
-    result: [Template[], Link[]],
-    graph: Graph
-  ) {
+  initTemplateAndLinks(result: [Template[], Link[]], graph: Graph) {
     // on attribiut leur template aux events et aux graph
     graph.nodes.map((node: Node, index: number) => {
       if (node['template']) node['template'] = result[0][index];
@@ -206,7 +210,9 @@ export class EditeurComponent implements OnInit {
 
     // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
     graph.links.map((link: Link) => {
-      let nodeSource = graph.nodes.filter((node:Node) => node.id === link.out)[0];
+      let nodeSource = graph.nodes.filter(
+        (node: Node) => node.id === link.out
+      )[0];
       if (nodeSource.type == NodeType.event)
         link.out = (nodeSource as Event).event;
     });
@@ -216,32 +222,37 @@ export class EditeurComponent implements OnInit {
    * initialize all curves
    */
   initCurves() {
-    this.curves = [];
-    this.targetVariable.forEach((variable, index) => {
-      let curve = new Curve(
-        variable.name,
-        this.duration,
-        variable,
-        variable.color
-      );
-      this.curves.push(curve);
-
-      curve.calculCurve(structuredClone(this.modele));
-    });
-
+    this.curves = this.targetVariable.map(
+      (variable: VariablePhysioInstance) =>
+        new Curve(variable.name, this.duration, variable, variable.color)
+    );
+    this.updateCurve();
+    this.curvesInitialized = true;
     this.newCurve.emit(this.curves);
   }
 
   initTrendsEventsRecursive(graph: Graph) {
-    graph.nodes.forEach((node:Node) => {
+    graph.nodes.forEach((node: Node) => {
       switch (Node.getType(node)) {
         case EventType.action:
-          node['template'] = this.allActions.filter((action:Action) => action.id == (node as Event).event)[0]
-          this.events = pushWithoutDuplicateByChamp<Event>(this.events,(node as Event),'event')
+          node['template'] = this.allActions.filter(
+            (action: Action) => action.id == (node as Event).event
+          )[0];
+          this.events = pushWithoutDuplicateByChamp<Event>(
+            this.events,
+            node as Event,
+            'event'
+          );
           break;
         case EventType.bio:
-          node['template'] = this.allBioevents.filter((bioevent:BioEvent) => bioevent.id == (node as Event).event)[0]
-          this.events = pushWithoutDuplicateByChamp<Event>(this.events,(node as Event),'event')
+          node['template'] = this.allBioevents.filter(
+            (bioevent: BioEvent) => bioevent.id == (node as Event).event
+          )[0];
+          this.events = pushWithoutDuplicateByChamp<Event>(
+            this.events,
+            node as Event,
+            'event'
+          );
           break;
         case NodeType.trend:
           this.trends.push(node as Trend);
@@ -254,39 +265,48 @@ export class EditeurComponent implements OnInit {
   }
 
   initGroup(group: Graph) {
-    let graphTemplate = getElementByChamp<Graph>(Graph.graphs,'id',group.template.toString())
-    
+    let graphTemplate = getElementByChamp<Graph>(
+      Graph.graphs,
+      'id',
+      group.template.toString()
+    );
+
     // TODO : créer de nouveaux node and links avec de nouveaux id ?
 
-    this.initGraph(graphTemplate).subscribe(
-      (result: [Template[], Link[]]) => {
-   //     group.links = structuredClone(graphTemplate.links);
-        group.nodes = structuredClone(graphTemplate.nodes);
-        this.initTemplateAndLinks(result,group)
-        this.initTrendsEventsRecursive(group)
+    this.initGraph(graphTemplate).subscribe((result: [Template[], Link[]]) => {
+      //     group.links = structuredClone(graphTemplate.links);
+      group.nodes = structuredClone(graphTemplate.nodes);
+      this.initTemplateAndLinks(result, group);
+      this.initTrendsEventsRecursive(group);
 
-        this.modele.graph.nodes.push(group);
-        this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
-      }
-    );
+      this.modele.graph.nodes.push(group);
+      this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+    });
   }
 
   // --- UPDATEURS -----------------------------------------
 
   /**
    * add an element, Node or Link, to the root graph
-   * @param element 
+   * @param element
    */
   addElement(element: Node | Link) {
-    if (element.type == NodeType.link) { // ADD LINK
+    if (element.type == NodeType.link) {
+      // ADD LINK
       let indice = this.modele.graph.links.length.toString();
       (element as Link).id = indice;
       this.modele.graph.links.push(element as Link);
       this.updateLink.emit(indice);
-    } else { // ADD NODE
+    } else {
+      // ADD NODE
       let indice = this.modele.graph.nodes.length.toString();
       element.id = indice;
-      if (element.type == NodeType.event) this.events = pushWithoutDuplicateByChamp<Event>(this.events,(element as Event),'event')
+      if (element.type == NodeType.event)
+        this.events = pushWithoutDuplicateByChamp<Event>(
+          this.events,
+          element as Event,
+          'event'
+        );
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       else this.modele.graph.nodes.push(element as Node);
     }
@@ -315,7 +335,11 @@ export class EditeurComponent implements OnInit {
         let oldEvent = (node as Event).template.id;
 
         // update template
-        (node as Event).template = getElementByChamp<Action>(this.allActions,'id',(node as Event).event)
+        (node as Event).template = getElementByChamp<Action>(
+          this.allActions,
+          'id',
+          (node as Event).event
+        );
         this.modele.graph.links.forEach((link) => {
           if (link.in == oldEvent) link.in = (node as Event).event;
           if (link.out == oldEvent) link.out = (node as Event).event;
@@ -332,7 +356,6 @@ export class EditeurComponent implements OnInit {
     if (event[0].delete) {
       this.deleteLink.emit(idLink);
     } else {
-      console.log("update link ",idLink)
       this.updateLink.emit(idLink);
     }
     // let index = Number(event[1])
@@ -341,8 +364,12 @@ export class EditeurComponent implements OnInit {
   }
 
   updateVariables(newVariable: VariablePhysioInstance) {
-    let variable = getElementByChamp<VariablePhysioInstance>(this.targetVariable,'template',newVariable.template)
-    let index  = this.targetVariable.indexOf(variable)
+    let variable = getElementByChamp<VariablePhysioInstance>(
+      this.targetVariable,
+      'template',
+      newVariable.template
+    );
+    let index = this.targetVariable.indexOf(variable);
     this.targetVariable[index] = newVariable;
     this.curves[index].variable = newVariable;
     this.curves[index].calculCurve(this.modele);
@@ -359,8 +386,6 @@ export class EditeurComponent implements OnInit {
       let newtriggered = curve.calculCurve(structuredClone(this.modele));
       this.modele.triggeredEvents = newtriggered;
     });
-
     this.curves = [...this.curves];
   }
-
 }

@@ -64,6 +64,7 @@ export abstract class Node extends Vertex {
           res.push(new Graph(element) as T);
           break;
         case NodeType.timer:
+          res.push(new Timer(element) as T);
           break;
       }
     });
@@ -199,8 +200,9 @@ export class Timer extends Node {
     else object = { type: NodeType.timer };
     super(object);
     this.name = object?.name ? object.name : 'Timer';
-    this.duration = 0;
-    this.counter = 0;
+    this.duration = object?.duration ? object.duration : 0;
+    this.counter = object?.counter ? object.counter : 0;
+
   }
 
   static override getName(element): string {

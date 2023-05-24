@@ -33,7 +33,6 @@ export class TriggerDialogComponent {
     this.isEdition = this.data[2];
     this.isTrigger = this.data[3];
     this.element = this.isTrigger ? 'trigger' : 'timestamp';
-    console.log('edit trigger ', this.trigger);
     this.form = this.fb.group(this.trigger,Validators.required);
     this.events = this.data[1];
 

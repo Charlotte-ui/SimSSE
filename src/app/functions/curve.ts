@@ -181,7 +181,7 @@ export class Curve {
       // if the timer has ended
 
       triggeredEvents.push(
-        new Trigger({ time: t + 1, id: timer.id, editable: false })
+        new Trigger({ time: t + 1, in: timer.id, editable: false , id: triggeredEvents.length})
       );
       timer.state = false; // the timer end
     }

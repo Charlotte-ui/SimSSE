@@ -127,7 +127,6 @@ export class ModeleComponent {
           this.modelService
             .createNewModeleTemplate(this.modele, result)
             .subscribe((res) => {
-              console.log('res ', res);
               this.dialog.closeAll();
             });
         } else {

@@ -286,7 +286,7 @@ export class NodeService {
           requestsNode.push(
             this.createNode(
               structuredClone(node),
-              node.type === NodeType.trend ? 'Trend' : 'Event'
+               [...node.type][0].toUpperCase() + node.type.slice(1)
             )
           );
         }

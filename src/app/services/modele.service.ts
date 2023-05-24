@@ -241,8 +241,6 @@ export class ModeleService {
    * @returns
    */
   createNewModeleTemplate(modele: Modele, newModele: Modele): Observable<any> {
-    console.log('createNewModeleTemplate ', modele);
-    console.log('newModele ', newModele);
 
     let saver = Modele.initSaver();
 

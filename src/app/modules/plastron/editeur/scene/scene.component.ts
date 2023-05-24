@@ -119,7 +119,6 @@ export class SceneComponent implements OnInit {
   }
 
   initGraphData() {
-    console.log('initGraphData ', this.modele);
     this.graphData = {};
     this.curves.forEach((curve) => {
       this.graphData[curve.name] = curve.values;
@@ -145,16 +144,10 @@ export class SceneComponent implements OnInit {
     });
 
     this.markLineData = [];
-
-    console.log("updateMarklineData")
     this.modele.triggeredEvents.map((trigger: Trigger) => {
-          console.log("trigger ",trigger)
-
       // time id
       let markline = [];
       let node = getNodeByID(this.modele.graph,trigger.in);
-                console.log("node ",node)
-
       if (node) {
         // si le node est présent sur le graph
         let name;
@@ -187,9 +180,6 @@ export class SceneComponent implements OnInit {
           yAxis: this.markLineY,
           lineStyle: { color: color },
         });
-
-                        console.log("markline ",markline)
-
 
         this.markLineData.push(markline);
       }
@@ -332,9 +322,7 @@ export class SceneComponent implements OnInit {
           time: Number(result.xAxis),
           id: result.id,
           in:result.in
-        });
-                
-        console.log("add trigger ",trigger)
+        });        
         this.modele.triggeredEvents.push(trigger);
       }
       this.updateTrigger.emit(trigger);

@@ -200,7 +200,6 @@ export class PlastronComponent implements OnInit {
           this.modelService
             .createNewModeleTemplate(this.plastron.modele, result)
             .subscribe((res) => {
-              console.log('res ', res);
               this.dialog.closeAll();
             });
         } else {
@@ -273,7 +272,6 @@ export class PlastronComponent implements OnInit {
   }
 
   deriveFromModele() {
-    console.log('deriveFromModele');
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
       data: [
         'Modifier le modèle traumato-physiologique ' +
