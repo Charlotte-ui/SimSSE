@@ -8,7 +8,7 @@
     <app-general-infos
       [scenario]="scenario"
       (newTotalPlastron)="totalPlastron = $event"
-      (updateScenario)="changesToSave = true; newScenario = $event"
+      (updateScenario)="changesToSave = true; scenarioToSave = true"
       (updateTags)="changesToSave = true;"
     ></app-general-infos>
   </mat-tab>
@@ -18,6 +18,7 @@
       [scenario]="scenario"
       [groupes]="groupes"
       (updateGroupes)="changesToSave = true; groupesToSave = true"
+      (updateScenario)="changesToSave = true; scenarioToSave = true"
     ></app-groupes>
   </mat-tab>
   <mat-tab label="Plastrons et modèles">

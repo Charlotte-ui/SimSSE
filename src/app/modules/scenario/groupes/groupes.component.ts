@@ -5,6 +5,7 @@ import { Scenario } from '../../../models/vertex/scenario';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { ScenarioService } from '../../../services/scenario.service';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { arrayEquals, roundingWithDecimal } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-groupes',
@@ -56,6 +57,7 @@ export class GroupesComponent {
   }
 
   @Output() updateGroupes = new EventEmitter<boolean>();
+  @Output() updateScenario = new EventEmitter<Scenario>();
 
   constructor(
     public dialog: MatDialog,
@@ -133,20 +135,33 @@ export class GroupesComponent {
   }
 
   updatePosition(event:any[]) {
+    let updateScenario = false;
     let i = 0;
     this.groupes.forEach((groupe:Groupe,index:number) => {
-      groupe.x = Math.round(event[index][0])
-      groupe.y = Math.round(event[index][1])
+      groupe.x = roundingWithDecimal(event[index][0],2)
+      groupe.y = roundingWithDecimal(event[index][1],2)
       i = index;
     });
     i++;
-    this.scenario.coordPRV = event[i]
+    if (!arrayEquals(this.scenario.coordPRV,event[i])){
+      this.scenario.coordPRV = event[i]
+      updateScenario = true;
+    }
     i++;
-    this.scenario.coordPMA = event[i]
+    if (!arrayEquals(this.scenario.coordPMA,event[i])){
+      this.scenario.coordPMA = event[i]
+      updateScenario = true;
+    }
     i++;
-    this.scenario.coordCADI = event[i]
+    if (!arrayEquals(this.scenario.coordCADI,event[i])){
+      this.scenario.coordCADI = event[i]
+      updateScenario = true;
+    }
+    console.log("updatePosition ",this.scenario)
 
-    this.updateGroupes.emit(true)
+    if (updateScenario!) this.updateGroupes.emit(true)
+    else this.updateScenario.emit(this.scenario)
+    
   }
 
   private setForm() {

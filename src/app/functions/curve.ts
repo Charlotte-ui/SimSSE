@@ -2,6 +2,7 @@ import { Modele } from '../models/vertex/modele';
 import { Graph, NodeType, Timer, Node, Trend } from '../models/vertex/node';
 import { Trigger } from '../models/trigger';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
+import { roundingWithDecimal } from './tools';
 
 export class Curve {
   name: string;
@@ -47,14 +48,10 @@ export class Curve {
 
       if (i > 0) prevValue = this.values[i - 1][1];
 
-      let newValue =
-        Math.round(
-          (prevValue +
-            this.gaussianRandom(0, this.variable.rand) +
-            trend +
-            Number.EPSILON) *
-            100
-        ) / 100; // the *100 /100 is the ensure 2 digit after . 
+      let newValue = roundingWithDecimal(
+        prevValue + this.gaussianRandom(0, this.variable.rand) + trend,
+        2
+      );
       //let newValue = variable.cible + i*trend + this.gaussianRandom(0, variable.rand) ;
 
       if (newValue > this.variable.max) newValue = this.variable.max;
@@ -181,7 +178,12 @@ export class Curve {
       // if the timer has ended
 
       triggeredEvents.push(
-        new Trigger({ time: t + 1, in: timer.id, editable: false , id: triggeredEvents.length})
+        new Trigger({
+          time: t + 1,
+          in: timer.id,
+          editable: false,
+          id: triggeredEvents.length,
+        })
       );
       timer.state = false; // the timer end
     }

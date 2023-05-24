@@ -110,7 +110,8 @@ export class ScenarioService {
     let requests: Observable<any>[] = [];
     delete newScenario.tags;
     Object.keys(newScenario).forEach((key) => {
-      if (newScenario[key] != oldScenario[key])
+      if (newScenario[key] != oldScenario[key]) {
+        //let value = Array.isArray((newScenario[key]))?`{coord:${newScenario[key].toString()}}`:newScenario[key].toString();
         requests.push(
           this.apiService.updateDocumentChamp(
             newScenario.id,
@@ -118,6 +119,7 @@ export class ScenarioService {
             newScenario[key].toString()
           )
         );
+      }
     });
     if (requests.length > 0) return forkJoin(requests);
     else return of(true);

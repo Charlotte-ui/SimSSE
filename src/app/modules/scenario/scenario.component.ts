@@ -10,8 +10,6 @@ import { ProfilService } from '../../services/profil.service';
 import { RegleService } from '../../services/regle.service';
 import { TagService } from '../../services/tag.service';
 import { PlastronService } from '../../services/plastron.service';
-import { Modele } from '../../models/vertex/modele';
-import { Profil } from '../../models/vertex/profil';
 import { Observable, concat, forkJoin, map, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../models/vertex/tag';
 import { WaitComponent } from '../shared/wait/wait.component';
@@ -30,7 +28,7 @@ export class ScenarioComponent implements OnInit {
   changesToSave = false;
   groupesToSave = false;
 
-  newScenario!: Scenario;
+  scenarioToSave!: boolean;
   oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
   oldScenario!: Scenario; // scenario before changes, use to define wich champ update after changes
   oldGroupes!: Groupe[]; // scenario before changes, use to define wich champ update after changes
@@ -99,9 +97,9 @@ export class ScenarioComponent implements OnInit {
     let requests: Observable<any>[] = [];
     this.dialog.open(WaitComponent);
 
-    if (this.newScenario)
+    if (this.scenarioToSave)
       requests.push(
-        this.scenarioService.updateScenario(this.newScenario, this.oldScenario)
+        this.scenarioService.updateScenario(structuredClone(this.scenario), this.oldScenario)
       );
 
     // save the tags

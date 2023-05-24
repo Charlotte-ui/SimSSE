@@ -1,27 +1,25 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Graph, Trend,Event,Link,Node } from 'src/app/models/vertex/node';
+import { Graph, Trend, Event, Link, Node } from 'src/app/models/vertex/node';
 
 @Component({
   selector: 'app-graph-editeur-dialog',
   templateUrl: './graph-editeur-dialog.component.html',
-  styleUrls: ['./graph-editeur-dialog.component.less']
+  styleUrls: ['./graph-editeur-dialog.component.less'],
 })
 export class GraphEditeurDialogComponent {
+  graph: Graph;
 
-  graph:Graph;
+  constructor(
+    public dialogRef: MatDialogRef<GraphEditeurDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Graph
+  ) {}
 
-  constructor(public dialogRef: MatDialogRef<GraphEditeurDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Graph ) {
-
-
-    }
-
-    ngOnInit() {
-      this.graph = this.data;
+  ngOnInit() {
+    this.graph = this.data;
   }
 
-  updateNodes(event){
+  updateNodes(event) {
     this.graph.nodes = [...event]; //TODO link to database
   }
 
@@ -34,7 +32,6 @@ export class GraphEditeurDialogComponent {
   }
 
   delete() {
-    this.dialogRef.close({delete:true,id:this.graph.id});
+    this.dialogRef.close({ delete: true, id: this.graph.id });
   }
-
 }

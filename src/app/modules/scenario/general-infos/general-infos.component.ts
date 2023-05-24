@@ -37,6 +37,14 @@ export class GeneralInfosComponent {
       this.calculTotalPlastron(value);
 
       this.scenarioFormGroup.valueChanges.subscribe((newScenario: Scenario) => {
+        this.scenario.title = newScenario.title;
+        this.scenario.description = newScenario.description;
+        this.scenario.implique = newScenario.implique;
+        this.scenario.psy = newScenario.psy;
+        this.scenario.EU = newScenario.EU;
+        this.scenario.UA = newScenario.UA;
+        this.scenario.UR = newScenario.UR;
+        
         this.updateScenario.emit(newScenario);
         this.calculTotalPlastron(newScenario);
       });
