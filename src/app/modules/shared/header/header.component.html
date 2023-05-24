@@ -50,32 +50,28 @@
     </div>
 
     <button mat-button>
-      <span>{{ plastron ? plastron : modele }}</span>
+      <span>{{ getElementTitle() }}</span>
     </button>
 
-    <app-triage *ngIf="triage" [triage]="triage"></app-triage>
+    <app-triage *ngIf="modele || plastron" [triage]="getTriage()"></app-triage>
   </ng-container>
 
   <button
     *ngIf="plastron || scenario || modele"
     mat-icon-button
-    [matTooltip]="
-      plastron
-        ? 'Enregister le plastron ' + plastron
-        : 'Enregister le scenario' + scenario?.title
-    "
+    [matTooltip]="getTooltip()"
     (click)="save()"
     [ngClass]="{ activate: changesToSave }"
     [disabled]="!changesToSave"
   >
     <mat-icon>save</mat-icon>
   </button>
-
   <button
-    *ngIf="plastron"
+    *ngIf="plastron || modele"
     mat-icon-button
-    matTooltip="Enregister le plastron actuel en tant que nouveau modele"
-    (click)="saveAsNewModele()"
+    matTooltip="Enregister en tant que nouveau modèle"
+    [disabled]="plastron?.modele.template === true"
+    (click)="this.newModele.emit(true)"
   >
     <mat-icon>note_add</mat-icon>
   </button>

@@ -182,49 +182,78 @@ export class PlastronComponent implements OnInit {
           'Le plastron actuel dérive du modèle ' +
             this.plastron.modele.title +
             ', créer un nouveau modèle à partir du plastron actuel changera aussi le modèle auquel le plastron actuel fait référence.',
-          this.allTags,
           false,
         ],
       });
 
       dialogRef.afterClosed().subscribe((result) => {
-      
         this.dialog.open(WaitComponent);
-
 
         if (result == undefined) {
           this.dialog.closeAll();
           return;
         }
 
-        // CAS OU IL N'Y A RIEN A ENREGISTRER 
+        // CAS OU IL N'Y A RIEN A ENREGISTRER
         // TODO ; disable le bt si il y a eu des modif
-        this.modelService.createNewModeleTemplate(this.plastron.modele,result).subscribe((res) => {
-          console.log('res ', res);
-
-          this.saver = Modele.initSaver();
-
-          
-          //location.reload();
-          this.dialog.closeAll();
-
-        });
+        if (!this.modeleToSave) {
+          this.modelService
+            .createNewModeleTemplate(this.plastron.modele, result)
+            .subscribe((res) => {
+              console.log('res ', res);
+              this.dialog.closeAll();
+            });
+        } else {
+          forkJoin(this.savingPlastronRequest())
+            .pipe(
+              switchMap((value) =>
+                this.modelService.createNewModeleTemplate(
+                  this.plastron.modele,
+                  result
+                )
+              )
+            )
+            .subscribe((res) => {
+              this.changesToSave = false;
+              this.modeleToSave = false;
+              this.saver = Modele.initSaver();
+              this.dialog.closeAll();
+            });
+        }
       });
     }
   }
 
   save() {
     this.dialog.open(WaitComponent);
+    let waitBeforeClosing =
+      this.modeleToSave && typeof this.plastron.modele.template !='string' ;
+    forkJoin(this.savingPlastronRequest()).subscribe((value) => {
+      this.changesToSave = false;
+      if (waitBeforeClosing) this.dialog.closeAll();
+      this.saver = Modele.initSaver();
+      this.modeleToSave = false;
+
+      this._snackBar.open(
+        'Modifications du plastron ' +
+          this.plastron.modele.title +
+          ' enregistrées !',
+        'Ok',
+        {
+          duration: 3000,
+        }
+      );
+    });
+  }
+
+  savingPlastronRequest(): Observable<any>[] {
     let requests: Observable<any>[] = [];
     let requestsProfil: Observable<any>[] = [];
-    let waitBeforeClosing = false;
 
     if (this.modeleToSave) {
-      if (this.plastron.modele.template){
-        waitBeforeClosing = true;
+      if (this.plastron.modele.template) {
         this.deriveFromModele();
-      }
-      else
+      } else
         requests = this.plastron.modele.save(
           this.saver,
           this.tagService,
@@ -240,22 +269,7 @@ export class PlastronComponent implements OnInit {
         this.variableToSave
       );
 
-      console.log("forkJoin ",requests.concat(requestsProfil))
-
-    forkJoin(requests.concat(requestsProfil)).subscribe((value) => {
-      this.changesToSave = false;
-      if (!waitBeforeClosing) this.dialog.closeAll();
-
-      this._snackBar.open(
-        'Modifications du plastron ' +
-          this.plastron.modele.title +
-          ' enregistrées !',
-        'Ok',
-        {
-          duration: 3000,
-        }
-      );
-    });
+    return requests.concat(requestsProfil);
   }
 
   deriveFromModele() {

@@ -132,7 +132,7 @@ export class ModeleService {
                 return this.apiService
                   .createRelationBetween(idGraph, idModele, 'rootGraph')
                   .pipe(
-                    switchMap(() => {
+                    switchMap(() =>
                       this.apiService
                         .createRelationBetweenWithProperty(
                           idStart,
@@ -141,9 +141,8 @@ export class ModeleService {
                           'time',
                           '0'
                         )
-                        .subscribe();
-                      return of([idModele, idGraph, idStart]);
-                    })
+                        .pipe(switchMap(() => of([idModele, idGraph, idStart])))
+                    )
                   );
               })
             )
@@ -163,10 +162,9 @@ export class ModeleService {
         let idnewModele = indexes[0];
         let idnewGraph = indexes[1];
         let idnewStart = indexes[2];
-        this.nodeService
+        return this.nodeService
           .duplicateGraph(graphToCopy, idnewGraph, idnewStart)
-          .subscribe();
-        return of(idnewModele);
+          .pipe(switchMap(()=> of(idnewModele)))
       })
     );
   }

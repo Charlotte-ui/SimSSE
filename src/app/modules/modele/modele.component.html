@@ -1,8 +1,8 @@
 <app-header
   *ngIf="modele"
-  [modele]="modele.title"
-  [triage]="modele.triage"
+  [modele]="modele"
   [changesToSave]="changesToSave"
+  (newModele)="saveAsNewModel($event)"
   (newSave)="save()"
 ></app-header>
 <mat-tab-group>
@@ -32,7 +32,6 @@
       [modele]="modele"
       [chooseTitle]="true"    
       [allTags]="allTags"
-      (newModel)="changeModeleRef($event)"
       (updateModele)="changesToSave = true; saver.champToUpdate.push($event)"
       (newTags)="
         changesToSave = true;

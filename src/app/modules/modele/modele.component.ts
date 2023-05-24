@@ -5,7 +5,7 @@ import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
 } from '../../models/vertex/variablePhysio';
-import { Graph  } from '../../models/vertex/node';
+import { Graph } from '../../models/vertex/node';
 import { ActivatedRoute, Data } from '@angular/router';
 import { ModeleService } from '../../services/modele.service';
 import { Tag } from '../../models/vertex/tag';
@@ -16,6 +16,7 @@ import { WaitComponent } from '../shared/wait/wait.component';
 import { RegleService } from '../../services/regle.service';
 import { Trigger } from '../../models/trigger';
 import { NodeService } from 'src/app/services/node.service';
+import { ModeleDialogComponent } from './modele-dialog/modele-dialog.component';
 
 @Component({
   selector: 'app-modele',
@@ -92,14 +93,8 @@ export class ModeleComponent {
 
   save() {
     this.dialog.open(WaitComponent);
-    let requests: Observable<any>[] = this.modele.save(
-      this.saver,
-      this.tagService,
-      this.modelService,
-      this.nodeService
-    );
 
-    forkJoin(requests).subscribe((value) => {
+    forkJoin(this.savingModeleRequest()).subscribe((value) => {
       this.changesToSave = false;
 
       this.dialog.closeAll();
@@ -107,7 +102,58 @@ export class ModeleComponent {
     });
   }
 
-  changeModeleRef(newModele) {
-    // this.plastronService.changeModelRef(this.plastron,newModele);
+  saveAsNewModel(event: boolean) {
+    if (event) {
+      let newModel = structuredClone(this.modele);
+      newModel.title = '';
+      delete newModel.id;
+      delete newModel.template;
+      const dialogRef = this.dialog.open(ModeleDialogComponent, {
+        data: [
+          newModel,
+          'Enregistrer en tant que nouveau modèle',
+          false,
+        ],
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        this.dialog.open(WaitComponent);
+
+        if (result == undefined) {
+          this.dialog.closeAll();
+          return;
+        }
+        if (!this.changesToSave) {
+          this.modelService
+            .createNewModeleTemplate(this.modele, result)
+            .subscribe((res) => {
+              console.log('res ', res);
+              this.dialog.closeAll();
+            });
+        } else {
+          forkJoin(this.savingModeleRequest())
+            .pipe(
+              switchMap((value) =>
+                this.modelService.createNewModeleTemplate(this.modele, result)
+              )
+            )
+            .subscribe((res) => {
+              this.changesToSave = false;
+              this.saver = Modele.initSaver();
+              this.dialog.closeAll();
+            });
+        }
+      });
+    }
+  }
+
+  savingModeleRequest(): Observable<any>[] {
+    let requests: Observable<any>[] = this.modele.save(
+      this.saver,
+      this.tagService,
+      this.modelService,
+      this.nodeService
+    );
+    return requests;
   }
 }

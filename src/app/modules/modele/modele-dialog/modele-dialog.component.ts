@@ -19,13 +19,13 @@ export class ModeleDialogComponent {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<ModeleDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: [Modele, string, Tag[], boolean]
+    @Inject(MAT_DIALOG_DATA) public data: [Modele, string, boolean]
   ) {}
 
   ngOnInit() {
     this.modele = this.data[0];
     this.message = this.data[1];
-    this.edition = this.data[3];
+    this.edition = this.data[2];
     this.title = this.edition
       ? 'Modifier le modele ' + this.modele.title
       : 'Créer un nouveau modèle';
