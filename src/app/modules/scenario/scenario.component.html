@@ -9,7 +9,7 @@
       [scenario]="scenario"
       (newTotalPlastron)="totalPlastron = $event"
       (updateScenario)="changesToSave = true; scenarioToSave = true"
-      (updateTags)="changesToSave = true;"
+      (updateTags)="changesToSave = true"
       (map)="map = $event"
     ></app-general-infos>
   </mat-tab>
@@ -26,10 +26,10 @@
   <mat-tab label="Plastrons et modèles">
     <ng-container *ngIf="totalPlastron">
       <app-lot-plastrons
+        [scenario]="scenario"
+        [totalPlastron]="totalPlastron"
         [groupes]="groupes"
         [plastrons]="plastrons"
-        [totalPlastron]="totalPlastron"
-        [scenario]="scenario"
       ></app-lot-plastrons>
     </ng-container>
   </mat-tab>

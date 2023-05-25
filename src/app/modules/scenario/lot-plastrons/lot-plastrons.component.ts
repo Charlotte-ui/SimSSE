@@ -94,7 +94,23 @@ export class LotPlastronsComponent {
   /**
    * nombre total de plastron désiré pour ce scenario
    */
-  @Input() totalPlastron!: number;
+  _totalPlastron: number;
+  get totalPlastron(): number {
+    return this._totalPlastron;
+  }
+
+  @Input() set totalPlastron(value: number) {
+    if (value) {
+      this._totalPlastron = value;
+      this.dataSourcePlastron = new Array<tableElementPlastron>(
+        this.totalPlastron
+      )
+        .fill({ ...this.defaultElementPlastron })
+        .map(() => ({ ...this.defaultElementPlastron }));
+
+      this.updateDataSourceTriage(0);
+    }
+  }
   @Input() scenario: Scenario;
 
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
@@ -143,18 +159,21 @@ export class LotPlastronsComponent {
       } else if (groupe.scene == oldScene) groupe[element.triage]--;
     });
 
-
-    this.plastronService.updatePlastronGroupe(plastron,newGroupe).subscribe(()=>{
-          plastron.groupe = newGroupe;
-    })
+    this.plastronService
+      .updatePlastronGroupe(plastron, newGroupe)
+      .subscribe(() => {
+        plastron.groupe = newGroupe;
+      });
   }
 
-    updateSelection(event,element: tableElementPlastron) {
+  updateSelection(event, element: tableElementPlastron) {
     let plastron = this.plastrons[element.id];
     let newStatut = event.value;
-    this.plastronService.updatePlastronStatut(plastron,newStatut).subscribe(()=>{
-      plastron.statut = newStatut
-    })
+    this.plastronService
+      .updatePlastronStatut(plastron, newStatut)
+      .subscribe(() => {
+        plastron.statut = newStatut;
+      });
   }
 
   deletePlastron(event, element: tableElementPlastron) {
@@ -183,12 +202,6 @@ export class LotPlastronsComponent {
   }
 
   public completePlastrons() {
-    this.dataSourcePlastron = new Array<tableElementPlastron>(
-      this.totalPlastron
-    )
-      .fill({ ...this.defaultElementPlastron })
-      .map(() => ({ ...this.defaultElementPlastron }));
-
     // s'il n'y a encore aucun plastron dans le scenario
     if (this.plastrons.length == 0) this.updateDataSourceTriage(0);
 
@@ -199,8 +212,6 @@ export class LotPlastronsComponent {
 
     // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
     this.updateDataSourceTriage(this.plastrons.length - 1);
-
-    //this.dataSourcePlastron = this.plastrons;
   }
 
   private addPlastronToDatasource(plastron: Plastron, index: number) {
@@ -255,8 +266,7 @@ export class LotPlastronsComponent {
     event.stopPropagation();
   }
 
-
-    drop(event: CdkDragDrop<string, any, any[]>) {
+  drop(event: CdkDragDrop<string, any, any[]>) {
     let index = event.currentIndex;
 
     // Get modele and plastron from drop event taking account of the filtered elements not showing in the arrays
