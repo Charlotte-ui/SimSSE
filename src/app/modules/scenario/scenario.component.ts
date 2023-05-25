@@ -13,6 +13,7 @@ import { PlastronService } from '../../services/plastron.service';
 import { Observable, concat, forkJoin, map, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../models/vertex/tag';
 import { WaitComponent } from '../shared/wait/wait.component';
+import { Image } from 'src/app/services/image.service';
 
 @Component({
   selector: 'app-scenario',
@@ -27,7 +28,7 @@ export class ScenarioComponent implements OnInit {
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
   changesToSave = false;
   groupesToSave = false;
-
+  map:Image;
   scenarioToSave!: boolean;
   oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
   oldScenario!: Scenario; // scenario before changes, use to define wich champ update after changes

@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { Listable } from 'src/app/models/interfaces/listable';
 import { WaitComponent } from '../../wait/wait.component';
+import { Image, ImageService } from 'src/app/services/image.service';
 
 @Component({
   selector: 'app-list-box-element',
@@ -11,6 +12,9 @@ import { WaitComponent } from '../../wait/wait.component';
   styleUrls: ['./list-box-element.component.less'],
 })
 export class ListBoxElementComponent<T extends Listable> {
+  
+  image:Image;
+  
   _element!: T;
 
   get element(): T {
@@ -18,12 +22,20 @@ export class ListBoxElementComponent<T extends Listable> {
   }
   @Input() set element(value: T) {
     this._element = value;
+    if (!this.element['triage']){
+      this.imageService.getImageCover(this.element.id).subscribe((image:Image)=>{
+        this.image = image;
+        console.log('image cover ',this.element.title," ",image)
+        
+      })
+    }
+
   }
 
   @Input() type: string;
   @Input() service;
 
-  constructor(private router: Router, public dialog: MatDialog) {}
+  constructor(private router: Router, public dialog: MatDialog, private imageService:ImageService) {}
 
   removeElement() {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {

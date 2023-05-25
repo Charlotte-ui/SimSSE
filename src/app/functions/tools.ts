@@ -57,3 +57,18 @@ export function arrayEquals(a, b) {
     a.length === b.length &&
     a.every((val, index) => val === b[index]);
 }
+
+export function orderBy<T>(array:T[],champ):T[]{
+
+  return array.sort((n1,n2) => {
+    if (n1[champ] > n2[champ]) {
+        return 1;
+    }
+
+    if (n1[champ] < n2[champ]) {
+        return -1;
+    }
+
+    return 0;
+});
+}

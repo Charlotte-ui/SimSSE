@@ -8,6 +8,7 @@ import {
 import * as echarts from 'echarts/types/dist/echarts';
 import { EChartsOption, util } from 'echarts';
 import 'echarts/extension/bmap/bmap';
+import { Image } from 'src/app/services/image.service';
 
 const SymbolSize = 20;
 let Data = [];
@@ -30,6 +31,9 @@ export class CarteComponent implements OnDestroy {
       this.updateChart();
     }
   }
+
+
+  @Input() map: Image;
 
   @Output() static positionsChange = new EventEmitter<any[]>();
   @Output() positionsChange2; // use this one

@@ -121,7 +121,8 @@ export class ScenarioService {
         );
       }
     });
-    if (requests.length > 0) return forkJoin(requests);
+    if (requests.length > 0) return from(requests).pipe(
+      concatMap((request: Observable<any>) => request));
     else return of(true);
     //  return of("34:2").pipe ( delay( 5000 ));
   }

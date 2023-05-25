@@ -1,68 +1,99 @@
-<form *ngIf="scenarioFormGroup" [formGroup]="scenarioFormGroup" >
+<form *ngIf="scenarioFormGroup" [formGroup]="scenarioFormGroup">
   <div class="container">
-    <mat-form-field>
-      <mat-label>Titre</mat-label>
-      <h1>
-      <input matInput formControlName="title" >
-      </h1>
-    </mat-form-field>
-  </div>
-  <div class="container">
-    <mat-form-field>
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description"></textarea>
-    </mat-form-field>
-  </div>
-  <div class="container">
-    <app-tags *ngIf="allTags" [allTags]="allTags"  [tags]="scenario.tags" (newTags)="updateTags.emit($event)"></app-tags>
+    <div class="col-9">
+      <div class="container">
+        <mat-form-field>
+          <mat-label>Titre</mat-label>
+          <h1>
+            <input matInput formControlName="title" />
+          </h1>
+        </mat-form-field>
+      </div>
+      <div class="col">
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="container">
+        <app-tags
+          *ngIf="allTags"
+          [allTags]="allTags"
+          [tags]="scenario.tags"
+          (newTags)="updateTags.emit($event)"
+        ></app-tags>
+      </div>
+    </div>
+    <div class="container-3 images">
+      <h4>Images</h4>
+      <mat-form-field>
+        <mat-label>Carte</mat-label>
+        <mat-select [(value)]="mapImage" (selectionChange)="changeMap($event)">
+          <mat-option *ngFor="let image of images" [value]="image">
+            {{image.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Image de couverture</mat-label>
+        <mat-select [(value)]="coverImage" (selectionChange)="changeCover($event)">
+          <mat-option *ngFor="let image of images" [value]="image">
+            {{image.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-label>Ajouter une image </mat-label>
+      <input type="file" accept=".png,.jpg,.jpeg" (change)="addImage($event)" multiple />
+      <img
+        [src]="image?.src || 'http://placehold.it/180'"
+      />
+    </div>
   </div>
   <div class="container">
     <mat-form-field>
       <mat-label>Impliqués</mat-label>
-      <input matInput type="number" formControlName="implique">
+      <input matInput type="number" formControlName="implique" />
     </mat-form-field>
-      <mat-form-field>
-        <mat-label>UR</mat-label>
-        <input matInput type="number" formControlName="UR">
-      </mat-form-field>
+    <mat-form-field>
+      <mat-label>UR</mat-label>
+      <input matInput type="number" formControlName="UR" />
+    </mat-form-field>
     <mat-form-field>
       <mat-label>EU</mat-label>
-      <input matInput type="number" formControlName="EU">
+      <input matInput type="number" formControlName="EU" />
     </mat-form-field>
     <mat-form-field>
       <mat-label>UA</mat-label>
-      <input matInput type="number" formControlName="UA">
+      <input matInput type="number" formControlName="UA" />
     </mat-form-field>
     <mat-form-field>
       <mat-label>Psy</mat-label>
-      <input matInput type="number" formControlName="psy">
+      <input matInput type="number" formControlName="psy" />
     </mat-form-field>
   </div>
   <div class="container align-items-center">
-
     <table mat-table [dataSource]="dataTotal" class="mat-elevation-z8">
-    
       <ng-container matColumnDef="total">
-        <th mat-header-cell *matHeaderCellDef>  </th>
-        <td mat-cell *matCellDef="let element"> <h2>Total</h2> </td>
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element"><h2>Total</h2></td>
       </ng-container>
-    
+
       <ng-container matColumnDef="totalParticipant">
-        <th mat-header-cell *matHeaderCellDef> Participants plastrons </th>
-        <td mat-cell *matCellDef="let element"> {{element.totalParticipant}} </td>
+        <th mat-header-cell *matHeaderCellDef>Participants plastrons</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.totalParticipant }}
+        </td>
       </ng-container>
-    
+
       <ng-container matColumnDef="totalPlastron">
-        <th mat-header-cell *matHeaderCellDef> Plastrons numériques </th>
-        <td mat-cell *matCellDef="let element"> {{element.totalPlastron}} </td>
+        <th mat-header-cell *matHeaderCellDef>Plastrons numériques</th>
+        <td mat-cell *matCellDef="let element">{{ element.totalPlastron }}</td>
       </ng-container>
-    
+
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
-    
   </div>
-
-
 </form>
-  

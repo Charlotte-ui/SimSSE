@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment.api';
 import { Observable, concatMap, from, map, of } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { Vertex } from '../models/vertex/vertex';
+import { getElementByChamp } from '../functions/tools';
 
 @Injectable({
   providedIn: 'root',
@@ -47,6 +48,29 @@ export class ApiService {
     return this.http.get<any>(
       `${environment.urlAPI}/query/simsse/sql/SELECT EXPAND( OUT("'${relation}'") ) FROM ${classe} WHERE @rid='${rid}'`
     );
+  }
+
+  getRelationFromWhithMatchingChamp<T>(
+    rid: string,
+    relation: string,
+    classe: string,
+    champ: string,
+    value: string
+  ): Observable<any> {
+    return this.http
+      .get<any>(
+        `${environment.urlAPI}/query/simsse/sql/SELECT $a, $b 
+let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid='${rid}'),
+	$b= (SELECT from ${relation} WHERE out='${rid}' AND ${champ}='${value}')`
+      )
+      .pipe(
+        map((response) => {
+          let res = response.result[0];
+          let elemId = res['$b'].length > 0 ? res['$b'][0].in : undefined;
+          if (elemId == undefined) return undefined;
+          return getElementByChamp<T>(res['$a'], '@rid', elemId);
+        })
+      );
   }
 
   getRelationTo(
@@ -106,23 +130,30 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
+  getLinkBetween(idIn: string, idOut: string, relation: string) {
+    return this.http.get<any>(
+      `${environment.urlAPI}/query/simsse/sql/SELECT from ${relation} WHERE out = ${idOut} AND in = ${idIn}`
+    );
+  }
+
   /**
    * UPDATE
    */
 
-  updateDocumentChamp(id:string,champ:string,value:string){
-    if(typeof value === 'string') value =  value.split('#').join('%23');
+  updateDocumentChamp(id: string, champ: string, value: string) {
+    console.log('updateDocumentChamp ', id, ' ', value);
+    if (typeof value === 'string') value = value.split('#').join('%23');
     return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/"${value}"`,
       {}
     );
   }
 
-  updateAllDocumentChamp(document:any){
+  updateAllDocumentChamp(document: any) {
     let requests: Observable<any>[] = [];
     Object.keys(document).forEach((key) => {
       requests.push(
-        this.updateDocumentChamp(document.id, key,  document[key].toString())
+        this.updateDocumentChamp(document.id, key, document[key].toString())
       );
     });
     if (requests.length > 0)
@@ -136,13 +167,12 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * CREATE
    */
 
-  createDocument(document: Vertex|any) {
+  createDocument(document: Vertex | any) {
     return this.http.post<any>(
       `${environment.urlAPI}/document/simsse/`,
       document
     );
   }
-
 
   createRelationBetween(idIn: string, idOut: string, relation: string) {
     return this.http.post<any>(
@@ -151,7 +181,13 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
-    createRelationBetweenWithProperty(idIn: string, idOut: string, relation: string,champ:string,value:string) {
+  createRelationBetweenWithProperty(
+    idIn: string,
+    idOut: string,
+    relation: string,
+    champ: string,
+    value: string
+  ) {
     return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/createEdgeWithProprety/${idOut}/${idIn}/${relation}/${champ}/${value}`,
       {}
@@ -162,22 +198,19 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * DELETE
    */
 
-
   deleteDocument(id: string) {
-    return this.http.delete<any>(
-      `${environment.urlAPI}/document/simsse/${id}`
-    );
+    return this.http.delete<any>(`${environment.urlAPI}/document/simsse/${id}`);
   }
 
   deleteRelationBetween(idIn: string, idOut: string) {
-     return this.http.post<any>(
+    return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/deleteEdgeBetween/${idOut}/${idIn}`,
       {}
     );
   }
 
-    deleteEdge(idEdge: string) {
-     return this.http.post<any>(
+  deleteEdge(idEdge: string) {
+    return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/deleteEdge/${idEdge}`,
       {}
     );
@@ -185,8 +218,8 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
 
   deleteOutRelation(idOut: string, relation: string) {
     return this.http.post<any>(
-    `${environment.urlAPI}/function/simsse/deleteOutEdgeRelation/${idOut}/${relation}`,
-    {}
-  );
-}
+      `${environment.urlAPI}/function/simsse/deleteOutEdgeRelation/${idOut}/${relation}`,
+      {}
+    );
+  }
 }

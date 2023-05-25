@@ -6,6 +6,7 @@ import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog
 import { ScenarioService } from '../../../services/scenario.service';
 import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { arrayEquals, roundingWithDecimal } from 'src/app/functions/tools';
+import { Image } from 'src/app/services/image.service';
 
 @Component({
   selector: 'app-groupes',
@@ -31,6 +32,8 @@ export class GroupesComponent {
   ];
 
   @Input() scenario: Scenario;
+  @Input() map: Image;
+
 
   _groupes: Groupe[];
 
