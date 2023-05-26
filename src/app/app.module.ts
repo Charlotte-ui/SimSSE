@@ -17,6 +17,7 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 
 import { NgxEchartsModule } from 'ngx-echarts';
+import { NgImageSliderModule } from 'ng-image-slider';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -162,7 +163,8 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
-    MatMenuModule
+    MatMenuModule,
+    NgImageSliderModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
