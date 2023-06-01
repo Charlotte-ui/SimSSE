@@ -4,7 +4,7 @@ import { FormBuilder } from '@angular/forms';
 import { Scenario } from '../../../models/vertex/scenario';
 import { TagService } from '../../../services/tag.service';
 import { Tag } from '../../../models/vertex/tag';
-import { ImageService, Image, ImageRole } from 'src/app/services/image.service';
+import { ImageService, Image, ImageRole, ImageObject } from 'src/app/services/image.service';
 import { getElementByChamp } from 'src/app/functions/tools';
 import { Observable, concat, concatMap, from, zipAll } from 'rxjs';
 
@@ -17,6 +17,8 @@ export class GeneralInfosComponent {
   scenarioFormGroup;
   allTags;
   displayedColumns: string[] = ['total', 'totalParticipant', 'totalPlastron'];
+
+  imageObjects:ImageObject[];
 
   dataTotal = [{ total: '', totalPlastron: 0, totalParticipant: 0 }];
 
@@ -67,8 +69,10 @@ export class GeneralInfosComponent {
         .subscribe((images: Image[]) => {
           console.log('images ', images);
           if (images) {
-            this.image = images[0];
+            
             this.images = images;
+            this.imageObjects = this.imageService.wrapImagesInObject(images);
+
             this.mapImage = getElementByChamp<Image>(
               this.images,
               'role',

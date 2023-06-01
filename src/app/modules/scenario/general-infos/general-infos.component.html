@@ -30,25 +30,40 @@
         <mat-label>Carte</mat-label>
         <mat-select [(value)]="mapImage" (selectionChange)="changeMap($event)">
           <mat-option *ngFor="let image of images" [value]="image">
-            {{image.name}}
+            {{ image.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-form-field>
         <mat-label>Image de couverture</mat-label>
-        <mat-select [(value)]="coverImage" (selectionChange)="changeCover($event)">
+        <mat-select
+          [(value)]="coverImage"
+          (selectionChange)="changeCover($event)"
+        >
           <mat-option *ngFor="let image of images" [value]="image">
-            {{image.name}}
+            {{ image.name }}
           </mat-option>
         </mat-select>
       </mat-form-field>
 
       <mat-label>Ajouter une image </mat-label>
-      <input type="file" accept=".png,.jpg,.jpeg" (change)="addImage($event)" multiple />
-      <img
-        [src]="image?.src || 'http://placehold.it/180'"
+      <input
+        type="file"
+        accept=".png,.jpg,.jpeg"
+        (change)="addImage($event)"
+        multiple
       />
+      <img [src]="image?.src " />
+      <ng-image-slider
+        #nav
+        [images]="imageObjects"
+        [infinite]="true"
+        [autoSlide]="false"
+        [animationSpeed]="0.5"
+        [imageSize]="{ width: 'auto', height: 200 }"
+        slideImage="1"
+      ></ng-image-slider>
     </div>
   </div>
   <div class="container">
