@@ -10,12 +10,12 @@
         <table
           mat-table
           #table
-          *ngIf="dataSourcePlastron"
+          *ngIf="sortedDataSourcePlastron"
           [dataSource]="sortedDataSourcePlastron"
           multiTemplateDataRows
           cdkDropList
           (cdkDropListDropped)="drop($event)"
-          cdkDropListData="dataSourcePlastron"
+          cdkDropListData="sortedDataSourcePlastron"
           cdkDropListDisabled="true"
           matSort
           (matSortChange)="sortData($event)"
