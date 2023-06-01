@@ -46,8 +46,6 @@ export class GeneralInfosComponent {
 
       this.scenarioFormGroup = this.form.group(scenarioGenalInfo);
 
-      this.calculTotalPlastron(value);
-
       this.scenarioFormGroup.valueChanges.subscribe((newScenario: Scenario) => {
         this.scenario.title = newScenario.title;
         this.scenario.description = newScenario.description;
@@ -59,8 +57,11 @@ export class GeneralInfosComponent {
 
         this.updateScenario.emit(newScenario);
         this.calculTotalPlastron(newScenario);
+        this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
+
       });
 
+      this.calculTotalPlastron(value);
       this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
 
       // get the scenario images

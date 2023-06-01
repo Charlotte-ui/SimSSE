@@ -110,6 +110,7 @@ export class LotPlastronsComponent {
 
   @Input() set totalPlastron(value: number) {
     if (value) {
+      console.log("totalPlastron ",value)
       this._totalPlastron = value;
       this.sortedDataSourcePlastron =
         new MatTableDataSource<tableElementPlastron>(
@@ -117,7 +118,8 @@ export class LotPlastronsComponent {
             .fill({ ...this.defaultElementPlastron })
             .map(() => ({ ...this.defaultElementPlastron }))
         );
-      this.updateDataSourceTriage(0);
+        if (this.plastrons.length > 0) this.completePlastrons();
+        else this.updateDataSourceTriage(0);
     }
   }
   @Input() scenario: Scenario;
@@ -206,9 +208,10 @@ export class LotPlastronsComponent {
               0
             );
             let notAPlastron = structuredClone(this.defaultElementPlastron);
+            notAPlastron.triage = element.triage;
             //   this.dataSourcePlastron.data[element.id] = notAPlastron;
             this.sortedDataSourcePlastron.data[indexSort] = notAPlastron;
-            //   this.sortedDataSourcePlastron = [...this.sortedDataSourcePlastron];
+            this.sortedDataSourcePlastron.data = [...this.sortedDataSourcePlastron.data];
           });
       }
     });
@@ -251,19 +254,22 @@ export class LotPlastronsComponent {
       if (index <= indexStart) {
         // pour les plastrons déjà complétés, on compte
         switch (plastron.triage) {
-          case 'UR':
+          case Triage.UR:
             UR++;
             break;
-          case 'UA':
+          case Triage.UA:
             UA++;
             break;
-          case 'EU':
+          case Triage.EU:
             EU++;
             break;
         }
       } else {
         // sinon on modifie le triage des platrons à compléter
-        if (UR < this.scenario.UR) UR++;
+        if (UR < this.scenario.UR) {
+          UR++;
+          plastron.triage = Triage.UR
+        }
         else if (EU < this.scenario.EU) {
           EU++;
           plastron.triage = Triage.EU;

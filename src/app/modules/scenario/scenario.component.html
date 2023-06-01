@@ -7,7 +7,7 @@
   <mat-tab label="Infos générales">
     <app-general-infos
       [scenario]="scenario"
-      (newTotalPlastron)="totalPlastron = $event"
+      (newTotalPlastron)="totalPlastron = $event; "
       (updateScenario)="changesToSave = true; scenarioToSave = true"
       (updateTags)="changesToSave = true"
       (map)="map = $event"
