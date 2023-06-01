@@ -23,7 +23,7 @@
       (updateScenario)="changesToSave = true; scenarioToSave = true"
     ></app-groupes>
   </mat-tab>
-  <mat-tab label="Plastrons et modèles">
+  <mat-tab label="Plastrons et modèles" class="plastrons">
     <ng-container *ngIf="totalPlastron">
       <app-lot-plastrons
         [scenario]="scenario"

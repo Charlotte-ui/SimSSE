@@ -46,7 +46,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {MatCheckboxModule} from '@angular/material/checkbox'; 
 import {MatMenuModule} from '@angular/material/menu'; 
-
+ import {MatPaginatorModule} from '@angular/material/paginator'; 
+  
 import { ConnexionComponent } from './modules/connexion/connexion.component';
 import { HeaderComponent } from './modules/shared/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
@@ -164,7 +165,8 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
     MatProgressSpinnerModule,
     MatCheckboxModule,
     MatMenuModule,
-    NgImageSliderModule
+    NgImageSliderModule,
+    MatPaginatorModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

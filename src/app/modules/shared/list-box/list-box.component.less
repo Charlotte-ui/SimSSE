@@ -1,21 +1,18 @@
-mat-card{
-    margin: 1%;
-}
 
 mat-divider {
-    width: 100%;
+  width: 100%;
 }
 
-mat-list-item{
+mat-list-item {
   height: fit-content !important;
   margin-bottom: 2%;
 }
 
-mat-card-content{
+mat-card-content {
   padding: 0;
 }
 
-mat-card-header{
+mat-card-header {
   flex-direction: column;
 }
 
@@ -39,43 +36,48 @@ button {
   margin-right: 1%;
 }
 
-.cdk-drag-preview{
+.cdk-drag-preview {
   box-sizing: border-box;
   border-radius: 4px;
-
 }
 
-.cdk-drag-placeholder{
-  opacity:0;
-  height: 0px!important;
+.cdk-drag-placeholder {
+  opacity: 0;
+  height: 0px !important;
 }
 
-.cdk-drag-animating{
-  transition: transform 250ms cubic-bezier(0,0,0.2,1);
-
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.box:not(.cdk-drag-placeholder){
-  transition: transform 250ms cubic-bezier(0,0,0.2,1);
-
+.box:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.col-1{
+.col-1 {
   align-items: center;
-    display: flex;
+  display: flex;
 }
 
 .mat-expansion-panel-header-description {
   flex-grow: 10;
 }
 
-
-
-#noFiltre{
+#noFiltre {
   font-style: italic;
 }
 
-.filtre{
+.filtre {
   font-weight: lighter !important;
 }
 
+.scrollable-content {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 600px; // TODO : change dynamicly
+
+  > mat-list {
+    overflow-y: auto;
+  }
+}
