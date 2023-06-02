@@ -18,16 +18,16 @@
       (newCurve)="changeCurves($event)"
       (newChange)="changesToSave = true; modeleToSave = true"
       (updateNode)="
-        changesToSave = true; modeleToSave = true; saver.nodeToUpdate.push($event)
+        changesToSave = true; modeleToSave = true; 
       "
       (deleteNode)="
-        changesToSave = true; modeleToSave = true; saver.nodeToDelete.push($event)
+        changesToSave = true; modeleToSave = true; 
       "
       (updateLink)="
-        changesToSave = true; modeleToSave = true; saver.linkToUpdate.push($event)
+        changesToSave = true; modeleToSave = true;
       "
       (deleteLink)="
-        changesToSave = true; modeleToSave = true; saver.linkToDelete.push($event)
+        changesToSave = true; modeleToSave = true; 
       "
       (updateTrigger)="
         changesToSave = true; modeleToSave = true;  saver.triggerToUpdate.push($event)
@@ -39,6 +39,19 @@
         changesToSave = true; variableToSave.push($event.id);
       "
     ></app-editeur>
+
+<!--     (updateNode)="
+        changesToSave = true; modeleToSave = true; saver.nodeToUpdate.push($event)
+      "
+      (deleteNode)="
+        changesToSave = true; modeleToSave = true; saver.nodeToDelete.push($event)
+      "
+      (updateLink)="
+        changesToSave = true; modeleToSave = true; saver.linkToUpdate.push($event)
+      "
+      (deleteLink)="
+        changesToSave = true; modeleToSave = true; saver.linkToDelete.push($event)
+      " -->
   </mat-tab>
   <mat-tab label="Modèle - tags et descriptions">
     <app-tags-descriptions

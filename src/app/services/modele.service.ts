@@ -242,7 +242,7 @@ export class ModeleService {
    */
   createNewModeleTemplate(modele: Modele, newModele: Modele): Observable<any> {
 
-    let saver = Modele.initSaver();
+    let saver = modele.initSaver();
 
     modele.title = newModele.title;
     saver.champToUpdate.push('title');

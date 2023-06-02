@@ -260,17 +260,27 @@ export class EditeurGrapheNodalComponent implements OnInit {
       dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           if (result.delete) {
-            this.graph.nodes.splice(index, 1);
+            let deletedNode = this.graph.nodes.splice(index, 1)[0];
             this.graphData.splice(index, 1);
+            let ref = deletedNode.id ;
+
+            console.log("deletedNode ",deletedNode)
+            
+            if (deletedNode.type == NodeType.event) ref = (deletedNode as Event).event;
+            console.log("ref ",ref)
+            result.ref = ref;
+            this.updateNode.emit([result, index]);
+
           } else {
             result.x = node.x; // keep the update node coordinate
             result.y = node.y;
             this.graph.nodes[index] = result;
             this.graphData[index].name = result.name;
+            this.updateNode.emit([result, index]);
+
           }
 
           this.updateChart();
-          this.updateNode.emit([result, index]);
         }
       });
   }

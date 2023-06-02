@@ -1,13 +1,14 @@
 import { Listable } from '../interfaces/listable';
-import { Graph, Node } from './node';
+import { Graph, Link, Node } from './node';
 import { Tag } from './tag';
 import { Trigger } from '../trigger';
 import { Vertex } from './vertex';
 import { ApiService } from 'src/app/services/api.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { TagService } from 'src/app/services/tag.service';
 import { ModeleService } from 'src/app/services/modele.service';
 import { NodeService } from 'src/app/services/node.service';
+import { getElementByChamp, isDeepEqual } from 'src/app/functions/tools';
 
 export enum Triage {
   UR = 'UR',
@@ -16,15 +17,12 @@ export enum Triage {
 }
 
 export interface ModeleSaverArrays {
-  nodeToUpdate: string[];
-  nodeToDelete: string[];
-  linkToUpdate: string[];
-  linkToDelete: string[];
   champToUpdate: string[];
   newTags: Tag[];
   tagsToDelete: Tag[];
   triggerToUpdate: Trigger[];
   triggerToDelete: Trigger[];
+  oldGraph:Graph;
 }
 
 export class Modele extends Vertex implements Listable {
@@ -71,17 +69,16 @@ export class Modele extends Vertex implements Listable {
     );
   }
 
-  public static initSaver(): ModeleSaverArrays {
+  public initSaver(): ModeleSaverArrays {
     let saver = {} as ModeleSaverArrays;
     saver.champToUpdate = [];
-    saver.linkToDelete = [];
-    saver.linkToUpdate = [];
     saver.newTags = [];
-    saver.nodeToDelete = [];
-    saver.nodeToUpdate = [];
     saver.tagsToDelete = [];
     saver.triggerToDelete = [];
     saver.triggerToUpdate = [];
+    saver.oldGraph = structuredClone(this.graph)
+
+    console.log('init saver ',saver)
     return saver;
   }
 
@@ -94,7 +91,7 @@ export class Modele extends Vertex implements Listable {
     modeleService: ModeleService,
     nodeService: NodeService
   ): Observable<any>[] {
-    let requests: Observable<any>[] = [];
+    let requests: Observable<any>[] = [of('saveModel')];
 
     // save the tags
     if (saver.newTags && saver.newTags.length > 0)
@@ -112,21 +109,57 @@ export class Modele extends Vertex implements Listable {
       requests.push(modeleService.updateModele(this, saver.champToUpdate));
 
     // save the graph
-    if (
-      (saver.nodeToUpdate && saver.nodeToUpdate.length > 0) ||
-      (saver.nodeToDelete && saver.nodeToDelete.length > 0) ||
-      (saver.linkToUpdate && saver.linkToUpdate.length > 0) ||
-      (saver.linkToDelete && saver.linkToDelete.length > 0)
-    )
-      requests.push(
+
+    if (!isDeepEqual(saver.oldGraph,this.graph)
+    ){
+      console.log("le graph a changé")
+
+      console.log("old graph ",saver.oldGraph)
+      console.log("new graph ",this.graph)
+
+      let nodeToUpdate = this.graph.nodes.filter((node:Node) => {
+        let oldNode = getElementByChamp<Node>(saver.oldGraph.nodes,'id',node.id) 
+        if (oldNode) return !isDeepEqual(node,oldNode)
+        return true;
+      }).map((node:Node) => node.id)
+
+      let nodeToDelete = saver.oldGraph.nodes.filter((oldNode:Node) => {
+        let node = getElementByChamp<Node>(this.graph.nodes,'id',oldNode.id) 
+        if (node) return false
+        return true;
+      }).map((node:Node) => node.id)
+
+      let linkToUpdate = this.graph.links.filter((link:Link) => {
+        let oldLink = getElementByChamp<Link>(saver.oldGraph.links,'id',link.id) 
+        if (oldLink) return !isDeepEqual(link,oldLink)
+        return true;
+      }).map((link:Link) => link.id)
+
+      let linkToDelete = saver.oldGraph.links.filter((oldLink:Link) => {
+        let link = getElementByChamp<Link>(this.graph.links,'id',oldLink.id) 
+        if (link) return false
+        return true;
+      }).map((link:Link) => link.id)
+
+      console.log("node to update ",nodeToUpdate)
+      console.log("node to delete ",nodeToDelete)
+      console.log("link to update ",linkToUpdate)
+
+      console.log("link to delete ",linkToDelete)
+
+
+       requests.push(
         nodeService.updateGraph(
           this.graph,
-          saver.nodeToUpdate,
-          saver.nodeToDelete,
-          saver.linkToUpdate,
-          saver.linkToDelete
+          nodeToUpdate,
+          nodeToDelete,
+          linkToUpdate,
+          linkToDelete
         )
-      );
+      ); 
+    }
+    else console.log("le graph n'a pas changé")
+  
 
     // save the triggers
     if (

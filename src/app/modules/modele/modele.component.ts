@@ -41,7 +41,6 @@ export class ModeleComponent {
     private regleService: RegleService,
     private nodeService: NodeService
   ) {
-    this.saver = Modele.initSaver();
   }
 
   ngOnInit(): void {
@@ -49,6 +48,8 @@ export class ModeleComponent {
       .pipe(
         switchMap((response: Data) => {
           this.modele = response['data'];
+          this.saver = this.modele.initSaver();
+
           this.initTrigger();
           this.initVariables();
           /**
@@ -96,9 +97,9 @@ export class ModeleComponent {
 
     forkJoin(this.savingModeleRequest()).subscribe((value) => {
       this.changesToSave = false;
-
       this.dialog.closeAll();
-      this.saver = Modele.initSaver();
+      this.saver = this.modele.initSaver();
+      location.reload();
     });
   }
 
@@ -138,8 +139,9 @@ export class ModeleComponent {
             )
             .subscribe((res) => {
               this.changesToSave = false;
-              this.saver = Modele.initSaver();
+              this.saver = this.modele.initSaver();
               this.dialog.closeAll();
+              location.reload();
             });
         }
       });

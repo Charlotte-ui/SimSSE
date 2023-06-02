@@ -16,7 +16,7 @@ import {
 import { RegleService } from '../../../services/regle.service';
 import { NodeService } from '../../../services/node.service';
 import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
-import { Modele } from '../../../models/vertex/modele';
+import { Modele, ModeleSaverArrays } from '../../../models/vertex/modele';
 import { Curve } from '../../../functions/curve';
 import { ModeleService } from '../../../services/modele.service';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
@@ -75,6 +75,8 @@ export class EditeurComponent implements OnInit {
           this.events = [];
           this.initTrendsEventsRecursive(this.modele.graph);
 
+          this.initSaver.emit(this.modele.initSaver())
+
           this.graphInitialized = true;
 
           // after the model graph initialization, the curves are generated
@@ -88,6 +90,7 @@ export class EditeurComponent implements OnInit {
 
   @Input() disabledInspecteur: boolean = false;
   @Input() duration: number = 100;
+
   @Input() variablesTemplate: VariablePhysioTemplate[];
 
   // liste de tout les modèles d'événements et de graphs existant
@@ -122,6 +125,7 @@ export class EditeurComponent implements OnInit {
   @Output() updateTrigger = new EventEmitter<Trigger>();
   @Output() deleteTrigger = new EventEmitter<Trigger>();
   @Output() updateVariable = new EventEmitter<VariablePhysioInstance>();
+  @Output() initSaver = new EventEmitter<ModeleSaverArrays>();
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
@@ -315,18 +319,19 @@ export class EditeurComponent implements OnInit {
     this.newChange.emit(true);
   }
 
-  updateNodes(event) {
+  updateNodes(event) { // TODO ; mettre l'id de l'event dans le cas d'un event
     if (event[0].delete) {
-      let idNodeToDelete = event[0].id;
+      let ref = event[0].ref ;   
+      console.log("ref ",ref)
       // delete all the links link to the deleted node
       this.modele.graph.links.forEach((link) => {
-        if (link.in == idNodeToDelete || link.out == idNodeToDelete)
+        if (link.in == ref || link.out == ref)
           this.modele.graph.links.splice(
             this.modele.graph.links.indexOf(link),
             1
           );
       });
-      this.deleteNode.emit(idNodeToDelete);
+      console.log('this.modele.graph.links ',this.modele.graph.links)
     } else {
       let node = event[0] as Node;
       this.updateNode.emit(node.id);

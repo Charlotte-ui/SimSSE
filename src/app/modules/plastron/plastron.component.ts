@@ -3,7 +3,6 @@ import { ActivatedRoute, Data } from '@angular/router';
 import { Plastron } from '../../models/vertex/plastron';
 import { ModeleService } from '../../services/modele.service';
 import { Modele, ModeleSaverArrays } from '../../models/vertex/modele';
-import { Event } from '../../models/vertex/node';
 import { ProfilService } from '../../services/profil.service';
 import {
   VariablePhysioInstance,
@@ -20,7 +19,7 @@ import { ScenarioService } from '../../services/scenario.service';
 import { Groupe } from '../../models/vertex/groupe';
 import { TagService } from '../../services/tag.service';
 import { Trigger } from '../../models/trigger';
-import { Observable, concat, forkJoin, switchMap, zipAll } from 'rxjs';
+import { Observable, concat, forkJoin, of, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../models/vertex/tag';
 import { Pdf } from '../../models/pdf';
 import { Curve } from '../../functions/curve';
@@ -58,7 +57,7 @@ export class PlastronComponent implements OnInit {
     private profilService: ProfilService,
     private nodeService: NodeService
   ) {
-    this.saver = Modele.initSaver();
+    this.saver = this.plastron.modele.initSaver();
   }
 
   ngOnInit(): void {
@@ -215,7 +214,7 @@ export class PlastronComponent implements OnInit {
             .subscribe((res) => {
               this.changesToSave = false;
               this.modeleToSave = false;
-              this.saver = Modele.initSaver();
+              this.saver = this.plastron.modele.initSaver();
               this.dialog.closeAll();
             });
         }
@@ -230,7 +229,7 @@ export class PlastronComponent implements OnInit {
     forkJoin(this.savingPlastronRequest()).subscribe((value) => {
       this.changesToSave = false;
       if (waitBeforeClosing) this.dialog.closeAll();
-      this.saver = Modele.initSaver();
+      this.saver = this.plastron.modele.initSaver();
       this.modeleToSave = false;
 
       this._snackBar.open(

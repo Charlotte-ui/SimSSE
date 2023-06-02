@@ -13,11 +13,12 @@
       [targetVariable]="targetVariable"
       [variablesTemplate]="variablesTemplate"
       [disabledInspecteur]="true"
+      (initSaver)="saver = $event"
       (newChange)="changesToSave = true"
-      (updateNode)="changesToSave = true; saver.nodeToUpdate.push($event)"
-      (deleteNode)="changesToSave = true; saver.nodeToDelete.push($event)"
-      (updateLink)="changesToSave = true; saver.linkToUpdate.push($event)"
-      (deleteLink)="changesToSave = true; saver.linkToDelete.push($event)"
+      (updateNode)="changesToSave = true;"
+      (deleteNode)="changesToSave = true; "
+      (updateLink)="changesToSave = true; "
+      (deleteLink)="changesToSave = true;"
       (updateTrigger)="
         changesToSave = true; saver.triggerToUpdate.push($event)
       "
@@ -25,6 +26,13 @@
         changesToSave = true; saver.triggerToDelete.push($event)
       "
     ></app-editeur>
+
+<!-- 
+    (updateNode)="changesToSave = true; saver.nodeToUpdate.push($event)"
+    (deleteNode)="changesToSave = true; saver.nodeToDelete.push($event)"
+    (updateLink)="changesToSave = true; saver.linkToUpdate.push($event)"
+    (deleteLink)="changesToSave = true; saver.linkToDelete.push($event)" -->
+
   </mat-tab>
   <mat-tab label="Tags et descriptions">
     <app-tags-descriptions
