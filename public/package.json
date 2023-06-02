@@ -1,0 +1,8 @@
+{
+    "name": "simsse-editeur",
+    "productName": "SimSSE editeur",
+    "version": "1.0.0",
+    "description": "SimSSE editeur",
+    "main": "electron.prod.js",
+    "license": "MIT"
+}
