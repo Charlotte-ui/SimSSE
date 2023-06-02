@@ -15,6 +15,7 @@ export class Scenario extends Vertex implements Listable {
   psy: number;
   UR: number;
   EU: number;
+  decede:number;
   image: string;
   coordPMA:[number,number]
   coordCADI:[number,number]
@@ -28,6 +29,7 @@ export class Scenario extends Vertex implements Listable {
     this.tags = object?.tags ? object.tags : [];
     this.UA = object?.UA ? object.UA : 0;
     this.implique = object?.implique ? object.implique : 0;
+    this.decede = object?.decede ? object.decede : 0;
     this.psy = object?.psy ? object.psy : 0;
     this.UR = object?.UR ? object.UR : 0;
     this.EU = object?.EU ? object.EU : 0;

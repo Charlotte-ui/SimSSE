@@ -82,4 +82,8 @@ export class HeaderComponent implements OnInit {
     if (this.modele) return this.modele.triage;
     return '';
   }
+
+    goTo(element: string) {
+    this.router.navigate([`/${element}/`]);
+  }
 }

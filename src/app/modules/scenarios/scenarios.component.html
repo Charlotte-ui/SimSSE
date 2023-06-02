@@ -1,0 +1,20 @@
+<app-header></app-header>
+
+<div class="container">
+    <div class="container" id="presentation">
+  <p>Vous pouvez parcourir la liste des scenarios et des modèles, les modifier ou en créer de nouveaux.</p>
+</div>
+<div class="container" id="lists">
+  <app-list-box
+    title="Scenarios"
+    [service]="scenarioService"
+    [classe]="Scenario"
+  ></app-list-box>
+
+  <app-list-box
+    title="Modèles traumato-physiologiques"
+    [service]="modeleService"
+    [classe]="Modele"
+  ></app-list-box>
+</div>
+</div>

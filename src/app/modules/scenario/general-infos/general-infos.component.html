@@ -54,7 +54,7 @@
         (change)="addImage($event)"
         multiple
       />
-      <img [src]="image?.src " />
+      <img [src]="image?.src" />
       <ng-image-slider
         #nav
         [images]="imageObjects"
@@ -68,14 +68,6 @@
   </div>
   <div class="container">
     <mat-form-field>
-      <mat-label>Impliqués</mat-label>
-      <input matInput type="number" formControlName="implique" />
-    </mat-form-field>
-    <mat-form-field>
-      <mat-label>UR</mat-label>
-      <input matInput type="number" formControlName="UR" />
-    </mat-form-field>
-    <mat-form-field>
       <mat-label>EU</mat-label>
       <input matInput type="number" formControlName="EU" />
     </mat-form-field>
@@ -84,19 +76,38 @@
       <input matInput type="number" formControlName="UA" />
     </mat-form-field>
     <mat-form-field>
+      <mat-label>UR</mat-label>
+      <input matInput type="number" formControlName="UR" />
+    </mat-form-field>
+    <mat-form-field>
       <mat-label>Psy</mat-label>
       <input matInput type="number" formControlName="psy" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Impliqués</mat-label>
+      <input matInput type="number" formControlName="implique" />
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Décédés</mat-label>
+      <input matInput type="number" formControlName="decede" />
     </mat-form-field>
   </div>
   <div class="container align-items-center">
     <table mat-table [dataSource]="dataTotal" class="mat-elevation-z8">
-      <ng-container matColumnDef="total">
+      <ng-container matColumnDef="title">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element"><h2>Total</h2></td>
       </ng-container>
 
+      <ng-container matColumnDef="total">
+        <th mat-header-cell *matHeaderCellDef>Plastrons</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.total }}
+        </td>
+      </ng-container>
+
       <ng-container matColumnDef="totalParticipant">
-        <th mat-header-cell *matHeaderCellDef>Participants plastrons</th>
+        <th mat-header-cell *matHeaderCellDef>Participants</th>
         <td mat-cell *matCellDef="let element">
           {{ element.totalParticipant }}
         </td>
@@ -105,6 +116,11 @@
       <ng-container matColumnDef="totalPlastron">
         <th mat-header-cell *matHeaderCellDef>Plastrons numériques</th>
         <td mat-cell *matCellDef="let element">{{ element.totalPlastron }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="totalManequin">
+        <th mat-header-cell *matHeaderCellDef>Mannequins</th>
+        <td mat-cell *matCellDef="let element">{{ element.totalManequin }}</td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
