@@ -1,5 +1,5 @@
 <div class="container editeur">
-  <div *ngIf="modele && modele.graph" class="row">
+  <div *ngIf="modele && modele.graph" class="row scrollable-content">
     <div id="barre-outils">
       <mat-accordion multi="true" class="barre-container">
         <mat-expansion-panel
@@ -28,10 +28,9 @@
     <div
       id="scene"
       [ngClass]="{
-        smallMargLeft: !barreOutilsOpened,
-        bigMargLeft: barreOutilsOpened,
-        smallMargRight: !inspecteurOpened,
-        bigMargRight: inspecteurOpened
+        bigMargLeft: barreOutilsOpened && !inspecteurOpened,
+        bigMargRight: inspecteurOpened  && !barreOutilsOpened,
+        bigMargBoth: inspecteurOpened  && barreOutilsOpened,
       }"
     >
       <div class="row">

@@ -5,7 +5,7 @@ import { ModeleService } from 'src/app/services/modele.service';
 import { ScenarioService } from 'src/app/services/scenario.service';
 
 @Component({
-  selector: 'app-editeur',
+  selector: 'app-scenarios',
   templateUrl: './scenarios.component.html',
   styleUrls: ['./scenarios.component.less']
 })

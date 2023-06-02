@@ -1,45 +1,62 @@
+// Margins
+@smallMarg: 30px;
+@toolBarMarg: 120px;
+@inspecteurMarg: 250px;
+
+
 .container {
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    margin: 0;
-    max-width: 97%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  max-width: 97%;
 }
 
-.row{
-    width: 100%;
-    --bs-gutter-x:0;
+.row {
+  width: 100%;
+  --bs-gutter-x: 0;
 }
 
-#barre-outils{
-    width: fit-content;
+#barre-outils {
+  width: fit-content;
 }
 
-#inspecteur{
- //   width: fit-content;
-    height: fit-content;
-    position: fixed;
-    right: 3px;
-    transform: rotate(180deg) translateY(-600px);
-    transform: scaleX(-1);
+#inspecteur {
+  //   width: fit-content;
+  height: fit-content;
+  position: fixed;
+  right: 3px;
+  transform: rotate(180deg) translateY(-800px);
+  transform: scaleX(-1);
 }
 
-#scene{
-  //width: 50%;
-}
+.scrollable-content {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 800px; // TODO : change dynamicly
 
+  > #scene {
+    position: absolute;
+    overflow-y: auto;
+    scrollbar-width: none;
+    width: calc(100% - @smallMarg);
+    margin-left: @smallMarg;
+
+  }
+}
 // for the collapsible panels
 
-.panel-title-barre-outils{
+.panel-title-barre-outils {
   flex-direction: row-reverse;
 }
 
-.panel-title-inspecteur{
+.panel-title-inspecteur {
   transform: scale(-1, 1);
   flex-direction: row;
 }
 
-.panel-retracted{
+.panel-retracted {
   height: min-content;
 }
 
@@ -47,21 +64,26 @@
 .mat-accordion {
   display: block;
   transform-origin: top left;
-  transform: rotate(-90deg) translateX(-600px); /* rotate and position it; translateX value corresponds to panel height */
-  width: 600px; /* this will be the height of the accordion (inversed due to rotation) */
+  transform: rotate(-90deg) translateX(-800px); /* rotate and position it; translateX value corresponds to panel height */
+  width: 800px; /* this will be the height of the accordion (inversed due to rotation) */
 }
 
 .mat-expansion-panel {
- // display: flex!important;
- // flex-direction: column;
+  // display: flex!important;
+  // flex-direction: column;
   max-height: 500px; /* this will be the width of the panel (inversed due to rotation) */
 }
 
-.mat-expansion-panel-header{
- // order: 2;
- z-index: 1;
+.mat-expansion-panel-header {
+  // order: 2;
+  z-index: 1;
 }
 
+mat-panel-description {
+  padding: 1%;
+  font-size: larger;
+  font-weight: lighter;
+}
 .panel-content {
   transform-origin: top left;
   transform: rotate(90deg); /* rotate back */
@@ -79,39 +101,37 @@
   margin-top: -30px;
 }
 
-.reverse{
-  transform: scaleY(-1)!important;
+.reverse {
+  transform: scaleY(-1) !important;
 }
 
-.barre-container{
+.barre-container {
   position: fixed;
- // max-width: min-content;
+  // max-width: min-content;
 }
 
-.editeur{
+.editeur {
   padding: 0;
 }
 
-.smallMargLeft{
-  margin-left: 20px;
+.bigMargLeft {
+  margin-left: @toolBarMarg !important;
+  width: calc(100% - @toolBarMarg) !important;
 }
 
-.bigMargLeft{
-  margin-left: 110px;
+.bigMargRight {
+  width: calc(100% - @inspecteurMarg) !important;;
 }
 
-.smallMargRight{
-  width: 95%;
+.bigMargBoth {
+  margin-left: @toolBarMarg !important;
+  width: calc(100% - @inspecteurMarg - @toolBarMarg + 25px) !important;;
 }
 
-.bigMargRight{
-  width: 75%;
-}
-
-.small{
+.small {
   width: 20px;
 }
 
-.big{
+.big {
   width: 250px;
 }
