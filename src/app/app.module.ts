@@ -9,12 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
 
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 
 import { NgxEchartsModule } from 'ngx-echarts';
 
@@ -123,10 +118,6 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    AngularFirestoreModule,
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()),
     MatCardModule,
     MatListModule,
     ReactiveFormsModule,
@@ -167,7 +158,6 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: FIREBASE_OPTIONS, useValue: environment.firebase },
     ScenarioResolver,
   ],
   bootstrap: [AppComponent],
