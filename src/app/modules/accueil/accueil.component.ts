@@ -1,8 +1,5 @@
 import { Component } from '@angular/core';
-import { Scenario } from '../../models/vertex/scenario';
-import { ScenarioService } from '../../services/scenario.service';
-import { Modele } from '../../models/vertex/modele';
-import { ModeleService } from '../../services/modele.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-accueil',
@@ -10,13 +7,9 @@ import { ModeleService } from '../../services/modele.service';
   styleUrls: ['./accueil.component.less'],
 })
 export class AccueilComponent {
+  constructor(private router: Router) {}
 
-  Scenario = Scenario;
-  Modele = Modele;
-
-  constructor(
-    public scenarioService: ScenarioService,
-    public modeleService: ModeleService,
-  ) {}
-
+  goTo(element: string) {
+    this.router.navigate([`/${element}/`]);
+  }
 }

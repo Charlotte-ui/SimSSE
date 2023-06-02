@@ -3,12 +3,15 @@
     mat-icon-button
     class="example-icon"
     aria-label="Example icon-button with menu icon"
+    [matMenuTriggerFor]="navMenu"
   >
     <mat-icon>menu</mat-icon>
   </button>
-  <button mat-button matTooltip="Retour à l'acceuil">
-    <span (click)="goToAccueil()">SimSSE Editeur</span>
+  <button class="icon-button" mat-button matTooltip="Retour à l'acceuil" (click)="goToAccueil()">
+    <img class="icon" src="assets/logo_simsse.png" />
   </button>
+
+
 
   <ng-container *ngIf="scenario">
     <span>
@@ -99,4 +102,14 @@
   <div class="container">Vous êtes connecté en tant que {{pseudo}} ({{role}})</div>
   
   <button mat-menu-item (click)="logout()">Se déconnecter <mat-icon>arrow_right_alt</mat-icon></button>
+</mat-menu>
+
+
+<mat-menu #navMenu="matMenu" xPosition="after">
+  <div class="container">Aller à la page :</div>
+
+  <button mat-menu-item (click)="goTo('scenarios')">Editeur</button>
+  <button mat-menu-item disabled (click)="goTo('animateur')">Animateur</button>
+  <button mat-menu-item disabled (click)="goTo('retex')">Retex</button>
+
 </mat-menu>

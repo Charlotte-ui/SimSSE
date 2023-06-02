@@ -16,6 +16,13 @@ export interface Image {
   role: ImageRole;
 }
 
+
+export interface ImageObject {
+  image: string;
+  thumbImage : string;
+  title: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -104,5 +111,9 @@ export class ImageService {
         )
       );
     //
+  }
+
+  wrapImagesInObject(images:Image[]):ImageObject[]{
+    return images.map((image:Image) => ({'image':image.src,'thumbImage':image.src,'title':image.name} as ImageObject))
   }
 }

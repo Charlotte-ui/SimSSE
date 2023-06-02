@@ -12,6 +12,7 @@ import { ErrorInterceptor } from './helpers/error.interceptor';
 import { environment } from '../environments/environment';
 
 import { NgxEchartsModule } from 'ngx-echarts';
+import { NgImageSliderModule } from 'ng-image-slider';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -40,7 +41,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import {MatCheckboxModule} from '@angular/material/checkbox'; 
 import {MatMenuModule} from '@angular/material/menu'; 
-
+ import {MatPaginatorModule} from '@angular/material/paginator'; 
+  
 import { ConnexionComponent } from './modules/connexion/connexion.component';
 import { HeaderComponent } from './modules/shared/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
@@ -74,6 +76,7 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
 import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plastrons.component';
 import { WaitComponent } from './modules/shared/wait/wait.component';
 import { TriageFilterComponent } from './modules/shared/triage-filter/triage-filter.component';
+import { ScenariosComponent } from './modules/scenarios/scenarios.component';
 
 //import { PopupComponent } from './popup/popup.component';
 
@@ -112,6 +115,7 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
     LotPlastronsComponent,
     WaitComponent,
     TriageFilterComponent,
+    ScenariosComponent
   ],
   imports: [
     BrowserModule,
@@ -153,7 +157,9 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
-    MatMenuModule
+    MatMenuModule,
+    NgImageSliderModule,
+    MatPaginatorModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

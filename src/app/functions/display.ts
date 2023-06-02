@@ -36,7 +36,8 @@ export const champLabel = {
   med:'Med',
   paraMed:"Paramed",
   start:"Activation",
-  template:'Groupe'
+  template:'Groupe',
+  decede:'Décédé'
 
 };
 
@@ -131,7 +132,7 @@ export class Button {
     {
       name: 'Scenario',
       type: 'scenario',
-      icon: 'ballot',
+      icon: 'art_track',
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',

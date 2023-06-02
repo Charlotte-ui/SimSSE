@@ -40,6 +40,8 @@ export class SceneComponent implements OnInit {
   @Input() set curves(value: Curve[]) {
     if (value) {
       this._curves = value;
+      console.log('Curves ',value)
+      console.log('value.length ',value.length)
       if (this.legend.length < value.length) this.initLegend(); // if there is new variables to show, changed the legend
       this.initGraphData();
     }
@@ -61,7 +63,6 @@ export class SceneComponent implements OnInit {
   constructor(public dialog: MatDialog) {}
 
   ngOnInit(): void {
-    //this.intitChartOption()
   }
 
   onChartInit(ec) {
@@ -81,9 +82,15 @@ export class SceneComponent implements OnInit {
     this.variableSelected = {};
 
     this.curves.forEach((curve) => {
-      this.legend.push(curve.name);
-      this.variableSelected[curve.name] = true; // at init, all the variables are selected
+      if (curve.name) {
+          this.legend.push(curve.name);
+          this.variableSelected[curve.name] = true; // at init, all the variables are selected
+      }
     });
+
+    console.log('this.legend ',this.legend)
+    console.log('this.legend.length ',this.legend.length)
+
     this.intitChartOption();
   }
 
@@ -123,7 +130,6 @@ export class SceneComponent implements OnInit {
     this.curves.forEach((curve) => {
       this.graphData[curve.name] = curve.values;
     });
-    this.updateMarklineData();
     this.updateChart();
   }
 
@@ -205,6 +211,9 @@ export class SceneComponent implements OnInit {
   }
 
   updateChart() {
+
+    this.updateMarklineData();
+
     let series: any[] = this.curves.map((curve) => ({
       name: curve.name,
       type: 'line',
@@ -258,7 +267,6 @@ export class SceneComponent implements OnInit {
 
   onChartLegendSelectChanged(event: any): void {
     this.variableSelected = event.selected;
-    this.updateMarklineData();
     this.updateChart();
   }
 

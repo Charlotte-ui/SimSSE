@@ -4,7 +4,12 @@ import { FormBuilder } from '@angular/forms';
 import { Scenario } from '../../../models/vertex/scenario';
 import { TagService } from '../../../services/tag.service';
 import { Tag } from '../../../models/vertex/tag';
-import { ImageService, Image, ImageRole } from 'src/app/services/image.service';
+import {
+  ImageService,
+  Image,
+  ImageRole,
+  ImageObject,
+} from 'src/app/services/image.service';
 import { getElementByChamp } from 'src/app/functions/tools';
 import { Observable, concat, concatMap, from, zipAll } from 'rxjs';
 
@@ -16,9 +21,25 @@ import { Observable, concat, concatMap, from, zipAll } from 'rxjs';
 export class GeneralInfosComponent {
   scenarioFormGroup;
   allTags;
-  displayedColumns: string[] = ['total', 'totalParticipant', 'totalPlastron'];
+  displayedColumns: string[] = [
+    'title',
+    'total',
+    'totalParticipant',
+    'totalPlastron',
+    'totalManequin',
+  ];
 
-  dataTotal = [{ total: '', totalPlastron: 0, totalParticipant: 0 }];
+  imageObjects: ImageObject[];
+
+  dataTotal = [
+    {
+      title: '',
+      total: 0,
+      totalPlastron: 0,
+      totalParticipant: 0,
+      totalManequin: 0,
+    },
+  ];
 
   images: Image[] = [];
   image: Image;
@@ -44,8 +65,6 @@ export class GeneralInfosComponent {
 
       this.scenarioFormGroup = this.form.group(scenarioGenalInfo);
 
-      this.calculTotalPlastron(value);
-
       this.scenarioFormGroup.valueChanges.subscribe((newScenario: Scenario) => {
         this.scenario.title = newScenario.title;
         this.scenario.description = newScenario.description;
@@ -57,8 +76,10 @@ export class GeneralInfosComponent {
 
         this.updateScenario.emit(newScenario);
         this.calculTotalPlastron(newScenario);
+        this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
       });
 
+      this.calculTotalPlastron(value);
       this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
 
       // get the scenario images
@@ -67,8 +88,9 @@ export class GeneralInfosComponent {
         .subscribe((images: Image[]) => {
           console.log('images ', images);
           if (images) {
-            this.image = images[0];
             this.images = images;
+            this.imageObjects = this.imageService.wrapImagesInObject(images);
+
             this.mapImage = getElementByChamp<Image>(
               this.images,
               'role',
@@ -110,6 +132,9 @@ export class GeneralInfosComponent {
     this.dataTotal[0].totalPlastron = scenario.EU + scenario.UA + scenario.UR;
     this.dataTotal[0].totalParticipant =
       this.dataTotal[0].totalPlastron + scenario.implique + scenario.psy;
+    this.dataTotal[0].totalManequin = scenario.decede;
+    this.dataTotal[0].total =
+      this.dataTotal[0].totalParticipant + this.dataTotal[0].totalManequin;
   }
 
   addImage(event: any) {
@@ -122,13 +147,13 @@ export class GeneralInfosComponent {
       let image = {} as Image;
       image.name = file.name;
       this.image = image;
-      
+
       (reader.onload = (e) => {
         console.log('reader.onload ');
         image.src = reader.result;
 
         requests.push(this.imageService.postFile(image, this.scenario.id));
-        if (index == files.length-1) {
+        if (index == files.length - 1) {
           from(requests)
             .pipe(concatMap((request: Observable<Image>) => request))
             .subscribe((res) => {

@@ -24,7 +24,7 @@ export class ScenarioComponent implements OnInit {
   scenario!: Scenario;
   groupes!: Groupe[];
   plastrons!: Plastron[];
-  totalPlastron!: number;
+  totalPlastron!: number; // wrap in an array so the reference update trigger the Input() event
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
   changesToSave = false;
   groupesToSave = false;
@@ -143,4 +143,5 @@ export class ScenarioComponent implements OnInit {
   }
 
   reloadPlastron(event) {}
+
 }

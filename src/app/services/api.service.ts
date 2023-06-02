@@ -142,7 +142,10 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
 
   updateDocumentChamp(id: string, champ: string, value: string) {
     console.log('updateDocumentChamp ', id, ' ', value);
-    if (typeof value === 'string') value = value.split('#').join('%23');
+    if (typeof value === 'string') {
+      value = value.split('%').join('%25');
+      value = value.split('#').join('%23');
+    }
     return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/updateVertex/${id}/${champ}/"${value}"`,
       {}

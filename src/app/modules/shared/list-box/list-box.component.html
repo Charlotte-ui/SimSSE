@@ -1,4 +1,4 @@
-<mat-card>
+<mat-card >
   <mat-card-header>
     <mat-card-title>
       <div>
@@ -41,11 +41,20 @@
             <div id="noFiltre" *ngIf="!filtreActif">Aucun filtre actif</div>
           </mat-panel-description>
         </mat-expansion-panel-header>
-        <button mat-button color="primary" (click)="deleteFilter()" [disabled]="!filtreActif">
+        <button
+          mat-button
+          color="primary"
+          (click)="deleteFilter()"
+          [disabled]="!filtreActif"
+        >
           Effacer les filtres
         </button>
         <div class="container row filtre" *ngIf="keys?.indexOf('triage') > 0">
-          <app-triage-filter [multiple]="true" (change)="changeFilterTriage($event)" [filterTriage]="filterTriage"></app-triage-filter>
+          <app-triage-filter
+            [multiple]="true"
+            (change)="changeFilterTriage($event)"
+            [filterTriage]="filterTriage"
+          ></app-triage-filter>
         </div>
         <div class="container row filtre">
           <div class="col-1">Tags</div>
@@ -55,33 +64,36 @@
               (change)="changeFilterTag($event)"
               [value]="filterTag"
             >
-              <mat-chip-option
-                *ngFor="let chip of chips; index as i"
-                >{{ chip.value }}</mat-chip-option
-              >
+              <mat-chip-option *ngFor="let chip of chips; index as i">{{
+                chip.value
+              }}</mat-chip-option>
             </mat-chip-listbox>
           </div>
         </div>
       </mat-expansion-panel>
     </mat-accordion>
 
-    <mat-list
-      cdkDropList
-      [cdkDropListData]="elements"
-      (cdkDropListDropped)="drop($event)"
-    >
-      <ng-container *ngFor="let element of elements">
-        <ng-container *ngIf="element['show'] === undefined || element['show']">
-          <mat-divider></mat-divider>
-          <mat-list-item cdkDrag class="box">
-            <app-list-box-element
-              [service]="service"
-              [element]="element"
-              [type]="classe.className"
-            ></app-list-box-element>
-          </mat-list-item>
+    <div class="scrollable-content">
+      <mat-list
+        cdkDropList
+        [cdkDropListData]="elements"
+        (cdkDropListDropped)="drop($event)"
+      >
+        <ng-container *ngFor="let element of elements">
+          <ng-container
+            *ngIf="element['show'] === undefined || element['show']"
+          >
+            <mat-divider></mat-divider>
+            <mat-list-item cdkDrag class="box">
+              <app-list-box-element
+                [service]="service"
+                [element]="element"
+                [type]="classe.className"
+              ></app-list-box-element>
+            </mat-list-item>
+          </ng-container>
         </ng-container>
-      </ng-container>
-    </mat-list>
+      </mat-list>
+    </div>
   </mat-card-content>
 </mat-card>
