@@ -294,7 +294,7 @@ export class PlastronComponent implements OnInit {
 
   exportAsPdf(event: boolean) {
     if (event) {
-      new Pdf(this.plastron.modele, this.curves);
+      new Pdf(this.plastron.modele, this.plastron.profil, this.curves);
       /* 
       // Default export is a4 paper, portrait, using millimeters for units
       const doc = new jsPDF();

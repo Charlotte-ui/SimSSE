@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { FirebaseService } from '../../services/firebase.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
@@ -23,10 +22,11 @@ export class ConnexionComponent implements OnInit {
 
   constructor(
     private form: FormBuilder,
-    public firebaseService: FirebaseService,
     public authentificationService: AuthenticationService,
     private router: Router
-  ) {}
+  ) {
+    if (authentificationService.alreadyLogin) this.router.navigate(['/accueil']);
+  }
 
   ngOnInit(): void {}
 

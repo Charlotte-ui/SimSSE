@@ -73,6 +73,7 @@ export class GeneralInfosComponent {
         this.scenario.EU = newScenario.EU;
         this.scenario.UA = newScenario.UA;
         this.scenario.UR = newScenario.UR;
+        this.scenario.duration = newScenario.duration;
 
         this.updateScenario.emit(newScenario);
         this.calculTotalPlastron(newScenario);
@@ -86,7 +87,6 @@ export class GeneralInfosComponent {
       this.imageService
         .getImages(this.scenario.id, 'Scenario')
         .subscribe((images: Image[]) => {
-          console.log('images ', images);
           if (images) {
             this.images = images;
             this.imageObjects = this.imageService.wrapImagesInObject(images);
@@ -103,10 +103,7 @@ export class GeneralInfosComponent {
             );
             this.oldCoverImage = structuredClone(this.coverImage);
             this.oldMapImage = structuredClone(this.mapImage);
-
             this.map.emit(this.mapImage);
-
-            console.log('this.mapImage ', this.mapImage);
           }
         });
     }
@@ -149,7 +146,6 @@ export class GeneralInfosComponent {
       this.image = image;
 
       (reader.onload = (e) => {
-        console.log('reader.onload ');
         image.src = reader.result;
 
         requests.push(this.imageService.postFile(image, this.scenario.id));

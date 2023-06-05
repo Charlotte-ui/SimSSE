@@ -1,9 +1,8 @@
-import { Collection } from "../../services/firebase.service";
 import { VariablePhysioInstance } from "./variablePhysio";
 import { Vertex } from "./vertex";
 
 
-export class Profil extends Vertex implements Collection{
+export class Profil extends Vertex {
     age:number;
     targetVariable:VariablePhysioInstance[];
     template:boolean;

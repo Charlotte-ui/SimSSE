@@ -1,4 +1,3 @@
-import { Collection } from '../../services/firebase.service';
 import { Nameable } from '../interfaces/nameable';
 import { Template } from '../interfaces/templatable';
 import { Action, BioEvent } from './event';

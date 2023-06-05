@@ -1,6 +1,8 @@
 import jsPDF from 'jspdf';
 import { Curve } from '../functions/curve';
-import { Trigger } from './trigger';
+import { Timestamp, Trigger } from './trigger';
+import { Profil } from './vertex/profil';
+import { Modele } from './vertex/modele';
 
 export class Pdf {
   static sizes = [12, 16, 20];
@@ -9,34 +11,33 @@ export class Pdf {
   verticalOffset = 40;
 
   description: string;
-  timeStamps: number[];
+  age: number;
+  timeStamps: Timestamp[];
   triggeredEvents: Trigger[];
 
   pdf!: jsPDF;
 
   pageWidth: number;
 
-  constructor(object?, curves?: Curve[]) {
+  constructor(modele?:Modele, profil?:Profil, curves?: Curve[]) {
     this.pdf = new jsPDF('p', 'px', 'letter');
 
-    this.description = object?.description ? object.description : '';
-    this.timeStamps = object?.timeStamps ? object.timeStamps : [];
-    this.triggeredEvents = object?.triggeredEvents
-      ? object.triggeredEvents
+    this.description = modele?.description ? modele.description : '';
+    this.age = profil?.age ? profil.age : undefined;
+    this.timeStamps = modele?.timeStamps ? modele.timeStamps : [];
+    this.triggeredEvents = modele?.triggeredEvents
+      ? modele.triggeredEvents
       : [];
 
     this.pageWidth = this.pdf.internal.pageSize.width;
 
-    this.addText('EXERCICE ORSEC', 20, true);
-    this.verticalOffset += 10;
+    this.addParagraph('EXERCICE ORSEC', 20, true);
+    this.addParagraph('Fiche Plastron', 16, true);
 
-    this.addText('Nom :                  Prénom : ', 16, true);
+    this.addParagraph('Nom :                  Prénom : ', 16, true);
 
-    this.verticalOffset += 10;
+    this.addIdentiteDescription()
 
-    this.addText(this.description, 12, false);
-
-    this.verticalOffset += 10;
     this.pdf.line(
       Pdf.margin,
       this.verticalOffset,
@@ -45,12 +46,16 @@ export class Pdf {
     ); // horizontal line
     this.verticalOffset += 10;
 
-    this.timeStamps.forEach((timeStamp) => {
-      this.addText(`A ${timeStamp} minutes`, 14, false);
-      this.addText(`blabla`, 12, false);
+    this.timeStamps.forEach((timeStamp:Timestamp) => {
+     
+      console.log("timeStamp ",timeStamp)
+      this.addPage()
+      this.addParagraph(timeStamp.name, 20, true);
+      this.addParagraph(`(a ${timeStamp.time} minutes)`, 14, false);
+      this.addIdentiteDescription()
       curves.forEach((curve: Curve) => {
         this.addText(
-          `${curve.name} : ${curve.values[timeStamp][1]}`,
+          `${curve.name} : ${curve.values[timeStamp.time][1]}`,
           12,
           false
         );
@@ -89,6 +94,11 @@ export class Pdf {
     this.verticalOffset += lines.length * fontSize;
   }
 
+  addParagraph(text: string, fontSize: number, center: boolean){
+    this.addText(text,fontSize,center)
+    this.verticalOffset += 10;
+  }
+
   addLine() {
     this.verticalOffset += 10;
     this.pdf.line(
@@ -98,5 +108,18 @@ export class Pdf {
       this.verticalOffset
     ); // horizontal line
     this.verticalOffset += 10;
+  }
+
+  addPage(){
+    this.pdf.addPage()
+    this.verticalOffset = 40;
+  }
+
+  addIdentiteDescription(){
+    this.addLine();
+    this.addText("Identité plastron: ", 12, false);
+    this.addParagraph("Âge : "+this.age.toString(), 12, false);
+    this.addLine();
+    this.addParagraph(this.description, 12, false);
   }
 }

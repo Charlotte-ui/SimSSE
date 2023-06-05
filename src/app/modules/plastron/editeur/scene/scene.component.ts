@@ -12,9 +12,11 @@ import {
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 import { Modele } from 'src/app/models/vertex/modele';
 import { Curve } from 'src/app/functions/curve';
-import { Trigger } from 'src/app/models/trigger';
-import { deleteElementFromArray, getNodeByID } from 'src/app/functions/tools';
+import { Trigger, Timestamp } from 'src/app/models/trigger';
+import { deleteElementFromArray, getNodeByID, getElementByChamp } from 'src/app/functions/tools';
 import { Button } from 'src/app/functions/display';
+import { Edge } from 'src/app/models/vertex/vertex';
+import { Timeable } from 'src/app/models/interfaces/timeable';
 
 @Component({
   selector: 'app-scene',
@@ -22,7 +24,10 @@ import { Button } from 'src/app/functions/display';
   styleUrls: ['./scene.component.less'],
 })
 export class SceneComponent implements OnInit {
-    button: Button = new Button();
+  Trigger = Trigger;
+  Timestamp = Timestamp;
+
+  button: Button = new Button();
 
   // Inputs
   @Input() duration: number;
@@ -67,6 +72,7 @@ export class SceneComponent implements OnInit {
 
   onChartInit(ec) {
     this.echartsInstance = ec;
+    console.log(ec)
   }
 
   // chart initialisations
@@ -191,17 +197,17 @@ export class SceneComponent implements OnInit {
       }
     });
 
-    this.modele.timeStamps.map((timeStamp: number) => {
+    this.modele.timeStamps.map((timeStamp: Timestamp) => {
       let markline = [];
       markline.push({
-        name: '',
-        xAxis: timeStamp,
+        name: timeStamp.name,
+        xAxis: timeStamp.time,
         yAxis: 0,
         lineStyle: { color: '#6c757d' },
       });
       markline.push({
         name: 'end',
-        xAxis: timeStamp,
+        xAxis: timeStamp.time,
         yAxis: this.markLineY,
         lineStyle: { color: '#6c757d' },
       });
@@ -270,21 +276,8 @@ export class SceneComponent implements OnInit {
     this.updateChart();
   }
 
-  addTrigger() {
-    this.openDialog(new Trigger(), false, true);
-  }
-
-  addTimeStamp() {
-    let newTimeSTamp = {
-      name: '',
-      xAxis: 0,
-      yAxis: 0,
-      coord: [0, 0],
-      type: null,
-      id: '',
-    };
-
-    this.openDialog(newTimeSTamp, false, false);
+  add(classe: typeof Edge) {
+    this.openDialog(new classe(), false, classe.className === 'Trigger');
   }
 
   /**
@@ -300,52 +293,49 @@ export class SceneComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (isTrigger) {
-          this.changeTrigger(result, edition);
+          this.change<Trigger>(Trigger,result, edition);
         } else {
-          this.changeTimeStamp(result, edition);
+          this.change<Timestamp>(Timestamp,result, edition);
+          console.log("this.modele.timeStamps ",this.modele.timeStamps)
         }
         this.initGraphData();
       }
     });
   }
 
-  changeTrigger(result, edition) {
-    let trigger;
+  change<T extends Timeable>(classe: typeof Edge, result, edition) {
+    let element:T;
+    let list :T[]= ((classe.className === 'Trigger')?this.modele.triggeredEvents:this.modele.timeStamps) as unknown as T[];
     if (result.delete) {
-      trigger = this.modele.triggeredEvents.filter(
-        (trigger: Trigger) => trigger.id == result.id
-      )[0];
-      deleteElementFromArray(this.modele.triggeredEvents, trigger);
-      this.deleteTrigger.emit(trigger);
+      result = getElementByChamp<T>(list,'id',result.id)
+      deleteElementFromArray(list, element);
+      if(classe.className === 'Trigger') this.deleteTrigger.emit(element as unknown  as Trigger);
     } else if (result) {
       if (edition) {
         // update the time of the trigger
-        trigger = this.modele.triggeredEvents.filter(
-          (trigger: Trigger) => trigger.time == result.coord
-        )[0];
-        trigger.time = Number(result.xAxis);
+        element = getElementByChamp<T>(list,'time',result.coord)
+        element.time = Number(result.xAxis);
       } else {
         // add the trigger
-        trigger = new Trigger({
-          time: Number(result.xAxis),
-          id: result.id,
-          in:result.in
-        });        
-        this.modele.triggeredEvents.push(trigger);
+        result.time = Number(result.xAxis)
+        element = new classe(result) as unknown as T ;        
+        list.push(element);
       }
-      this.updateTrigger.emit(trigger);
+      if(classe.className === 'Trigger') this.deleteTrigger.emit(element as unknown as Trigger);
     }
   }
 
   changeTimeStamp(result, edition) {
+    let timestamp;
     if (result.delete) {
-      deleteElementFromArray(this.modele.timeStamps, result.coord);
+      timestamp = getElementByChamp<Timestamp>(this.modele.timeStamps,'id',result.id)
+      deleteElementFromArray(this.modele.timeStamps, result);
     } else if (result) {
       if (edition) {
-        let index = this.modele.timeStamps.indexOf(result.coord);
-        if (index > -1) this.modele.timeStamps[index] = Number(result.xAxis);
+        timestamp = getElementByChamp<Timestamp>(this.modele.timeStamps,'time',result.coord)
+        timestamp.time = Number(result.xAxis);
       } else {
-        this.modele.timeStamps.push(result.xAxis);
+        this.modele.timeStamps.push(timestamp);
       }
     }
   }

@@ -11,7 +11,6 @@ import {
   zipAll,
 } from 'rxjs';
 
-import { FirebaseService } from './firebase.service';
 import { Plastron } from '../models/vertex/plastron';
 import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
 import {

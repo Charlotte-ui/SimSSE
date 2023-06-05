@@ -1,7 +1,7 @@
 import { Listable } from '../interfaces/listable';
 import { Graph, Node } from './node';
 import { Tag } from './tag';
-import { Trigger } from '../trigger';
+import { Timestamp, Trigger } from '../trigger';
 import { Vertex } from './vertex';
 import { ApiService } from 'src/app/services/api.service';
 import { Observable } from 'rxjs';
@@ -35,7 +35,7 @@ export class Modele extends Vertex implements Listable {
   graph: Graph;
   triggeredEvents: Trigger[];
   tags: Tag[];
-  timeStamps: number[];
+  timeStamps: Timestamp[];
 
   public static override className = 'Modele';
 

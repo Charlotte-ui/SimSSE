@@ -12,7 +12,6 @@ import {
   zipAll,
 } from 'rxjs';
 
-import { FirebaseService } from './firebase.service';
 import { Scenario } from '../models/vertex/scenario';
 import { Groupe } from '../models/vertex/groupe';
 import { Plastron } from '../models/vertex/plastron';
@@ -26,7 +25,6 @@ import { PlastronService } from './plastron.service';
 })
 export class ScenarioService {
   constructor(
-    public firebaseService: FirebaseService,
     public apiService: ApiService,
     public tagService: TagService,
     public plastronService: PlastronService

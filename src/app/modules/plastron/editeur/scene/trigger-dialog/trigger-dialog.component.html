@@ -18,6 +18,13 @@
       </mat-form-field>
     </div>
 
+    <div mat-dialog-content *ngIf="!isTrigger">
+      <mat-form-field appearance="fill">
+        <mat-label>Nom </mat-label>
+        <input matInput formControlName="name">
+      </mat-form-field>
+    </div>
+
     <div mat-dialog-content>
       <mat-form-field appearance="fill">
         <mat-label>Temps </mat-label>

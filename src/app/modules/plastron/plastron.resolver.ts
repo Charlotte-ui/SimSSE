@@ -6,7 +6,6 @@ import {
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { Plastron } from '../../models/vertex/plastron';
-import { FirebaseService } from '../../services/firebase.service';
 import { PlastronService } from '../../services/plastron.service';
 
 @Injectable({

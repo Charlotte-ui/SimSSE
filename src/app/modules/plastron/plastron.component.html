@@ -11,10 +11,11 @@
 <mat-tab-group>
   <mat-tab label="Modèle - cas clinique">
     <app-editeur
-      *ngIf="plastron.modele"
+      *ngIf="plastron.modele && scenario"
       [modele]="plastron.modele"
       [targetVariable]="plastron.profil.targetVariable"
       [variablesTemplate]="variablesTemplate"
+      [duration]="scenario.duration"
       (newCurve)="changeCurves($event)"
       (newChange)="changesToSave = true; modeleToSave = true"
       (updateNode)="

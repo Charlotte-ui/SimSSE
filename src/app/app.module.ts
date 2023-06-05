@@ -8,13 +8,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
-
-import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { environment } from '../environments/environment';
-import { provideAuth, getAuth } from '@angular/fire/auth';
-import { provideFirestore, getFirestore } from '@angular/fire/firestore';
-import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
-import { FIREBASE_OPTIONS } from '@angular/fire/compat';
 
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NgImageSliderModule } from 'ng-image-slider';
@@ -44,10 +38,10 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {MatCheckboxModule} from '@angular/material/checkbox'; 
-import {MatMenuModule} from '@angular/material/menu'; 
- import {MatPaginatorModule} from '@angular/material/paginator'; 
-  
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatPaginatorModule } from '@angular/material/paginator';
+
 import { ConnexionComponent } from './modules/connexion/connexion.component';
 import { HeaderComponent } from './modules/shared/header/header.component';
 import { AccueilComponent } from './modules/accueil/accueil.component';
@@ -83,7 +77,6 @@ import { WaitComponent } from './modules/shared/wait/wait.component';
 import { TriageFilterComponent } from './modules/shared/triage-filter/triage-filter.component';
 import { ScenariosComponent } from './modules/scenarios/scenarios.component';
 
-//import { PopupComponent } from './popup/popup.component';
 
 @NgModule({
   declarations: [
@@ -120,17 +113,13 @@ import { ScenariosComponent } from './modules/scenarios/scenarios.component';
     LotPlastronsComponent,
     WaitComponent,
     TriageFilterComponent,
-    ScenariosComponent
+    ScenariosComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    AngularFirestoreModule,
-    provideFirebaseApp(() => initializeApp(environment.firebase)),
-    provideAuth(() => getAuth()),
-    provideFirestore(() => getFirestore()),
     MatCardModule,
     MatListModule,
     ReactiveFormsModule,
@@ -168,12 +157,11 @@ import { ScenariosComponent } from './modules/scenarios/scenarios.component';
     MatCheckboxModule,
     MatMenuModule,
     NgImageSliderModule,
-    MatPaginatorModule
+    MatPaginatorModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
-    { provide: FIREBASE_OPTIONS, useValue: environment.firebase },
     ScenarioResolver,
   ],
   bootstrap: [AppComponent],

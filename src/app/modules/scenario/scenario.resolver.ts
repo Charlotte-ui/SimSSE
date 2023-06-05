@@ -7,7 +7,6 @@ import {
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { Scenario } from '../../models/vertex/scenario';
-import { FirebaseService } from '../../services/firebase.service';
 import { ScenarioService } from '../../services/scenario.service';
 
 @Injectable({
