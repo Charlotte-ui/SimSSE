@@ -1,0 +1,115 @@
+<mat-toolbar>
+  <button
+    mat-icon-button
+    class="example-icon"
+    aria-label="Example icon-button with menu icon"
+    [matMenuTriggerFor]="navMenu"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+  <button class="icon-button" mat-button matTooltip="Retour à l'acceuil" (click)="goToAccueil()">
+    <img class="icon" src="assets/logo_simsse.png" />
+  </button>
+
+
+
+  <ng-container *ngIf="scenario">
+    <span>
+      <mat-icon id="arrow">arrow_forward_ios</mat-icon>
+    </span>
+
+    <button
+      mat-mini-fab
+      [style.background]="button.getButtonByType('scenario').color"
+      disabled
+    >
+      <mat-icon [fontIcon]="button.getButtonByType('scenario').icon"></mat-icon>
+    </button>
+
+    <button *ngIf="scenario" mat-button>
+      <span (click)="goToScenario()">{{ scenario.title }}</span>
+    </button>
+  </ng-container>
+
+  <ng-container *ngIf="plastron || modele">
+    <span>
+      <mat-icon id="arrow">arrow_forward_ios</mat-icon>
+    </span>
+
+    <div>
+      <button
+        mat-mini-fab
+        [style.background]="
+          button.getButtonByType(plastron ? 'plastron' : 'modele').color
+        "
+        disabled
+      >
+        <mat-icon
+          [fontIcon]="
+            button.getButtonByType(plastron ? 'plastron' : 'modele').icon
+          "
+        ></mat-icon>
+      </button>
+    </div>
+
+    <button mat-button>
+      <span>{{ getElementTitle() }}</span>
+    </button>
+
+    <app-triage *ngIf="modele || plastron" [triage]="getTriage()"></app-triage>
+  </ng-container>
+
+  <button
+    *ngIf="plastron || scenario || modele"
+    mat-icon-button
+    [matTooltip]="getTooltip()"
+    (click)="save()"
+    [ngClass]="{ activate: changesToSave }"
+    [disabled]="!changesToSave"
+  >
+    <mat-icon>save</mat-icon>
+  </button>
+  <button
+    *ngIf="plastron || modele"
+    mat-icon-button
+    matTooltip="Enregister en tant que nouveau modèle"
+    [disabled]="plastron?.modele.template === true"
+    (click)="this.newModele.emit(true)"
+  >
+    <mat-icon>note_add</mat-icon>
+  </button>
+
+  <button
+    *ngIf="plastron"
+    mat-icon-button
+    matTooltip="Télécharger la fiche plastron au format PDF"
+    (click)="saveAsPDF()"
+  >
+    <mat-icon>picture_as_pdf</mat-icon>
+  </button>
+
+  <span class="example-spacer"></span>
+
+  <button mat-icon-button (click)="goToRules()" matTooltip="Voir les règles">
+    <mat-icon>assignment</mat-icon>
+  </button>
+  <button mat-icon-button [matMenuTriggerFor]="accountMenu" matTooltip="Ma session">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-menu #accountMenu="matMenu" xPosition="before">
+  <div class="container">Vous êtes connecté en tant que {{pseudo}} ({{role}})</div>
+  
+  <button mat-menu-item (click)="logout()">Se déconnecter <mat-icon>arrow_right_alt</mat-icon></button>
+</mat-menu>
+
+
+<mat-menu #navMenu="matMenu" xPosition="after">
+  <div class="container">Aller à la page :</div>
+
+  <button mat-menu-item (click)="goTo('scenarios')">Editeur</button>
+  <button mat-menu-item disabled (click)="goTo('animateur')">Animateur</button>
+  <button mat-menu-item disabled (click)="goTo('retex')">Retex</button>
+
+</mat-menu>

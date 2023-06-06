@@ -1,17 +1,20 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Listable } from '../../core/models/interfaces/listable';
-import { FirebaseService } from '../../core/services/firebase.service';
+import { Listable } from '../../../models/interfaces/listable';
+import { FirebaseService } from '../../../services/firebase.service';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DialogComponent } from '../dialog/dialog.component';
-import { ApiService } from '../../core/services/api.service';
-import { Scenario } from '../../core/models/vertex/scenario';
-import { Vertex } from '../../core/models/vertex/vertex';
-import { TagService } from '../../core/services/tag.service';
+import { ApiService } from '../../../services/api.service';
+import { Scenario } from '../../../models/vertex/scenario';
+import { Vertex } from '../../../models/vertex/vertex';
+import { TagService } from '../../../services/tag.service';
 import { concat, filter, finalize, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../../core/models/vertex/tag';
-import { Triage } from '../../core/models/vertex/modele';
+import { Tag } from '../../../models/vertex/tag';
+import { Modele, Triage } from '../../../models/vertex/modele';
+import { Button } from 'src/app/functions/display';
+import { WaitComponent } from '../wait/wait.component';
+import { deleteElementFromArray } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-list-box',
@@ -21,16 +24,25 @@ import { Triage } from '../../core/models/vertex/modele';
 export class ListBoxComponent<T extends Listable> {
   keys;
   elements!: T[];
-  triages:Triage[] = [Triage.EU,Triage.UA,Triage.UR]
+  triages: Triage[] = [Triage.EU, Triage.UA, Triage.UR];
+  filtreActif: boolean = false;
+
+  filterTag!: string[];
+  filterTriage!: string[];
 
   filterTagElement!: string[];
   filterTriageElement!: string[];
 
+  button = new Button();
+
+  selectAll: boolean = false;
+
   @Input() chips!: Tag[];
   @Input() title!: string;
-  @Input() subTitle!: string;
 
-  _classe: typeof Vertex;
+  @Input() service;
+
+  _classe: typeof Vertex | typeof Scenario | typeof Modele;
   get classe(): typeof Vertex {
     return this._classe;
   }
@@ -38,8 +50,14 @@ export class ListBoxComponent<T extends Listable> {
     if (value) {
       this._classe = value;
 
-      this.apiService
-        .getClasseElements<T>(value)
+      this.tagService
+        .getAllTags(this.classe.className.toLowerCase())
+        .subscribe((response) => {
+          this.chips = response;
+        });
+
+      value
+        .getListTemplate<T>(this.apiService)
         .pipe(
           switchMap((elements: T[]) => {
             const requests = elements.map((element: T) =>
@@ -65,93 +83,77 @@ export class ListBoxComponent<T extends Listable> {
   @Output() newElement = new EventEmitter<T>();
 
   constructor(
-    private router: Router,
     public apiService: ApiService,
     public dialog: MatDialog,
-    public tagService: TagService
+    public tagService: TagService,
+    private router: Router
   ) {
     this.elements = [];
     this.filterTagElement = [];
     this.filterTriageElement = [];
   }
 
+  ngOnInit(): void {}
+
   intElements(elements: T[]) {
     this.elements = elements;
-    this.filterTagElement = [...elements.map(element=>(element.title))]
-    this.filterTriageElement = [...elements.map(element=>(element.title))]
+    this.filterTagElement = [...elements.map((element) => element.title)];
+    this.filterTriageElement = [...elements.map((element) => element.title)];
 
     this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
-    const index = this.keys.indexOf('template', 0);
-    if (index > -1) this.keys.splice(index, 1);
+
+    deleteElementFromArray(this.keys, 'template');
   }
 
   addElement() {
-    let newElement = {} as T;
-    this.keys.forEach((proprety) => {
-      newElement[proprety] = '';
-    });
-
+    let newElement = new this.classe({ template: true });
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newElement, [], false],
+      data: [newElement, this.classe, this.triages, false, ['template']],
     });
 
     dialogRef.afterClosed().subscribe((result: T) => {
       if (result) {
-        this.newElement.emit(result);
-        this.elements.push(result); // add to database with template = true
-
-        console.log(this.elements);
+        this.createElement(result);
       }
+    });
+  }
+
+  createElement(element: T) {
+    this.dialog.open(WaitComponent);
+    this.service.createElement(element).subscribe((id) => {
+      if (Array.isArray(id)) id = id[0];
+      this.elements.push(element);
+      this.router.navigate([`/${this.classe.className.toLowerCase()}/` + id]);
+      this.dialog.closeAll();
     });
   }
 
   drop(event: CdkDragDrop<T[]>) {
-    console.log('origin');
-
-    console.log(event);
-
     moveItemInArray(this.elements, event.previousIndex, event.previousIndex);
   }
 
   changeFilterTag(event) {
-    let filter = event.value;
-    console.log("filter ")
-    console.log(filter)
-    this.filterTagElement=[];
+    this.filterTag = event.value;
+    this.filterTagElement = [];
     this.elements.forEach((element) => {
-      console.log("tags")
-      console.log(element.tags)
-      console.log("tags filtrées")
-      console.log(element.tags.filter((tag:Tag) => filter.includes(tag.value)))
-      if (element.tags.filter((tag:Tag) => filter.includes(tag.value)).length > 0){
+      if (
+        element.tags.filter((tag: Tag) => this.filterTag.includes(tag.value))
+          .length > 0
+      ) {
         this.filterTagElement.push(element.title);
       }
-       
     });
-
-    console.log("filter tag")
-    console.log(this.filterTagElement)
 
     this.changeFilter();
   }
 
-  
   changeFilterTriage(event) {
-    let filter = event.value;
-       console.log("filter ")
-    console.log(filter)
-    this.filterTriageElement=[];
+    this.filterTriage = event.value;
+    this.filterTriageElement = [];
     this.elements.forEach((element) => {
-       console.log("triage "+element.title)
-      console.log(element["triage"])
-      console.log("triage filtrées")
-      console.log(filter.indexOf(element["triage"]))
-      if (filter.indexOf(element["triage"])>=0)
+      if (this.filterTriage.indexOf(element['triage']) >= 0)
         this.filterTriageElement.push(element.title);
     });
-
-        console.log("filter filterTriageElement")
-    console.log(this.filterTriageElement)
 
     this.changeFilter();
   }
@@ -165,5 +167,30 @@ export class ListBoxComponent<T extends Listable> {
         element['show'] = true;
       else element['show'] = false;
     });
+
+    this.filtreActif = true;
+  }
+
+  deleteFilter() {
+    this.selectAll = true;
+    this.filterTriage = [];
+    this.filterTag = [];
+    this.filterTriageElement = [];
+    this.filterTagElement = [];
+    this.elements.map((element) => {
+      element['show'] = true;
+      this.filterTagElement.push(element.title);
+      this.filterTriageElement.push(element.title);
+    });
+    this.filtreActif = false;
+    this.selectAll = false;
+  }
+
+  getColor() {
+    return this.button.getButtonByType(this.classe.getType({})).color;
+  }
+
+  getIcon() {
+    return this.button.getButtonByType(this.classe.getType({}))?.icon;
   }
 }

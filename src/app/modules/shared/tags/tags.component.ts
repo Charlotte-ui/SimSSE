@@ -4,7 +4,7 @@ import { FormControl } from '@angular/forms';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { Observable, map, startWith } from 'rxjs';
-import { Tag } from '../../core/models/vertex/tag';
+import { Tag } from '../../../models/vertex/tag';
 
 @Component({
   selector: 'app-tags',
@@ -31,10 +31,11 @@ export class TagsComponent {
   }
 
   addTag(event: MatChipInputEvent): void {
+
     let input = event.input;
     let value = event.value;
 
-    // Add our fruit
+
     if ((value || '').trim()) {
       this.tags.push(new Tag({value:value}));
     }
@@ -44,28 +45,24 @@ export class TagsComponent {
       input.value = '';
     }
 
-     this.newTags.emit(this.tags);
+   this.newTags.emit(this.tags);
   }
 
   removeTag(index: number): void {
-
     if (index >= 0) {
       this.tags.splice(index, 1);
     }
-
-    
-     this.newTags.emit(this.tags);
+    this.newTags.emit(this.tags);
   }
 
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.tags.push(new Tag({value:event.option.viewValue}));
+    this.tags.push(new Tag(event.option.value));
     this.tagInput.nativeElement.value = '';
     this.newTags.emit(this.tags);
   }
 
   private _filter(tag: Tag): Tag[] {
     const filterValue = tag.value;
-
     return this.allTags.filter((value:Tag) => value.value.indexOf(filterValue) === 0);
   }
 

@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
-import { Trend } from 'src/app/modules/core/models/vertex/node';
+import { Trend } from 'src/app/models/vertex/node';
 import {
   VariablePhysio,
   VariablePhysioInstance,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
+} from 'src/app/models/vertex/variablePhysio';
 
 @Component({
   selector: 'app-variable-controller',
@@ -26,6 +26,11 @@ export class VariableControllerComponent implements OnInit {
   @Input() set variable(value: VariablePhysioInstance) {
     this._variable = value;
     this.form = this.fb.group(value);
+
+    this.form.valueChanges.subscribe((newVariable: VariablePhysioInstance) => {
+        this.variable = newVariable;
+        this.newVariable.emit(newVariable);
+      });
   }
 
   get tendances(): Trend[] {
@@ -36,13 +41,11 @@ export class VariableControllerComponent implements OnInit {
     this._tendances = value;
   }
 
+  @Input() disabled:boolean=false;
+
   @Output() newVariable = new EventEmitter<VariablePhysioInstance>();
 
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {}
-
-  changeValues() {
-    this.newVariable.emit(this.form.value);
-  }
 }

@@ -1,5 +1,5 @@
 <div class="container editeur">
-  <div *ngIf="modele && modele.graph" class="row">
+  <div *ngIf="modele && modele.graph" class="row scrollable-content">
     <div id="barre-outils">
       <mat-accordion multi="true" class="barre-container">
         <mat-expansion-panel
@@ -28,19 +28,20 @@
     <div
       id="scene"
       [ngClass]="{
-        smallMargLeft: !barreOutilsOpened,
-        bigMargLeft: barreOutilsOpened,
-        smallMargRight: !inspecteurOpened,
-        bigMargRight: inspecteurOpened
+        bigMargLeft: barreOutilsOpened && !inspecteurOpened,
+        bigMargRight: inspecteurOpened  && !barreOutilsOpened,
+        bigMargBoth: inspecteurOpened  && barreOutilsOpened,
       }"
     >
       <div class="row">
         <app-scene
+        *ngIf="curvesInitialized"
           [modele]="modele"
           [events]="events"
           [curves]="curves"
           [duration]="duration"
-          (updateTrigger)="updateTriggers($event)"
+          (updateTrigger)="updateTrigger.emit($event) ; updateCurve();"
+          (deleteTrigger)="deleteTrigger.emit($event) ; updateCurve();"
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">
@@ -75,6 +76,7 @@
               <app-inspecteur
                 [variables]="targetVariable"
                 [trends]="trends"
+                [disabled]="disabledInspecteur"
                 (updateVariable)="updateVariables($event)"
               ></app-inspecteur>
             </div>

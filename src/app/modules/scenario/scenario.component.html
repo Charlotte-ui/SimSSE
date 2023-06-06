@@ -1,27 +1,36 @@
-<app-header [scenario]="scenario"></app-header>
+<app-header
+  [scenario]="scenario"
+  [changesToSave]="changesToSave"
+  (newSave)="save()"
+></app-header>
 <mat-tab-group (selectedTabChange)="reloadPlastron($event)">
   <mat-tab label="Infos générales">
     <app-general-infos
       [scenario]="scenario"
-      (newTotalPlastron)="totalPlastron = $event"
+      (newTotalPlastron)="totalPlastron = $event; "
+      (updateScenario)="changesToSave = true; scenarioToSave = true"
+      (updateTags)="changesToSave = true"
+      (map)="map = $event"
     ></app-general-infos>
   </mat-tab>
   <mat-tab label="Groupes">
     <app-groupes
       *ngIf="groupes"
-      [groupes]="groupes"
       [scenario]="scenario"
+      [groupes]="groupes"
+      [map]="map"
+      (updateGroupes)="changesToSave = true; groupesToSave = true"
+      (updateScenario)="changesToSave = true; scenarioToSave = true"
     ></app-groupes>
   </mat-tab>
-  <mat-tab label="Plastrons et modèles" >
+  <mat-tab label="Plastrons et modèles" class="plastrons">
     <ng-container *ngIf="totalPlastron">
-    <app-lot-plastrons
-      [groupes]="groupes"
-      [plastrons]="plastrons"
-      [totalPlastron]="totalPlastron"
-      [scenario]="scenario"
-      (newChange)="save()"
-    ></app-lot-plastrons>
+      <app-lot-plastrons
+        [scenario]="scenario"
+        [totalPlastron]="totalPlastron"
+        [groupes]="groupes"
+        [plastrons]="plastrons"
+      ></app-lot-plastrons>
     </ng-container>
   </mat-tab>
 </mat-tab-group>

@@ -1,8 +1,12 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { VariablePhysio } from '../../core/models/vertex/variablePhysio';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { DialogComponent } from '../../shared/dialog/dialog.component';
+import { Vertex } from '../../../models/vertex/vertex';
+import { Button, champLabel } from 'src/app/functions/display';
+import { RegleService } from 'src/app/services/regle.service';
+import { CategoryAction } from 'src/app/models/vertex/event';
+import { deleteElementFromArray } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-tab-regles',
@@ -15,34 +19,38 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
   age:number;
 }
  */
-export class TabReglesComponent<T> {
+export class TabReglesComponent<T extends Vertex> {
   _elements!: T[];
   keys;
   displayedColumns;
-  dataSource!: T[];
+
+  champLabel = champLabel;
+
+  button = new Button();
+
+  getType = Button.getType ;
+
+
+  @Input() classe: typeof Vertex;
 
   get elements(): T[] {
     return this._elements;
   }
   @Input() set elements(value: T[]) {
-    if (value != undefined) {
+    if (value?.length > 0) {
       this._elements = value;
       this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
       this.displayedColumns = [...this.keys];
-
-      const index = this.displayedColumns.indexOf('id', 0);
-      if (index > -1) this.displayedColumns.splice(index, 1);
+      deleteElementFromArray(this.displayedColumns,'id')
       this.displayedColumns.push('edit');
       this.displayedColumns.push('delete');
-      this.dataSource = this.elements;
     }
   }
 
   @Input() title: string;
   @Input() description: string;
-  @Output() newElement = new EventEmitter<T>();
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, private regleService: RegleService) {}
 
   addElement() {
     let newElement = {} as T;
@@ -50,54 +58,77 @@ export class TabReglesComponent<T> {
       newElement[proprety] = '';
     });
 
-    this.openDialog(newElement, -1);
+    this.openDialog(newElement, -1, false);
   }
 
   editElement(element: T) {
     let id = this.elements.indexOf(element);
-    this.openDialog(element, id);
+    this.openDialog(element, id, true);
   }
 
-  openDialog(element: T, id: number) {
-    console.log('openDialog');
+  openDialog(element: T, id: number, edit: boolean) {
 
-    console.log(element);
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, [], false],
+      data: [element, this.classe, Object.values(CategoryAction), edit],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
 
       if (result == undefined) return;
 
-      if (Number(id) >= 0) this.dataSource[Number(id)] = result;
-      else this.dataSource.push(result);
+      if (Number(id) >= 0) {
+        // UPDATE
+        this.regleService.updateRegle(result).subscribe();
+        this.elements[Number(id)] = result;
+      } else {
+        // ADD
+        this.regleService
+          .createRegle(result, this.classe.name)
+          .subscribe((id: string) => {
+            result.id = id;
+            delete result['@class'];
+            this.elements.push(result);
 
-      console.log(this.dataSource);
+            this.elements = [...this.elements];
+          });
+      }
 
-      this.dataSource = [...this.dataSource]; // TODO : delete when bdd ok
-      this.newElement.emit(result);
+      this.elements = [...this.elements]; // TODO : delete when bdd ok
     });
   }
 
   removeElement(id: number) {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-      data: this.elements[id]['name'],
+      data: [
+        'Supprimer ' + this.elements[id]['name'],
+        'Voulez-vous vraiment suprimer ' + this.elements[id]['name'],
+      ],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      console.log(result);
-
-      if (result) this.dataSource.splice(id, 1);
-
-      this.dataSource = [...this.dataSource];
+      if (result) {
+        this.regleService.deleteRegle(this.elements[id].id).subscribe(() => {
+          this.elements.splice(id, 1);
+          this.elements = [...this.elements];
+        });
+      }
     });
   }
 
   isColor(column: string) {
-    //S console.log("isColor "+column)
-    if (column == 'couleur') return true;
+    if (column == 'color') return true;
     return false;
+  }
+
+  getColor() {
+    return this.button.getButtonByType(this.classe.getType({})).color;
+  }
+
+  getIcon() {
+    return this.button.getButtonByType(this.classe.getType({}))?.icon;
+  }
+
+  getLabel(champ: string) {
+    return this.champLabel[champ] ? this.champLabel[champ] : champ;
   }
 }

@@ -1,31 +1,31 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
-import { Plastron } from '../core/models/vertex/plastron';
-import { ModeleService } from '../core/services/modele.service';
-import { Modele } from '../core/models/vertex/modele';
-import { Graph, Node, Event, Link } from '../core/models/vertex/node';
-
-import { ProfilService } from '../core/services/profil.service';
+import { Plastron } from '../../models/vertex/plastron';
+import { ModeleService } from '../../services/modele.service';
+import { Modele, ModeleSaverArrays } from '../../models/vertex/modele';
+import { ProfilService } from '../../services/profil.service';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from '../core/models/vertex/variablePhysio';
-import { RegleService } from '../core/services/regle.service';
-import { Profil } from '../core/models/vertex/profil';
-import { PlastronService } from '../core/services/plastron.service';
-import { Scenario } from '../core/models/vertex/scenario';
+} from '../../models/vertex/variablePhysio';
+import { RegleService } from '../../services/regle.service';
+import { Profil } from '../../models/vertex/profil';
+import { PlastronService } from '../../services/plastron.service';
+import { Scenario } from '../../models/vertex/scenario';
 import { MatDialog } from '@angular/material/dialog';
 import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { jsPDF } from 'jspdf';
-import { ScenarioService } from '../core/services/scenario.service';
-import { Groupe } from '../core/models/vertex/groupe';
-import { TagService } from '../core/services/tag.service';
-import { Trigger } from '../core/models/trigger';
-import { concat, forkJoin, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../core/models/vertex/tag';
-import { Pdf } from '../core/models/pdf';
-import { Curve } from '../core/models/curve';
+import { ScenarioService } from '../../services/scenario.service';
+import { Groupe } from '../../models/vertex/groupe';
+import { TagService } from '../../services/tag.service';
+import { Trigger } from '../../models/trigger';
+import { Observable, concat, forkJoin, of, switchMap, zipAll } from 'rxjs';
+import { Tag } from '../../models/vertex/tag';
+import { Pdf } from '../../models/pdf';
+import { Curve } from '../../functions/curve';
+import { WaitComponent } from '../shared/wait/wait.component';
+import { ConfirmDeleteDialogComponent } from '../shared/confirm-delete-dialog/confirm-delete-dialog.component';
+import { NodeService } from 'src/app/services/node.service';
 
 @Component({
   selector: 'app-plastron',
@@ -35,14 +35,15 @@ import { Curve } from '../core/models/curve';
 export class PlastronComponent implements OnInit {
   plastron!: Plastron;
   scenario: Scenario;
+  variablesTemplate: VariablePhysioTemplate[] = [];
+  allTags!: Tag[];
+  curves!: Curve[];
 
   changesToSave: boolean = false;
-
-  variablesTemplate: VariablePhysioTemplate[] = [];
-
-  allTags!: Tag[];
-
-  curves!: Curve[];
+  variableToSave: string[] = [];
+  modeleToSave: boolean = false;
+  saver: ModeleSaverArrays;
+  oldVariables: VariablePhysioInstance[];
 
   constructor(
     private route: ActivatedRoute,
@@ -53,8 +54,11 @@ export class PlastronComponent implements OnInit {
     private _snackBar: MatSnackBar,
     private scenarioService: ScenarioService,
     private tagService: TagService,
-    private profilService: ProfilService
-  ) {}
+    private profilService: ProfilService,
+    private nodeService: NodeService
+  ) {
+    this.saver = this.plastron.modele.initSaver();
+  }
 
   ngOnInit(): void {
     this.route.data
@@ -80,9 +84,7 @@ export class PlastronComponent implements OnInit {
           return forkJoin([requestModelProfil, requestScenario]);
         })
       )
-      .subscribe((response: [[Modele, Profil], Scenario]) => {
-        this.plastron.modele = response[0][0];
-        this.plastron.profil = response[0][1];
+      .subscribe((response: [Plastron, Scenario]) => {
         this.scenario = response[1];
         this.initTrigger();
         this.initVariables();
@@ -99,14 +101,8 @@ export class PlastronComponent implements OnInit {
   initTrigger() {
     this.modelService
       .getTrigger(this.plastron.modele.id)
-      .subscribe((result: any) => {
-        this.plastron.modele.triggeredEvents = result.$a.map(
-          (event: Event, index: number) =>
-            new Trigger({
-              time: result.$b[index].time,
-              id: event.event,
-            })
-        );
+      .subscribe((triggers: Trigger[]) => {
+        this.plastron.modele.triggeredEvents = triggers;
       });
   }
 
@@ -132,12 +128,21 @@ export class PlastronComponent implements OnInit {
       )
       .subscribe((variables: VariablePhysioInstance[]) => {
         this.plastron.profil.targetVariable = variables;
+        this.oldVariables = structuredClone(variables);
 
         variables.forEach((variable: VariablePhysioInstance, index: number) => {
           if (variable.id == '')
-            this.plastron.modele.createVariableCible(
-              this.variablesTemplate[index]
-            );
+            this.profilService
+              .createVariableCible(
+                this.variablesTemplate[index],
+                this.plastron.profil
+              )
+              .subscribe((res: VariablePhysioInstance) => {
+                this.plastron.profil.targetVariable[index] = res;
+                this.plastron.profil.targetVariable = [
+                  ...this.plastron.profil.targetVariable,
+                ];
+              });
           // si la variable cible n'existe pas, on la crée
           else {
             variable.name = this.variablesTemplate[index].name;
@@ -146,10 +151,6 @@ export class PlastronComponent implements OnInit {
           }
         });
       });
-  }
-
-  changeModele() {
-    this.changesToSave = true;
   }
 
   changeGraph($event) {
@@ -170,8 +171,6 @@ export class PlastronComponent implements OnInit {
 
   saveAsNewModel(event: boolean) {
     if (event) {
-      console.log('saveAsNewModel');
-      console.log(this.plastron.modele);
       let newModel = structuredClone(this.plastron.modele);
       newModel.title = '';
       delete newModel.id;
@@ -182,29 +181,56 @@ export class PlastronComponent implements OnInit {
           'Le plastron actuel dérive du modèle ' +
             this.plastron.modele.title +
             ', créer un nouveau modèle à partir du plastron actuel changera aussi le modèle auquel le plastron actuel fait référence.',
-          this.allTags,
           false,
         ],
       });
 
       dialogRef.afterClosed().subscribe((result) => {
-        console.log(result);
+        this.dialog.open(WaitComponent);
 
-        if (result == undefined) return;
+        if (result == undefined) {
+          this.dialog.closeAll();
+          return;
+        }
 
-        let newModele = this.modelService.createNewModel(result, true);
-
-        this.plastronService.changeModelRef(this.plastron, newModele);
+        // CAS OU IL N'Y A RIEN A ENREGISTRER
+        // TODO ; disable le bt si il y a eu des modif
+        if (!this.modeleToSave) {
+          this.modelService
+            .createNewModeleTemplate(this.plastron.modele, result)
+            .subscribe((res) => {
+              this.dialog.closeAll();
+            });
+        } else {
+          forkJoin(this.savingPlastronRequest())
+            .pipe(
+              switchMap((value) =>
+                this.modelService.createNewModeleTemplate(
+                  this.plastron.modele,
+                  result
+                )
+              )
+            )
+            .subscribe((res) => {
+              this.changesToSave = false;
+              this.modeleToSave = false;
+              this.saver = this.plastron.modele.initSaver();
+              this.dialog.closeAll();
+            });
+        }
       });
     }
   }
 
-  savePlastron(event: boolean) {
-    if (event) {
-      console.log('savePlastron');
-      console.log(this.plastron);
-      this.plastronService.updatePlastron(this.plastron);
+  save() {
+    this.dialog.open(WaitComponent);
+    let waitBeforeClosing =
+      this.modeleToSave && typeof this.plastron.modele.template !='string' ;
+    forkJoin(this.savingPlastronRequest()).subscribe((value) => {
       this.changesToSave = false;
+      if (waitBeforeClosing) this.dialog.closeAll();
+      this.saver = this.plastron.modele.initSaver();
+      this.modeleToSave = false;
 
       this._snackBar.open(
         'Modifications du plastron ' +
@@ -215,7 +241,54 @@ export class PlastronComponent implements OnInit {
           duration: 3000,
         }
       );
+    });
+  }
+
+  savingPlastronRequest(): Observable<any>[] {
+    let requests: Observable<any>[] = [];
+    let requestsProfil: Observable<any>[] = [];
+
+    if (this.modeleToSave) {
+      if (this.plastron.modele.template) {
+        this.deriveFromModele();
+      } else
+        requests = this.plastron.modele.save(
+          this.saver,
+          this.tagService,
+          this.modelService,
+          this.nodeService
+        );
     }
+
+    if (this.variableToSave && this.variableToSave.length > 0)
+      requestsProfil = this.profilService.updateVariables(
+        this.plastron.profil,
+        this.oldVariables,
+        this.variableToSave
+      );
+
+    return requests.concat(requestsProfil);
+  }
+
+  deriveFromModele() {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      data: [
+        'Modifier le modèle traumato-physiologique ' +
+          this.plastron.modele.title,
+        'Le plastron suit actuellement le modèle ' +
+          this.plastron.modele.title +
+          '. En enregistrant ces modifications, il ne suivre plus exactement ce modèle. Voulez-vous confirmer ces modifications ? ',
+      ],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.plastronService.changeModeleRef(this.plastron).subscribe((res) => {
+          this.dialog.closeAll();
+          //  location.reload(); TODO : wait for all the calls before reload
+        });
+      }
+    });
   }
 
   exportAsPdf(event: boolean) {

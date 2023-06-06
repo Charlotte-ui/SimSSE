@@ -23,22 +23,22 @@ import {
   Link,
   Graph,
   Node,
-  BioEvent,
-  Action,
-} from 'src/app/modules/core/models/vertex/node';
+  Timer,
+} from 'src/app/models/vertex/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
-import { NodeType } from 'src/app/modules/core/models/vertex/node';
-import { EventType } from 'src/app/modules/core/models/vertex/node';
+import { NodeType } from 'src/app/models/vertex/node';
+import { EventType } from 'src/app/models/vertex/node';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
-import { Button } from 'src/app/modules/core/models/buttons';
+} from 'src/app/models/vertex/variablePhysio';
+import { Button } from 'src/app/functions/display';
+import { Action, BioEvent } from 'src/app/models/vertex/event';
 
-const GREEN = '#2E933C';
-const RED = '#DE1A1A';
+const GREEN = '#45C456';
+const RED = '#A41313';
 
 let DataName = [];
 
@@ -50,6 +50,7 @@ let DataName = [];
 export class EditeurGrapheNodalComponent implements OnInit {
   echartsInstance;
   mergeOptions = {};
+  actionByCategories ;
 
   _graph!: Graph;
   get graph(): Graph {
@@ -126,29 +127,11 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     DataName = [];
     this.graph.nodes.forEach((node: Node, index: number) => {
-      let draggable =
-        node.type == NodeType.event &&
-        (node as Event).typeEvent == EventType.start
-          ? false
-          : true;
 
-      let name;
-      let label;
-      switch (node.type) {
-        case NodeType.event:
-           label = (node as Event).template
-            ? (node as Event).template.name
-            : (node as Event).typeEvent; 
-            name = (node as Event).event
-          break;
-        case NodeType.timer:
-          name = node.type;
-          label = node.type;
-          break;
-        default:
-          name = (node as Trend | Graph).name;
-          label = (node as Trend | Graph).name;
-      }
+      let draggable = Node.getType(node)== EventType.start? false:true;
+
+      let name = Node.getName(node)
+      let label = (node.type ==  NodeType.event && (node as Event).template)?(node as Event).template.name:name;
 
       DataName.push(label);
 
@@ -242,6 +225,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
     // update the coordinate ; if not is reset to start coordinates
     this.updateNodeCoordinate(event.event.offsetX, event.event.offsetY, node);
+    this.actionByCategories= Action.getListByCategory()
 
     let dialogRef;
 
@@ -253,22 +237,22 @@ export class EditeurGrapheNodalComponent implements OnInit {
         break;
       case EventType.bio:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, this.allBioevents, true],
+          data: [node,Event, this.allBioevents, true,['template']],
         });
         break;
       case EventType.action:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, this.allActions, true],
+          data: [node, Event,this.actionByCategories, true,['template']],
         });
         break;
       case NodeType.trend:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, this.variablesTemplate, true],
+          data: [node,Trend,this.variablesTemplate, true],
         });
         break;
       case NodeType.timer:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, [], true],
+          data: [node,Timer, [], true],
         });
     }
 
@@ -276,17 +260,27 @@ export class EditeurGrapheNodalComponent implements OnInit {
       dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           if (result.delete) {
-            this.graph.nodes.splice(index, 1);
+            let deletedNode = this.graph.nodes.splice(index, 1)[0];
             this.graphData.splice(index, 1);
+            let ref = deletedNode.id ;
+
+            console.log("deletedNode ",deletedNode)
+            
+            if (deletedNode.type == NodeType.event) ref = (deletedNode as Event).event;
+            console.log("ref ",ref)
+            result.ref = ref;
+            this.updateNode.emit([result, index]);
+
           } else {
             result.x = node.x; // keep the update node coordinate
             result.y = node.y;
             this.graph.nodes[index] = result;
             this.graphData[index].name = result.name;
+            this.updateNode.emit([result, index]);
+
           }
 
           this.updateChart();
-          this.updateNode.emit([result, index]);
         }
       });
   }
@@ -295,7 +289,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
     let index = event.dataIndex;
     let link = this.graph.links[index];
     let dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, this.graph.nodes, true],
+      data: [link, Link,this.graph.nodes, true],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -304,7 +298,8 @@ export class EditeurGrapheNodalComponent implements OnInit {
           this.graph.links.splice(index, 1);
           this.graphLink.splice(index, 1);
         } else {
-          this.graphLink[index] = this.parseLinkIntoGraphLink(this.graph.links[index])
+          this.graphLink[index] = this.parseLinkIntoGraphLink(result as Link)
+          this.graph.links[index].start = result.start;
         }
         this.updateChart();
         this.updateLink.emit([result, index]);

@@ -1,7 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Graph } from 'src/app/modules/core/models/vertex/node';
+import { Graph } from 'src/app/models/vertex/node';
 
 @Component({
   selector: 'app-graph-dialog',

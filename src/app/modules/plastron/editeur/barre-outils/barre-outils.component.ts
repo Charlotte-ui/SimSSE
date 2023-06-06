@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Button, IButton } from 'src/app/modules/core/models/buttons';
+import { Button, IButton } from 'src/app/functions/display';
 import {
   EventType,
   Graph,
@@ -8,16 +8,15 @@ import {
   Trend,
   Event,
   Node,
-  Action,
-  BioEvent,
   Link,
-} from 'src/app/modules/core/models/vertex/node';
+} from 'src/app/models/vertex/node';
 import { DialogComponent } from '../../../shared/dialog/dialog.component';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
+} from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
+import { Action, BioEvent } from 'src/app/models/vertex/event';
 
 @Component({
   selector: 'app-barre-outils',
@@ -25,12 +24,18 @@ import { MatDialog } from '@angular/material/dialog';
   styleUrls: ['./barre-outils.component.less'],
 })
 export class BarreOutilsComponent implements OnInit {
+
+  actionByCategories ;
+  bioEventByCategories ;
+
   // liste de tout les modèles d'événements et de graphs existant
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
   @Input() allGraphs!: Graph[];
   @Input() variables!: VariablePhysioTemplate[];
   @Input() nodes!: Node[];
+
+
 
   @Output() newElement = new EventEmitter<Node | Link>();
 
@@ -40,21 +45,24 @@ export class BarreOutilsComponent implements OnInit {
     this.buttons = Button.buttons;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+
+  }
+
+
 
   addElement(element: string) {
-    let x = 50; // l'element est ajouter au milieu
-    let y = 50;
-
+    this.actionByCategories= Action.getListByCategory()
+    this.bioEventByCategories= BioEvent.getListByCategory()
     switch (element) {
       case NodeType.link:
         return this.createLink();
       case EventType.bio:
         let bioevent = new Event({ typeEvent: EventType.bio });
-        return this.createNode(bioevent, this.allBioevents);
+        return this.createNode(bioevent, this.bioEventByCategories,['template']);
       case EventType.action:
         let action = new Event({ typeEvent: EventType.action });
-        return this.createNode(action, this.allActions);
+        return this.createNode(action, this.actionByCategories,['template']);
       case NodeType.trend:
         let trend = new Trend();
         return this.createNode(trend, this.variables);
@@ -71,28 +79,23 @@ export class BarreOutilsComponent implements OnInit {
     let link: Link = new Link();
 
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, this.nodes, false],
+      data: [link,Link, this.nodes, false],
     });
 
     dialogRef.afterClosed().subscribe((result: Link) => {
       if (result) {
-        console.log('create link ');
-        console.log(result);
         this.newElement.emit(result);
       }
     });
   }
 
-  createNode(newNode: Node, liste: any[]) {
+  createNode(newNode: Node, liste: any[],hidden?:string[]) {
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newNode, liste, false],
+      data: [newNode,Node, liste, false,hidden],
     });
 
     dialogRef.afterClosed().subscribe((newNode: Node) => {
       if (newNode) {
-        console.log('node created');
-        console.log(newNode);
-
         if (newNode.type == NodeType.event) {
           newNode['template'] = this.getTemplate(
             (newNode as Event).typeEvent == EventType.action
