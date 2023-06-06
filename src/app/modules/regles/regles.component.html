@@ -1,24 +1,38 @@
 <app-header></app-header>
 
-<div class="container">
+<div class="scrollable-content">
+  <div class="container">
+    <app-tab-regles
+      [elements]="variablesDetails"
+      title="Variables"
+      [classe]="VariablePhysioTemplate"
+      description="Ensemble des variables physiologiques qui caractèrisent un modèle traumato-physiologique. L'écart-type et les valeurs maximum et minimum renseignées ici font références à ceux de l'appareil de mesure. La couleur désigne celle de la courbe, et la valeur par défaut est celle utilisée à titre d'exemple lors de la création de nouveaux modèles."
+    ></app-tab-regles>
 
-  <div class="row">
-    <div class="col-4">
-      <app-tab-regles [elements]="variablesDetails" title="Variables" (newElement)="addVariable($event)" description="bla bla bla"></app-tab-regles>
-    </div>
-    <div class="col-4">
-      <app-tab-regles [elements]="events" title="Événements" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
-    </div>
-      <div class="col-4">
-        <app-tab-regles [elements]="actions" title="Actions" (newElement)="addAction($event)"
-          description="bla bla bla"></app-tab-regles>
-      </div>
-  </div>
-  <div class="row">
-    <app-tab-regles [elements]="moyennesAge" title="Moyenne par âge" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
-  </div>
-  <div class="row">
-    <app-tab-regles [elements]="moyennesSexe" title="Moyenne par sexe" (newElement)="addBioEvent($event)" description="bla bla bla"></app-tab-regles>
-  </div>
+    <app-tab-regles
+      [elements]="events"
+      title="Événements"
+      [classe]="BioEvent"
+      description="Les Événements se déclenchent lorsque des conditions sont requises, en particulier lorsqu'une variable atteint une certaine valeur."
+    ></app-tab-regles>
 
+    <app-tab-regles
+      [elements]="actions"
+      title="Actions"
+      [classe]="Action"
+      description="Les actions que les intervenants peuvent faire sur un plastron. Les actions sont classées par catégories correspondant à celles de la méthode MARCH auxquelles se rajoutent les catégories Divers, Prise de médicament et Évaluation clinique - cette dernière permet uniquement à l'intervenant de prendre des informations, elle ne permet pas d'intéragir avec le cas clinique. A chaque action est associé une possibilité d'accès aux personnel médical et paramédical."
+    ></app-tab-regles>
+
+    <app-tab-regles
+      [elements]="moyennesAge"
+      title="Moyenne par âge"
+      description="bla bla bla"
+    ></app-tab-regles>
+
+    <app-tab-regles
+      [elements]="categories"
+      title="Catégories"
+      description="bla bla bla"
+    ></app-tab-regles>
+  </div>
 </div>

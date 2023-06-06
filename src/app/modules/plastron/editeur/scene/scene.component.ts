@@ -2,22 +2,21 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { EChartsOption } from 'echarts';
 import {
-  Link,
   Trend,
   Event,
   Node,
   Graph,
   NodeType,
   Timer,
-} from 'src/app/modules/core/models/vertex/node';
-import {
-  VariablePhysio,
-  VariablePhysioInstance,
-} from 'src/app/modules/core/models/vertex/variablePhysio';
+} from 'src/app/models/vertex/node';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
-import { Modele } from 'src/app/modules/core/models/vertex/modele';
-import { Curve } from 'src/app/modules/core/models/curve';
-import { Trigger } from 'src/app/modules/core/models/trigger';
+import { Modele } from 'src/app/models/vertex/modele';
+import { Curve } from 'src/app/functions/curve';
+import { Trigger, Timestamp } from 'src/app/models/trigger';
+import { deleteElementFromArray, getNodeByID, getElementByChamp } from 'src/app/functions/tools';
+import { Button } from 'src/app/functions/display';
+import { Edge } from 'src/app/models/vertex/vertex';
+import { Timeable } from 'src/app/models/interfaces/timeable';
 
 @Component({
   selector: 'app-scene',
@@ -25,6 +24,11 @@ import { Trigger } from 'src/app/modules/core/models/trigger';
   styleUrls: ['./scene.component.less'],
 })
 export class SceneComponent implements OnInit {
+  Trigger = Trigger;
+  Timestamp = Timestamp;
+
+  button: Button = new Button();
+
   // Inputs
   @Input() duration: number;
   /**
@@ -40,14 +44,16 @@ export class SceneComponent implements OnInit {
   }
   @Input() set curves(value: Curve[]) {
     if (value) {
-      // if value isnt undefined
       this._curves = value;
+      console.log('Curves ',value)
+      console.log('value.length ',value.length)
       if (this.legend.length < value.length) this.initLegend(); // if there is new variables to show, changed the legend
       this.initGraphData();
     }
   }
 
-  @Output() updateTrigger = new EventEmitter<Trigger[]>();
+  @Output() updateTrigger = new EventEmitter<Trigger>();
+  @Output() deleteTrigger = new EventEmitter<Trigger>();
 
   // Echart Graph Variables
   legend: any[] = [];
@@ -62,11 +68,11 @@ export class SceneComponent implements OnInit {
   constructor(public dialog: MatDialog) {}
 
   ngOnInit(): void {
-    //this.intitChartOption()
   }
 
   onChartInit(ec) {
     this.echartsInstance = ec;
+    console.log(ec)
   }
 
   // chart initialisations
@@ -79,12 +85,18 @@ export class SceneComponent implements OnInit {
         lineStyle: { color: '#FEEA00' },
       },
     ];
-    this.variableSelected = {}; 
+    this.variableSelected = {};
 
     this.curves.forEach((curve) => {
-      this.legend.push(curve.name);
-      this.variableSelected[curve.name] = true; // at init, all the variables are selected
+      if (curve.name) {
+          this.legend.push(curve.name);
+          this.variableSelected[curve.name] = true; // at init, all the variables are selected
+      }
     });
+
+    console.log('this.legend ',this.legend)
+    console.log('this.legend.length ',this.legend.length)
+
     this.intitChartOption();
   }
 
@@ -124,7 +136,6 @@ export class SceneComponent implements OnInit {
     this.curves.forEach((curve) => {
       this.graphData[curve.name] = curve.values;
     });
-    this.updateMarklineData();
     this.updateChart();
   }
 
@@ -145,11 +156,10 @@ export class SceneComponent implements OnInit {
     });
 
     this.markLineData = [];
-
-    this.modele.triggeredEvents.map((event: Trigger) => {
+    this.modele.triggeredEvents.map((trigger: Trigger) => {
       // time id
       let markline = [];
-      let node = this.getNodeByID(event.id);
+      let node = getNodeByID(this.modele.graph,trigger.in);
       if (node) {
         // si le node est présent sur le graph
         let name;
@@ -167,17 +177,18 @@ export class SceneComponent implements OnInit {
             name = (node as Trend | Graph).name;
         }
 
+        // TODO replace by ref
         let color = 'event' in node ? '#FEEA00' : '#C8FFBE';
 
         markline.push({
           name: name,
-          xAxis: event.time,
+          xAxis: trigger.time,
           yAxis: 0,
           lineStyle: { color: color },
         });
         markline.push({
           name: 'end',
-          xAxis: event.time,
+          xAxis: trigger.time,
           yAxis: this.markLineY,
           lineStyle: { color: color },
         });
@@ -186,17 +197,17 @@ export class SceneComponent implements OnInit {
       }
     });
 
-    this.modele.timeStamps.map((timeStamp: number) => {
+    this.modele.timeStamps.map((timeStamp: Timestamp) => {
       let markline = [];
       markline.push({
-        name: '',
-        xAxis: timeStamp,
+        name: timeStamp.name,
+        xAxis: timeStamp.time,
         yAxis: 0,
         lineStyle: { color: '#6c757d' },
       });
       markline.push({
         name: 'end',
-        xAxis: timeStamp,
+        xAxis: timeStamp.time,
         yAxis: this.markLineY,
         lineStyle: { color: '#6c757d' },
       });
@@ -206,15 +217,16 @@ export class SceneComponent implements OnInit {
   }
 
   updateChart() {
-    let series:any[] = this.curves.map(curve => (
-      {
-        name: curve.name,
-        type: 'line',
-        data: this.graphData[curve.name],
-        lineStyle: { color: curve.color },
-        itemStyle: { color: curve.color },
-      }
-    ));
+
+    this.updateMarklineData();
+
+    let series: any[] = this.curves.map((curve) => ({
+      name: curve.name,
+      type: 'line',
+      data: this.graphData[curve.name],
+      lineStyle: { color: curve.color },
+      itemStyle: { color: curve.color },
+    }));
 
     // add triggers (markline)
     series.push({
@@ -228,7 +240,7 @@ export class SceneComponent implements OnInit {
     });
 
     // add timeStamp (markline)
-/*     series.push({
+    /*     series.push({
       name: 'timeStamp',
       type: 'line',
       //  stack: 'x',
@@ -245,40 +257,27 @@ export class SceneComponent implements OnInit {
 
   // event handlers
   onChartClick(event: any): void {
-    let index = event.dataIndex;
-    let elements;
-    let graphElements;
-
     if (event.componentType != 'markLine') return;
 
-    let trigger = event.data;
-    let eventTriggered = this.getTriggerAtTime(trigger.xAxis);
-    trigger['editable'] = eventTriggered.editable;
-    trigger['id'] = eventTriggered.id;
-    this.openTriggerDialog(event.data, true, true);
+    let clickTrigger = new Trigger(event.data);
+
+    let eventTriggered = this.modele.triggeredEvents.filter(
+      (trigger: Trigger) => trigger.time == clickTrigger.xAxis
+    )[0];
+
+    clickTrigger.editable = eventTriggered.editable;
+    clickTrigger.id = eventTriggered.id;
+    clickTrigger.in = eventTriggered.in;
+    this.openDialog(clickTrigger, true, true);
   }
 
   onChartLegendSelectChanged(event: any): void {
     this.variableSelected = event.selected;
-    this.updateMarklineData();
     this.updateChart();
   }
 
-  addTrigger() {
-    this.openTriggerDialog(new Trigger(), false, true);
-  }
-
-  addTimeStamp() {
-    let newTimeSTamp = {
-      name: '',
-      xAxis: 0,
-      yAxis: 0,
-      coord: [0, 0],
-      type: null,
-      id: '',
-    };
-
-    this.openTriggerDialog(newTimeSTamp, false, false);
+  add(classe: typeof Edge) {
+    this.openDialog(new classe(), false, classe.className === 'Trigger');
   }
 
   /**
@@ -286,70 +285,59 @@ export class SceneComponent implements OnInit {
    * @param trigger
    * @param edition
    */
-  openTriggerDialog(trigger, edition: boolean, isTrigger: boolean) {
+  openDialog(trigger, edition: boolean, isTrigger: boolean) {
     const dialogRef = this.dialog.open(TriggerDialogComponent, {
       data: [trigger, this.events, edition, isTrigger],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if(result){
-      if (isTrigger) {
-        let event = this.getTriggerAtTime(result.coord);
-        if (result.delete) {
-          const index = this.modele.triggeredEvents.indexOf(event);
-          if (index > -1) this.modele.triggeredEvents.splice(index, 1);
-        } else if (result) {
-          // update the time of the trigger
-          if (edition)
-            event.time = Number(result.xAxis);
-          else {
-            let event = new Trigger({
-              time: Number(result.xAxis),
-              id: result.event,
-            });
-            this.modele.triggeredEvents.push(event);
-          }
-          this.updateTrigger.emit(this.modele.triggeredEvents);
+      if (result) {
+        if (isTrigger) {
+          this.change<Trigger>(Trigger,result, edition);
+        } else {
+          this.change<Timestamp>(Timestamp,result, edition);
+          console.log("this.modele.timeStamps ",this.modele.timeStamps)
         }
-      } else {
-        if (result.delete) {
-          let index = this.modele.timeStamps.indexOf(result.coord);
-          if (index > -1) this.modele.timeStamps.splice(index, 1);
-        } else if (result) {
-          if (edition) {
-            let index = this.modele.timeStamps.indexOf(result.coord);
-            if (index > -1)
-              this.modele.timeStamps[index] = Number(result.xAxis);
-          } else {
-            this.modele.timeStamps.push(result.xAxis);
-          }
-        }
+        this.initGraphData();
       }
-      this.initGraphData();
+    });
+  }
+
+  change<T extends Timeable>(classe: typeof Edge, result, edition) {
+    let element:T;
+    let list :T[]= ((classe.className === 'Trigger')?this.modele.triggeredEvents:this.modele.timeStamps) as unknown as T[];
+    if (result.delete) {
+      result = getElementByChamp<T>(list,'id',result.id)
+      deleteElementFromArray(list, element);
+      if(classe.className === 'Trigger') this.deleteTrigger.emit(element as unknown  as Trigger);
+    } else if (result) {
+      if (edition) {
+        // update the time of the trigger
+        element = getElementByChamp<T>(list,'time',result.coord)
+        element.time = Number(result.xAxis);
+      } else {
+        // add the trigger
+        result.time = Number(result.xAxis)
+        element = new classe(result) as unknown as T ;        
+        list.push(element);
+      }
+      if(classe.className === 'Trigger') this.deleteTrigger.emit(element as unknown as Trigger);
     }
-    });
-  
   }
 
-  // tools
-
-  private getTriggerAtTime(time: number): Trigger | undefined {
-    let result = undefined;
-    this.modele.triggeredEvents.forEach((trigger) => {
-      if (trigger.time == time) result = trigger;
-    });
-    return result;
+  changeTimeStamp(result, edition) {
+    let timestamp;
+    if (result.delete) {
+      timestamp = getElementByChamp<Timestamp>(this.modele.timeStamps,'id',result.id)
+      deleteElementFromArray(this.modele.timeStamps, result);
+    } else if (result) {
+      if (edition) {
+        timestamp = getElementByChamp<Timestamp>(this.modele.timeStamps,'time',result.coord)
+        timestamp.time = Number(result.xAxis);
+      } else {
+        this.modele.timeStamps.push(timestamp);
+      }
+    }
   }
 
-  private getNodeByID(id: string): Node {
-    let result = undefined;
-    this.modele.graph.nodes.forEach((node) => {
-      // event are identified by name
-
-      if (node.type == NodeType.event && (node as Event).event == id)
-        result = node;
-      else if (node.id == id) result = node;
-    });
-    return result;
-  }
 }

@@ -1,5 +1,13 @@
 import { Component, OnInit, Inject, Input } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormGroupDirective,
+  NgForm,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import {
   MatDialog,
   MatDialogRef,
@@ -12,37 +20,26 @@ import {
   Link,
   NodeType,
   EventType,
-} from 'src/app/modules/core/models/vertex/node';
-import { Button } from 'src/app/modules/core/models/buttons';
+} from 'src/app/models/vertex/node';
+import { Button, champLabel } from 'src/app/functions/display';
+import { Scenario } from '../../../models/vertex/scenario';
+import { Modele } from '../../../models/vertex/modele';
+import { Vertex } from '../../../models/vertex/vertex';
 
 @Component({
   selector: 'app-dialog',
   templateUrl: './dialog.component.html',
   styleUrls: ['./dialog.component.less'],
 })
-export class DialogComponent<T extends Node | Link> {
+export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   // valable aussi pour les modèles et les règles
 
   form: FormGroup;
   liste: any[];
-  node: T;
+  element: T;
+  classe: typeof Vertex;
   champs;
 
-  numbers = [
-    'rand',
-    'min',
-    'max',
-    'cible',
-    'impliques',
-    'psy',
-    'UR',
-    'EU',
-    'UA',
-    'x',
-    'y',
-    'parameter',
-    'duration',
-  ];
   hidden = [
     'x',
     'y',
@@ -54,43 +51,62 @@ export class DialogComponent<T extends Node | Link> {
     'typeEvent',
     'counter',
     'root',
+    'image',
+    'tags',
+    'graph',
+    'triggeredEvents',
+    'timeStamps',
+    'PMAx',
+    'PMAy',
+    'CADIx',
+    'CADIy',
+    'PRVx',
+    'PRVy',
   ];
-  listable = ['source', 'target', 'event', 'template', 'in', 'out'];
-  booleans = ['start'];
 
-  champLabel = {
-    name: 'Nom',
-    target: 'Cible',
-    parameter: 'Paramètre',
-    event: 'Évènement',
-    duration: 'Durée',
-    out: 'Depuis',
-    in: 'Vers',
-  };
+
+  champLabel = champLabel;
+
+  required = ['title', 'triage','name','target','parameter','event','duration','in','out'];
 
   title!: string;
   edition!: boolean;
 
   button = new Button();
 
+  getType = Button.getType ;
+
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<DialogComponent<T>>,
-    @Inject(MAT_DIALOG_DATA) public data: [T, any[], boolean]
+    @Inject(MAT_DIALOG_DATA)
+    public data: [T, typeof Vertex, any[], boolean, string[]]
   ) {}
 
   ngOnInit() {
-    this.liste = this.data[1];
-    this.node = this.data[0];
-    this.edition = this.data[2];
-    this.title = this.completeTitle(
-      this.node.type == NodeType.event
-        ? (this.node as Event).typeEvent
-        : this.node.type
-    );
-    this.form = this.fb.group(this.node);
+    this.element = structuredClone(this.data[0]);
+    this.classe = this.data[1];
+    this.liste = this.data[2];
+    this.edition = this.data[3];
+    let newHidden = this.data.length > 4 ? this.data[4] : []; // les nouveaux hidden sont optionnels
 
-    this.setChamp();
+    this.title = this.completeTitle(this.classe.getType(this.element));
+
+
+    Object.keys(this.element).forEach(key => { // avoid the error  this.validator is not a function
+      if (Array.isArray(this.element[key])) delete this.element[key];
+    });
+
+    this.form = this.fb.group(this.element);
+
+    this.champs = Object.keys(this.element) as Array<keyof T>;
+
+    this.champs.map((champ: string) => {
+      if (this.required.includes(champ))
+        this.form.controls[champ].addValidators(Validators.required); //this.formControls[champ] = new FormControl('', [Validators.required]);
+    });
+
+    this.hidden = this.hidden.concat(newHidden);
   }
 
   completeTitle(type: string): string {
@@ -109,11 +125,7 @@ export class DialogComponent<T extends Node | Link> {
       case NodeType.timer:
         return start + ' le timer';
     }
-    return '';
-  }
-
-  setChamp() {
-    this.champs = Object.keys(this.node) as Array<keyof T>;
+    return start + ' un ' + type;
   }
 
   onNoClick(): void {
@@ -121,20 +133,15 @@ export class DialogComponent<T extends Node | Link> {
   }
 
   save() {
+    this.isErrorInForm();
     this.dialogRef.close(this.form.value);
   }
 
   delete() {
-    this.dialogRef.close({ delete: true, id: this.node.id });
+    this.dialogRef.close({ delete: true, id: this.element.id });
   }
 
-  public getType(champ: string) {
-    if (this.numbers.includes(champ)) return 'number';
-    if (champ == 'couleur') return 'color';
-    if (this.listable.includes(champ)) return 'liste';
-    if (this.booleans.includes(champ)) return 'boolean';
-    return 'text';
-  }
+  
 
   public isHidden(champ: string) {
     if (this.hidden.includes(champ)) return true;
@@ -142,6 +149,7 @@ export class DialogComponent<T extends Node | Link> {
   }
 
   getValue(elem) {
+    if (typeof elem === 'string') return elem;
     if ('event' in elem) return elem.event;
     if ('couleur' in elem)
       return elem.name; // si varible TODO trouver une soluce plus propre
@@ -149,25 +157,35 @@ export class DialogComponent<T extends Node | Link> {
   }
 
   getName(elem: Node | any) {
-    if (elem instanceof Node) return elem.getName();
-    else if ('name' in elem) return elem.name;
+    if (typeof elem === 'string') return elem;
+    if (elem instanceof Node) {
+      return Node.getName(elem);
+    } else if ('name' in elem) return elem.name;
     return elem.template ? elem.template.name : elem.event;
     //TODO rendre plus propre
   }
 
-  getColor(node: Node | Link) {
+  getColor(element: T) {
     return this.button.getButtonByType(
-      node instanceof Event ? node.typeEvent : node.type
-    ).color;
+      element instanceof Event ? element.typeEvent : Node.getType(element)
+    )?.color;
   }
 
-  getIcon(node: Node | Link) {
-    return this.button.getButtonByType(
-      node.type == NodeType.event ? (node as Event).typeEvent : node.type
-    ).icon;
+  getIcon(element: T) {
+    return this.button.getButtonByType(this.classe.getType(element))?.icon;
   }
 
   getLabel(champ: string) {
     return this.champLabel[champ] ? this.champLabel[champ] : champ;
+  }
+
+  // Get all Form Controls keys and loop them
+  isErrorInForm(): boolean {
+    let res = false;
+    Object.keys(this.form.controls).forEach((key) => {
+      // Get errors of every form control
+      if (this.form.get(key).errors) res = true;
+    });
+    return res;
   }
 }

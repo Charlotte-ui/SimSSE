@@ -1,29 +1,24 @@
 <mat-form-field>
-    <mat-label>Tags</mat-label>
-    <mat-chip-grid #chipGrid [(ngModel)]="tags"
-    aria-label="tags">
+  <mat-label>Tags</mat-label>
+  <mat-chip-grid #chipGrid aria-label="tags">
+    <mat-chip-row *ngFor="let tag of tags; index as i" (removed)="removeTag(i)">
+      {{ tag.value }}
+      <button matChipRemove>
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip-row>
 
-      <mat-chip-row *ngFor="let tag of tags; index as i"
-                  (removed)="removeTag(i)">
-        {{tag.value}}
-        <button matChipRemove>
-          <mat-icon>cancel</mat-icon>
-        </button>
-      </mat-chip-row>
-
-
-      <input [matChipInputFor]="chipGrid"
-              #tagInput
-              [matAutocomplete]="auto"
-            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-            (matChipInputTokenEnd)="addTag($event)" />
-
-
-    </mat-chip-grid>
-    <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-      <mat-option *ngFor="let tag of filteredTags | async" [value]="tag">
-        {{tag.value}}
-      </mat-option>
-    </mat-autocomplete>
-
+    <input
+      [matChipInputFor]="chipGrid"
+      #tagInput
+      [matAutocomplete]="auto"
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      (matChipInputTokenEnd)="addTag($event)"
+    />
+  </mat-chip-grid>
+  <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+    <mat-option *ngFor="let tag of filteredTags | async" [value]="tag">
+      {{ tag.value }}
+    </mat-option>
+  </mat-autocomplete>
 </mat-form-field>

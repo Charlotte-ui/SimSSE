@@ -36,11 +36,13 @@
     >
       <div class="row">
         <app-scene
+        *ngIf="curvesInitialized"
           [modele]="modele"
           [events]="events"
           [curves]="curves"
           [duration]="duration"
-          (updateTrigger)="updateTriggers($event)"
+          (updateTrigger)="updateTrigger.emit($event) ; updateCurve();"
+          (deleteTrigger)="deleteTrigger.emit($event) ; updateCurve();"
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">
@@ -75,6 +77,7 @@
               <app-inspecteur
                 [variables]="targetVariable"
                 [trends]="trends"
+                [disabled]="disabledInspecteur"
                 (updateVariable)="updateVariables($event)"
               ></app-inspecteur>
             </div>

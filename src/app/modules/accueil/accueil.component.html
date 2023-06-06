@@ -1,37 +1,38 @@
 <app-header></app-header>
 
-<div class="container">
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus.
-  Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed,
-  dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper
-  congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est
-  eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu
-  massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue.
-  Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue.
-  Praesent egestas leo in pede. Praesent blandit odio eu enim. Pellentesque sed
-  dui ut augue blandit sodales. Vestibulum ante ipsum primis in faucibus orci
-  luctus et ultrices posuere cubilia Curae; Aliquam nibh. Mauris ac mauris sed
-  pede pellentesque fermentum. Maecenas adipiscing ante non diam sodales
-  hendrerit.
+<div class="container" id="presentation">
+
+  <h1>Qu'est-ce que SimSSE ?</h1>
+  <p>
+L’objectif du projet SimSSE est d’améliorer le réalisme de l’évolution clinique des plastrons lors des simulations de
+  SSE, afin de préparer au mieux les équipes de secours et de faciliter le travail de préparation / animation de ces
+  exercices. </p>
+  <p>
+La solution SimSSE permettrait de mieux préparer les professionnels de la prise en charge, de leur permettre de mieux
+anticiper les conséquences de leurs actions et de revenir sur le déroulé de l’exercice pour identifier les axes
+d’amélioration. Une meilleure préparation permettrait de réduire le stress, d’apprendre à déléguer, d’améliorer la
+coordination et le parcours de soins des victimes en SSE.</p>
+<p>
+
+Dans le cadre de SimSSE, nous nous intéressons principalement aux exercices préfectoral de grande ampleur (de 50 à 300
+victimes) impliquant des moyens sur le terrain. Il y a un exercice ORSEC NOVI (Nombreuses Victimes) grandeur réel par
+département et par an.</p>
+<p>
+De façon secondaire, SimSSE peut aussi inclure les cas d’usages liés aux exercices plus petits organisés par les acteurs
+pré-hospitaliers (SAMU, SDIS, associations de sécurité civile…) et intra-hospitalier (CHU, dans le cadre du plan ORSAN).
+Pour le moment, il est prévu que SimSSE servent uniquement à la partie pré-hospitalière et que le scénario s’arrête une
+fois le plastron monté dans l’ambulance. Toutefois, on pourrait très bien envisager une poursuite du scénario en
+intra-hospitalier, car eux aussi se réfèrent à des fiches plastrons papiers et souffrent de problématiques similaires.
+Les contraintes particulières de l’intra-hospitalier n’entrent pas dans le périmètre de base du projet, mais il peut
+être intéressant de les prendre en compte dans une perspective d’expansion futur.</p>
+
 </div>
 
-<div class="container">
-  <div class="row">
-    <div class="col-6">
-      <app-list-box
-        title="Scenarios"
-        [classe]="Scenario"
-        (newElement)="createScenario($event)"
-        [chips]="allTagsScenario"
-      ></app-list-box>
-    </div>
-    <div class="col-6">
-      <app-list-box
-        title="Modèles"
-        [classe]="Modele"
-        (newElement)="createModele($event)"
-        [chips]="allTagsPlastron"
-      ></app-list-box>
-    </div>
-  </div>
+
+
+<div class="container" id="navigation">
+<button mat-raised-button (click)="goTo('scenarios')">Editeur</button>
+<button mat-raised-button (click)="goTo('')" disabled>Animateur</button>
+<button mat-raised-button (click)="goTo('')" disabled>Retex</button>
+
 </div>

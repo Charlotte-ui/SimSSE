@@ -4,8 +4,8 @@
       <app-triage [triage]="element['triage']"></app-triage>
     </div>
 
-    <div *ngIf="element['image']" class="col-2 image">
-      <img src="{{ 'assets/images/' + element['image'] + '.jpg' }}" />
+    <div *ngIf="!element['triage']" class="col-2 image">
+      <img [src]="image?.src || 'http://placehold.it/180'" />
     </div>
 
     <div class="col-9 texte">
@@ -22,7 +22,7 @@
       </div>
     </div>
     <div class="col-1 buttons">
-      <button mat-mini-fab (click)="removeElement()">
+      <button mat-icon-button (click)="removeElement()" [matTooltip]="'Supprimer '+element.title">
         <mat-icon>delete</mat-icon>
       </button>
     </div>

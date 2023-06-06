@@ -2,29 +2,28 @@
   <h1 mat-dialog-title>{{ title }}</h1>
 
   <mat-dialog-content [formGroup]="form">
-    <div mat-dialog-content>
-      <div class="container">{{ message }}</div>
+    <div class="container">{{ message }}</div>
 
-      <mat-form-field appearance="fill" class="container">
-        <mat-label>Titre</mat-label>
-        <input matInput formControlName="title"/>
-      </mat-form-field>
+    <mat-form-field appearance="fill" class="container">
+      <mat-label>Titre</mat-label>
+      <input matInput formControlName="title" />
+      <mat-error>
+        Le titre du nouveau modèle est <strong>requis</strong>
+      </mat-error>
+    </mat-form-field>
 
-      <mat-form-field appearance="fill" class="container">
-        <mat-label>Description</mat-label>
-        <textarea matInput formControlName="description"></textarea>
-      </mat-form-field>
+    <mat-form-field appearance="fill" class="container">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
 
-      <div class="container noOverflow">
-        <mat-label>Triage</mat-label>
-        <mat-radio-group formControlName="triage" aria-label="Select an option">
-          <mat-radio-button value="UA">UA</mat-radio-button>
-          <mat-radio-button value="EU">EU</mat-radio-button>
-          <mat-radio-button value="UR">UR</mat-radio-button>
-        </mat-radio-group>
-      </div>
-
-      <app-tags [tags]="modele.tags" [allTags]="alltags"></app-tags>
+    <div class="container noOverflow">
+      <mat-label>Triage</mat-label>
+      <mat-radio-group formControlName="triage" aria-label="Select an option">
+        <mat-radio-button value="UA">UA</mat-radio-button>
+        <mat-radio-button value="EU">EU</mat-radio-button>
+        <mat-radio-button value="UR">UR</mat-radio-button>
+      </mat-radio-group>
     </div>
 
     <div mat-dialog-actions>

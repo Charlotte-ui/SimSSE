@@ -4,15 +4,27 @@ mat-form-field {
     display: flex;
 }
 
+
 .container {
     display: flex;
-    margin: 1%;
+    justify-content: space-around;
+    width: 100%;
     max-width: 100%;
+    row-gap: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-right: 0px;
+    padding-left: 0px;
+
 }
 
 mat-card {
-    margin: 1%;
     display: flex;
+    margin: 2%;
+}
+
+app-list-box{
+margin: 2%;
 }
 
 button {
@@ -21,14 +33,6 @@ button {
 
 .tab {
     flex-direction: column;
-}
-
-.plastron {
-    padding: 0;
-}
-
-.modele {
-    padding: 0;
 }
 
 .left {
@@ -46,11 +50,12 @@ tr.mat-mdc-footer-row td {
 
 td {
     max-width: 150px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .row {
     max-width: 100%;
-    width: 100%;
 }
 
 .expanded {
@@ -58,8 +63,15 @@ td {
     display: flex;
 }
 
-.description {
-    padding: 16px;
+.collapsed{
+    height: 0;
+    min-height: 0;
+}
+
+.expanded > div{
+    padding: 1%;
+    font-weight: lighter;
+    width: fit-content;
 }
 
 .description-row {
@@ -67,7 +79,6 @@ td {
 }
 
 .profil {
-    border: 2px solid black;
     padding: 8px;
     font-weight: lighter;
     margin: 8px 0;
@@ -96,4 +107,28 @@ mat-option {
 
 .hover:not(.hover):active {
     background: #efefef;
+}
+
+
+
+#variant{
+    font-style: italic;
+}
+
+#description{
+    width: 100%;
+}
+
+#numero{
+width: 25px;
+}
+
+#title{
+max-width: 500px;
+    width: 500px;
+}
+
+#title > div{
+justify-content: space-between;
+align-items: center;
 }

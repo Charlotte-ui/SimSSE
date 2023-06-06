@@ -1,7 +1,7 @@
 
 <div class="container">
     <div class="background">
-        <img src="/assets/images/carte.png"/>
+        <img [src]="map?.src || 'http://placehold.it/180'"/>
     </div>
     <div class="firstPlan">
         <div echarts (chartInit)="onChartReady($event)" [options]="initialChartOption" [merge]="mergeOptions" style="height: 100%;"></div>
