@@ -17,8 +17,6 @@ export enum EventType {
   action = 'action',
 }
 
-
-
 export abstract class Node extends Vertex {
   x: number;
   y: number;

@@ -19,8 +19,8 @@ export class GroupesComponent {
   });
   groupPositions!: any[];
 
-  editable: string[] = ['psy', 'implique'];
-  keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique'];
+  editable: string[] = ['psy', 'implique','t0'];
+  keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique','t0'];
   displayedColumnsGroup: string[] = [
     'scene',
     'UR',
@@ -28,6 +28,7 @@ export class GroupesComponent {
     'EU',
     'psy',
     'implique',
+    't0',
     'delete',
   ];
 
@@ -106,6 +107,7 @@ export class GroupesComponent {
   }
 
   getTotal(proprerty: string) {
+    if (proprerty == 't0') return ''
     let res = 0;
     this.groupes.forEach((group) => {
       res += Number(group[proprerty]);
@@ -173,6 +175,7 @@ export class GroupesComponent {
       let formGroupe = this.fb.group({
         implique: [groupe.implique],
         psy: [groupe.psy],
+        t0: [groupe.t0],
       });
       groupeCtrl.push(formGroupe);
     });

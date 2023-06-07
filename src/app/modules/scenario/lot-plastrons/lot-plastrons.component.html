@@ -1,11 +1,13 @@
 <!-- Plastrons  -->
-<div class="container">
+<div class="container "> 
   <div class="container" cdkDropListGroup>
     
-      <mat-card >
+      <mat-card class="scrollable-content">
         <mat-card-header>
             <mat-card-title>Plastrons</mat-card-title>
         </mat-card-header>
+
+        <div>
 
         <table
           mat-table
@@ -39,14 +41,15 @@
           <ng-container matColumnDef="title">
             <th mat-header-cell *matHeaderCellDef mat-sort-header>Modèle</th>
             <td id="title" mat-cell *matCellDef="let element; let i = index">
-              <div class="container">
-                <button mat-button (click)="goToPlastron(element.idPlastron)">
+              <div class="container" [ngClass]="{drag:!element.idPlastron}">
+                <button mat-button (click)="goToPlastron(element.idPlastron)"
+                [disabled]="!element.idPlastron">
                   {{ element.title }}
                 </button>
                 <button
                   mat-icon-button
                   (click)="deletePlastron(i, element)"
-                  [disabled]="element.id == -1"
+                  [disabled]="!element.idPlastron"
                 >
                   <mat-icon>clear</mat-icon>
                 </button>
@@ -93,9 +96,10 @@
                   [disabled]="element.id == -1"
                   (selectionChange)="updateSelection($event, element)"
                 >
+                <mat-select-trigger><mat-icon *ngIf="element.statut == 'Terminé'">check_circle</mat-icon> {{element.statut}}</mat-select-trigger>
                   <mat-option value="En cours">En cours</mat-option>
                   <mat-option value="A faire">A faire</mat-option>
-                  <mat-option value="Terminé">Terminé</mat-option>
+                  <mat-option value="Terminé"><mat-icon>keyboard_arrow_down</mat-icon>Terminé</mat-option>
                 </mat-select>
               </mat-form-field>
             </td>
@@ -150,10 +154,10 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumnsPlastron"></tr>
+          <tr mat-header-row *matHeaderRowDef="displayedColumnsPlastron ; sticky: true" ></tr>
           <tr
             mat-row
-            *matRowDef="let row; columns: displayedColumnsPlastron"
+            *matRowDef="let row; columns: displayedColumnsPlastron ; sticky: true"
             cdkDrag
             [cdkDragData]="row"
             [class.expandedDescription]="expandedElement === row"
@@ -166,8 +170,7 @@
             class="description-row"
           ></tr>
         </table>
-        <mat-paginator [pageSizeOptions]="[5,6,7,8,9,10]" showFirstLastButtons aria-label="Choisissez une page">
-        </mat-paginator>
+</div>
       </mat-card>
 
       <app-list-box
