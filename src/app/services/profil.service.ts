@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
-import { FirebaseService } from './firebase.service';
 import { Profil } from '../models/vertex/profil';
 import { ApiService } from './api.service';
 import { concat, concatMap, from, map, of, switchMap, zipAll } from 'rxjs';
@@ -14,7 +13,6 @@ import {
 })
 export class ProfilService {
   constructor(
-    public firebaseService: FirebaseService,
     public apiService: ApiService
   ) {}
   getProfilById(id: string): Observable<Profil | undefined> {

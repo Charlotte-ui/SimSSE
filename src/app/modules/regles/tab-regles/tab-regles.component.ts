@@ -5,8 +5,8 @@ import { DialogComponent } from '../../shared/dialog/dialog.component';
 import { Vertex } from '../../../models/vertex/vertex';
 import { Button, champLabel } from 'src/app/functions/display';
 import { RegleService } from 'src/app/services/regle.service';
-import { CategoryAction } from 'src/app/models/vertex/event';
 import { deleteElementFromArray } from 'src/app/functions/tools';
+import { Categorie } from 'src/app/models/vertex/event';
 
 @Component({
   selector: 'app-tab-regles',
@@ -69,7 +69,7 @@ export class TabReglesComponent<T extends Vertex> {
   openDialog(element: T, id: number, edit: boolean) {
 
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, this.classe, Object.values(CategoryAction), edit],
+      data: [element, this.classe, Categorie.categories.map((cat:Categorie) => cat.name), edit],
     });
 
     dialogRef.afterClosed().subscribe((result) => {

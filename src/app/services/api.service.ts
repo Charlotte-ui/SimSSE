@@ -13,8 +13,7 @@ export class ApiService {
   token!: string;
 
   constructor(
-    private http: HttpClient,
-    private authenticationService: AuthenticationService
+    private http: HttpClient
   ) {}
 
   // return of("34:2").pipe ( delay( 5000 ));

@@ -9,12 +9,18 @@
           </h1>
         </mat-form-field>
       </div>
-      <div class="col">
+      <div class="container">
         <mat-form-field>
           <mat-label>Description</mat-label>
           <textarea matInput formControlName="description"></textarea>
         </mat-form-field>
       </div>
+        <div class="container">
+          <mat-form-field>
+            <mat-label>Durée (en minutes)</mat-label>
+            <input matInput type="number" formControlName="duration"/>
+          </mat-form-field>
+        </div>
       <div class="container">
         <app-tags
           *ngIf="allTags"

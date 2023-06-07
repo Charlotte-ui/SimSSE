@@ -17,6 +17,7 @@ export class Scenario extends Vertex implements Listable {
   EU: number;
   decede:number;
   image: string;
+  duration: number;
   coordPMA:[number,number]
   coordCADI:[number,number]
   coordPRV:[number,number]
@@ -37,7 +38,7 @@ export class Scenario extends Vertex implements Listable {
     this.coordPMA = object?.coordPMA ? object.coordPMA : [48,52];
     this.coordPRV = object?.coordPRV ? object.coordPRV : [52,48];
     this.coordCADI = object?.coordCADI ? object.coordCADI : [48,48];
-
+    this.duration = object?.duration ? object.duration : 100;
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {

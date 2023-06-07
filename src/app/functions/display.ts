@@ -61,7 +61,7 @@ const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage'
 
 const listableWithGroupe = ['event'];
 
-const booleans = ['start','med','paraMed'];
+const booleans = ['start','med','paraMed','secouriste'];
 
 export class Button {
   static buttons: IButton[] = [

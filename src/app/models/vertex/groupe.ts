@@ -10,6 +10,7 @@ export class Groupe extends Vertex{
     scene:number;
     x:number;
     y:number;
+    t0:number;
 
     public static override className = "Groupe"
 
@@ -24,6 +25,7 @@ export class Groupe extends Vertex{
         this.psy = (object?.psy)?object.psy:0;
         this.UR = (object?.UR)?object.UR:0;
         this.EU = (object?.EU)?object.EU:0;
+        this.t0 = (object?.t0)?object.t0:0;
 
     }
 

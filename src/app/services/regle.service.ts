@@ -8,12 +8,13 @@ import {
 } from '../models/vertex/node';
 import { ApiService } from './api.service';
 import { Vertex } from '../models/vertex/vertex';
-import { Action, BioEvent } from '../models/vertex/event';
+import { Action, BioEvent, Categorie } from '../models/vertex/event';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RegleService {
+
 
   constructor(private apiService:ApiService) {}
 
@@ -29,6 +30,10 @@ export class RegleService {
 
   getActions(): Observable<Action[]> {
     return this.apiService.getClasseElements(Action)
+  }
+
+  getCategories() {
+     return this.apiService.getClasseElements(Categorie)
   }
 
 

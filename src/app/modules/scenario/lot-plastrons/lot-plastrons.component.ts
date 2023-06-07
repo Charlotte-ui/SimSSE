@@ -36,7 +36,6 @@ import { WaitComponent } from '../../shared/wait/wait.component';
 import { PlastronService } from 'src/app/services/plastron.service';
 import { Profil } from 'src/app/models/vertex/profil';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { getElementByChamp } from 'src/app/functions/tools';
 
 interface tableElementPlastron {
@@ -126,7 +125,6 @@ export class LotPlastronsComponent {
 
   @ViewChild('table', { static: true }) table: MatTable<tableElementPlastron>;
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
     public scenarioService: ScenarioService,
@@ -143,7 +141,7 @@ export class LotPlastronsComponent {
     this.defaultElementPlastron = new Object() as tableElementPlastron;
     this.defaultElementPlastron.description = '';
     this.defaultElementPlastron.groupe = undefined;
-    this.defaultElementPlastron.title = 'Associer un modèle';
+    this.defaultElementPlastron.title = 'Faites glisser un modèle traumato-physiopathologique';
     this.defaultElementPlastron.statut = Statut.Todo;
     this.defaultElementPlastron.triage = Triage.UR;
     this.defaultElementPlastron.id = -1;
@@ -282,7 +280,6 @@ export class LotPlastronsComponent {
         this.sortedDataSourcePlastron.data
       );
 
-    this.sortedDataSourcePlastron.paginator = this.paginator;
   }
 
   expandElement(event, element: tableElementPlastron) {
@@ -314,7 +311,7 @@ export class LotPlastronsComponent {
       (element) => element['show'] || element['show'] === undefined
     );
     let modele = filteredData[event.previousIndex] as Modele;
-    let currentPlastron = items[index];
+    let currentPlastron = this.sortedDataSourcePlastron.data[index];
     let datasourceIndex =
       this.sortedDataSourcePlastron.data.indexOf(currentPlastron);
     let filteredDataSource = this.sortedDataSourcePlastron.data.filter(
@@ -323,10 +320,7 @@ export class LotPlastronsComponent {
 
     let realIndex = filteredDataSource.indexOf(currentPlastron);
 
-    // Without paginator
-    /*     
-    let currentPlastron = this.sortedDataSourcePlastron.data[index];
-     */
+
 
     console.log('modele ', modele);
 

@@ -1,4 +1,3 @@
-import { Collection } from '../../services/firebase.service';
 import { Nameable } from '../interfaces/nameable';
 import { Template } from '../interfaces/templatable';
 import { Action, BioEvent } from './event';
@@ -17,8 +16,6 @@ export enum EventType {
   bio = 'bio',
   action = 'action',
 }
-
-
 
 export abstract class Node extends Vertex {
   x: number;

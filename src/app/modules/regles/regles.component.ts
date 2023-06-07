@@ -4,7 +4,11 @@ import {
   VariablePhysioTemplate,
 } from '../../models/vertex/variablePhysio';
 import { RegleService } from '../../services/regle.service';
-import { Action, BioEvent } from 'src/app/models/vertex/event';
+import { Action, BioEvent, Categorie } from 'src/app/models/vertex/event';
+import { Vertex } from 'src/app/models/vertex/vertex';
+
+
+
 
 @Component({
   selector: 'app-regles',
@@ -17,6 +21,8 @@ export class ReglesComponent {
   moyennesAge!: any[];
   events!: BioEvent[];
   actions!: Action[];
+  categories!: Categorie[];
+
 
   VariablePhysioTemplate = VariablePhysioTemplate;
   Action = Action;
@@ -32,12 +38,8 @@ export class ReglesComponent {
 
       this.variables.forEach((variable) => {
         let v = structuredClone(variable);
-
-
         let ma = this.initTableMoyenne(v.name, v.moyennesAge, v.sdAge, true);
-
         delete v.moyennesAge;
-
         delete v.sdAge;
         this.variablesDetails.push(v);
         this.moyennesAge.push(ma);
@@ -51,6 +53,14 @@ export class ReglesComponent {
     this.regleService.getActions().subscribe((response: Action[]) => {
       this.actions = response;
     });
+
+
+    this.regleService.getCategories().subscribe((response: Categorie[]) => {
+      console.log('response ',response)
+      this.categories = response;
+    });
+    
+
   }
 
   initTableMoyenne(name: string, moyennes, sd, age: boolean) {

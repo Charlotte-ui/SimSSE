@@ -15,6 +15,7 @@ export class HeaderComponent implements OnInit {
   button = new Button();
   pseudo!: string;
   role!: string;
+  editor:boolean = false;
 
   @Input() scenario: Scenario;
   @Input() plastron: Plastron;
@@ -32,7 +33,13 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.pseudo = localStorage.getItem('pseudo');
-    this.role = localStorage.getItem('role');
+    this.role = '';
+    if(localStorage.getItem('admin') == 'true') this.role += 'admin '
+    if(localStorage.getItem('editor') == 'true') {
+      this.role += 'editeur ';
+      this.editor = true ;
+    }
+    if(localStorage.getItem('animator') == 'true') this.role += 'animateur '
   }
 
   goToRules() {
