@@ -11,8 +11,16 @@
   <div class="container" cdkDropListGroup>
     <mat-card class="scrollable-content">
       <mat-card-header>
-        <mat-card-title>Plastrons</mat-card-title>
-        <mat-icon>{{ button.getButtonByType("plastron")?.icon }}</mat-icon>
+        <mat-card-title
+          >Plastrons
+          <button
+            mat-mini-fab
+            [style.background]="button.getButtonByType('plastron')?.color"
+            disabled
+          >
+            <mat-icon>{{ button.getButtonByType("plastron")?.icon }}</mat-icon>
+          </button>
+        </mat-card-title>
       </mat-card-header>
 
       <div>
@@ -137,7 +145,7 @@
                 <mat-select
                   [(value)]="element.statut"
                   [disabled]="element.id == -1"
-                  (selectionChange)="updateSelection($event, element)"
+                  (selectionChange)="updateStatut($event, element)"
                 >
                   <mat-select-trigger
                     [ngClass]="{ finished: element.statut == 'Terminé' }"
@@ -217,11 +225,7 @@
           ></tr>
           <tr
             mat-row
-            *matRowDef="
-              let row;
-              columns: displayedColumnsPlastron;
-              sticky: true
-            "
+            *matRowDef="let row; columns: displayedColumnsPlastron"
             cdkDrag
             [cdkDragData]="row"
             [class.expandedDescription]="expandedElement === row"
@@ -243,6 +247,7 @@
       title="Modèles traumato-physiologiques"
       [service]="modeleService"
       [classe]="Modele"
+      style="max-height: 720px"
     ></app-list-box>
   </div>
 </div>

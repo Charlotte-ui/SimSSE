@@ -125,7 +125,7 @@ export class LotPlastronsComponent {
             .fill({ ...this.defaultElementPlastron })
             .map(() => ({ ...this.defaultElementPlastron }))
         );
-      if (this.plastrons.length > 0) this.completePlastrons();
+      if (this.plastrons?.length > 0) this.completePlastrons();
       else this.updateDataSourceTriage(0);
     }
   }
@@ -165,6 +165,11 @@ export class LotPlastronsComponent {
     this.router.navigate(['/plastron/' + plastronId]);
   }
 
+  /**
+   * on change group plastron attribution, update the database
+   * @param event 
+   * @param element 
+   */
   updateGroup(event, element: tableElementPlastron) {
     let plastron = getElementByChamp(this.plastrons, 'id', element.idPlastron);
     let newScene = event.value;
@@ -185,7 +190,12 @@ export class LotPlastronsComponent {
       });
   }
 
-  updateSelection(event, element: tableElementPlastron) {
+  /**
+   * on change plastron statut, update database
+   * @param event 
+   * @param element 
+   */
+  updateStatut(event, element: tableElementPlastron) {
     let plastron = this.plastrons[element.id];
     let newStatut = event.value;
     this.plastronService
@@ -233,8 +243,15 @@ export class LotPlastronsComponent {
     if (this.plastrons.length == 0) this.updateDataSourceTriage(0);
 
     this.plastrons.forEach((plastron, index) => {
-      if (plastron.modele) this.addPlastronToDatasource(plastron, index);
-      plastron.groupe[plastron.modele.triage]++;
+      console.log()
+      if(plastron.modele.id){
+        this.addPlastronToDatasource(plastron, index);
+        plastron.groupe[plastron.modele.triage]++;
+      }
+      else{
+//TODO delete all plastron that have no modele
+      }
+
     });
 
     // une fois que tout les plastrons sont chargés, on update le triage des plastrons manquants
