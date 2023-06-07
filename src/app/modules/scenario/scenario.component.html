@@ -4,7 +4,7 @@
   (newSave)="save()"
 ></app-header>
 <mat-tab-group (selectedTabChange)="reloadPlastron($event)">
-  <mat-tab label="Infos générales">
+  <mat-tab label="Informations générales">
     <app-general-infos
       [scenario]="scenario"
       (newTotalPlastron)="totalPlastron = $event; "

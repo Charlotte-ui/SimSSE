@@ -1,14 +1,21 @@
 <!-- Plastrons  -->
-<div class="container "> 
+<div class="container" id="general">
+  <div class="information-text">
+    Préparez ici vos plastrons. A gauche, vous avez la liste des plastrons du
+    scenario. Choisissez pour chacun d'entre eux un modèle
+    traumato-physiopathologique de même triage et faîte glisser ce modèle
+    au-dessus de la ligne du plastron. Vous pourrez ensuite éditer le modèle et
+    le profil du plastron en question. Vous pouvez aussi assigner les plastrons
+    à un groupe.
+  </div>
   <div class="container" cdkDropListGroup>
-    
-      <mat-card class="scrollable-content">
-        <mat-card-header>
-            <mat-card-title>Plastrons</mat-card-title>
-        </mat-card-header>
+    <mat-card class="scrollable-content">
+      <mat-card-header>
+        <mat-card-title>Plastrons</mat-card-title>
+        <mat-icon>{{ button.getButtonByType("plastron")?.icon }}</mat-icon>
+      </mat-card-header>
 
-        <div>
-
+      <div>
         <table
           mat-table
           #table
@@ -29,6 +36,7 @@
               *matHeaderCellDef
               mat-sort-header
               sortActionDescription="Sort by id"
+              matTooltip="Numéro identifiant chaque plastron, en fonction de l'ordre de création. Trier par numéro pour remettre les plastrons dans l'ordre de création."
             >
               N°
             </th>
@@ -39,11 +47,26 @@
 
           <!-- Title Column -->
           <ng-container matColumnDef="title">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Modèle</th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              matTooltip="Titre du modèle traumato-physiopathologique associé au plastron. Trier par ordre alphabétique."
+            >
+              Modèle
+            </th>
             <td id="title" mat-cell *matCellDef="let element; let i = index">
-              <div class="container" [ngClass]="{drag:!element.idPlastron}">
-                <button mat-button (click)="goToPlastron(element.idPlastron)"
-                [disabled]="!element.idPlastron">
+              <div
+                class="container"
+                [ngClass]="{ drag: !element.idPlastron }"
+                (mouseup)="mouseup(element)"
+                (mouseleave)="mouseleave()"
+              >
+                <button
+                  mat-button
+                  (click)="goToPlastron(element.idPlastron)"
+                  [disabled]="!element.idPlastron"
+                >
                   {{ element.title }}
                 </button>
                 <button
@@ -59,7 +82,14 @@
 
           <!-- Triage Column -->
           <ng-container matColumnDef="triage">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Triage</th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              matTooltip="Triage du plastron. Trier par triage (EU - UA - UR)."
+            >
+              Triage
+            </th>
             <td mat-cell *matCellDef="let element">
               <app-triage [triage]="element.triage"></app-triage>
             </td>
@@ -67,11 +97,17 @@
 
           <!-- Group Column -->
           <ng-container matColumnDef="groupe">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Groupe</th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              matTooltip="Groupe d'appartenance du plastron. Trier par scène."
+            >
+              Groupe
+            </th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field appearance="fill">
                 <mat-select
-                  [disabled]="element.id == -1"
                   [(value)]="element.groupe"
                   (selectionChange)="updateGroup($event, element)"
                 >
@@ -88,7 +124,14 @@
 
           <!-- Statut Column -->
           <ng-container matColumnDef="statut">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header>Statut</th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              mat-sort-header
+              matTooltip="Etat d'avancement du plastron. Trier par statut (à faire - en cours - terminé)."
+            >
+              Statut
+            </th>
             <td mat-cell *matCellDef="let element">
               <mat-form-field appearance="fill">
                 <mat-select
@@ -96,10 +139,18 @@
                   [disabled]="element.id == -1"
                   (selectionChange)="updateSelection($event, element)"
                 >
-                <mat-select-trigger><mat-icon *ngIf="element.statut == 'Terminé'">check_circle</mat-icon> {{element.statut}}</mat-select-trigger>
+                  <mat-select-trigger
+                    [ngClass]="{ finished: element.statut == 'Terminé' }"
+                    ><mat-icon *ngIf="element.statut == 'Terminé'"
+                      >check_circle</mat-icon
+                    >
+                    {{ element.statut }}</mat-select-trigger
+                  >
                   <mat-option value="En cours">En cours</mat-option>
                   <mat-option value="A faire">A faire</mat-option>
-                  <mat-option value="Terminé"><mat-icon>keyboard_arrow_down</mat-icon>Terminé</mat-option>
+                  <mat-option value="Terminé"
+                    ><mat-icon>keyboard_arrow_down</mat-icon>Terminé</mat-option
+                  >
                 </mat-select>
               </mat-form-field>
             </td>
@@ -107,11 +158,18 @@
 
           <!-- Description Column -->
           <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              matTooltip="Cliquez pour voir le profil et la description du plastron"
+            >
+              Description
+            </th>
             <td mat-cell *matCellDef="let element">
               <button
                 mat-icon-button
                 aria-label="expand row"
+                [disabled]="element.id == -1"
                 (click)="expandElement($event, element)"
               >
                 <mat-icon *ngIf="expandedElement !== element"
@@ -136,8 +194,7 @@
                 [@descriptionExpand]="
                   element === expandedElement ? 'expanded' : 'collapsed'
                 "
-
-                [ngClass]="{'collapsed': element !== expandedElement}"
+                [ngClass]="{ collapsed: element !== expandedElement }"
               >
                 <div class="age">Âge : {{ element.age }}</div>
 
@@ -154,10 +211,17 @@
             </td>
           </ng-container>
 
-          <tr mat-header-row *matHeaderRowDef="displayedColumnsPlastron ; sticky: true" ></tr>
+          <tr
+            mat-header-row
+            *matHeaderRowDef="displayedColumnsPlastron; sticky: true"
+          ></tr>
           <tr
             mat-row
-            *matRowDef="let row; columns: displayedColumnsPlastron ; sticky: true"
+            *matRowDef="
+              let row;
+              columns: displayedColumnsPlastron;
+              sticky: true
+            "
             cdkDrag
             [cdkDragData]="row"
             [class.expandedDescription]="expandedElement === row"
@@ -170,14 +234,15 @@
             class="description-row"
           ></tr>
         </table>
-</div>
-      </mat-card>
+      </div>
+    </mat-card>
 
-      <app-list-box
-        title="Modèles traumato-physiologiques"
-        [service]="modeleService"
-        [classe]="Modele"
-      ></app-list-box>
-    </div>
+    <div id="arrow"><mat-icon>keyboard_backspace</mat-icon></div>
 
+    <app-list-box
+      title="Modèles traumato-physiologiques"
+      [service]="modeleService"
+      [classe]="Modele"
+    ></app-list-box>
+  </div>
 </div>
