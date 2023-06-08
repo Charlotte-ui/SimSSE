@@ -1,9 +1,12 @@
 <div class="container">
-  <div class="row">
-    <div class="col-6">
-      <form [formGroup]="form">
+  <div class="col">
+    <!-- Groupe Edition Table -->
+
+    <div class="information-text" >Indiquer la répartition désiré des plastrons dans les groupes.</div>
+    
+    <form [formGroup]="form">
       <table
-      *ngIf="groupes"
+        *ngIf="groupes"
         mat-table
         [dataSource]="groupes"
         class="mat-elevation-z8 demo-table"
@@ -19,12 +22,18 @@
         <!-- Keys Column -->
         <ng-container *ngFor="let key of keysGroup" [matColumnDef]="key">
           <th mat-header-cell *matHeaderCellDef>{{ key }}</th>
-          <td mat-cell *matCellDef="let element ; let rowIndex = index" [formGroupName]="rowIndex">
-            <ng-container *ngIf="!isEditable(key)">
-              {{ element[key] }}
-            </ng-container>
-            <mat-form-field *ngIf="isEditable(key)">
-              <input matInput type="number" [value]="element[key]" [formControlName]="key" />
+          <td
+            mat-cell
+            *matCellDef="let element; let rowIndex = index"
+            [formGroupName]="rowIndex"
+          >
+            <mat-form-field>
+              <input
+                matInput
+                type="number"
+                [value]="element[key]"
+                [formControlName]="key"
+              />
             </mat-form-field>
           </td>
           <td
@@ -60,9 +69,51 @@
         <tr mat-footer-row *matFooterRowDef="displayedColumnsGroup"></tr>
       </table>
     </form>
-    </div>
-    <div class="col-6">
-      <app-carte [data]="groupPositions" [map]="map" (positionsChange2)="updatePosition($event)"></app-carte>
-    </div>
+
+    <div class="information-text">Voici un récapitulatif de la répartition effective des plastrons dont les groupes.</div>
+
+    <!-- Groupe Recap Table -->
+      <table
+        *ngIf="groupeRecapValues"
+        mat-table
+        [dataSource]="groupeRecapValues"
+        class="mat-elevation-z8 demo-table"
+      >
+        <!-- Scene Column -->
+        <ng-container matColumnDef="scene">
+          <th mat-header-cell *matHeaderCellDef>Scène</th>
+          <td mat-cell *matCellDef="let element">{{ element?.scene }}</td>
+          <td mat-footer-cell *matFooterCellDef>Total</td>
+        </ng-container>
+
+        <!-- Triage Column -->
+        <ng-container
+          *ngFor="let triage of ['EU', 'UA', 'UR']"
+          [matColumnDef]="triage"
+        >
+          <th mat-header-cell *matHeaderCellDef>{{ triage }}</th>
+          <td mat-cell *matCellDef="let element; let rowIndex = index">
+            {{ (element)?element[triage]:0 }}
+          </td>
+          <td
+            mat-footer-cell
+            *matFooterCellDef
+            [ngClass]="getTotal(triage) == scenario[triage] ? 'ok' : 'noOk'"
+          >
+            {{ getTotal(triage) }}
+          </td>
+        </ng-container>
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsRecap"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsRecap"></tr>
+        <tr mat-footer-row *matFooterRowDef="displayedColumnsRecap"></tr>
+      </table>
+  </div>
+
+  <div class="col" id="carte">
+    <app-carte
+      [data]="groupPositions"
+      [map]="map"
+      (positionsChange2)="updatePosition($event)"
+    ></app-carte>
   </div>
 </div>

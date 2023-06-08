@@ -1,10 +1,16 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import { Groupe } from '../../../models/vertex/groupe';
 import { MatDialog } from '@angular/material/dialog';
 import { Scenario } from '../../../models/vertex/scenario';
 import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { ScenarioService } from '../../../services/scenario.service';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { Form, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { arrayEquals, roundingWithDecimal } from 'src/app/functions/tools';
 import { Image } from 'src/app/services/image.service';
 
@@ -17,10 +23,11 @@ export class GroupesComponent {
   form: FormGroup = this.fb.group({
     groupes: this.fb.array([]),
   });
+  recapForm: FormGroup = this.fb.group({
+    groupeRecapValues: this.fb.array([]),
+  });
   groupPositions!: any[];
-
-  editable: string[] = ['psy', 'implique','t0'];
-  keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique','t0'];
+  keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique', 't0'];
   displayedColumnsGroup: string[] = [
     'scene',
     'UR',
@@ -32,9 +39,10 @@ export class GroupesComponent {
     'delete',
   ];
 
+  displayedColumnsRecap: string[] = ['scene', 'UR', 'UA', 'EU'];
+
   @Input() scenario: Scenario;
   @Input() map: Image;
-
 
   _groupes: Groupe[];
 
@@ -50,6 +58,9 @@ export class GroupesComponent {
           if (this.groupes[index]) {
             this.groupes[index].implique = groupe.implique;
             this.groupes[index].psy = groupe.psy;
+            this.groupes[index].UR = groupe.UR;
+            this.groupes[index].UA = groupe.UA;
+            this.groupes[index].EU = groupe.EU;
           }
         });
 
@@ -60,6 +71,16 @@ export class GroupesComponent {
     }
   }
 
+  _groupeRecapValues: Groupe[];
+  get groupeRecapValues(): Groupe[] {
+    return this._groupeRecapValues;
+  }
+
+  @Input() set groupeRecapValues(value: Groupe[]) {
+    if (value) {
+      this._groupeRecapValues = value;
+    }
+  }
   @Output() updateGroupes = new EventEmitter<boolean>();
   @Output() updateScenario = new EventEmitter<Scenario>();
 
@@ -67,11 +88,11 @@ export class GroupesComponent {
     public dialog: MatDialog,
     private scenarioService: ScenarioService,
     private fb: FormBuilder,
-    private cdRef: ChangeDetectorRef   
+    private cdRef: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.cdRef.detectChanges(); 
+    this.cdRef.detectChanges();
   }
 
   addGroup() {
@@ -94,11 +115,10 @@ export class GroupesComponent {
       groupe.y,
       groupe.scene,
     ]);
-    
+
     this.groupPositions.push(this.scenario.coordPRV);
     this.groupPositions.push(this.scenario.coordPMA);
     this.groupPositions.push(this.scenario.coordCADI);
- 
   }
 
   editGroup(id: number) {
@@ -107,7 +127,7 @@ export class GroupesComponent {
   }
 
   getTotal(proprerty: string) {
-    if (proprerty == 't0') return ''
+    if (proprerty == 't0') return '';
     let res = 0;
     this.groupes.forEach((group) => {
       res += Number(group[proprerty]);
@@ -118,13 +138,16 @@ export class GroupesComponent {
   public deleteGroup(groupId: number) {
     let grpScene = this.groupes[groupId]['scene'];
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
-      data: ['Supprimer le groupe ' + grpScene, "Voulez-vous supprimer le groupe "+grpScene],
+      data: [
+        'Supprimer le groupe ' + grpScene,
+        'Voulez-vous supprimer le groupe ' + grpScene,
+      ],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.scenarioService
-          .removeGroupe(this.groupes[groupId],this.groupes[0])
+          .removeGroupe(this.groupes[groupId], this.groupes[0])
           .subscribe(() => {
             this.groupes.splice(groupId, 1);
 
@@ -134,39 +157,33 @@ export class GroupesComponent {
     });
   }
 
-  public isEditable(champ: string) {
-    if (this.editable.includes(champ)) return true;
-    return false;
-  }
-
-  updatePosition(event:any[]) {
+  updatePosition(event: any[]) {
     let updateScenario = false;
     let i = 0;
-    this.groupes.forEach((groupe:Groupe,index:number) => {
-      groupe.x = roundingWithDecimal(event[index][0],2)
-      groupe.y = roundingWithDecimal(event[index][1],2)
+    this.groupes.forEach((groupe: Groupe, index: number) => {
+      groupe.x = roundingWithDecimal(event[index][0], 2);
+      groupe.y = roundingWithDecimal(event[index][1], 2);
       i = index;
     });
     i++;
-    if (!arrayEquals(this.scenario.coordPRV,event[i])){
-      this.scenario.coordPRV = event[i]
+    if (!arrayEquals(this.scenario.coordPRV, event[i])) {
+      this.scenario.coordPRV = event[i];
       updateScenario = true;
     }
     i++;
-    if (!arrayEquals(this.scenario.coordPMA,event[i])){
-      this.scenario.coordPMA = event[i]
+    if (!arrayEquals(this.scenario.coordPMA, event[i])) {
+      this.scenario.coordPMA = event[i];
       updateScenario = true;
     }
     i++;
-    if (!arrayEquals(this.scenario.coordCADI,event[i])){
-      this.scenario.coordCADI = event[i]
+    if (!arrayEquals(this.scenario.coordCADI, event[i])) {
+      this.scenario.coordCADI = event[i];
       updateScenario = true;
     }
-    console.log("updatePosition ",this.scenario)
+    console.log('updatePosition ', this.scenario);
 
-    if (updateScenario!) this.updateGroupes.emit(true)
-    else this.updateScenario.emit(this.scenario)
-    
+    if (updateScenario!) this.updateGroupes.emit(true);
+    else this.updateScenario.emit(this.scenario);
   }
 
   private setForm() {
@@ -174,6 +191,9 @@ export class GroupesComponent {
     this.groupes.forEach((groupe: Groupe) => {
       let formGroupe = this.fb.group({
         implique: [groupe.implique],
+        UR: [groupe.UR],
+        UA: [groupe.UA],
+        EU: [groupe.EU],
         psy: [groupe.psy],
         t0: [groupe.t0],
       });

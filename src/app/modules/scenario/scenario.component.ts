@@ -10,10 +10,11 @@ import { ProfilService } from '../../services/profil.service';
 import { RegleService } from '../../services/regle.service';
 import { TagService } from '../../services/tag.service';
 import { PlastronService } from '../../services/plastron.service';
-import { Observable, concat, forkJoin, map, switchMap, zipAll } from 'rxjs';
+import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
 import { Tag } from '../../models/vertex/tag';
 import { WaitComponent } from '../shared/wait/wait.component';
 import { Image } from 'src/app/services/image.service';
+import { number } from 'echarts';
 
 @Component({
   selector: 'app-scenario',
@@ -23,6 +24,7 @@ import { Image } from 'src/app/services/image.service';
 export class ScenarioComponent implements OnInit {
   scenario!: Scenario;
   groupes!: Groupe[];
+  groupeRecapValues!: Groupe[];
   plastrons!: Plastron[];
   totalPlastron!: number; // wrap in an array so the reference update trigger the Input() event
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
@@ -54,17 +56,18 @@ export class ScenarioComponent implements OnInit {
           this.scenario.tags = [];
 
           this.scenarioService
-            .initTags(this.scenario)
+            .getTags(this.scenario)
             .subscribe((tags: Tag[]) => {
               this.scenario.tags = tags;
               this.oldTags = [...tags];
             });
 
-          return this.scenarioService.initGroupe(this.scenario).pipe(
+          return this.scenarioService.getGroupes(this.scenario).pipe(
             switchMap((groupes: Groupe[]) => {
               this.groupes = groupes;
+              this.groupeRecapValues = structuredClone(groupes)
               this.oldGroupes = structuredClone(groupes)
-              const requestsGroupes = this.groupes.map((groupe: Groupe) => {
+              const requestsGroupes = this.groupeRecapValues.map((groupe: Groupe) => {
                 return this.scenarioService.getGroupePlastrons(groupe.id).pipe(
                   map((plastrons: Plastron[]) => {
                     plastrons.map((plastron: Plastron) => {
@@ -95,7 +98,7 @@ export class ScenarioComponent implements OnInit {
   }
 
   save() {
-    let requests: Observable<any>[] = [];
+    let requests: Observable<any>[] = [of('save')];
     this.dialog.open(WaitComponent);
 
     if (this.scenarioToSave)
