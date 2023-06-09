@@ -1,14 +1,15 @@
+<mat-divider></mat-divider>
 <div *ngIf="element" class="container">
-  <div class="row">
-    <div *ngIf="element['triage']" class="col-2 image">
-      <app-triage [triage]="element['triage']"></app-triage>
-    </div>
+  <div *ngIf="element['triage']" class="image">
+    <app-triage [triage]="element['triage']"></app-triage>
+  </div>
 
-    <div *ngIf="!element['triage']" class="col-2 image">
-      <img [src]="image?.src || 'http://placehold.it/180'" />
-    </div>
+  <div *ngIf="!element['triage']" class="image">
+    <img [src]="image?.src || 'http://placehold.it/180'" />
+  </div>
 
-    <div class="col-9 texte">
+  <div class="texte">
+    <div id="title">
       <button mat-button (click)="goToElement(element.id)">
         <h2>{{ element.title }}</h2>
       </button>
@@ -17,14 +18,18 @@
           {{ tag.value }}
         </mat-chip>
       </div>
-      <div id="description">
-        <textarea disabled [value]="element.description"></textarea>
-      </div>
     </div>
-    <div class="col-1 buttons">
-      <button mat-icon-button (click)="removeElement()" [matTooltip]="'Supprimer '+element.title">
-        <mat-icon>delete</mat-icon>
-      </button>
+    <div id="description">
+      <textarea disabled [value]="element.description"></textarea>
     </div>
+  </div>
+  <div class="buttons">
+    <button
+      mat-icon-button
+      (click)="removeElement()"
+      [matTooltip]="'Supprimer ' + element.title"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
   </div>
 </div>

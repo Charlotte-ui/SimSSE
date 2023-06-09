@@ -1,3 +1,4 @@
+@import "variables.less";
 mat-form-field {
   width: 300px;
 }
@@ -29,11 +30,11 @@ mat-option {
   top: 0;
 }
 
-::ng-deep app-header + div {
-  margin-top: 65px !important;
+::ng-deep app-header+div {
+  margin-top: @headerHeigth !important;
 }
 
-::ng-deep app-header + mat-tab-group {
-  margin-top: 65px !important;
+::ng-deep app-header+mat-tab-group {
+  margin-top: @headerHeigth !important;
 }
 

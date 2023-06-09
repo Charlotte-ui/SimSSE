@@ -1,3 +1,8 @@
+@import "src/app/variables.less";
+@presentationHeigth: 100px;
+@modeleHeight:170px;
+@plastronHeight: 27px;
+
 mat-form-field {
   width: 100%;
   margin: 1%;
@@ -9,7 +14,6 @@ mat-form-field {
   justify-content: space-around;
   width: 100%;
   max-width: 100%;
-  row-gap: 10px;
   padding-bottom: 15px;
   padding-right: 0px;
   padding-left: 0px;
@@ -123,7 +127,7 @@ mat-option {
 .scrollable-content {
   overflow: hidden;
   display: flex;
-  height: 745px; // TODO : change dynamicly
+  height: calc(100vh - @headerHeigth - @matTabHeigth - @presentationHeigth - @plastronHeight) !important;
   width: 100%;
   div {
     overflow-y: auto;
@@ -162,10 +166,17 @@ mat-select-trigger {
 
 #general {
   flex-direction: column;
-  padding-top: 15px;
 }
 
 mat-card-title {
     display: flex !important;
     align-items: center;
+}
+
+:host ::ng-deep app-list-box .scrollable-content {
+  height: calc(100vh - @headerHeigth - @matTabHeigth - @presentationHeigth - @modeleHeight) !important;
+}
+
+.information-text{
+  height: @presentationHeigth;
 }

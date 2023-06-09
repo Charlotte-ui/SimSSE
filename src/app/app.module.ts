@@ -75,7 +75,9 @@ import { ModeleDialogComponent } from './modules/modele/modele-dialog/modele-dia
 import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plastrons.component';
 import { WaitComponent } from './modules/shared/wait/wait.component';
 import { TriageFilterComponent } from './modules/shared/triage-filter/triage-filter.component';
-import { ScenariosComponent } from './modules/scenarios/scenarios.component';
+import { ScenariosComponent } from './modules/scenario-editor/scenarios/scenarios.component';
+import { ModelesComponent } from './modules/scenario-editor/modeles/modeles.component';
+import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-editor.component';
 
 
 @NgModule({
@@ -114,6 +116,8 @@ import { ScenariosComponent } from './modules/scenarios/scenarios.component';
     WaitComponent,
     TriageFilterComponent,
     ScenariosComponent,
+    ModelesComponent,
+    ScenarioEditorComponent,
   ],
   imports: [
     BrowserModule,

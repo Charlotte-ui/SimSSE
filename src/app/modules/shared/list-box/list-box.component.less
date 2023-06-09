@@ -1,11 +1,9 @@
 
-mat-divider {
-  width: 100%;
-}
+
 
 mat-list-item {
   height: fit-content !important;
-  margin-bottom: 2%;
+  padding-bottom: 10px;
 }
 
 mat-card-content {
@@ -81,4 +79,22 @@ button {
     overflow-y: auto;
     scrollbar-width: thin;
   }
+}
+
+app-list-box-element {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+#bottom{
+  height: 500px;
+}
+
+mat-list-item:nth-child(2n) {
+  background-color: whitesmoke;
+}
+mat-list-item:nth-child(2n+1) {
+  background-color: white;
 }

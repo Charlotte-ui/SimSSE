@@ -83,7 +83,7 @@
           <ng-container
             *ngIf="element['show'] === undefined || element['show']"
           >
-            <mat-divider></mat-divider>
+           
             <mat-list-item cdkDrag class="box">
               <app-list-box-element
                 [service]="service"
@@ -93,7 +93,9 @@
             </mat-list-item>
           </ng-container>
         </ng-container>
+        <div id="bottom"></div>
       </mat-list>
+
     </div>
   </mat-card-content>
 </mat-card>
