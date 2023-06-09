@@ -55,6 +55,7 @@
           (updateLink)="updateLinks($event)"
         ></app-editeur-graphe-nodal>
       </div>
+      <app-gojs [graph]="modele.graph" (updateNodes)="updateNodes($event)"></app-gojs>
     </div>
 
     <div

@@ -12,9 +12,7 @@ import { getElementByChamp } from '../functions/tools';
 export class ApiService {
   token!: string;
 
-  constructor(
-    private http: HttpClient
-  ) {}
+  constructor(private http: HttpClient) {}
 
   // return of("34:2").pipe ( delay( 5000 ));
   documentId(document: any): string {
@@ -154,9 +152,10 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
   updateAllDocumentChamp(document: any) {
     let requests: Observable<any>[] = [];
     Object.keys(document).forEach((key) => {
-      requests.push(
-        this.updateDocumentChamp(document.id, key, document[key].toString())
-      );
+      if (document[key])
+        requests.push(
+          this.updateDocumentChamp(document.id, key, document[key].toString())
+        );
     });
     if (requests.length > 0)
       return from(requests).pipe(

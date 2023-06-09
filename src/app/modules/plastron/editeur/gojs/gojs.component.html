@@ -1,0 +1,10 @@
+
+<!-- <div id="myDiagramDiv" style="width:1500px; height:600px; background-color: #DAE4E4;"></div>
+ -->
+
+<gojs-diagram [initDiagram]='initDiagram' [nodeDataArray]='state.diagramNodeData'
+    [linkDataArray]='state.diagramLinkData' [modelData]='state.diagramModelData'
+    [skipsDiagramUpdate]='state.skipsDiagramUpdate' (modelChange)='diagramModelChange($event)'
+    [divClassName]='diagramDivClassName' #diagram >
+</gojs-diagram>
+

@@ -176,10 +176,10 @@ export class NodeService {
     });
 
     graphToCopy.links.forEach((link: Link) => {
-      link.in = nodeIds.includes(link.in) ? link.in.replace(':', '') : link.in;
-      link.out = nodeIds.includes(link.out)
-        ? link.out.replace(':', '')
-        : link.out;
+      link.to = nodeIds.includes(link.to) ? link.to.replace(':', '') : link.to;
+      link.from = nodeIds.includes(link.from)
+        ? link.from.replace(':', '')
+        : link.from;
       link.id = link.id.replace(':', '');
     });
 
@@ -196,7 +196,8 @@ export class NodeService {
    */
 
   /**
-   * push a  Node in the database
+   * update all the node parameters in the database
+   * TODO : update only those who have change
    * @param node
    */
   updateNode(node: Node): Observable<string[]> {
@@ -333,8 +334,8 @@ export class NodeService {
       if (this.isNew(link.id))
         requestsLinks.push(
           this.apiService.createRelationBetweenWithProperty(
-            this.getNodeId(link.in, graph.nodes, indexesNode),
-            this.getNodeId(link.out, graph.nodes, indexesNode),
+            this.getNodeId(link.to, graph.nodes, indexesNode),
+            this.getNodeId(link.from, graph.nodes, indexesNode),
             'link',
             'start',
             link.start.toString()

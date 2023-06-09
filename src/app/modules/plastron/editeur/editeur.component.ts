@@ -212,14 +212,7 @@ export class EditeurComponent implements OnInit {
 
     graph.links = result[1];
 
-    // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-    graph.links.map((link: Link) => {
-      let nodeSource = graph.nodes.filter(
-        (node: Node) => node.id === link.out
-      )[0];
-      if (nodeSource.type == NodeType.event)
-        link.out = (nodeSource as Event).event;
-    });
+
   }
 
   /**
@@ -319,7 +312,7 @@ export class EditeurComponent implements OnInit {
     this.newChange.emit(true);
   }
 
-  updateNodes(event) { // TODO ; mettre l'id de l'event dans le cas d'un event
+  /* updateNodes(event) { // TODO ; mettre l'id de l'event dans le cas d'un event
     if (event[0].delete) {
       let ref = event[0].ref ;   
       console.log("ref ",ref)
@@ -354,6 +347,22 @@ export class EditeurComponent implements OnInit {
     this.updateCurve();
     this.modele.graph = structuredClone(this.modele.graph);
     this.newChange.emit(true);
+  } */
+
+  /**
+   * if the updated nodes have an effect on the graph resolution, the graph is reload
+   * @param nodesToUpdate 
+   */
+  updateNodes(nodesToUpdate:Node[]) { // TODO ; mettre l'id de l'event dans le cas d'un event
+
+    console.log("updateNodes graph ",this.modele.graph)
+    console.log("updateNodes nodesToUpdate ",nodesToUpdate)
+
+      
+    nodesToUpdate.forEach((nodeToUpdate:Node) => {
+    
+
+    });
   }
 
   updateLinks(event) {

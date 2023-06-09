@@ -22,6 +22,7 @@ export abstract class Node extends Vertex {
   y: number;
   type: NodeType;
   state: boolean; // activate or not activate
+  localisation:string
 
   public static override className = 'Node';
 
@@ -31,6 +32,7 @@ export abstract class Node extends Vertex {
     this.y = object?.y ? object.y : 50;
     this.type = object?.type ? object.type : undefined;
     this.state = false;
+    this.localisation = object?.localisation ? object.localisation : "50 50"
   }
 
   static getName(element): string {
@@ -128,16 +130,16 @@ export class Event extends Node {
 
 export class Link extends Edge {
   type: string;
-  out: string;
-  in: string;
+  from: string;
+  to: string;
   start: boolean;
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.link;
     else object = { type: NodeType.link };
     super(object);
-    this.out = object?.out ? object.out.substring(1) : undefined;
-    this.in = object?.in ? object.in.substring(1) : undefined;
+    this.from = object?.out ? object.out.substring(1) : undefined;
+    this.to = object?.in ? object.in.substring(1) : undefined;
     this.type = NodeType.link;
     this.start = object?.start !== undefined ? object.start : true;
   }

@@ -8,10 +8,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { JwtInterceptor } from './helpers/jwt.interceptor';
 import { ErrorInterceptor } from './helpers/error.interceptor';
-import { environment } from '../environments/environment';
 
 import { NgxEchartsModule } from 'ngx-echarts';
 import { NgImageSliderModule } from 'ng-image-slider';
+import {GojsAngularModule} from 'gojs-angular';
 
 import { MatCardModule } from '@angular/material/card';
 import { MatListModule } from '@angular/material/list';
@@ -76,6 +76,7 @@ import { LotPlastronsComponent } from './modules/scenario/lot-plastrons/lot-plas
 import { WaitComponent } from './modules/shared/wait/wait.component';
 import { TriageFilterComponent } from './modules/shared/triage-filter/triage-filter.component';
 import { ScenariosComponent } from './modules/scenarios/scenarios.component';
+import { GojsComponent } from './modules/plastron/editeur/gojs/gojs.component';
 
 
 @NgModule({
@@ -114,6 +115,7 @@ import { ScenariosComponent } from './modules/scenarios/scenarios.component';
     WaitComponent,
     TriageFilterComponent,
     ScenariosComponent,
+    GojsComponent,
   ],
   imports: [
     BrowserModule,
@@ -158,6 +160,7 @@ import { ScenariosComponent } from './modules/scenarios/scenarios.component';
     MatMenuModule,
     NgImageSliderModule,
     MatPaginatorModule,
+    GojsAngularModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

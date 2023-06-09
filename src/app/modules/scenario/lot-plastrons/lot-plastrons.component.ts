@@ -243,7 +243,6 @@ export class LotPlastronsComponent {
     if (this.plastrons.length == 0) this.updateDataSourceTriage(0);
 
     this.plastrons.forEach((plastron, index) => {
-      console.log()
       if(plastron.modele.id){
         this.addPlastronToDatasource(plastron, index);
         plastron.groupe[plastron.modele.triage]++;

@@ -25,6 +25,7 @@ export class Curve {
     this.values = [];
     this.currentMax = 0;
   }
+  // TODO declenche all event when an event is trigger
 
   /**
    * generate the curve
@@ -87,8 +88,8 @@ export class Curve {
         // event trigger at time t
 
         graph.links.forEach((link) => {
-          if (trigger.in == link.out) {
-            let nodeTrigger = this.getNodeByID(link.in, graph);
+          if (trigger.in == link.from) {
+            let nodeTrigger = this.getNodeByID(link.to, graph);
 
             if (nodeTrigger) {
               nodeTrigger.state = link.start;

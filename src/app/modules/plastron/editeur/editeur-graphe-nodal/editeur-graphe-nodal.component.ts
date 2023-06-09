@@ -154,8 +154,8 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
   parseLinkIntoGraphLink(link?:Link):any{
      return {
-        source: link?.out,
-        target: link?.in, 
+/*         source: link?.out,
+        target: link?.in,  */
         lineStyle: { color: link?.start ? GREEN : RED },
       };
   }
