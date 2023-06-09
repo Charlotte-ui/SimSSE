@@ -9,6 +9,24 @@
 >
 </app-header>
 <mat-tab-group>
+  <mat-tab label="Modèle - tags et descriptions">
+    <app-tags-descriptions
+      *ngIf="allTags"
+      [modele]="plastron.modele"
+      [allTags]="allTags"
+      (updateModele)="
+        changesToSave = true;
+        modeleToSave = true;
+        saver.champToUpdate.push($event)
+      "
+      (newTags)="
+        changesToSave = true;
+        modeleToSave = true;
+        saver.newTags = $event.newTags;
+        saver.tagsToDelete = $event.tagsToDelete
+      "
+    ></app-tags-descriptions>
+  </mat-tab>
   <mat-tab label="Modèle - cas clinique">
     <app-editeur
       *ngIf="plastron.modele && scenario"
@@ -18,30 +36,24 @@
       [duration]="scenario.duration"
       (newCurve)="changeCurves($event)"
       (newChange)="changesToSave = true; modeleToSave = true"
-      (updateNode)="
-        changesToSave = true; modeleToSave = true; 
-      "
-      (deleteNode)="
-        changesToSave = true; modeleToSave = true; 
-      "
-      (updateLink)="
-        changesToSave = true; modeleToSave = true;
-      "
-      (deleteLink)="
-        changesToSave = true; modeleToSave = true; 
-      "
+      (updateNode)="changesToSave = true; modeleToSave = true"
+      (deleteNode)="changesToSave = true; modeleToSave = true"
+      (updateLink)="changesToSave = true; modeleToSave = true"
+      (deleteLink)="changesToSave = true; modeleToSave = true"
       (updateTrigger)="
-        changesToSave = true; modeleToSave = true;  saver.triggerToUpdate.push($event)
+        changesToSave = true;
+        modeleToSave = true;
+        saver.triggerToUpdate.push($event)
       "
       (deleteTrigger)="
-        changesToSave = true; modeleToSave = true;   saver.triggerToDelete.push($event)
+        changesToSave = true;
+        modeleToSave = true;
+        saver.triggerToDelete.push($event)
       "
-      (updateVariable)="
-        changesToSave = true; variableToSave.push($event.id);
-      "
+      (updateVariable)="changesToSave = true; variableToSave.push($event.id)"
     ></app-editeur>
 
-<!--     (updateNode)="
+    <!--     (updateNode)="
         changesToSave = true; modeleToSave = true; saver.nodeToUpdate.push($event)
       "
       (deleteNode)="
@@ -54,19 +66,7 @@
         changesToSave = true; modeleToSave = true; saver.linkToDelete.push($event)
       " -->
   </mat-tab>
-  <mat-tab label="Modèle - tags et descriptions">
-    <app-tags-descriptions
-      *ngIf="allTags"
-      [modele]="plastron.modele"
-      [allTags]="allTags"
-      (updateModele)="changesToSave = true; modeleToSave = true ; saver.champToUpdate.push($event)"
-      (newTags)="
-        changesToSave = true;  modeleToSave = true; 
-        saver.newTags = $event.newTags;
-        saver.tagsToDelete = $event.tagsToDelete
-      "
-    ></app-tags-descriptions>
-  </mat-tab>
+
   <mat-tab *ngIf="plastron.profil" label="Profil">
     <app-profil
       [profil]="plastron.profil"

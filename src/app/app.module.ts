@@ -41,6 +41,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import {MatProgressBarModule} from '@angular/material/progress-bar'; 
 
 import { ConnexionComponent } from './modules/connexion/connexion.component';
 import { HeaderComponent } from './modules/shared/header/header.component';
@@ -162,6 +163,7 @@ import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-edit
     MatMenuModule,
     NgImageSliderModule,
     MatPaginatorModule,
+    MatProgressBarModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

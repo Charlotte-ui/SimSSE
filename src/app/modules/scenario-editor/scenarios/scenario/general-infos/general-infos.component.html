@@ -132,5 +132,16 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
     </table>
+
+    
   </div>
+
+  <div id="progress" >
+    <div class="information-text">{{plastronsCreated}}/{{dataTotal[0].totalPlastron}} plastrons créés - scenario à
+    {{(plastronsCreated/dataTotal[0].totalPlastron)*100}}% terminé
+</div>
+  <mat-progress-bar mode="determinate" [value]="(plastronsCreated/dataTotal[0].totalPlastron)*100"></mat-progress-bar>
+
+  </div>
+
 </form>

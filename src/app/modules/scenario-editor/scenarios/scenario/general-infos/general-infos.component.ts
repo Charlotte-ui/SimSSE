@@ -49,6 +49,9 @@ export class GeneralInfosComponent {
   oldMapImage!: Image;
   oldCoverImage!: Image;
 
+
+  @Input() plastronsCreated:number;
+
   _scenario: Scenario;
 
   get scenario(): Scenario {
