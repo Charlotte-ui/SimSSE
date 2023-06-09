@@ -1,22 +1,19 @@
 import { Component } from '@angular/core';
-import { Modele, ModeleSaverArrays } from '../../models/vertex/modele';
-import { Scenario } from '../../models/vertex/scenario';
-import {
-  VariablePhysioInstance,
-  VariablePhysioTemplate,
-} from '../../models/vertex/variablePhysio';
-import { Graph } from '../../models/vertex/node';
 import { ActivatedRoute, Data } from '@angular/router';
-import { ModeleService } from '../../services/modele.service';
-import { Tag } from '../../models/vertex/tag';
-import { TagService } from '../../services/tag.service';
 import { Observable, forkJoin, switchMap } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { WaitComponent } from '../shared/wait/wait.component';
-import { RegleService } from '../../services/regle.service';
-import { Trigger } from '../../models/trigger';
 import { NodeService } from 'src/app/services/node.service';
 import { ModeleDialogComponent } from './modele-dialog/modele-dialog.component';
+import { Trigger } from 'src/app/models/trigger';
+import { Modele, ModeleSaverArrays } from 'src/app/models/vertex/modele';
+import { Graph } from 'src/app/models/vertex/node';
+import { Scenario } from 'src/app/models/vertex/scenario';
+import { Tag } from 'src/app/models/vertex/tag';
+import { VariablePhysioInstance, VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
+import { WaitComponent } from 'src/app/modules/shared/wait/wait.component';
+import { ModeleService } from 'src/app/services/modele.service';
+import { RegleService } from 'src/app/services/regle.service';
+import { TagService } from 'src/app/services/tag.service';
 
 @Component({
   selector: 'app-modele',

@@ -1,20 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Data } from '@angular/router';
-import { Groupe } from '../../models/vertex/groupe';
-import { Scenario } from '../../models/vertex/scenario';
-import { Plastron } from '../../models/vertex/plastron';
-import { ScenarioService } from '../../services/scenario.service';
-import { ModeleService } from '../../services/modele.service';
-import { MatDialog } from '@angular/material/dialog';
-import { ProfilService } from '../../services/profil.service';
-import { RegleService } from '../../services/regle.service';
-import { TagService } from '../../services/tag.service';
-import { PlastronService } from '../../services/plastron.service';
+
 import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
-import { Tag } from '../../models/vertex/tag';
-import { WaitComponent } from '../shared/wait/wait.component';
+
 import { Image } from 'src/app/services/image.service';
 import { number } from 'echarts';
+import { MatDialog } from '@angular/material/dialog';
+import { Groupe } from 'src/app/models/vertex/groupe';
+import { Plastron } from 'src/app/models/vertex/plastron';
+import { Scenario } from 'src/app/models/vertex/scenario';
+import { Tag } from 'src/app/models/vertex/tag';
+import { WaitComponent } from 'src/app/modules/shared/wait/wait.component';
+import { ModeleService } from 'src/app/services/modele.service';
+import { PlastronService } from 'src/app/services/plastron.service';
+import { ProfilService } from 'src/app/services/profil.service';
+import { RegleService } from 'src/app/services/regle.service';
+import { ScenarioService } from 'src/app/services/scenario.service';
+import { TagService } from 'src/app/services/tag.service';
 
 @Component({
   selector: 'app-scenario',

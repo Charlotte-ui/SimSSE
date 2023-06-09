@@ -1,9 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ScenarioService } from '../../../services/scenario.service';
-import { FormBuilder } from '@angular/forms';
-import { Scenario } from '../../../models/vertex/scenario';
-import { TagService } from '../../../services/tag.service';
-import { Tag } from '../../../models/vertex/tag';
+
 import {
   ImageService,
   Image,
@@ -12,6 +8,11 @@ import {
 } from 'src/app/services/image.service';
 import { getElementByChamp } from 'src/app/functions/tools';
 import { Observable, concat, concatMap, from, zipAll } from 'rxjs';
+import { FormBuilder } from '@angular/forms';
+import { Scenario } from 'src/app/models/vertex/scenario';
+import { Tag } from 'src/app/models/vertex/tag';
+import { ScenarioService } from 'src/app/services/scenario.service';
+import { TagService } from 'src/app/services/tag.service';
 
 @Component({
   selector: 'app-general-infos',

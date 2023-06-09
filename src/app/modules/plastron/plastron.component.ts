@@ -13,7 +13,6 @@ import { Profil } from '../../models/vertex/profil';
 import { PlastronService } from '../../services/plastron.service';
 import { Scenario } from '../../models/vertex/scenario';
 import { MatDialog } from '@angular/material/dialog';
-import { ModeleDialogComponent } from '../modele/modele-dialog/modele-dialog.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ScenarioService } from '../../services/scenario.service';
 import { Groupe } from '../../models/vertex/groupe';
@@ -26,6 +25,7 @@ import { Curve } from '../../functions/curve';
 import { WaitComponent } from '../shared/wait/wait.component';
 import { ConfirmDeleteDialogComponent } from '../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { NodeService } from 'src/app/services/node.service';
+import { ModeleDialogComponent } from '../scenario-editor/modeles/modele/modele-dialog/modele-dialog.component';
 
 @Component({
   selector: 'app-plastron',

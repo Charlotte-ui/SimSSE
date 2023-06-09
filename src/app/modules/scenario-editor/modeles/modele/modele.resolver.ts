@@ -4,8 +4,8 @@ import {
   RouterStateSnapshot,
   ActivatedRouteSnapshot
 } from '@angular/router';
-import { Modele } from '../../models/vertex/modele';
-import { ModeleService } from '../../services/modele.service';
+import { Modele } from 'src/app/models/vertex/modele';
+import { ModeleService } from 'src/app/services/modele.service';
 
 
 @Injectable({

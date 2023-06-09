@@ -5,14 +5,14 @@ import {
   Input,
   Output,
 } from '@angular/core';
-import { Groupe } from '../../../models/vertex/groupe';
 import { MatDialog } from '@angular/material/dialog';
-import { Scenario } from '../../../models/vertex/scenario';
-import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
-import { ScenarioService } from '../../../services/scenario.service';
 import { Form, FormArray, FormBuilder, FormGroup } from '@angular/forms';
 import { arrayEquals, roundingWithDecimal } from 'src/app/functions/tools';
 import { Image } from 'src/app/services/image.service';
+import { Groupe } from 'src/app/models/vertex/groupe';
+import { Scenario } from 'src/app/models/vertex/scenario';
+import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
+import { ScenarioService } from 'src/app/services/scenario.service';
 
 @Component({
   selector: 'app-groupes',

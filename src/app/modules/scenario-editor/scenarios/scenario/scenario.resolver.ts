@@ -6,8 +6,9 @@ import {
   ActivatedRouteSnapshot,
 } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { Scenario } from '../../models/vertex/scenario';
-import { ScenarioService } from '../../services/scenario.service';
+import { Scenario } from 'src/app/models/vertex/scenario';
+import { ScenarioService } from 'src/app/services/scenario.service';
+
 
 @Injectable({
   providedIn: 'root',

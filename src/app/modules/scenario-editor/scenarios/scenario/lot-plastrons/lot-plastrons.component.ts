@@ -12,17 +12,9 @@ import {
   MatTableDataSource,
   MatTableDataSourcePaginator,
 } from '@angular/material/table';
-import { Groupe } from '../../../models/vertex/groupe';
-import { Triage, Modele } from '../../../models/vertex/modele';
-import { Statut, Plastron } from '../../../models/vertex/plastron';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { ModeleService } from '../../../services/modele.service';
-import { ProfilService } from '../../../services/profil.service';
-import { RegleService } from '../../../services/regle.service';
-import { ScenarioService } from '../../../services/scenario.service';
-import { Scenario } from '../../../models/vertex/scenario';
 import {
   trigger,
   state,
@@ -30,14 +22,22 @@ import {
   transition,
   animate,
 } from '@angular/animations';
-import { TagService } from '../../../services/tag.service';
-import { Tag } from '../../../models/vertex/tag';
-import { WaitComponent } from '../../shared/wait/wait.component';
 import { PlastronService } from 'src/app/services/plastron.service';
 import { Profil } from 'src/app/models/vertex/profil';
-import { ConfirmDeleteDialogComponent } from '../../shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { getElementByChamp } from 'src/app/functions/tools';
 import { Button } from 'src/app/functions/display';
+import { Groupe } from 'src/app/models/vertex/groupe';
+import { Triage, Modele } from 'src/app/models/vertex/modele';
+import { Statut, Plastron } from 'src/app/models/vertex/plastron';
+import { Scenario } from 'src/app/models/vertex/scenario';
+import { Tag } from 'src/app/models/vertex/tag';
+import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
+import { WaitComponent } from 'src/app/modules/shared/wait/wait.component';
+import { ModeleService } from 'src/app/services/modele.service';
+import { ProfilService } from 'src/app/services/profil.service';
+import { RegleService } from 'src/app/services/regle.service';
+import { ScenarioService } from 'src/app/services/scenario.service';
+import { TagService } from 'src/app/services/tag.service';
 
 interface tableElementPlastron {
   title: string;
