@@ -11,10 +11,12 @@ import { ModeleComponent } from './modules/scenario-editor/modeles/modele/modele
 import { ModeleResolver } from './modules/scenario-editor/modeles/modele/modele.resolver';
 import { ScenarioComponent } from './modules/scenario-editor/scenarios/scenario/scenario.component';
 import { ScenarioResolver } from './modules/scenario-editor/scenarios/scenario/scenario.resolver';
+import { MxgraphComponent } from './modules/plastron/editeur/mxgraph/mxgraph.component';
 
 const routes: Routes = [
 {path: '', redirectTo: '/connexion', pathMatch: 'full'},
 {path: 'connexion', component: ConnexionComponent},
+{path: 'ngmxgraph', component: MxgraphComponent},
 {path: 'accueil', component: AccueilComponent,canActivate: [AuthGuard]},
 {path: 'regles', component: ReglesComponent,canActivate: [AuthGuard]},
 {path: 'editeur', component: ScenarioEditorComponent,canActivate: [AuthGuard]},

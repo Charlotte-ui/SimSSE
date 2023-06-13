@@ -79,6 +79,7 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
 import { ScenariosComponent } from './modules/scenario-editor/scenarios/scenarios.component';
 import { ModelesComponent } from './modules/scenario-editor/modeles/modeles.component';
 import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-editor.component';
+import { MxgraphComponent } from './modules/plastron/editeur/mxgraph/mxgraph.component';
 
 
 @NgModule({
@@ -119,6 +120,7 @@ import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-edit
     ScenariosComponent,
     ModelesComponent,
     ScenarioEditorComponent,
+    MxgraphComponent,
   ],
   imports: [
     BrowserModule,
