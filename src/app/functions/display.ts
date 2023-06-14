@@ -167,7 +167,7 @@ export class Button {
 
   constructor() {}
 
-  public getButtonByType(type: string): IButton | undefined {
+  public static getButtonByType(type: string): IButton | undefined {
     return getElementByChamp<IButton>(Button.buttons,'type',type)
   }
 

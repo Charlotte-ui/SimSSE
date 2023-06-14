@@ -199,11 +199,28 @@ export class NodeService {
    * push a  Node in the database
    * @param node
    */
-  updateNode(node: Node): Observable<string[]> {
+  updateNode(node: Node, champs?: string[]): Observable<string[]> {
     delete node['nodes'];
     delete node['links'];
     if (node.type == NodeType.graph && typeof node['template'] === 'string')
       node['template'] = false;
+
+    if (champs) {
+      let requests: Observable<any>[] = [];
+      champs.forEach((champ) => {
+        requests.push(
+          this.apiService.updateDocumentChamp(
+            node.id,
+            champ,
+            node[champ].toString()
+          )
+        );
+      });
+      
+      return from(requests).pipe(
+        concatMap((request: Observable<any>) => request)
+      );
+    }
     return this.apiService.updateAllDocumentChamp(node);
   }
 
@@ -286,7 +303,7 @@ export class NodeService {
           requestsNode.push(
             this.createNode(
               structuredClone(node),
-               [...node.type][0].toUpperCase() + node.type.slice(1)
+              [...node.type][0].toUpperCase() + node.type.slice(1)
             )
           );
         }

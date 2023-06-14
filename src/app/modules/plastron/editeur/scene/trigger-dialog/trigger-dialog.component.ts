@@ -20,7 +20,7 @@ export class TriggerDialogComponent {
   trigger;
   isTrigger: boolean;
 
-  button: Button = new Button();
+  Button= Button ;
 
   constructor(
     private fb: FormBuilder,
@@ -88,10 +88,10 @@ export class TriggerDialogComponent {
   }
 
   getColor() {
-    return this.button.getButtonByType(this.element)?.color;
+    return Button.getButtonByType(this.element)?.color;
   }
 
   getIcon() {
-    return this.button.getButtonByType(this.element)?.icon;
+    return Button.getButtonByType(this.element)?.icon;
   }
 }

@@ -1,3 +1,17 @@
 <div id="demoGraph">
-    <div #graphContainer></div>
+  <div #graphContainer></div>
+</div>
+<div id="controls">
+  <button mat-mini-fab (click)="zoomIn()">
+    <mat-icon>zoom_in</mat-icon>
+  </button>
+  <button mat-mini-fab (click)="zoomOut()">
+    <mat-icon>zoom_out</mat-icon>
+  </button>
+  <button mat-mini-fab (click)="actual()">
+    <mat-icon>photo_size_select_actual</mat-icon>
+  </button>
+  <button mat-mini-fab (click)="fit()">
+    <mat-icon>photo_size_select_large</mat-icon>
+  </button>
 </div>

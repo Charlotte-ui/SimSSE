@@ -12,7 +12,7 @@
         <mat-label>Évenement</mat-label>
         <mat-select formControlName="in">
           <mat-option *ngFor="let event of events" [value]="event.template?event.template.id:event.id">
-            {{event.template?event.template.name:event.event}} <mat-icon  [fontIcon]="button.getButtonByType(event.typeEvent).icon"></mat-icon>
+            {{event.template?event.template.name:event.event}} <mat-icon  [fontIcon]="Button.getButtonByType(event.typeEvent).icon"></mat-icon>
           </mat-option>
         </mat-select>
       </mat-form-field>

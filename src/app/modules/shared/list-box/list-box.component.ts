@@ -186,10 +186,10 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   getColor() {
-    return this.button.getButtonByType(this.classe.getType({})).color;
+    return Button.getButtonByType(this.classe.getType({})).color;
   }
 
   getIcon() {
-    return this.button.getButtonByType(this.classe.getType({}))?.icon;
+    return Button.getButtonByType(this.classe.getType({}))?.icon;
   }
 }

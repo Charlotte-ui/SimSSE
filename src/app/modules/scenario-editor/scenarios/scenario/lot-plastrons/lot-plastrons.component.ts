@@ -81,7 +81,7 @@ export class LotPlastronsComponent {
     'description',
   ];
 
-  button = new Button();
+  Button = Button;
 
   /**
    * plastron on mouseup

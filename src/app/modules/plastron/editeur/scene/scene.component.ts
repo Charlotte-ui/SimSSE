@@ -27,7 +27,7 @@ export class SceneComponent implements OnInit {
   Trigger = Trigger;
   Timestamp = Timestamp;
 
-  button: Button = new Button();
+  Button =Button;
 
   // Inputs
   @Input() duration: number;

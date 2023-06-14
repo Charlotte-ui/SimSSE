@@ -12,7 +12,7 @@ import { Modele } from 'src/app/models/vertex/modele';
   styleUrls: ['./header.component.less'],
 })
 export class HeaderComponent implements OnInit {
-  button = new Button();
+  Button =  Button;
   pseudo!: string;
   role!: string;
   editor:boolean = false;

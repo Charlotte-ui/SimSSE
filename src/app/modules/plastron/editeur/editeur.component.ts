@@ -213,13 +213,13 @@ export class EditeurComponent implements OnInit {
     graph.links = result[1];
 
     // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-    graph.links.map((link: Link) => {
+/*     graph.links.map((link: Link) => {
       let nodeSource = graph.nodes.filter(
         (node: Node) => node.id === link.out
       )[0];
       if (nodeSource.type == NodeType.event)
         link.out = (nodeSource as Event).event;
-    });
+    }); */
   }
 
   /**

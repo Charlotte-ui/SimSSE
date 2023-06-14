@@ -121,11 +121,11 @@ export class TabReglesComponent<T extends Vertex> {
   }
 
   getColor() {
-    return this.button.getButtonByType(this.classe.getType({})).color;
+    return Button.getButtonByType(this.classe.getType({})).color;
   }
 
   getIcon() {
-    return this.button.getButtonByType(this.classe.getType({}))?.icon;
+    return Button.getButtonByType(this.classe.getType({}))?.icon;
   }
 
   getLabel(champ: string) {

@@ -166,13 +166,13 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   getColor(element: T) {
-    return this.button.getButtonByType(
+    return Button.getButtonByType(
       element instanceof Event ? element.typeEvent : Node.getType(element)
     )?.color;
   }
 
   getIcon(element: T) {
-    return this.button.getButtonByType(this.classe.getType(element))?.icon;
+    return Button.getButtonByType(this.classe.getType(element))?.icon;
   }
 
   getLabel(champ: string) {
