@@ -311,8 +311,23 @@ export class EditeurComponent implements OnInit {
           element as Event,
           'event'
         );
+        
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
-      else this.modele.graph.nodes.push(element as Node);
+      else {
+        this.modele.graph.nodes.push(element as Node);
+        
+        this.nodeService.updateGraph(
+          this.modele.graph,
+          [element.id],
+          [],
+          [],
+          []
+        ).subscribe(res=>{console.log('res',res)})
+
+        // TODO : créer une méthode create node qui renvoit l'id du node, puis le bind avant de le renvoyer dans le xmgraph
+
+
+      }
     }
     this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
     this.updateCurve();
@@ -383,11 +398,15 @@ export class EditeurComponent implements OnInit {
   }
 
   updateCurve() {
+    console.log('updateCurve ',this.curves)
+    console.log('updateCurve ',this.modele)
     this.curves.forEach((curve) => {
+
       // clean the triggereds of all the curves-genereted triggerd
       this.modele.triggeredEvents = this.modele.triggeredEvents.filter(
         (trigger) => trigger.editable
       );
+      
       let newtriggered = curve.calculCurve(structuredClone(this.modele));
       this.modele.triggeredEvents = newtriggered;
     });

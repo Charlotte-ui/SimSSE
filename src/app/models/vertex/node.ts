@@ -47,6 +47,11 @@ export abstract class Node extends Vertex {
     return '';
   }
 
+  public static override getType(element): string {
+    if (element.type == NodeType.event) return Event.getType(element);
+    return element.type;
+  }
+
   public static override instanciateListe<T>(list: any[]): T[] {
     let res: T[] = [];
     list.forEach((element: Node) => {
@@ -67,11 +72,6 @@ export abstract class Node extends Vertex {
     });
 
     return res;
-  }
-
-  public static override getType(element): string {
-    if (element.type == NodeType.event) return Event.getType(element);
-    return element.type;
   }
 }
 
@@ -118,7 +118,9 @@ export class Event extends Node {
   }
 
   static override getName(element): string {
-    return element.event;
+    return (element as Event).template
+      ? (element as Event).template.name
+      : element.event;
   }
 
   public static override getType(element): string {
@@ -148,7 +150,7 @@ export class Link extends Edge {
 
   public static override getType(element): string {
     if (element['type'] === NodeType.link) return 'link';
-    else return Node.getType(element)
+    else return Node.getType(element);
   }
 }
 
@@ -199,11 +201,9 @@ export class Timer extends Node {
     this.name = object?.name ? object.name : 'Timer';
     this.duration = object?.duration ? object.duration : 0;
     this.counter = object?.counter ? object.counter : 0;
-
   }
 
   static override getName(element): string {
     return element.name;
   }
 }
-

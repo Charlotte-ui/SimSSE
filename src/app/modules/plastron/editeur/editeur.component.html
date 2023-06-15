@@ -35,17 +35,17 @@
     >
       <div class="row">
         <app-scene
-        *ngIf="curvesInitialized"
+          *ngIf="curvesInitialized"
           [modele]="modele"
           [events]="events"
           [curves]="curves"
           [duration]="duration"
-          (updateTrigger)="updateTrigger.emit($event) ; updateCurve();"
-          (deleteTrigger)="deleteTrigger.emit($event) ; updateCurve();"
+          (updateTrigger)="updateTrigger.emit($event); updateCurve()"
+          (deleteTrigger)="deleteTrigger.emit($event); updateCurve()"
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">
-<!--         <app-editeur-graphe-nodal
+        <!--         <app-editeur-graphe-nodal
           [variablesTemplate]="variablesTemplate"
           [graph]="modele.graph"
           [allBioevents]="allBioevents"
@@ -54,7 +54,13 @@
           (updateNode)="updateNodes($event)"
           (updateLink)="updateLinks($event)"
         ></app-editeur-graphe-nodal> -->
-        <app-mxgraph [graphData]="modele.graph"  [variablesTemplate]="variablesTemplate" [allBioevents]="allBioevents" [allActions]="allActions"></app-mxgraph>
+        <app-mxgraph
+          [graphData]="modele.graph"
+          [variablesTemplate]="variablesTemplate"
+          [allBioevents]="allBioevents"
+          [allActions]="allActions"
+          (updateNodes)="updateNodes($event)"
+        ></app-mxgraph>
       </div>
     </div>
 

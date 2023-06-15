@@ -2,7 +2,7 @@ import { Modele } from '../models/vertex/modele';
 import { Graph, NodeType, Timer, Node, Trend } from '../models/vertex/node';
 import { Trigger } from '../models/trigger';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
-import { roundingWithDecimal } from './tools';
+import { getElementByChamp, roundingWithDecimal } from './tools';
 
 export class Curve {
   name: string;
@@ -87,9 +87,10 @@ export class Curve {
         // event trigger at time t
 
         graph.links.forEach((link) => {
-          if (trigger.in == link.out) {
-            let nodeTrigger = this.getNodeByID(link.in, graph);
 
+          if (trigger.in == link.out || trigger.in == getElementByChamp<Node>(graph.nodes,'id',link.out)['event']) {
+            let nodeTrigger = getElementByChamp<Node>(graph.nodes,'id',link.in)
+            
             if (nodeTrigger) {
               nodeTrigger.state = link.start;
               if (nodeTrigger.type == NodeType.graph) {
@@ -204,14 +205,5 @@ export class Curve {
     let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     // Transform to the desired mean and standard deviation:
     return z * stdev + mean;
-  }
-
-  getNodeByID(id: string, graph: Graph): Node {
-    let result = undefined;
-
-    graph.nodes.forEach((node: Node) => {
-      if (node.id == id) result = node;
-    });
-    return result;
   }
 }

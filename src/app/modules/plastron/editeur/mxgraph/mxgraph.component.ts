@@ -19,6 +19,7 @@ import factory, {
   mxConstants,
   mxLayoutManager,
   mxRectangle,
+  mxPoint,
 } from 'mxgraph';
 import mx from '../../../../../mxgraph';
 import {
@@ -37,6 +38,8 @@ import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { DialogComponent } from 'src/app/modules/shared/dialog/dialog.component';
+
+const NODE_HEIGTH = 30;
 
 @Component({
   selector: 'app-mxgraph',
@@ -68,7 +71,13 @@ export class MxgraphComponent implements AfterViewInit {
 
   @ViewChild('graphContainer') containerElementRef: ElementRef;
 
-  constructor(public nodeService: NodeService, public dialog: MatDialog) {}
+  constructor(public nodeService: NodeService, public dialog: MatDialog) {
+    mx.mxConnectionHandler.prototype.connectImage = new mx.mxImage(
+      '../assets/icons/link.png',
+      16,
+      16
+    );
+  }
 
   get container() {
     return this.containerElementRef.nativeElement;
@@ -76,16 +85,8 @@ export class MxgraphComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     if (mx.mxClient.isBrowserSupported()) {
-      console.log('Yes! Yes!');
     }
-    // Enables guides
-    mx.mxGraphHandler.prototype.guidesEnabled = true;
-
-    // Enables snapping waypoints to terminals
-    mx.mxEdgeHandler.prototype.snapToTerminals = true;
-
     this.initContainer();
-
     this.graph = this.initGraph();
 
     // Enables rubberband selection
@@ -96,7 +97,6 @@ export class MxgraphComponent implements AfterViewInit {
     this.parent = this.graph.getDefaultParent();
 
     this.configureStylesheet();
-    // this.configureLayout();
     this.collapsed(this.graph);
     this.addListeners();
     this.graph.setResizeContainer(true);
@@ -105,99 +105,98 @@ export class MxgraphComponent implements AfterViewInit {
   updateModel() {
     this.model.beginUpdate();
     try {
-      console.log(this.graphData);
+      // add nodes
       this.graphData.nodes.forEach((node: Node) => {
-        let name = Node.getName(node);
-        let label =
-          node.type == NodeType.event && (node as Event).template
-            ? (node as Event).template.name
-            : name;
-        let nodeWidth = 50 + label.length * 8;
-        let nodeHeigth = 30;
-        let style =
-          node.type == NodeType.event
-            ? (node as Event).typeEvent == EventType.start
-              ? 'image'
-              : (node as Event).typeEvent
-            : node.type;
+        let type = Node.getType(node);
 
-        let nodeTitle = this.graph.insertVertex(
-          this.parent,
-          node.id,
-          label,
-          node.x,
-          node.y,
-          nodeWidth,
-          nodeHeigth,
-          style
-        );
 
-        nodeTitle.geometry.alternateBounds = new mx.mxRectangle(
-          0,
-          0,
-          nodeWidth,
-          200
-        );
-
-        //var v31 = this.graph.insertVertex(nodeTitle, null, 'Hello,', 0,nodeHeigth,nodeWidth, 200-nodeHeigth,'open');
-        nodeTitle.collapsed = true;
-
-        if (node.type == NodeType.trend) {
-          nodeTitle['tooltip'] =
-            getElementByChamp<VariablePhysioTemplate>(
-              this.variablesTemplate,
-              'id',
-              (node as Trend).target
-            ).name +
-            ', ' +
-            (node as Trend).parameter;
+        console.log(this.model.cells)
+console.log(this.model.cells[node.id])
+        if (this.model.cells[node.id] === undefined) {
+          console.log('create node ')
+          if (type === NodeType.graph)
+            this.createGraphBox(node as Graph, this.parent);
+          else this.createNodeBox(node, type, this.parent);
         }
       });
 
-      this.graphData.links.forEach((link: Link) => {
-        let color = link.start ? 'green' : 'red';
-        this.graph.insertEdge(
-          this.parent,
-          link.id,
-          link.start,
-          this.model.cells[link?.out],
-          this.model.cells[link?.in],
-          `strokeColor=${color}`
-        );
-      });
+      // add links
+      this.createLinks(this.graphData.links);
 
-      console.log(this.graph);
-
-      /* var e1 = this.graph.insertEdge(
-        this.parent,
-        null,
-        '',
-        v1,
-        v2,
-        'entryX=0.25;entryY=0;exitX=1;exitY=1;exitPerimeter=1'
+      /*'entryX=0.25;entryY=0;exitX=1;exitY=1;exitPerimeter=1'
       ); */ // to chose the entry and exit anchor point
       // graph.connectCell(e2,v3,false, mxShape.prototype.constraints[0]);
-
-      /*  var v3 = this.graph.insertVertex(
-        this.parent,
-        null,
-        'Container',
-        20,
-        20,
-        200,
-        200,
-        'shape=swimlane;startSize=20;'
-      );
-      v3.geometry.alternateBounds = new mx.mxRectangle(0, 0, 110, 70);
-      var v31 = this.graph.insertVertex(v3, null, 'Hello,', 10, 40, 120, 80); */
     } finally {
       this.model.endUpdate();
     }
   }
 
+  createNodeBox(node: Node, type: string, source: mxCell): mxCell {
+    let name = Node.getName(node);
+    let nodeWidth = 50 + name.length * 8;
+
+    let nodeBox = this.graph.insertVertex(
+      source,
+      node.id,
+      name,
+      node.x,
+      node.y,
+      nodeWidth,
+      NODE_HEIGTH,
+      type
+    );
+
+    nodeBox.geometry.alternateBounds = new mx.mxRectangle(0, 0, nodeWidth, 200);
+
+    //var v31 = this.graph.insertVertex(nodeTitle, null, 'Hello,', 0,nodeHeigth,nodeWidth, 200-nodeHeigth,'open');
+    if (source === this.parent) nodeBox.setConnectable(true);
+    else nodeBox.setConnectable(false);
+    nodeBox.collapsed = true;
+
+    if (node.type == NodeType.trend) {
+      nodeBox['tooltip'] =
+        getElementByChamp<VariablePhysioTemplate>(
+          this.variablesTemplate,
+          'id',
+          (node as Trend).target
+        ).name +
+        ', ' +
+        (node as Trend).parameter;
+    }
+
+    return nodeBox;
+  }
+
+  createGraphBox(graph: Graph, source: mxCell) {
+    let graphBox = this.createNodeBox(graph, NodeType.graph, source);
+    graph.nodes.forEach((node) => {
+      let type = Node.getType(node);
+      if (type === NodeType.graph) this.createGraphBox(node as Graph, graphBox);
+      else this.createNodeBox(node, type, graphBox);
+    });
+    this.createLinks(graph.links);
+  }
+
+  createLinks(links: Link[]) {
+    links.forEach((link: Link) => {
+      let color = link.start ? 'green' : 'red';
+      let edge = this.graph.insertEdge(
+        this.parent,
+        link.id,
+        '<img src="../assets/icons/start.png" width="16" height="16"> ' +
+          link.start,
+        this.model.cells[link?.out],
+        this.model.cells[link?.in],
+        `strokeColor=${color}`
+      );
+      edge.setConnectable(false);
+    });
+  }
+
   zoomIn() {
     this.graph.zoomIn();
   }
+
   zoomOut() {
     this.graph.zoomOut();
   }
@@ -205,9 +204,10 @@ export class MxgraphComponent implements AfterViewInit {
   actual() {
     this.graph.zoomActual();
   }
+
   fit() {
     this.graph.center();
-  } 
+  }
 
   initContainer() {
     // Disables the built-in context menu
@@ -225,14 +225,17 @@ export class MxgraphComponent implements AfterViewInit {
     graph.setHtmlLabels(true);
     graph.setTooltips(true);
 
+    graph.connectableEdges = true;
+
     // Disables global features
     graph.collapseToPreferredSize = false;
     graph.constrainChildren = false;
-    graph.cellsSelectable = false;
+    graph.cellsSelectable = true;
     graph.extendParentsOnAdd = false;
     graph.extendParents = false;
     graph.border = 10;
     graph.edgeLabelsMovable = false;
+    graph.allowDanglingEdges = false;
 
     // Enables connect preview for the default edge style
     graph.connectionHandler.createEdgeState = function (me) {
@@ -245,68 +248,94 @@ export class MxgraphComponent implements AfterViewInit {
       );
     };
 
-    //  graph.connectionHandler.createTarget = true;
-    graph.centerZoom = true;
-
-    /*     graph.createHandler = function(state)
-				{
-					if (state != null &&
-						this.model.isVertex(state.cell))
-					{
-						return new mx.mxVertexToolHandler(state);
-					}
-
-					return mxGraph.prototype.createHandler.apply(this, arguments);
-				}; */
-
     // Specifies the default edge style
     graph.getStylesheet().getDefaultEdgeStyle()['edgeStyle'] =
       'orthogonalEdgeStyle';
-
-    graph.connectableEdges = true;
-    graph.allowDanglingEdges = false;
 
     // Installs a custom tooltip for cells
     graph.getTooltipForCell = function (cell) {
       console.log(cell);
       return cell['tooltip'];
+
+      /* if (this.model.isEdge(cell))
+					{
+						return this.convertValueToString(this.model.getTerminal(cell, true)) + ' => ' +
+							this.convertValueToString(this.model.getTerminal(cell, false))
+					}
+
+					return mxGraph.prototype.getTooltipForCell.apply(this, arguments); */
     };
 
+    // Defines the tolerance before removing the icons
+    var iconTolerance = 20;
+
+    // Shows icons if the mouse is over a cell
+    graph.addMouseListener({
+      currentState: null,
+      currentIconSet: null,
+      mouseDown: function (sender, me) {
+        // Hides icons on mouse down
+        if (this.currentState != null) {
+          this.dragLeave(me.getEvent(), this.currentState);
+          this.currentState = null;
+        }
+      },
+      mouseMove: function (sender, me) {
+        if (
+          this.currentState != null &&
+          (me.getState() == this.currentState || me.getState() == null)
+        ) {
+          var tol = iconTolerance;
+          var tmp = new mx.mxRectangle(
+            me.getGraphX() - tol,
+            me.getGraphY() - tol,
+            2 * tol,
+            2 * tol
+          );
+
+          if (mx.mxUtils.intersects(tmp, this.currentState)) {
+            return;
+          }
+        }
+
+        var tmp2 = graph.view.getState(me.getCell());
+
+        // Ignores everything but vertices
+        if (
+          graph.isMouseDown ||
+          (tmp2 != null && !graph.getModel().isVertex(tmp2.cell))
+        ) {
+          tmp2 = null;
+        }
+
+        if (tmp2 != this.currentState) {
+          if (this.currentState != null) {
+            this.dragLeave(me.getEvent(), this.currentState);
+          }
+
+          this.currentState = tmp2;
+
+          if (this.currentState != null) {
+            this.dragEnter(me.getEvent(), this.currentState);
+          }
+        }
+      },
+      mouseUp: function (sender, me) {},
+      dragEnter: function (evt, state) {
+        if (this.currentIconSet == null) {
+          this.currentIconSet = mxIconSet(state);
+        }
+      },
+      dragLeave: function (evt, state) {
+        if (this.currentIconSet != null) {
+          mxIconSetDestroy(this.currentIconSet);
+          //this.currentIconSet.destroy();
+          this.currentIconSet = null;
+        }
+      },
+    });
+
     return graph;
-  }
-
-  initConnectionHandler(graph: mxGraph) {
-    let connectionHandlerStart: mxConnectionHandler =
-      new mx.mxConnectionHandler(graph, function (source, target, style) {
-        let edge = new mx.mxCell('', new mx.mxGeometry());
-        edge.setEdge(true);
-        edge.setStyle(style);
-        edge.geometry.relative = true;
-        return edge;
-      });
-
-    connectionHandlerStart.connectImage = new mx.mxImage(
-      'assets/icons/start.png',
-      14,
-      14
-    );
-
-    let connectionHandlerStop: mxConnectionHandler = new mx.mxConnectionHandler(
-      graph,
-      function (source, target, style) {
-        let edge = new mx.mxCell('', new mx.mxGeometry());
-        edge.setEdge(true);
-        edge.setStyle(style);
-        edge.geometry.relative = true;
-        return edge;
-      }
-    );
-
-    connectionHandlerStop.connectImage = new mx.mxImage(
-      'assets/icons/stop.png',
-      14,
-      14
-    );
   }
 
   addListeners() {
@@ -321,11 +350,13 @@ export class MxgraphComponent implements AfterViewInit {
           'id',
           element.id
         );
-        node.x = element.geometry.x;
-        node.y = element.geometry.y;
-        this.nodeService
-          .updateNode(node, ['x', 'y'])
-          .subscribe((res) => console.log(res));
+        if (node) {
+          node.x = element.geometry.x;
+          node.y = element.geometry.y;
+          this.nodeService
+            .updateNode(node, ['x', 'y'])
+            .subscribe((res) => console.log(res));
+        }
       });
     });
 
@@ -422,6 +453,24 @@ export class MxgraphComponent implements AfterViewInit {
       }
     });
 
+    this.graph.model.addListener(mx.mxEvent.CHANGE, (sender, evt) => {
+      console.log(
+        '--------------------------------------------------------------------------------'
+      );
+      var changes = evt.getProperty('edit').changes;
+      for (var i = 0; i < changes.length; i++) {
+        if (changes[i].constructor.name == 'mxTerminalChange') {
+          console.log(i);
+          if (changes[i].cell.edge && !changes[i].cell.value) {
+            this.createEdge(changes[i].cell);
+            break;
+          }
+
+          console.log(changes[i]);
+        }
+      }
+    });
+
     mx.mxEvent.addListener(this.container, 'drop', function (evt) {
       if (this.graph.isEnabled()) {
         evt.stopPropagation();
@@ -444,6 +493,42 @@ export class MxgraphComponent implements AfterViewInit {
         for (var i = 0; i < filesArray.length; i++) {
           this.handleDrop(this.graph, filesArray[i], x + i * 10, y + i * 10);
         }
+      }
+    });
+  }
+
+  createEdge(cell: mxCell) {
+    let boxes = cell.parent.children;
+    let source = cell.source;
+    let target = cell.target;
+    let inBox;
+    let outBox;
+
+    console.log('boxes ', boxes);
+
+    console.log('target ', target);
+
+    let outNode = getElementByChamp<Node>(
+      this.graphData.nodes,
+      'id',
+      source.id
+    );
+    let inNode = getElementByChamp<Node>(this.graphData.nodes, 'id', target.id);
+
+    console.log('outNode ', outNode);
+    console.log('inNode ', inNode);
+
+    console.log('createEdge ', cell);
+    let link: Link = new Link({ out: '#' + outNode.id, in: '#' + inNode.id });
+
+    const dialogRef = this.dialog.open(DialogComponent, {
+      data: [link, Link, this.graphData.nodes, false],
+    });
+
+    dialogRef.afterClosed().subscribe((result: Link) => {
+      if (result) {
+        //this.newElement.emit(result);
+        console.log('res ', result);
       }
     });
   }
@@ -521,6 +606,7 @@ export class MxgraphComponent implements AfterViewInit {
     edgeStyle[mx.mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = 'white';
     edgeStyle[mx.mxConstants.STYLE_FONTCOLOR] = '#00000';
     edgeStyle[mx.mxConstants.STYLE_ROUNDED] = true;
+    edgeStyle[mx.mxConstants.STYLE_IMAGE] = `../assets/icons/start.png`;
 
     // create styles
     var nodeStyle = new Object();
@@ -530,7 +616,6 @@ export class MxgraphComponent implements AfterViewInit {
     nodeStyle[mx.mxConstants.STYLE_IMAGE_ALIGN] = mx.mxConstants.ALIGN_RIGHT;
     nodeStyle[mx.mxConstants.STYLE_SPACING_LEFT] = '5';
     nodeStyle[mx.mxConstants.STYLE_SPACING_RIGHT] = '15';
-
     nodeStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_LABEL;
     vertexStyle[mx.mxConstants.STYLE_ROUNDED] = true;
     nodeStyle[mx.mxConstants.STYLE_STROKECOLOR] = '#000000';
@@ -546,27 +631,33 @@ export class MxgraphComponent implements AfterViewInit {
     nodeStyle[mx.mxConstants.STYLE_FONTFAMILY] = 'verdana';
     nodeStyle[mx.mxConstants.STYLE_SHADOW] = true;
 
-    let trendStyle = mx.mxUtils.clone(nodeStyle);
-    trendStyle[mx.mxConstants.STYLE_FILLCOLOR] = Button.getButtonByType(
-      NodeType.trend
-    ).color;
-    trendStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/trend.png';
-    this.graph.getStylesheet().putCellStyle(NodeType.trend, trendStyle);
+    let stylesTypes = [
+      NodeType.trend,
+      EventType.action,
+      EventType.bio,
+      EventType.start,
+    ];
 
-    let eventStyle = mx.mxUtils.clone(nodeStyle);
-    eventStyle[mx.mxConstants.STYLE_FILLCOLOR] = Button.getButtonByType(
-      EventType.action
-    ).color;
-    eventStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/event.png';
-    this.graph.getStylesheet().putCellStyle(EventType.action, eventStyle);
+    stylesTypes.forEach((styleType) => {
+      let style = mx.mxUtils.clone(nodeStyle);
+      style[mx.mxConstants.STYLE_FILLCOLOR] =
+        Button.getButtonByType(styleType).color;
+      style[mx.mxConstants.STYLE_IMAGE] = `../assets/icons/${styleType}.png`;
+      this.graph.getStylesheet().putCellStyle(styleType, style);
+    });
 
-    let openStyle = new Object();
-    openStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_RECTANGLE;
-    openStyle[mx.mxConstants.STYLE_STARTSIZE] = 20;
-    openStyle[mx.mxConstants.STYLE_STROKECOLOR] = 'white';
-    openStyle[mx.mxConstants.STYLE_FILLCOLOR] = 'white';
-    openStyle[mx.mxConstants.STYLE_FOLDABLE] = false;
-    this.graph.getStylesheet().putCellStyle('open', openStyle);
+    let graphStyle = mx.mxUtils.clone(nodeStyle);
+    graphStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_SWIMLANE;
+    graphStyle[mx.mxConstants.STYLE_FILLCOLOR] = Button.getButtonByType(
+      NodeType.graph
+    ).color;
+    graphStyle[
+      mx.mxConstants.STYLE_IMAGE
+    ] = `../assets/icons/${NodeType.graph}.png`;
+    graphStyle[mx.mxConstants.STYLE_STARTSIZE] = NODE_HEIGTH;
+    graphStyle[mx.mxConstants.STYLE_SHADOW] = false;
+    graphStyle[mx.mxConstants.STYLE_SPACING_LEFT] = '15';
+    this.graph.getStylesheet().putCellStyle(NodeType.graph, graphStyle);
 
     let imageStyle = new Object();
     imageStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_IMAGE;
@@ -575,66 +666,21 @@ export class MxgraphComponent implements AfterViewInit {
     imageStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/start.png';
     imageStyle[mx.mxConstants.STYLE_FONTCOLOR] = 'white';
     this.graph.getStylesheet().putCellStyle('image', imageStyle);
-  }
 
-  // Installs auto layout for all levels
-  configureLayout() {
-    var layout = new mx.mxStackLayout(this.graph, true);
-    layout.border = this.graph.border;
-    var layoutMgr: mxLayoutManager = new mx.mxLayoutManager(this.graph);
-    layoutMgr.getLayout = function (cell) {
-      if (!cell.collapsed) {
-        if (cell.parent != this.graph.model.root) {
-          layout.resizeParent = true;
-          layout.horizontal = false;
-          layout.spacing = 10;
-        } else {
-          layout.resizeParent = true;
-          layout.horizontal = true;
-          layout.spacing = 40;
-        }
-
-        return layout;
-      }
-
-      return null;
-    };
-  }
-
-  // Overridden to define per-shape connection points
-  // Defines the default constraints for all shapes
-  defineConnectionPoints(graph) {
-    graph.getAllConnectionConstraints = function (terminal, source) {
-      if (terminal != null && terminal.shape != null) {
-        if (terminal.shape.stencil != null) {
-          if (terminal.shape.stencil.constraints != null) {
-            return terminal.shape.stencil.constraints;
-          }
-        } else if (terminal.shape.constraints != null) {
-          return terminal.shape.constraints;
-        }
-      }
-
-      return null;
-    };
-
-    mx.mxShape.constraints = [
-      new mx.mxConnectionConstraint(new mx.mxPoint(0.25, 0), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0.5, 0), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0.75, 0), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0, 0.25), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0, 0.5), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0, 0.75), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(1, 0.25), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(1, 0.5), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(1, 0.75), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0.25, 1), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0.5, 1), true),
-      new mx.mxConnectionConstraint(new mx.mxPoint(0.75, 1), true),
-    ];
-
-    // Edges have no connection points
-    mx.mxPolyline.constraints = null;
+    let portStyle = new Object();
+    portStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_IMAGE;
+    portStyle[mx.mxConstants.STYLE_FONTCOLOR] = 'white';
+    portStyle[mx.mxConstants.STYLE_PERIMETER] =
+      mx.mxPerimeter.RectanglePerimeter;
+    portStyle[mx.mxConstants.STYLE_PERIMETER_SPACING] = '6';
+    portStyle[mx.mxConstants.STYLE_ALIGN] = mx.mxConstants.ALIGN_LEFT;
+    portStyle[mx.mxConstants.STYLE_VERTICAL_ALIGN] =
+      mx.mxConstants.ALIGN_MIDDLE;
+    portStyle[mx.mxConstants.STYLE_FONTSIZE] = '10';
+    portStyle[mx.mxConstants.STYLE_FONTSTYLE] = 2;
+    portStyle[mx.mxConstants.STYLE_IMAGE_WIDTH] = '16';
+    portStyle[mx.mxConstants.STYLE_IMAGE_HEIGHT] = '16';
+    this.graph.getStylesheet().putCellStyle('port', portStyle);
   }
 
   // Extends mxGraphModel.getStyle to show an image when collapsed
@@ -661,227 +707,6 @@ export class MxgraphComponent implements AfterViewInit {
   // icons to every selected vertex.
   mxVertexToolHandler(state) {
     mx.mxVertexHandler.apply(this, arguments);
-  }
-  /* 
-  contexticons(){
-    this.mxVertexToolHandler.prototype = new mx.mxVertexHandler();
-		this.mxVertexToolHandler.prototype.constructor = this.mxVertexToolHandler;
-
-		this.mxVertexToolHandler.prototype.domNode = null;
-
-		this.mxVertexToolHandler.prototype.init = function()
-		{
-			mxVertexHandler.prototype.init.apply(this, arguments);
-
-			// In this example we force the use of DIVs for images in IE. This
-			// handles transparency in PNG images properly in IE and fixes the
-			// problem that IE routes all mouse events for a gesture via the
-			// initial IMG node, which means the target vertices 
-			this.domNode = document.createElement('div');
-			this.domNode.style.position = 'absolute';
-			this.domNode.style.whiteSpace = 'nowrap';
-			
-			function createImage(src)
-			{
-				return mx.mxUtils.createImage(src);
-			};
-
-			// Delete
-			var img = createImage('images/delete2.png');
-			img.setAttribute('title', 'Delete');
-			img.style.cursor = 'pointer';
-			img.style.width = '16px';
-			img.style.height = '16px';
-			mxEvent.addGestureListeners(img,
-				mx.mxUtils.bind(this, function(evt)
-				{
-					// Disables dragging the image
-					mxEvent.consume(evt);
-				})
-			);
-			mxEvent.addListener(img, 'click',
-				mx.mxUtils.bind(this, function(evt)
-				{
-					this.graph.removeCells([this.state.cell]);
-					mxEvent.consume(evt);
-				})
-			);
-			this.domNode.appendChild(img);
-
-			// Size
-			var img = createImage('images/fit_to_size.png');
-			img.setAttribute('title', 'Resize');
-			img.style.cursor = 'se-resize';
-			img.style.width = '16px';
-			img.style.height = '16px';
-			mxEvent.addGestureListeners(img,
-				mx.mxUtils.bind(this, function(evt)
-				{
-					this.start(mxEvent.getClientX(evt), mxEvent.getClientY(evt), 7);
-					this.graph.isMouseDown = true;
-					this.graph.isMouseTrigger = mxEvent.isMouseEvent(evt);
-					mxEvent.consume(evt);
-				})
-			);
-			this.domNode.appendChild(img);
-
-			// Move
-			var img = createImage('images/plus.png');
-			img.setAttribute('title', 'Move');
-			img.style.cursor = 'move';
-			img.style.width = '16px';
-			img.style.height = '16px';
-			mxEvent.addGestureListeners(img,
-				mx.mxUtils.bind(this, function(evt)
-				{
-					this.graph.graphHandler.start(this.state.cell,
-						mxEvent.getClientX(evt), mxEvent.getClientY(evt));
-					this.graph.graphHandler.cellWasClicked = true;
-					this.graph.isMouseDown = true;
-					this.graph.isMouseTrigger = mxEvent.isMouseEvent(evt);
-					mxEvent.consume(evt);
-				})
-			);
-			this.domNode.appendChild(img);
-
-			// Connect
-			var img = createImage('images/check.png');
-			img.setAttribute('title', 'Connect');
-			img.style.cursor = 'pointer';
-			img.style.width = '16px';
-			img.style.height = '16px';
-			mxEvent.addGestureListeners(img,
-				mx.mxUtils.bind(this, function(evt)
-				{
-					var pt = mx.mxUtils.convertPoint(this.graph.container,
-							mxEvent.getClientX(evt), mxEvent.getClientY(evt));
-					this.graph.connectionHandler.start(this.state, pt.x, pt.y);
-					this.graph.isMouseDown = true;
-					this.graph.isMouseTrigger = mxEvent.isMouseEvent(evt);
-					mxEvent.consume(evt);
-				})
-			);
-			this.domNode.appendChild(img);
-			
-			this.graph.container.appendChild(this.domNode);
-			this.redrawTools();
-		};
-
-		this.mxVertexToolHandler.prototype.redraw = function()
-		{
-			mx.mxVertexHandler.prototype.redraw.apply(this);
-			this.redrawTools();
-		};
-
-		this.mxVertexToolHandler.prototype.redrawTools = function()
-		{
-			if (this.state != null && this.domNode != null)
-			{
-				var dy = (mx.mxClient.IS_VML && document.compatMode == 'CSS1Compat') ? 20 : 4;
-				this.domNode.style.left = (this.state.x + this.state.width - 56) + 'px';
-				this.domNode.style.top = (this.state.y + this.state.height + dy) + 'px';
-			}
-		};
-		
-		this.mxVertexToolHandler.prototype.destroy = function(sender, me)
-		{
-			mx.mxVertexHandler.prototype.destroy.apply(this, arguments);
-
-			if (this.domNode != null)
-			{
-				this.domNode.parentNode.removeChild(this.domNode);
-				this.domNode = null;
-			}
-		};
-  } */
-
-  createControls() {
-    // Specifies the URL and size of the new control
-    var startImage = new mx.mxImage('assets/icons/start.png', 16, 16);
-
-    // Overridden to add an additional control to the state at creation time
-    mx.mxCellRendererCreateControl = mx.mxCellRenderer.prototype.createControl;
-    mx.mxCellRenderer.prototype.createControl = function (state) {
-      mx.mxCellRendererCreateControl.apply(this, arguments);
-
-      var graph = state.view.graph;
-
-      if (graph.getModel().isVertex(state.cell)) {
-        if (state.deleteControl == null) {
-          var b = new mx.mxRectangle(0, 0, startImage.width, startImage.height);
-          state.deleteControl = new mx.mxImageShape(b, startImage.src);
-          state.deleteControl.dialect = graph.dialect;
-          state.deleteControl.preserveImageAspect = false;
-
-          this.initControl(state, state.deleteControl, false, function (evt) {
-            if (graph.isEnabled()) {
-              graph.removeCells([state.cell]);
-              mxEvent.consume(evt);
-            }
-          });
-        }
-      } else if (state.deleteControl != null) {
-        state.deleteControl.destroy();
-        state.deleteControl = null;
-      }
-    };
-
-    // Helper function to compute the bounds of the control
-    var getDeleteControlBounds = function (state) {
-      if (state.deleteControl != null) {
-        var oldScale = state.deleteControl.scale;
-        var w = state.deleteControl.bounds.width / oldScale;
-        var h = state.deleteControl.bounds.height / oldScale;
-        var s = state.view.scale;
-
-        return state.view.graph.getModel().isEdge(state.cell)
-          ? new mx.mxRectangle(
-              state.x + state.width / 2 - (w / 2) * s,
-              state.y + state.height / 2 - (h / 2) * s,
-              w * s,
-              h * s
-            )
-          : new mx.mxRectangle(
-              state.x + state.width - w * s,
-              state.y,
-              w * s,
-              h * s
-            );
-      }
-
-      return null;
-    };
-
-    // Overridden to update the scale and bounds of the control
-    mx.mxCellRendererRedrawControl = mx.mxCellRenderer.prototype.redrawControl;
-    mx.mxCellRenderer.prototype.redrawControl = function (state) {
-      mx.mxCellRendererRedrawControl.apply(this, arguments);
-
-      if (state.deleteControl != null) {
-        var bounds = getDeleteControlBounds(state);
-        var s = state.view.scale;
-
-        if (
-          state.deleteControl.scale != s ||
-          !state.deleteControl.bounds.equals(bounds)
-        ) {
-          state.deleteControl.bounds = bounds;
-          state.deleteControl.scale = s;
-          state.deleteControl.redraw();
-        }
-      }
-    };
-
-    // Overridden to remove the control if the state is destroyed
-    mx.mxCellRendererDestroy = mx.mxCellRenderer.prototype.destroy;
-    mx.mxCellRenderer.prototype.destroy = function (state) {
-      mx.mxCellRendererDestroy.apply(this, arguments);
-
-      if (state.deleteControl != null) {
-        state.deleteControl.destroy();
-        state.deleteControl = null;
-      }
-    };
   }
 
   // Inserts a cell at the given location
@@ -910,67 +735,67 @@ export class MxgraphComponent implements AfterViewInit {
         // find initial size from SVG attributes (only for IE11)
         if (file.type.substring(0, 9) == 'image/svg') {
           /* 	var comma = 1//data.indexOf(',');
-    					var svgText = atob(data.substring(comma + 1));
-    					var root = mxUtils.parseXml(svgText);
-    					
-    					// Parses SVG to find width and height
-    					if (root != null)
-    					{
-    						var svgs = root.getElementsByTagName('svg');
-    						
-    						if (svgs.length > 0)
-	    					{
-    							var svgRoot = svgs[0];
-	    						var w = parseFloat(svgRoot.getAttribute('width'));
-	    						var h = parseFloat(svgRoot.getAttribute('height'));
-	    						
-	    						// Check if viewBox attribute already exists
-	    						var vb = svgRoot.getAttribute('viewBox');
-	    						
-	    						if (vb == null || vb.length == 0)
-	    						{
-	    							svgRoot.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
-	    						}
-	    						// Uses width and height from viewbox for
-	    						// missing width and height attributes
-	    						else if (isNaN(w) || isNaN(h))
-	    						{
-	    							var tokens = vb.split(' ');
-	    							
-	    							if (tokens.length > 3)
-	    							{
-	    								w = parseFloat(tokens[2]);
-	    								h = parseFloat(tokens[3]);
-	    							}
-	    						}
-	    						
-		                    	w = Math.max(1, Math.round(w));
-		                    	h = Math.max(1, Math.round(h));
-	    						
-	    						data = 'data:image/svg+xml,' + btoa(mxUtils.getXml(svgs[0], '\n'));
-	    						graph.insertVertex(null, null, '', x, y, w, h, 'shape=image;image=' + data + ';');
-	    					}
-    					} */
+              var svgText = atob(data.substring(comma + 1));
+              var root = mxUtils.parseXml(svgText);
+            	
+              // Parses SVG to find width and height
+              if (root != null)
+              {
+                var svgs = root.getElementsByTagName('svg');
+              	
+                if (svgs.length > 0)
+                {
+                  var svgRoot = svgs[0];
+                  var w = parseFloat(svgRoot.getAttribute('width'));
+                  var h = parseFloat(svgRoot.getAttribute('height'));
+                	
+                  // Check if viewBox attribute already exists
+                  var vb = svgRoot.getAttribute('viewBox');
+                	
+                  if (vb == null || vb.length == 0)
+                  {
+                    svgRoot.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+                  }
+                  // Uses width and height from viewbox for
+                  // missing width and height attributes
+                  else if (isNaN(w) || isNaN(h))
+                  {
+                    var tokens = vb.split(' ');
+                  	
+                    if (tokens.length > 3)
+                    {
+                      w = parseFloat(tokens[2]);
+                      h = parseFloat(tokens[3]);
+                    }
+                  }
+                	
+                          w = Math.max(1, Math.round(w));
+                          h = Math.max(1, Math.round(h));
+                	
+                  data = 'data:image/svg+xml,' + btoa(mxUtils.getXml(svgs[0], '\n'));
+                  graph.insertVertex(null, null, '', x, y, w, h, 'shape=image;image=' + data + ';');
+                }
+              } */
         } else {
           /* var img = new Image();
                     	
-                    	img.onload = function()
-                    	{
-	                    	var w = Math.max(1, img.width);
-	                    	var h = Math.max(1, img.height);
-	                    	
-	                    	// Converts format of data url to cell style value for use in vertex
-	        				var semi = data.indexOf(';');
-	        				
-	        				if (semi > 0)
-	        				{
-	        					data = data.substring(0, semi) + data.substring(data.indexOf(',', semi + 1));
-	        				}
+                      img.onload = function()
+                      {
+                        var w = Math.max(1, img.width);
+                        var h = Math.max(1, img.height);
+                      	
+                        // Converts format of data url to cell style value for use in vertex
+                  var semi = data.indexOf(';');
+                	
+                  if (semi > 0)
+                  {
+                    data = data.substring(0, semi) + data.substring(data.indexOf(',', semi + 1));
+                  }
 
-	        				graph.insertVertex(null, null, '', x, y, w, h, 'shape=image;image=' + data + ';');
-                    	};
+                  graph.insertVertex(null, null, '', x, y, w, h, 'shape=image;image=' + data + ';');
+                      };
                     	
-                    	img.src = data; */
+                      img.src = data; */
         }
       };
 
@@ -978,3 +803,76 @@ export class MxgraphComponent implements AfterViewInit {
     }
   }
 }
+
+// Defines a new class for all icons
+let mxIconSet = (state) => {
+  let images = [];
+  var graph = state.view.graph;
+
+  // Icon1
+  var img = mx.mxUtils.createImage('../assets/icons/start.png');
+  img.setAttribute('title', 'Démarrer');
+  img.style.position = 'absolute';
+  img.style.cursor = 'pointer';
+  img.style.width = '16px';
+  img.style.height = '16px';
+  img.style.left = state.x + state.width / 3 + 'px'; //(state.x + state.width) + 'px';
+  img.style.top = state.y - 18 + 'px'; //(state.y + state.height) + 'px';
+
+  mx.mxEvent.addGestureListeners(
+    img,
+    mx.mxUtils.bind(this, function (evt) {
+      var s = graph.gridSize;
+      graph.setSelectionCells(graph.moveCells([state.cell], s, s, true));
+      mx.mxEvent.consume(evt);
+      this.destroy();
+    })
+  );
+
+  state.view.graph.container.appendChild(img);
+  images.push(img);
+
+  // Delete
+  var img = mx.mxUtils.createImage('../assets/icons/pause.png');
+  img.setAttribute('title', 'Pause');
+  img.style.position = 'absolute';
+  img.style.cursor = 'pointer';
+  img.style.width = '16px';
+  img.style.height = '16px';
+  img.style.left = state.x + (2 * state.width) / 3 + 'px'; //(state.x + state.width) + 'px';
+  img.style.top = state.y - 18 + 'px'; //(state.y - 16) + 'px';
+
+  mx.mxEvent.addGestureListeners(
+    img,
+    mx.mxUtils.bind(this, function (evt) {
+      // Disables dragging the image
+      mx.mxEvent.consume(evt);
+    })
+  );
+
+  mx.mxEvent.addListener(
+    img,
+    'click',
+    mx.mxUtils.bind(this, function (evt) {
+      graph.removeCells([state.cell]);
+      mx.mxEvent.consume(evt);
+      this.destroy();
+    })
+  );
+
+  state.view.graph.container.appendChild(img);
+  images.push(img);
+
+  return images;
+};
+
+let mxIconSetDestroy = (images) => {
+  if (images != null) {
+    for (var i = 0; i < images.length; i++) {
+      var img = images[i];
+      img.parentNode.removeChild(img);
+    }
+  }
+
+  images = null;
+};

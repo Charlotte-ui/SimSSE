@@ -85,6 +85,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   ngOnInit() {
     this.element = structuredClone(this.data[0]);
+    console.log('this.element ',this.element)
     this.classe = this.data[1];
     this.liste = this.data[2];
     this.edition = this.data[3];
@@ -150,7 +151,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   getValue(elem) {
     if (typeof elem === 'string') return elem;
-    if ('event' in elem) return elem.event;
+   // if ('event' in elem) return elem.event;
     if ('couleur' in elem)
       return elem.name; // si varible TODO trouver une soluce plus propre
     else return elem.id;
