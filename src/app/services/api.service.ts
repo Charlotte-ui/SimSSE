@@ -176,11 +176,11 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
-  createRelationBetween(idIn: string, idOut: string, relation: string) {
+  createRelationBetween(idIn: string, idOut: string, relation: string):Observable<any> {
     return this.http.post<any>(
       `${environment.urlAPI}/function/simsse/createEdge/${idOut}/${idIn}/${relation}`,
       {}
-    );
+    )
   }
 
   createRelationBetweenWithProperty(

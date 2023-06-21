@@ -30,9 +30,11 @@ import {
   Link,
   EventType,
   Trend,
+  LinkType,
+  Timer,
 } from 'src/app/models/vertex/node';
 import { NodeService } from 'src/app/services/node.service';
-import { getElementByChamp } from 'src/app/functions/tools';
+import { getElementByChamp, remove } from 'src/app/functions/tools';
 import { Button } from 'src/app/functions/display';
 import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
@@ -40,6 +42,10 @@ import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { DialogComponent } from 'src/app/modules/shared/dialog/dialog.component';
 
 const NODE_HEIGTH = 30;
+const IMAGE_HEIGTH = 50;
+
+var nodes: Node[] = [];
+var variablesTemplate: VariablePhysioTemplate[] = [];
 
 @Component({
   selector: 'app-mxgraph',
@@ -48,8 +54,6 @@ const NODE_HEIGTH = 30;
 })
 export class MxgraphComponent implements AfterViewInit {
   title = 'ngmxgraph';
-  actionByCategories;
-
   model: mxGraphModel;
   graph: mxGraph;
   parent: mxCell;
@@ -61,11 +65,21 @@ export class MxgraphComponent implements AfterViewInit {
   @Input() set graphData(value: Graph) {
     if (value) {
       this._graphData = value;
+      nodes = value.nodes;
       if (value.nodes && value.links && this.model) this.updateModel();
     }
   }
 
-  @Input() variablesTemplate: VariablePhysioTemplate[];
+  _variablesTemplate!: VariablePhysioTemplate[];
+  get variablesTemplate(): VariablePhysioTemplate[] {
+    return this._variablesTemplate;
+  }
+  @Input() set variablesTemplate(value: VariablePhysioTemplate[]) {
+    if (value) {
+      this._variablesTemplate = value;
+      variablesTemplate = value;
+    }
+  }
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
 
@@ -109,11 +123,10 @@ export class MxgraphComponent implements AfterViewInit {
       this.graphData.nodes.forEach((node: Node) => {
         let type = Node.getType(node);
 
-
-        console.log(this.model.cells)
-console.log(this.model.cells[node.id])
+        console.log(this.model.cells);
+        console.log(this.model.cells[node.id]);
         if (this.model.cells[node.id] === undefined) {
-          console.log('create node ')
+          console.log('create node ');
           if (type === NodeType.graph)
             this.createGraphBox(node as Graph, this.parent);
           else this.createNodeBox(node, type, this.parent);
@@ -142,7 +155,7 @@ console.log(this.model.cells[node.id])
       node.x,
       node.y,
       nodeWidth,
-      NODE_HEIGTH,
+      (type === NodeType.timer || type === EventType.start)? IMAGE_HEIGTH:NODE_HEIGTH,
       type
     );
 
@@ -152,18 +165,6 @@ console.log(this.model.cells[node.id])
     if (source === this.parent) nodeBox.setConnectable(true);
     else nodeBox.setConnectable(false);
     nodeBox.collapsed = true;
-
-    if (node.type == NodeType.trend) {
-      nodeBox['tooltip'] =
-        getElementByChamp<VariablePhysioTemplate>(
-          this.variablesTemplate,
-          'id',
-          (node as Trend).target
-        ).name +
-        ', ' +
-        (node as Trend).parameter;
-    }
-
     return nodeBox;
   }
 
@@ -179,15 +180,13 @@ console.log(this.model.cells[node.id])
 
   createLinks(links: Link[]) {
     links.forEach((link: Link) => {
-      let color = link.start ? 'green' : 'red';
       let edge = this.graph.insertEdge(
         this.parent,
         link.id,
-        '<img src="../assets/icons/start.png" width="16" height="16"> ' +
-          link.start,
+        Link.getIcon(link),
         this.model.cells[link?.out],
         this.model.cells[link?.in],
-        `strokeColor=${color}`
+        `strokeColor=${Link.getColor(link)}`
       );
       edge.setConnectable(false);
     });
@@ -255,7 +254,24 @@ console.log(this.model.cells[node.id])
     // Installs a custom tooltip for cells
     graph.getTooltipForCell = function (cell) {
       console.log(cell);
-      return cell['tooltip'];
+      let tt = undefined;
+
+      let node = getElementByChamp<Node>(nodes, 'id', cell.id);
+      if (node.type == NodeType.trend) {
+        tt =
+          getElementByChamp<VariablePhysioTemplate>(
+            variablesTemplate,
+            'id',
+            (node as Trend).target
+          ).name +
+          ', ' +
+          (node as Trend).parameter;
+      }
+
+      if(node.type === NodeType.timer){
+        tt = (node as Timer).duration + ' min'
+      }
+      return tt;
 
       /* if (this.model.isEdge(cell))
 					{
@@ -270,7 +286,7 @@ console.log(this.model.cells[node.id])
     var iconTolerance = 20;
 
     // Shows icons if the mouse is over a cell
-    graph.addMouseListener({
+    /*     graph.addMouseListener({
       currentState: null,
       currentIconSet: null,
       mouseDown: function (sender, me) {
@@ -333,7 +349,7 @@ console.log(this.model.cells[node.id])
           this.currentIconSet = null;
         }
       },
-    });
+    }); */
 
     return graph;
   }
@@ -376,10 +392,14 @@ console.log(this.model.cells[node.id])
 
     this.graph.addListener(mx.mxEvent.DOUBLE_CLICK, (sender, evt) => {
       var cell: mxCell = evt.getProperty('cell');
+      console.log('DOUBLE CLICK');
       console.log(cell);
       let node = getElementByChamp<Node>(this.graphData.nodes, 'id', cell.id);
-
-      this.actionByCategories = Action.getListByCategory();
+      if (node === undefined) {
+        let link = getElementByChamp<Link>(this.graphData.links, 'id', cell.id);
+        this.onEdgeClick(link, cell);
+        return;
+      }
 
       let dialogRef;
 
@@ -397,7 +417,7 @@ console.log(this.model.cells[node.id])
           break;
         case EventType.action:
           dialogRef = this.dialog.open(DialogComponent, {
-            data: [node, Event, this.actionByCategories, true, ['template']],
+            data: [node, Event, Action.getListByCategory(), true, ['template']],
           });
           break;
         case NodeType.trend:
@@ -406,42 +426,45 @@ console.log(this.model.cells[node.id])
           });
           break;
         case NodeType.timer:
-        //
+        dialogRef = this.dialog.open(DialogComponent, {
+          data: [node,Timer, [], true],
+        });
       }
 
       if (dialogRef)
         dialogRef.afterClosed().subscribe((result) => {
           if (result) {
             if (result.delete) {
-              /*   let deletedNode = this.graphData.nodes.splice(index, 1)[0];
-            this.graphData.splice(index, 1);
-            let ref = deletedNode.id ;
-
-            console.log("deletedNode ",deletedNode)
-            
-            if (deletedNode.type == NodeType.event) ref = (deletedNode as Event).event;
-            console.log("ref ",ref)
-            result.ref = ref;
-            this.updateNode.emit([result, index]); */
+              remove<Node>(this.graphData.nodes, node);
+              this.graph.removeCells([cell]);
+              // delete all the links link to the deleted node
+              this.graphData.links.forEach((link) => {
+                if (link.in == node.id || link.out == node.id)
+                  remove<Link>(this.graphData.links, link);
+              });
+              this.graph.removeCells([cell]);
+              this.nodeService.deleteNode(node).subscribe();
             } else {
-              console.log('result ', result);
-              console.log('cell ', cell);
-              console.log('node ', node);
-              node = result;
-              if (node.type == NodeType.trend) cell.value = result['name'];
-              // this.updateModel(); -> diff de initModel
-              this.model.beginUpdate();
-              try {
-                if (node.type == NodeType.trend) {
-                  cell.value = result['name'];
-                  cell.geometry.width = 50 + cell.value.length * 8;
-                }
-              } finally {
-                this.model.endUpdate();
-              }
-            }
+              let updatableParameters = Node.getUpdatables(node);
+              let updatedParameters = [];
 
-            //    this.updateChart();
+              updatableParameters.forEach((parameter) => {
+                if (node[parameter] != result[parameter]) {
+                  node[parameter] = result[parameter];
+                  updatedParameters.push(parameter);
+                }
+              });
+              if(node.type == NodeType.event) (node as Event).template = getElementByChamp<Action>(
+                this.allActions,
+                'id',
+                (node as Event).event
+              );
+
+              cell.value = Node.getName(node);
+              cell.geometry.width = 50 + cell.value.length * 8;
+              this.graph.refresh(cell);
+              this.nodeService.updateNode(node, updatedParameters).subscribe();
+            }
           }
         });
     });
@@ -529,6 +552,39 @@ console.log(this.model.cells[node.id])
       if (result) {
         //this.newElement.emit(result);
         console.log('res ', result);
+        console.log('model ', this.model);
+
+        this.nodeService
+          .createLink(result.in, result.out, result.trigger)
+          .subscribe((newLink: Link) => {
+            this.graphData.links.push(newLink);
+            cell.id = newLink.id;
+          });
+        cell.style = `strokeColor=${Link.getColor(result)}`;
+        cell.value = Link.getIcon(result);
+        this.graph.refresh(cell);
+      }
+    });
+  }
+
+  onEdgeClick(link: Link, cell: mxCell) {
+    let dialogRef = this.dialog.open(DialogComponent, {
+      data: [link, Link, this.graphData.nodes, true],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        if (result.delete) {
+          remove<Link>(this.graphData.links, link);
+          this.graph.removeCells([cell]);
+          this.nodeService.deleteLink(link).subscribe();
+        } else {
+          link.trigger = result.trigger;
+          cell.style = `strokeColor=${Link.getColor(link)}`;
+          cell.value = Link.getIcon(link);
+          this.graph.refresh(cell);
+          this.nodeService.updateLink(link).subscribe();
+        }
       }
     });
   }
@@ -635,7 +691,7 @@ console.log(this.model.cells[node.id])
       NodeType.trend,
       EventType.action,
       EventType.bio,
-      EventType.start,
+   //   EventType.start,
     ];
 
     stylesTypes.forEach((styleType) => {
@@ -663,9 +719,17 @@ console.log(this.model.cells[node.id])
     imageStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_IMAGE;
     imageStyle[mx.mxConstants.STYLE_PERIMETER] =
       mx.mxPerimeter.RectanglePerimeter;
-    imageStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/start.png';
-    imageStyle[mx.mxConstants.STYLE_FONTCOLOR] = 'white';
-    this.graph.getStylesheet().putCellStyle('image', imageStyle);
+    imageStyle[mx.mxConstants.STYLE_IMAGE_WIDTH] = '50';
+    imageStyle[mx.mxConstants.STYLE_IMAGE_HEIGHT] = '50';
+
+
+    let startStyle = mx.mxUtils.clone(imageStyle);
+    startStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/start.png';
+    this.graph.getStylesheet().putCellStyle('start', startStyle);
+
+    let timerStyle = mx.mxUtils.clone(imageStyle);
+    timerStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/timer.png';
+    this.graph.getStylesheet().putCellStyle('timer', timerStyle);
 
     let portStyle = new Object();
     portStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_IMAGE;

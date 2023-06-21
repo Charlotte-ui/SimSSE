@@ -70,12 +70,12 @@
 
         <div *ngIf="getType(champ) == 'boolean'" class="noOverflow">
           <mat-label>{{ getLabel(champ) }}</mat-label>
-          <mat-radio-group
-            [formControlName]="champ"
-            aria-label="Select an option"
-          >
-            <mat-radio-button [value]="true">Vrai</mat-radio-button>
-            <mat-radio-button [value]="false">Faux</mat-radio-button>
+          <mat-radio-group [formControlName]="champ">
+            <mat-radio-button
+              *ngFor="let elem of getGroup(champ)"
+              [value]="elem"
+              >{{ elem }}</mat-radio-button
+            >
           </mat-radio-group>
         </div>
       </div>

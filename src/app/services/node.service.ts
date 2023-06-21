@@ -7,6 +7,7 @@ import {
   NodeType,
   EventType,
   Node,
+  LinkType,
 } from '../models/vertex/node';
 import {
   Observable,
@@ -124,6 +125,37 @@ export class NodeService {
       .pipe(map((response) => this.apiService.documentId(response)));
   }
 
+    /**
+   * create a node and link it to a graph
+   * return the node ID
+   * @param node 
+   * @param graph 
+   * @returns 
+   */
+  addNodeToGraph(node: Node, graph: Graph) {
+    let request: Observable<string>;
+    if (node.type === NodeType.graph) {
+      // create a graph node
+      request = this.createGraphNode(structuredClone(node as Graph));
+    } else {
+      // create a trend or event node
+      request = this.createNode(
+        structuredClone(node),
+        [...node.type][0].toUpperCase() + node.type.slice(1)
+      );
+    }
+
+    return request.pipe(
+      switchMap((newNodeIndex: string) => {
+        return this.apiService.createRelationBetween(
+          newNodeIndex,
+          graph.id,
+          'aNode'
+        ).pipe(map(() => newNodeIndex));
+      })
+    );
+  }
+
   /**
    * push a new Graph in the database
    * link the graph to his template
@@ -192,11 +224,24 @@ export class NodeService {
   }
 
   /**
+   * create a link between two Nodes
+   * @param idIn
+   * @param idOut
+   * @param value
+   * @returns
+   */
+  createLink(idIn: string, idOut: string, value: LinkType): Observable<Link> {
+    return this.apiService
+      .createRelationBetweenWithProperty(idIn, idOut, 'link', 'trigger', value)
+      .pipe(map((response) => new Link(response.result[0])));
+  }
+
+  /**
    * UPDATE
    */
 
   /**
-   * push a  Node in the database
+   * update a  Node in the database
    * @param node
    */
   updateNode(node: Node, champs?: string[]): Observable<string[]> {
@@ -216,7 +261,7 @@ export class NodeService {
           )
         );
       });
-      
+
       return from(requests).pipe(
         concatMap((request: Observable<any>) => request)
       );
@@ -225,14 +270,14 @@ export class NodeService {
   }
 
   /**
-   * push a  Node in the database
+   * update a link trigger value
    * @param node
    */
   updateLink(link: Link): Observable<string[]> {
     return this.apiService.updateDocumentChamp(
       link.id,
-      'start',
-      link.start.toString()
+      'trigger',
+      link.trigger
     );
   }
 
@@ -353,8 +398,8 @@ export class NodeService {
             this.getNodeId(link.in, graph.nodes, indexesNode),
             this.getNodeId(link.out, graph.nodes, indexesNode),
             'link',
-            'start',
-            link.start.toString()
+            'trigger',
+            link.trigger
           )
         );
     });
@@ -385,6 +430,33 @@ export class NodeService {
     return res;
   }
 
+  /**
+   * DELETE
+   */
+
+  /**
+   * delete a Link by id
+   * @param link
+   * @returns
+   */
+  deleteLink(link: Link): Observable<any> {
+    return this.apiService.deleteEdge(link.id);
+  }
+
+  /**
+   * delete a node by id
+   * @param node
+   * @returns
+   */
+  deleteNode(node: Node): Observable<any> {
+    return this.apiService.deleteDocument(node.id);
+  }
+
+  /**
+   *
+   * @param graph
+   * @returns
+   */
   deleteGraph(graph: Graph): any {
     let requests: Observable<any>[] = [];
 

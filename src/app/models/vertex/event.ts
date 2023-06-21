@@ -1,3 +1,4 @@
+import { pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
 import { Template } from '../interfaces/templatable';
 import { EventType } from './node';
 import { Vertex } from './vertex';
@@ -11,12 +12,12 @@ export class Categorie extends Vertex {
   constructor(object?: any) {
     super(object);
     this.name = object?.name ? object.name : '';
-
-    Categorie.categories.push(this);
-
+    Categorie.categories = pushWithoutDuplicateByChamp<Categorie>(Categorie.categories,this,'name')
+    console.log('Categorie ',Categorie.categories)
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
+    console.log('instanciateListe ',list)
     return list.map((element) => new Categorie(element) as T);
   }
 }
@@ -63,6 +64,9 @@ export class Action extends Vertex implements Template {
         ),
       });
     });
+        console.log('categories ',categories)
+
+    console.log('getListByCategory ',actions)
 
     return actions;
   }

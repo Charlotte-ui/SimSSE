@@ -1,5 +1,5 @@
 import { Modele } from '../models/vertex/modele';
-import { Graph, NodeType, Timer, Node, Trend } from '../models/vertex/node';
+import { Graph, NodeType, Timer, Node, Trend, LinkType } from '../models/vertex/node';
 import { Trigger } from '../models/trigger';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
 import { getElementByChamp, roundingWithDecimal } from './tools';
@@ -92,7 +92,7 @@ export class Curve {
             let nodeTrigger = getElementByChamp<Node>(graph.nodes,'id',link.in)
             
             if (nodeTrigger) {
-              nodeTrigger.state = link.start;
+              nodeTrigger.state = link.trigger === LinkType.start;
               if (nodeTrigger.type == NodeType.graph) {
                 if (nodeTrigger.state)
                   this.updateNodeStatesRecursive(

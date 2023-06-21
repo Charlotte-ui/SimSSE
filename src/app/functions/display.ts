@@ -37,8 +37,8 @@ export const champLabel = {
   paraMed:"Paramed",
   start:"Activation",
   template:'Groupe',
-  decede:'Décédé'
-
+  decede:'Décédé',
+  trigger:'Déclencheur'
 };
 
 const numbers = [
@@ -61,7 +61,7 @@ const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage'
 
 const listableWithGroupe = ['event'];
 
-const booleans = ['start','med','paraMed','secouriste'];
+const booleans = ['start','med','paraMed','secouriste','trigger'];
 
 export class Button {
   static buttons: IButton[] = [

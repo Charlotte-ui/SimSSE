@@ -97,3 +97,9 @@ export function isDeepEqual(object1, object2): boolean {
 const isObject = (object) => {
   return object != null && typeof object === 'object';
 };
+
+
+export function remove<T>(array: T[],element:T) {
+  const index = array.indexOf(element);
+  array.splice(index, 1);
+}

@@ -20,6 +20,7 @@ import {
   Link,
   NodeType,
   EventType,
+  LinkType,
 } from 'src/app/models/vertex/node';
 import { Button, champLabel } from 'src/app/functions/display';
 import { Scenario } from '../../../models/vertex/scenario';
@@ -178,6 +179,13 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   getLabel(champ: string) {
     return this.champLabel[champ] ? this.champLabel[champ] : champ;
+  }
+
+  getGroup(champ: string) {
+    console.log('champ ',champ)
+    if (champ == 'trigger') return Object.values(LinkType)
+    else return ['Vrai','Faux']
+    
   }
 
   // Get all Form Controls keys and loop them
