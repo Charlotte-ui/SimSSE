@@ -1,3 +1,4 @@
+import { getElementByChamp, pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
 import { Nameable } from '../interfaces/nameable';
 import { Template } from '../interfaces/templatable';
 import { Action, BioEvent } from './event';
@@ -141,8 +142,8 @@ export class Event extends Node {
 
   static override getName(element): string {
     return (element as Event).template
-      ? (element as Event).template.name : ''
-      //: element.event;
+      ? (element as Event).template.name : element.event;
+      //: 
   }
 
   public static override getType(element): string {
@@ -217,7 +218,8 @@ export class Graph extends Node implements Template {
     this.nodes = object?.nodes ? object.nodes : [];
     this.links = object?.links ? object.links : [];
     this.template = object?.template ? object.template : false;
-    Graph.graphs.push(this);
+
+    if (this.template) Graph.graphs = pushWithoutDuplicateByChamp<Graph>(Graph.graphs,this,'name')
   }
 
   static override getName(element): string {
@@ -232,6 +234,11 @@ export class Graph extends Node implements Template {
     });
 
     return res;
+  }
+
+  
+  public static getGraphById(id: string) {
+    return getElementByChamp<Graph>(Graph.graphs, 'id', id);
   }
 }
 

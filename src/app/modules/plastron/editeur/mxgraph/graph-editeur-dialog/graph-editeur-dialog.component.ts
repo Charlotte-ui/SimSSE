@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Graph, Trend, Event, Link, Node } from 'src/app/models/vertex/node';
+import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 
 @Component({
   selector: 'app-graph-editeur-dialog',
@@ -9,14 +10,17 @@ import { Graph, Trend, Event, Link, Node } from 'src/app/models/vertex/node';
 })
 export class GraphEditeurDialogComponent {
   graph: Graph;
-
+  variablesTemplate!: VariablePhysioTemplate[];
+  
+  
   constructor(
     public dialogRef: MatDialogRef<GraphEditeurDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Graph
+    @Inject(MAT_DIALOG_DATA) public data: [Graph,VariablePhysioTemplate[]]
   ) {}
 
   ngOnInit() {
-    this.graph = this.data;
+    this.graph = this.data[0];
+    this.variablesTemplate =  this.data[1];
   }
 
   updateNodes(event) {
@@ -28,7 +32,7 @@ export class GraphEditeurDialogComponent {
   }
 
   save() {
-    this.dialogRef.close(this.data);
+    this.dialogRef.close(this.graph);
   }
 
   delete() {

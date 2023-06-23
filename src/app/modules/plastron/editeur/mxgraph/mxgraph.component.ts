@@ -2,7 +2,9 @@ import {
   AfterViewInit,
   Component,
   ElementRef,
+  EventEmitter,
   Input,
+  Output,
   ViewChild,
 } from '@angular/core';
 import factory, {
@@ -20,6 +22,8 @@ import factory, {
   mxLayoutManager,
   mxRectangle,
   mxPoint,
+  mxUndoManager,
+  mxEditor,
 } from 'mxgraph';
 import mx from '../../../../../mxgraph';
 import {
@@ -34,18 +38,28 @@ import {
   Timer,
 } from 'src/app/models/vertex/node';
 import { NodeService } from 'src/app/services/node.service';
-import { getElementByChamp, remove } from 'src/app/functions/tools';
+import {
+  getElementByChamp,
+  getLinkByID,
+  getNodeByID,
+  remove,
+  shade,
+} from 'src/app/functions/tools';
 import { Button } from 'src/app/functions/display';
 import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { DialogComponent } from 'src/app/modules/shared/dialog/dialog.component';
+import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
+import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
+import { Groupe } from 'src/app/models/vertex/groupe';
 
 const NODE_HEIGTH = 30;
 const IMAGE_HEIGTH = 50;
 
-var nodes: Node[] = [];
+var DATA: Graph;
 var variablesTemplate: VariablePhysioTemplate[] = [];
+var undoManager: mxUndoManager;
 
 @Component({
   selector: 'app-mxgraph',
@@ -55,7 +69,7 @@ var variablesTemplate: VariablePhysioTemplate[] = [];
 export class MxgraphComponent implements AfterViewInit {
   title = 'ngmxgraph';
   model: mxGraphModel;
-  graph: mxGraph;
+  editor: mxEditor;
   parent: mxCell;
 
   _graphData!: Graph;
@@ -64,9 +78,11 @@ export class MxgraphComponent implements AfterViewInit {
   }
   @Input() set graphData(value: Graph) {
     if (value) {
+      console.log('graphData ', value);
+
       this._graphData = value;
-      nodes = value.nodes;
-      if (value.nodes && value.links && this.model) this.updateModel();
+      DATA = value;
+      //     if (value.nodes && value.links && this.model) this.updateModel();
     }
   }
 
@@ -83,7 +99,15 @@ export class MxgraphComponent implements AfterViewInit {
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
 
+  @Input() set draw(value: any[]) {
+    console.log('draw');
+    DATA = this.graphData;
+    if (this.model) this.updateModel();
+  }
+
   @ViewChild('graphContainer') containerElementRef: ElementRef;
+
+  @Output() updateGraphData = new EventEmitter<Node | Link>();
 
   constructor(public nodeService: NodeService, public dialog: MatDialog) {
     mx.mxConnectionHandler.prototype.connectImage = new mx.mxImage(
@@ -101,32 +125,33 @@ export class MxgraphComponent implements AfterViewInit {
     if (mx.mxClient.isBrowserSupported()) {
     }
     this.initContainer();
-    this.graph = this.initGraph();
+    this.editor = new mx.mxEditor();
+
+    console.log('editor ', this.editor);
+    this.editor.graph = this.initGraph();
 
     // Enables rubberband selection
-    new mx.mxRubberband(this.graph);
-    var keyHandler = new mx.mxKeyHandler(this.graph);
+    new mx.mxRubberband(this.editor.graph);
+    var keyHandler = new mx.mxKeyHandler(this.editor.graph);
 
-    this.model = this.graph.getModel();
-    this.parent = this.graph.getDefaultParent();
+    this.model = this.editor.graph.getModel();
+    this.parent = this.editor.graph.getDefaultParent();
 
     this.configureStylesheet();
-    this.collapsed(this.graph);
+    this.configureUndoRedo();
+    this.collapsed(this.editor.graph);
     this.addListeners();
-    this.graph.setResizeContainer(true);
+    this.editor.graph.setResizeContainer(true);
   }
 
   updateModel() {
+    console.log('updateModel');
     this.model.beginUpdate();
     try {
       // add nodes
       this.graphData.nodes.forEach((node: Node) => {
         let type = Node.getType(node);
-
-        console.log(this.model.cells);
-        console.log(this.model.cells[node.id]);
         if (this.model.cells[node.id] === undefined) {
-          console.log('create node ');
           if (type === NodeType.graph)
             this.createGraphBox(node as Graph, this.parent);
           else this.createNodeBox(node, type, this.parent);
@@ -144,24 +169,38 @@ export class MxgraphComponent implements AfterViewInit {
     }
   }
 
-  createNodeBox(node: Node, type: string, source: mxCell): mxCell {
+  createNodeBox(
+    node: Node,
+    type: string,
+    source: mxCell,
+    alternateX?: number,
+    alternateY?: number
+  ): mxCell {
     let name = Node.getName(node);
     let nodeWidth = 50 + name.length * 8;
 
-    let nodeBox = this.graph.insertVertex(
+    let nodeBox = this.editor.graph.insertVertex(
       source,
       node.id,
       name,
       node.x,
       node.y,
       nodeWidth,
-      (type === NodeType.timer || type === EventType.start)? IMAGE_HEIGTH:NODE_HEIGTH,
+      type === NodeType.timer || type === EventType.start
+        ? IMAGE_HEIGTH
+        : NODE_HEIGTH,
       type
     );
 
-    nodeBox.geometry.alternateBounds = new mx.mxRectangle(0, 0, nodeWidth, 200);
+    if (alternateX)
+      nodeBox.geometry.alternateBounds = new mx.mxRectangle(
+        0,
+        0,
+        alternateX,
+        alternateY
+      ); // TODO ; change 500 and 200
 
-    //var v31 = this.graph.insertVertex(nodeTitle, null, 'Hello,', 0,nodeHeigth,nodeWidth, 200-nodeHeigth,'open');
+    //var v31 = this.editor.graph.insertVertex(nodeTitle, null, 'Hello,', 0,nodeHeigth,nodeWidth, 200-nodeHeigth,'open');
     if (source === this.parent) nodeBox.setConnectable(true);
     else nodeBox.setConnectable(false);
     nodeBox.collapsed = true;
@@ -169,7 +208,15 @@ export class MxgraphComponent implements AfterViewInit {
   }
 
   createGraphBox(graph: Graph, source: mxCell) {
-    let graphBox = this.createNodeBox(graph, NodeType.graph, source);
+    let width = this.maxCoordinate(graph.nodes, 'x');
+    let height = this.maxCoordinate(graph.nodes, 'y');
+    let graphBox = this.createNodeBox(
+      graph,
+      NodeType.graph,
+      source,
+      width,
+      height
+    );
     graph.nodes.forEach((node) => {
       let type = Node.getType(node);
       if (type === NodeType.graph) this.createGraphBox(node as Graph, graphBox);
@@ -179,33 +226,20 @@ export class MxgraphComponent implements AfterViewInit {
   }
 
   createLinks(links: Link[]) {
+    console.log();
     links.forEach((link: Link) => {
-      let edge = this.graph.insertEdge(
-        this.parent,
-        link.id,
-        Link.getIcon(link),
-        this.model.cells[link?.out],
-        this.model.cells[link?.in],
-        `strokeColor=${Link.getColor(link)}`
-      );
-      edge.setConnectable(false);
+      if (this.model.cells[link.id] === undefined) {
+        let edge = this.editor.graph.insertEdge(
+          this.parent,
+          link.id,
+          Link.getIcon(link),
+          this.model.cells[link?.out],
+          this.model.cells[link?.in],
+          `strokeColor=${Link.getColor(link)}`
+        );
+        edge.setConnectable(false);
+      }
     });
-  }
-
-  zoomIn() {
-    this.graph.zoomIn();
-  }
-
-  zoomOut() {
-    this.graph.zoomOut();
-  }
-
-  actual() {
-    this.graph.zoomActual();
-  }
-
-  fit() {
-    this.graph.center();
   }
 
   initContainer() {
@@ -223,6 +257,7 @@ export class MxgraphComponent implements AfterViewInit {
     graph.setDropEnabled(true);
     graph.setHtmlLabels(true);
     graph.setTooltips(true);
+    graph.setCellsEditable(false);
 
     graph.connectableEdges = true;
 
@@ -241,9 +276,9 @@ export class MxgraphComponent implements AfterViewInit {
       var edge = graph.createEdge(null, null, null, null, null);
 
       return new mx.mxCellState(
-        this.graph.view,
+        this.editor.graph.view,
         edge,
-        this.graph.getCellStyle(edge)
+        this.editor.graph.getCellStyle(edge)
       );
     };
 
@@ -253,23 +288,22 @@ export class MxgraphComponent implements AfterViewInit {
 
     // Installs a custom tooltip for cells
     graph.getTooltipForCell = function (cell) {
-      console.log(cell);
       let tt = undefined;
-
-      let node = getElementByChamp<Node>(nodes, 'id', cell.id);
-      if (node.type == NodeType.trend) {
+      let node = getNodeByID(DATA, cell.id);
+      if (node && node.type == NodeType.trend) {
         tt =
+          'Variable cible : ' +
           getElementByChamp<VariablePhysioTemplate>(
             variablesTemplate,
             'id',
             (node as Trend).target
           ).name +
-          ', ' +
+          '\n Paramètre : ' +
           (node as Trend).parameter;
       }
 
-      if(node.type === NodeType.timer){
-        tt = (node as Timer).duration + ' min'
+      if (node.type === NodeType.timer) {
+        tt = (node as Timer).duration + ' min';
       }
       return tt;
 
@@ -358,155 +392,105 @@ export class MxgraphComponent implements AfterViewInit {
     /**
      * quand un node bouge, on mets à jour la bdd
      */
-    this.graph.addListener(mx.mxEvent.CELLS_MOVED, (sender, evt) => {
+    this.editor.graph.addListener(mx.mxEvent.CELLS_MOVED, (sender, evt) => {
       var cell = evt.getProperties('cell');
       cell.cells.forEach((element) => {
-        let node = getElementByChamp<Node>(
-          this.graphData.nodes,
-          'id',
-          element.id
-        );
+        let node = getNodeByID(this.graphData, element.id);
+
         if (node) {
           node.x = element.geometry.x;
           node.y = element.geometry.y;
           this.nodeService
-            .updateNode(node, ['x', 'y'])
-            .subscribe((res) => console.log(res));
+            .updateNode(structuredClone(node), ['x', 'y'])
+            .subscribe();
         }
       });
     });
 
-    this.graph.addListener(mx.mxEvent.LABEL_CHANGED, (sender, evt) => {
+ /*    this.editor.addListener(mx.mxEvent.ROOT, (sender, evt) => {
+      var cell = evt.getProperties('cell');
+      console.log('mx.mxEvent.GROUP_CELLS ');
+    });
+ */
+
+
+    this.editor.graph.addListener(mx.mxEvent.LABEL_CHANGED, (sender, evt) => {
       var cell: mxCell = evt.getProperty('cell');
-      console.log(cell);
       cell.geometry.width = 50 + cell.value.length * 8;
       let node = getElementByChamp<Node>(this.graphData.nodes, 'id', cell.id);
 
       if (node.type == NodeType.trend) {
         (node as Trend).name = cell.value;
-        this.nodeService
-          .updateNode(node, ['name'])
-          .subscribe((res) => console.log(res));
+        this.nodeService.updateNode(node, ['name']).subscribe();
       }
     });
 
-    this.graph.addListener(mx.mxEvent.DOUBLE_CLICK, (sender, evt) => {
+    this.editor.graph.addListener(mx.mxEvent.DOUBLE_CLICK, (sender, evt) => {
       var cell: mxCell = evt.getProperty('cell');
       console.log('DOUBLE CLICK');
-      console.log(cell);
-      let node = getElementByChamp<Node>(this.graphData.nodes, 'id', cell.id);
+      console.log('cell ', cell);
+      console.log('modele ', this.model);
+
+      let node = getNodeByID(this.graphData, cell.id);
       if (node === undefined) {
-        let link = getElementByChamp<Link>(this.graphData.links, 'id', cell.id);
-        this.onEdgeClick(link, cell);
+        let link = getLinkByID(this.graphData, cell.id);
+        if (link) this.onEdgeClick(link, cell);
         return;
-      }
-
-      let dialogRef;
-
-      let category: string =
-        node.type == NodeType.event ? (node as Event).typeEvent : node.type;
-
-      switch (category) {
-        case NodeType.graph:
-          //
-          break;
-        case EventType.bio:
-          dialogRef = this.dialog.open(DialogComponent, {
-            data: [node, Event, this.allBioevents, true, ['template']],
-          });
-          break;
-        case EventType.action:
-          dialogRef = this.dialog.open(DialogComponent, {
-            data: [node, Event, Action.getListByCategory(), true, ['template']],
-          });
-          break;
-        case NodeType.trend:
-          dialogRef = this.dialog.open(DialogComponent, {
-            data: [node, Trend, this.variablesTemplate, true],
-          });
-          break;
-        case NodeType.timer:
-        dialogRef = this.dialog.open(DialogComponent, {
-          data: [node,Timer, [], true],
-        });
-      }
-
-      if (dialogRef)
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result) {
-            if (result.delete) {
-              remove<Node>(this.graphData.nodes, node);
-              this.graph.removeCells([cell]);
-              // delete all the links link to the deleted node
-              this.graphData.links.forEach((link) => {
-                if (link.in == node.id || link.out == node.id)
-                  remove<Link>(this.graphData.links, link);
-              });
-              this.graph.removeCells([cell]);
-              this.nodeService.deleteNode(node).subscribe();
-            } else {
-              let updatableParameters = Node.getUpdatables(node);
-              let updatedParameters = [];
-
-              updatableParameters.forEach((parameter) => {
-                if (node[parameter] != result[parameter]) {
-                  node[parameter] = result[parameter];
-                  updatedParameters.push(parameter);
-                }
-              });
-              if(node.type == NodeType.event) (node as Event).template = getElementByChamp<Action>(
-                this.allActions,
-                'id',
-                (node as Event).event
-              );
-
-              cell.value = Node.getName(node);
-              cell.geometry.width = 50 + cell.value.length * 8;
-              this.graph.refresh(cell);
-              this.nodeService.updateNode(node, updatedParameters).subscribe();
-            }
-          }
-        });
+      } else if (node.type === NodeType.graph)
+        this.onGroupClick(node as Graph, cell);
+      else this.onNodeClick(node, cell);
     });
 
     mx.mxEvent.addListener(this.container, 'dragover', function (evt) {
-      if (this.graph.isEnabled()) {
+      if (this.editor.graph.isEnabled()) {
         evt.stopPropagation();
         evt.preventDefault();
       }
     });
 
-    this.graph.model.addListener(mx.mxEvent.CHANGE, (sender, evt) => {
+    this.editor.graph.model.addListener(mx.mxEvent.CHANGE, (sender, evt) => {
       console.log(
         '--------------------------------------------------------------------------------'
       );
       var changes = evt.getProperty('edit').changes;
+         console.log('changes ',changes);
       for (var i = 0; i < changes.length; i++) {
         if (changes[i].constructor.name == 'mxTerminalChange') {
-          console.log(i);
           if (changes[i].cell.edge && !changes[i].cell.value) {
             this.createEdge(changes[i].cell);
             break;
           }
+          
+        }
 
-          console.log(changes[i]);
+        if (changes[i].constructor.name == 'mxGeometryChange') {
+          if (changes[i].cell.vertex && changes[i].cell.children && !changes[i].cell.id.includes(":") && changes[i].cell.value==""){
+            this.onGroup(changes[i].cell)
+            break;
+          }
         }
       }
     });
 
+    this.editor.graph.model.addListener(mx.mxEvent.RESIZE, (sender, evt) => {
+      console.log('RESIZE -------------------');
+      var changes = evt.getProperty('edit').changes;
+      console.log('evt ', evt);
+    });
+
     mx.mxEvent.addListener(this.container, 'drop', function (evt) {
-      if (this.graph.isEnabled()) {
+      if (this.editor.graph.isEnabled()) {
         evt.stopPropagation();
         evt.preventDefault();
 
         // Gets drop location point for vertex
         var pt = mx.mxUtils.convertPoint(
-          this.graph.container,
+          this.editor.graph.container,
           mxEvent.getClientX(evt),
           mxEvent.getClientY(evt)
         );
-        var tr = this.graph.view.translate;
-        var scale = this.graph.view.scale;
+        var tr = this.editor.graph.view.translate;
+        var scale = this.editor.graph.view.scale;
         var x = pt.x / scale - tr.x;
         var y = pt.y / scale - tr.y;
 
@@ -514,7 +498,12 @@ export class MxgraphComponent implements AfterViewInit {
         var filesArray = evt.dataTransfer.files;
 
         for (var i = 0; i < filesArray.length; i++) {
-          this.handleDrop(this.graph, filesArray[i], x + i * 10, y + i * 10);
+          this.handleDrop(
+            this.editor.graph,
+            filesArray[i],
+            x + i * 10,
+            y + i * 10
+          );
         }
       }
     });
@@ -526,10 +515,6 @@ export class MxgraphComponent implements AfterViewInit {
     let target = cell.target;
     let inBox;
     let outBox;
-
-    console.log('boxes ', boxes);
-
-    console.log('target ', target);
 
     let outNode = getElementByChamp<Node>(
       this.graphData.nodes,
@@ -559,72 +544,13 @@ export class MxgraphComponent implements AfterViewInit {
           .subscribe((newLink: Link) => {
             this.graphData.links.push(newLink);
             cell.id = newLink.id;
+            this.updateGraphData.emit(link);
           });
         cell.style = `strokeColor=${Link.getColor(result)}`;
         cell.value = Link.getIcon(result);
-        this.graph.refresh(cell);
+        this.editor.graph.refresh(cell);
       }
     });
-  }
-
-  onEdgeClick(link: Link, cell: mxCell) {
-    let dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, Link, this.graphData.nodes, true],
-    });
-
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        if (result.delete) {
-          remove<Link>(this.graphData.links, link);
-          this.graph.removeCells([cell]);
-          this.nodeService.deleteLink(link).subscribe();
-        } else {
-          link.trigger = result.trigger;
-          cell.style = `strokeColor=${Link.getColor(link)}`;
-          cell.value = Link.getIcon(link);
-          this.graph.refresh(cell);
-          this.nodeService.updateLink(link).subscribe();
-        }
-      }
-    });
-  }
-
-  drag(graph: mxGraph) {
-    // Creates a DOM node that acts as the drag source
-    var img = mx.mxUtils.createImage('assets/icons/start.png');
-    img.style.width = '48px';
-    img.style.height = '48px';
-    document.body.appendChild(img);
-
-    // Creates the element that is being for the actual preview.
-    var dragElt = document.createElement('div');
-    dragElt.style.border = 'dashed black 1px';
-    dragElt.style.width = '120px';
-    dragElt.style.height = '40px';
-
-    // Drag source is configured to use dragElt for preview and as drag icon
-    // if scalePreview (last) argument is true. Dx and dy are null to force
-    // the use of the defaults. Note that dx and dy are only used for the
-    // drag icon but not for the preview.
-    var ds = mx.mxUtils.makeDraggable(
-      img,
-      graph,
-      this.insertNode,
-      dragElt,
-      null,
-      null,
-      graph.autoScroll,
-      true
-    );
-
-    // Redirects feature to global switch. Note that this feature should only be used
-    // if the the x and y arguments are used in funct to insert the cell.
-    ds.isGuidesEnabled = function () {
-      return graph.graphHandler.guidesEnabled;
-    };
-
-    // Restores original drag icon while outside of graph
-    ds.createDragElement = mx.mxDragSource.prototype.createDragElement;
   }
 
   /**
@@ -648,27 +574,25 @@ export class MxgraphComponent implements AfterViewInit {
    * The appearance of the cells in a graph is defined by the stylesheet, which is an instance of mxStylesheet. The stylesheet maps from stylenames to styles. A style is an array of key, value pairs to be used with the cells. The keys are defined in mxConstants and the values may be strings and numbers or JavaScript objects or functions.
    */
   configureStylesheet() {
-    var vertexStyle = this.graph.getStylesheet().getDefaultVertexStyle();
-    vertexStyle[mx.mxConstants.STYLE_ROUNDED] = false;
+    var vertexStyle = this.editor.graph.getStylesheet().getDefaultVertexStyle();
     vertexStyle[mx.mxConstants.DEFAULT_HOTSPOT] = 1;
     vertexStyle[mx.mxConstants.STYLE_STARTSIZE] = 30;
     //vertexStyle[mx.mxConstants.HIGHLIGHT_COLOR] = null;
     // 'https://cdn4.iconfinder.com/data/icons/doodle-3/167/trend-down-square-512.png';
 
-    var edgeStyle = this.graph.getStylesheet().getDefaultEdgeStyle();
+    var edgeStyle = this.editor.graph.getStylesheet().getDefaultEdgeStyle();
     edgeStyle[mx.mxConstants.STYLE_EDGE] = mx.mxEdgeStyle.scalePointArray; // EntityRelation ?
     edgeStyle[mx.mxConstants.STYLE_PERIMETER_SPACING] = 0;
     edgeStyle[mx.mxConstants.STYLE_STROKEWIDTH] = 3;
     edgeStyle[mx.mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = 'white';
     edgeStyle[mx.mxConstants.STYLE_FONTCOLOR] = '#00000';
     edgeStyle[mx.mxConstants.STYLE_ROUNDED] = true;
-    edgeStyle[mx.mxConstants.STYLE_IMAGE] = `../assets/icons/start.png`;
 
     // create styles
     var nodeStyle = new Object();
     nodeStyle[mx.mxConstants.STYLE_PERIMETER] =
       mx.mxPerimeter.RectanglePerimeter;
-    nodeStyle[mx.mxConstants.STYLE_ALIGN] = mx.mxConstants.ALIGN_LEFT;
+    nodeStyle[mx.mxConstants.STYLE_ALIGN] = mx.mxConstants.ALIGN_CENTER;
     nodeStyle[mx.mxConstants.STYLE_IMAGE_ALIGN] = mx.mxConstants.ALIGN_RIGHT;
     nodeStyle[mx.mxConstants.STYLE_SPACING_LEFT] = '5';
     nodeStyle[mx.mxConstants.STYLE_SPACING_RIGHT] = '15';
@@ -683,37 +607,44 @@ export class MxgraphComponent implements AfterViewInit {
     nodeStyle[mx.mxConstants.STYLE_IMAGE_HEIGHT] = '16';
     nodeStyle[mx.mxConstants.STYLE_SPACING] = '5';
     nodeStyle[mx.mxConstants.STYLE_FONTCOLOR] = '#00000';
-    nodeStyle[mx.mxConstants.STYLE_FONTSIZE] = '14';
+    nodeStyle[mx.mxConstants.STYLE_FONTSIZE] = '15';
+    nodeStyle[mx.mxConstants.STYLE_FONTSTYLE] = 0;
     nodeStyle[mx.mxConstants.STYLE_FONTFAMILY] = 'verdana';
-    nodeStyle[mx.mxConstants.STYLE_SHADOW] = true;
+    nodeStyle[mx.mxConstants.STYLE_SHADOW] = 1;
 
     let stylesTypes = [
       NodeType.trend,
       EventType.action,
       EventType.bio,
-   //   EventType.start,
+      //   EventType.start,
     ];
 
     stylesTypes.forEach((styleType) => {
       let style = mx.mxUtils.clone(nodeStyle);
-      style[mx.mxConstants.STYLE_FILLCOLOR] =
-        Button.getButtonByType(styleType).color;
+      let color = Button.getButtonByType(styleType).color;
+      style[mx.mxConstants.STYLE_FILLCOLOR] = color;
+      style[mx.mxConstants.STYLE_GRADIENTCOLOR] = shade(color, 0.5);
       style[mx.mxConstants.STYLE_IMAGE] = `../assets/icons/${styleType}.png`;
-      this.graph.getStylesheet().putCellStyle(styleType, style);
+      style[mx.mxConstants.STYLE_STROKECOLOR] = shade(color, -0.5);
+      this.editor.graph.getStylesheet().putCellStyle(styleType, style);
     });
 
     let graphStyle = mx.mxUtils.clone(nodeStyle);
+    let color = Button.getButtonByType(NodeType.graph).color;
     graphStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_SWIMLANE;
-    graphStyle[mx.mxConstants.STYLE_FILLCOLOR] = Button.getButtonByType(
-      NodeType.graph
-    ).color;
+    graphStyle[mx.mxConstants.STYLE_FILLCOLOR] = color;
     graphStyle[
       mx.mxConstants.STYLE_IMAGE
     ] = `../assets/icons/${NodeType.graph}.png`;
     graphStyle[mx.mxConstants.STYLE_STARTSIZE] = NODE_HEIGTH;
-    graphStyle[mx.mxConstants.STYLE_SHADOW] = false;
-    graphStyle[mx.mxConstants.STYLE_SPACING_LEFT] = '15';
-    this.graph.getStylesheet().putCellStyle(NodeType.graph, graphStyle);
+    // graphStyle[mx.mxConstants.STYLE_SHADOW] = false;
+    graphStyle[mx.mxConstants.STYLE_SPACING_LEFT] = '14';
+    graphStyle[mx.mxConstants.STYLE_SWIMLANE_FILLCOLOR] = '#ffffff';
+    graphStyle[mx.mxConstants.STYLE_GRADIENTCOLOR] = shade(color, 0.5);
+    graphStyle[mx.mxConstants.STYLE_STROKECOLOR] = shade(color, -0.5);
+
+    graphStyle[mx.mxConstants.STYLE_ROUNDED] = true;
+    this.editor.graph.getStylesheet().putCellStyle(NodeType.graph, graphStyle);
 
     let imageStyle = new Object();
     imageStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_IMAGE;
@@ -722,14 +653,13 @@ export class MxgraphComponent implements AfterViewInit {
     imageStyle[mx.mxConstants.STYLE_IMAGE_WIDTH] = '50';
     imageStyle[mx.mxConstants.STYLE_IMAGE_HEIGHT] = '50';
 
-
     let startStyle = mx.mxUtils.clone(imageStyle);
     startStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/start.png';
-    this.graph.getStylesheet().putCellStyle('start', startStyle);
+    this.editor.graph.getStylesheet().putCellStyle('start', startStyle);
 
     let timerStyle = mx.mxUtils.clone(imageStyle);
     timerStyle[mx.mxConstants.STYLE_IMAGE] = '../assets/icons/timer.png';
-    this.graph.getStylesheet().putCellStyle('timer', timerStyle);
+    this.editor.graph.getStylesheet().putCellStyle('timer', timerStyle);
 
     let portStyle = new Object();
     portStyle[mx.mxConstants.STYLE_SHAPE] = mx.mxConstants.SHAPE_IMAGE;
@@ -744,7 +674,18 @@ export class MxgraphComponent implements AfterViewInit {
     portStyle[mx.mxConstants.STYLE_FONTSTYLE] = 2;
     portStyle[mx.mxConstants.STYLE_IMAGE_WIDTH] = '16';
     portStyle[mx.mxConstants.STYLE_IMAGE_HEIGHT] = '16';
-    this.graph.getStylesheet().putCellStyle('port', portStyle);
+    this.editor.graph.getStylesheet().putCellStyle('port', portStyle);
+  }
+
+  configureUndoRedo() {
+    undoManager = new mx.mxUndoManager();
+    console.log('this.undoManager ', undoManager);
+
+    var listener = function (sender, evt) {
+      undoManager.undoableEditHappened(evt.getProperty('edit'));
+    };
+    this.editor.graph.getModel().addListener(mx.mxEvent.UNDO, listener);
+    this.editor.graph.getView().addListener(mx.mxEvent.UNDO, listener);
   }
 
   // Extends mxGraphModel.getStyle to show an image when collapsed
@@ -865,6 +806,298 @@ export class MxgraphComponent implements AfterViewInit {
 
       reader.readAsDataURL(file);
     }
+  }
+
+  /**
+   * EVENTS HANDLERS
+   */
+
+  /**
+   * event trigger when double-click on an edge
+   * @param link
+   * @param cell
+   */
+  onEdgeClick(link: Link, cell: mxCell) {
+    let dialogRef = this.dialog.open(DialogComponent, {
+      data: [link, Link, this.graphData.nodes, true],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        if (result.delete) {
+          remove<Link>(this.graphData.links, link);
+          this.editor.graph.removeCells([cell]);
+          this.nodeService.deleteLink(link).subscribe();
+          this.updateGraphData.emit(undefined);
+        } else {
+          link.trigger = result.trigger;
+          cell.style = `strokeColor=${Link.getColor(link)}`;
+          cell.value = Link.getIcon(link);
+          this.editor.graph.refresh(cell);
+          this.nodeService.updateLink(link).subscribe();
+          this.updateGraphData.emit(link);
+        }
+      }
+    });
+  }
+
+  /**
+   * event trigger when double-click on a node
+   * @param node
+   * @param cell
+   */
+  onNodeClick(node: Node, cell: mxCell) {
+    let dialogRef;
+
+    let category: string =
+      node.type == NodeType.event ? (node as Event).typeEvent : node.type;
+
+    switch (category) {
+      case NodeType.graph:
+        //
+        break;
+      case EventType.bio:
+        dialogRef = this.dialog.open(DialogComponent, {
+          data: [node, Event, this.allBioevents, true, ['template']],
+        });
+        break;
+      case EventType.action:
+        dialogRef = this.dialog.open(DialogComponent, {
+          data: [node, Event, Action.getListByCategory(), true, ['template']],
+        });
+        break;
+      case NodeType.trend:
+        dialogRef = this.dialog.open(DialogComponent, {
+          data: [node, Trend, this.variablesTemplate, true],
+        });
+        break;
+      case NodeType.timer:
+        dialogRef = this.dialog.open(DialogComponent, {
+          data: [node, Timer, [], true],
+        });
+    }
+
+    if (dialogRef)
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          if (result.delete) {
+            remove<Node>(this.graphData.nodes, node);
+            this.editor.graph.removeCells([cell]);
+            // delete all the links link to the deleted node
+            this.graphData.links.forEach((link) => {
+              if (link.in == node.id || link.out == node.id)
+                remove<Link>(this.graphData.links, link);
+            });
+            this.editor.graph.removeCells([cell]);
+            this.nodeService.deleteNode(node).subscribe();
+            this.updateGraphData.emit(undefined);
+          } else {
+            let updatableParameters = Node.getUpdatables(node);
+            let updatedParameters = [];
+
+            updatableParameters.forEach((parameter) => {
+              if (node[parameter] != result[parameter]) {
+                node[parameter] = result[parameter];
+                updatedParameters.push(parameter);
+              }
+            });
+
+            if (node.type == NodeType.event)
+              (node as Event).template = Action.getActionById(
+                (node as Event).event
+              );
+
+            cell.value = Node.getName(node);
+            cell.geometry.width = 50 + cell.value.length * 8;
+            this.editor.graph.refresh(cell);
+            this.nodeService.updateNode(node, updatedParameters).subscribe();
+            this.updateGraphData.emit(node);
+          }
+        }
+      });
+  }
+
+  /**
+   * event trigger when double-click on a group
+   * @param group
+   * @param cell
+   */
+  onGroupClick(group: Graph, cell: mxCell) {
+    let dialogRef = this.dialog.open(DialogComponent, {
+      data: [group, Graph, [], true, ['template']],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        if (result.delete) {
+          remove<Node>(this.graphData.nodes, group);
+          this.editor.graph.removeCells([cell]);
+          this.nodeService.deleteGraph(group).subscribe();
+          this.updateGraphData.emit(undefined);
+        } else {
+          group.name = result.name;
+          cell.value = result.name;
+          cell.geometry.width = 50 + cell.value.length * 8;
+          this.editor.graph.refresh(cell);
+          this.nodeService
+            .updateNode(structuredClone(group), ['name'])
+            .subscribe();
+          // this.updateGraphData.emit(group); NO UPDATE BECAUSE NAME DOESN'T IMPACT ANYTHING
+        }
+      }
+    });
+  }
+
+
+  onGroup(cell:mxCell){
+    console.log("onGroup ",cell)
+    let group = new Graph();
+    group.nodes = cell.children.map((cell: mxCell) =>
+      getNodeByID(this.graphData,cell.id)
+    );
+    console.log("group ",group)
+
+    let dialogRef = this.dialog.open(GraphEditeurDialogComponent, {
+      data: [group, variablesTemplate],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        if (result.delete) {
+          this.editor.execute('ungroup');
+        } else {
+          group.name = result.name;
+          this.nodeService
+            .groupNodes(group, this.graphData)
+            .subscribe((newId: string) => {
+              console.log('newId  ', newId);
+              group.id = newId;
+              cell.id = newId; // DONES'T CHANGE THE REF DELETE
+              this.graphData.nodes.push(group);
+              DATA = this.graphData;
+          //    this.updateGraphData.emit(group);
+              this.editor.graph.refresh(cell);
+              console.log('MODELE ',this.editor.graph.model)
+            });
+          
+          let width = this.maxCoordinate(group.nodes, 'x');
+          let height = this.maxCoordinate(group.nodes, 'y');
+          cell['value'] = result.name;
+          cell.geometry.width = 50 + cell.value.length * 8;
+          cell.geometry.height = NODE_HEIGTH;
+
+          cell.geometry.alternateBounds = new mx.mxRectangle(
+            0,
+            0,
+            width,
+            height
+          );
+          cell.style = NodeType.graph;
+          cell.collapsed = true;
+
+          /* this.nodeService
+            .updateNode(structuredClone(group), ['name'])
+            .subscribe(); */
+          // this.updateGraphData.emit(group); NO UPDATE BECAUSE NAME DOESN'T IMPACT ANYTHING
+        }
+      }
+    });
+  }
+
+  drag(graph: mxGraph) {
+    // Creates a DOM node that acts as the drag source
+    var img = mx.mxUtils.createImage('assets/icons/start.png');
+    img.style.width = '48px';
+    img.style.height = '48px';
+    document.body.appendChild(img);
+
+    // Creates the element that is being for the actual preview.
+    var dragElt = document.createElement('div');
+    dragElt.style.border = 'dashed black 1px';
+    dragElt.style.width = '120px';
+    dragElt.style.height = '40px';
+
+    // Drag source is configured to use dragElt for preview and as drag icon
+    // if scalePreview (last) argument is true. Dx and dy are null to force
+    // the use of the defaults. Note that dx and dy are only used for the
+    // drag icon but not for the preview.
+    var ds = mx.mxUtils.makeDraggable(
+      img,
+      graph,
+      this.insertNode,
+      dragElt,
+      null,
+      null,
+      graph.autoScroll,
+      true
+    );
+
+    // Redirects feature to global switch. Note that this feature should only be used
+    // if the the x and y arguments are used in funct to insert the cell.
+    ds.isGuidesEnabled = function () {
+      return graph.graphHandler.guidesEnabled;
+    };
+
+    // Restores original drag icon while outside of graph
+    ds.createDragElement = mx.mxDragSource.prototype.createDragElement;
+  }
+
+  /**
+   * TOOLBAR
+   */
+
+  zoomIn() {
+    this.editor.graph.zoomIn();
+  }
+
+  zoomOut() {
+    this.editor.graph.zoomOut();
+  }
+
+  actual() {
+    this.editor.graph.zoomActual();
+  }
+
+  fit() {
+    this.editor.graph.center();
+  }
+
+  undo() {
+    undoManager.undo();
+  }
+
+  redo() {
+    undoManager.redo();
+  }
+
+  group() {
+    this.editor.execute('group');
+  }
+
+  ungroup() {
+    console.log('ungroup');
+    this.editor.execute('ungroup');
+  }
+
+  /**
+   * UTILS
+   */
+
+  /**
+   * get the maximum of the wanted coordinate of the list of nodes
+   * @param nodes
+   * @param coordinate
+   * @returns number
+   */
+  private maxCoordinate(nodes: Node[], coordinate): number {
+    let max = 20;
+    nodes.forEach((node) => {
+      let value = node[coordinate];
+      if (coordinate === 'x') value += 50 + Node.getName(node).length * 8;
+      else value += NODE_HEIGTH;
+      if (value > max) max = value;
+    });
+    return max + 10;
   }
 }
 

@@ -1,0 +1,23 @@
+<h1 mat-dialog-title>{{ graph.name }}</h1>
+
+<mat-dialog-content>
+  <mat-form-field appearance="fill">
+    <mat-label>Nom du nouveau groupe</mat-label>
+    <input matInput [(ngModel)]="graph.name" />
+  </mat-form-field>
+
+    <mat-checkbox [(ngModel)]="graph.template" >
+    Enregistrer en tant que nouveau groupe de syndrôme
+    </mat-checkbox>
+<!-- 
+  <app-mxgraph
+    [graphData]="graph"
+    [variablesTemplate]="variablesTemplate"
+    [draw]="[]"
+  ></app-mxgraph>
+ -->
+  <div mat-dialog-actions>
+    <button mat-button (click)="delete()">Annuler</button>
+    <button mat-button (click)="save()">Enregistrer</button>
+  </div>
+</mat-dialog-content>

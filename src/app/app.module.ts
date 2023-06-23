@@ -68,7 +68,7 @@ import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
 import { TagsComponent } from './modules/shared/tags/tags.component';
 import { CarteComponent } from './modules/scenario-editor/scenarios/scenario/groupes/carte/carte.component';
-import { GraphEditeurDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/graph-editeur-dialog/graph-editeur-dialog.component';
+import { GraphEditeurDialogComponent } from './modules/plastron/editeur/mxgraph/graph-editeur-dialog/graph-editeur-dialog.component';
 import { ModeleComponent } from './modules/scenario-editor/modeles/modele/modele.component';
 import { GroupesComponent } from './modules/scenario-editor/scenarios/scenario/groupes/groupes.component';
 import { GeneralInfosComponent } from './modules/scenario-editor/scenarios/scenario/general-infos/general-infos.component';

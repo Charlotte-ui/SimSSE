@@ -162,6 +162,7 @@ export class LotPlastronsComponent {
   }
 
   goToPlastron(plastronId: string) {
+    console.log('plastronId ',plastronId)
     this.router.navigate(['/plastron/' + plastronId]);
   }
 

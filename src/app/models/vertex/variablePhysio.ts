@@ -42,6 +42,7 @@ export class VariablePhysioTemplate extends VariablePhysio {
 
   public static override className = 'VariablePhysioTemplate';
 
+
   constructor(object?: any) {
     super(object);
     this.moyennesAge = object?.moyennesAge
@@ -61,6 +62,9 @@ export class VariablePhysioTemplate extends VariablePhysio {
 export class VariablePhysioInstance extends VariablePhysio {
   cible: number;
   template: string; // id of the variable template
+
+  
+  public static updatables = ['cible']
 
   constructor(object?: any) {
     super(object);

@@ -27,7 +27,7 @@ import {
 } from 'src/app/models/vertex/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
-import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
+import { GraphEditeurDialogComponent } from '../mxgraph/graph-editeur-dialog/graph-editeur-dialog.component';
 import { NodeType } from 'src/app/models/vertex/node';
 import { EventType } from 'src/app/models/vertex/node';
 import {

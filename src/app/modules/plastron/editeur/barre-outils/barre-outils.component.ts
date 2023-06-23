@@ -28,14 +28,8 @@ export class BarreOutilsComponent implements OnInit {
   actionByCategories ;
   bioEventByCategories ;
 
-  // liste de tout les modèles d'événements et de graphs existant
-  @Input() allBioevents!: BioEvent[];
-  @Input() allActions!: Action[];
-  @Input() allGraphs!: Graph[];
   @Input() variables!: VariablePhysioTemplate[];
   @Input() nodes!: Node[];
-
-
 
   @Output() newElement = new EventEmitter<Node | Link>();
 
@@ -68,7 +62,7 @@ export class BarreOutilsComponent implements OnInit {
         return this.createNode(trend, this.variables);
       case NodeType.graph:
         let group = new Graph();
-        return this.createNode(group, this.allGraphs);
+        return this.createNode(group, Graph.graphs);
       case NodeType.timer:
         let timer = new Timer();
         return this.createNode(timer, []);
@@ -99,8 +93,8 @@ export class BarreOutilsComponent implements OnInit {
         if (newNode.type == NodeType.event) {
           newNode['template'] = this.getTemplate(
             (newNode as Event).typeEvent == EventType.action
-              ? this.allActions
-              : this.allBioevents,
+              ? Action.actions
+              : BioEvent.bioevents,
             (newNode as Event).event
           );
         }

@@ -1,5 +1,5 @@
 import { number } from 'echarts';
-import { Graph, NodeType, Event, Node } from '../models/vertex/node';
+import { Graph, NodeType, Event, Node, Link } from '../models/vertex/node';
 
 export function deleteElementFromArray(array: any[], element: any) {
   const index = array.indexOf(element);
@@ -40,6 +40,25 @@ export function getNodeByID(graph: Graph, id: string): Node {
     else if (node.type == NodeType.graph) {
       let deepNode = getNodeByID(node as Graph, id);
       if (deepNode) return deepNode;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * get a link by his id, looking recursivly
+ * @param graph
+ * @param id
+ * @returns
+ */
+export function getLinkByID(graph: Graph, id: string): Link {
+  console.log('getLinkByID ', graph);
+  let link = getElementByChamp<Link>(graph.links, 'id', id);
+  if (link) return link;
+  for (let node of graph.nodes) {
+    if (node.type == NodeType.graph) {
+      let deepLink = getLinkByID(node as Graph, id);
+      if (deepLink) return deepLink;
     }
   }
   return undefined;
@@ -98,8 +117,48 @@ const isObject = (object) => {
   return object != null && typeof object === 'object';
 };
 
-
-export function remove<T>(array: T[],element:T) {
+export function remove<T>(array: T[], element: T) {
   const index = array.indexOf(element);
   array.splice(index, 1);
 }
+
+/**
+ * darken or ligthen color
+ * @param pourcentage
+ * @param color
+ * @returns
+ */
+export function shade(col, light) {
+    var r = parseInt(col.substr(1, 2), 16);
+    var g = parseInt(col.substr(3, 2), 16);
+    var b = parseInt(col.substr(5, 2), 16);
+
+    if (light < 0) {
+        r = (1 + light) * r;
+        g = (1 + light) * g;
+        b = (1 + light) * b;
+    } else {
+        r = (1 - light) * r + light * 255;
+        g = (1 - light) * g + light * 255;
+        b = (1 - light) * b + light * 255;
+    }
+    return color(r, g, b);
+}
+
+
+
+function hex2(c) {
+    c = Math.round(c);
+    if (c < 0) c = 0;
+    if (c > 255) c = 255;
+
+    var s = c.toString(16);
+    if (s.length < 2) s = "0" + s;
+    return s;
+}
+
+function color(r, g, b) {
+    return "#" + hex2(r) + hex2(g) + hex2(b);
+}
+
+

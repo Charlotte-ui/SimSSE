@@ -70,7 +70,10 @@ export class ModeleService {
   getGraphNodes(id: string): Observable<Node[] | undefined> {
     return this.apiService
       .getRelationFrom(id, 'aNode', 'Graph')
-      .pipe(map((response) => Node.instanciateListe<Node>(response.result)));
+      .pipe(map((response) => {
+        console.log("getGraphNodes ",id,' ',response)
+        console.log("list ",Node.instanciateListe<Node>(response.result))
+        return Node.instanciateListe<Node>(response.result)}));
   }
 
   getTrigger(id: string): Observable<Trigger[]> {
@@ -92,9 +95,11 @@ export class ModeleService {
   }
 
   getGraphLinks(arrayId: string[]): Observable<Link[] | undefined> {
-    return this.apiService
-      .getLinkFromMultiple(arrayId, 'link')
-      .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
+    if (arrayId.length > 0)
+      return this.apiService
+        .getLinkFromMultiple(arrayId, 'link')
+        .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
+    else return of();
   }
 
   /**
@@ -124,6 +129,28 @@ export class ModeleService {
           this.nodeService
             .createGraph(new Graph({ template: true, name: 'root' }))
             .pipe(
+              switchMap((idGraph: string) => {
+                let start = Event.createStart();
+                start['@class'] = 'Event';
+                delete start.id;
+                return this.apiService
+                  .createDocument(start)
+                  .pipe(map((response) => this.apiService.documentId(response)))
+                  .pipe(
+                    switchMap((idStart: string) =>
+                      this.apiService
+                        .createRelationBetween(idStart, idGraph, 'aNode')
+                        .pipe(
+                          map((response) => [
+                            response.result[0].out,
+                            response.result[0].in,
+                          ])
+                        )
+                    )
+                  );
+              })
+            )
+            .pipe(
               switchMap((indexes: string[]) => {
                 let idGraph = indexes[0].substring(1);
                 let idStart = indexes[1].substring(1);
@@ -149,6 +176,19 @@ export class ModeleService {
       );
   }
 
+  createTrigger(trigger: Trigger, modele: Modele) {
+    let event = getNodeByID(modele.graph, trigger.in);
+    if (event)
+      return this.apiService.createRelationBetweenWithProperty(
+        event.id,
+        modele.id,
+        'triggeredAt',
+        'time',
+        trigger.time.toString()
+      );
+    else return of();
+  }
+
   /**
    * create a deep copy of a model
    * @param modele
@@ -160,10 +200,9 @@ export class ModeleService {
       switchMap((indexes: string[]) => {
         let idnewModele = indexes[0];
         let idnewGraph = indexes[1];
-        let idnewStart = indexes[2];
         return this.nodeService
-          .duplicateGraph(graphToCopy, idnewGraph, idnewStart)
-          .pipe(switchMap(()=> of(idnewModele)))
+          .duplicateGraph(graphToCopy, idnewGraph)
+          .pipe(switchMap(() => of(idnewModele)));
       })
     );
   }
@@ -234,13 +273,20 @@ export class ModeleService {
     );
   }
 
+  updateTrigger(trigger: Trigger) {
+    return this.apiService.updateDocumentChamp(
+      trigger.id,
+      'time',
+      trigger.time.toString()
+    );
+  }
+
   /**
    * the plastron modele is now
    * @param plastron
    * @returns
    */
   createNewModeleTemplate(modele: Modele, newModele: Modele): Observable<any> {
-
     let saver = modele.initSaver();
 
     modele.title = newModele.title;
@@ -293,5 +339,12 @@ export class ModeleService {
     return from(requests).pipe(
       concatMap((request: Observable<any>) => request)
     );
+  }
+
+  /**
+   * delete trigger
+   */
+  deleteTrigger(trigger: Trigger) {
+    return this.apiService.deleteEdge(trigger.id);
   }
 }

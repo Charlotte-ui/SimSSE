@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { Profil } from '../models/vertex/profil';
 import { ApiService } from './api.service';
-import { concat, concatMap, from, map, of, switchMap, zipAll } from 'rxjs';
+import { concat, concatMap, forkJoin, from, map, of, switchMap, zipAll } from 'rxjs';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
@@ -12,9 +12,7 @@ import {
   providedIn: 'root',
 })
 export class ProfilService {
-  constructor(
-    public apiService: ApiService
-  ) {}
+  constructor(public apiService: ApiService) {}
   getProfilById(id: string): Observable<Profil | undefined> {
     return this.apiService
       .getDocument(id)
@@ -53,8 +51,20 @@ export class ProfilService {
       }
     );
 
-  
-    return requests.length>0?requests:[of()];
+    return requests.length > 0 ? requests : [of()];
+  }
+
+  updateVariable(variable: VariablePhysioInstance) {
+        let requests: Observable<any>[] = [];
+    VariablePhysioInstance.updatables.forEach((champ) => {
+      requests.push(this.apiService.updateDocumentChamp(
+        variable.id,
+        champ,
+        variable[champ].toString()
+      ));
+    });
+
+    return forkJoin(requests);
   }
 
   getVariable(

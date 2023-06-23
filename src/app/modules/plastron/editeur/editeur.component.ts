@@ -26,6 +26,7 @@ import {
   getElementByChamp,
   pushWithoutDuplicateByChamp,
 } from 'src/app/functions/tools';
+import { ProfilService } from 'src/app/services/profil.service';
 
 @Component({
   selector: 'app-editeur',
@@ -39,7 +40,10 @@ export class EditeurComponent implements OnInit {
   graphInitialized: boolean = false;
   curvesInitialized: boolean = false;
 
+  // target variable of the homeostasi profil
   _targetVariable!: VariablePhysioInstance[];
+
+  draw: any[];
 
   get targetVariable(): VariablePhysioInstance[] {
     return this._targetVariable;
@@ -50,6 +54,11 @@ export class EditeurComponent implements OnInit {
       if (this.graphInitialized) this.initCurves();
     }
   }
+
+  /**
+   * all the variables templates
+   */
+  @Input() variablesTemplate: VariablePhysioTemplate[];
 
   _modele!: Modele;
   get modele(): Modele {
@@ -68,35 +77,31 @@ export class EditeurComponent implements OnInit {
           })
         )
         .subscribe((result: [Template[], Link[]]) => {
+          console.log('getGraph result ', result);
           this.initTemplateAndLinks(result, this.modele.graph);
 
           // all the trends and all the event from the graph and the nested graphs
           this.trends = [];
-          this.events = [];
+          this.actions = [];
+          this.bioevents = [];
           this.initTrendsEventsRecursive(this.modele.graph);
-
-          this.initSaver.emit(this.modele.initSaver())
-
           this.graphInitialized = true;
-
           // after the model graph initialization, the curves are generated
           if (this.targetVariable) {
             this.initCurves();
-            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+            this.draw = new Array(); // force change detection by forcing the value reference update
           }
         });
     }
   }
 
+  // in a modele vue, the inspecteur is disabled
   @Input() disabledInspecteur: boolean = false;
+
+  /**
+   * duration of the simulation (min), 100 min by default (form modele)
+   */
   @Input() duration: number = 100;
-
-  @Input() variablesTemplate: VariablePhysioTemplate[];
-
-  // liste de tout les modèles d'événements et de graphs existant
-  allBioevents!: BioEvent[];
-  allActions!: Action[];
-  allGraphs!: Graph[];
 
   /**
    * all currents trends in the nodes
@@ -104,59 +109,42 @@ export class EditeurComponent implements OnInit {
   trends!: Trend[];
 
   /**
-   * all currents events in the nodes, theirs ids and the id of the graph their from
-   * is there from the current graph id=-1
+   * all currents actions in the nodes
    */
-  events: Event[];
+  actions: Event[];
+
+  /**
+   * all currents bioevents in the nodes
+   */
+  bioevents: Event[];
 
   /**
    * courbes des data simulées
    */
-  curves: Curve[];
+  curves: Map<string, Curve>;
 
   /**
    * préviens le plastron quand un changement a besoin d'être enregistré
    */
-  @Output() newChange = new EventEmitter<boolean>();
-  @Output() updateNode = new EventEmitter<string>();
-  @Output() deleteNode = new EventEmitter<string>();
-  @Output() updateLink = new EventEmitter<string>();
-  @Output() deleteLink = new EventEmitter<string>();
-  @Output() updateTrigger = new EventEmitter<Trigger>();
-  @Output() deleteTrigger = new EventEmitter<Trigger>();
-  @Output() updateVariable = new EventEmitter<VariablePhysioInstance>();
-  @Output() initSaver = new EventEmitter<ModeleSaverArrays>();
-
-  /**
-   * préviens le plastron quand un changement a besoin d'être enregistré
-   */
-  @Output() newCurve = new EventEmitter<Curve[]>();
+  @Output() newCurve = new EventEmitter<Map<string, Curve>>();
 
   constructor(
     public dialog: MatDialog,
     public reglesService: RegleService,
     public nodeService: NodeService,
-    private modelService: ModeleService
-  ) {}
+    private modelService: ModeleService,
+    private profilService: ProfilService
+  ) {
+    this.curves = new Map<string, Curve>();
+  }
 
   // --- INITIALISATEURS -----------------------------------------
 
   ngOnInit(): void {
-    this.reglesService.getBioEvents().subscribe((response) => {
-      this.allBioevents = response as BioEvent[];
-    });
-
-    this.reglesService.getActions().subscribe((response) => {
-      this.allActions = response as Action[];
-    });
-
-    this.reglesService.getCategories().subscribe((response) => {
-      console.log('getCategories ',response)
-    });
-
-    this.nodeService.getAllGraphTemplate().subscribe((response) => {
-      this.allGraphs = response;
-    });
+    this.reglesService.getBioEvents().subscribe();
+    this.reglesService.getActions().subscribe();
+    this.reglesService.getCategories().subscribe();
+    this.nodeService.getAllGraphTemplate().subscribe();
   }
 
   /**
@@ -166,21 +154,31 @@ export class EditeurComponent implements OnInit {
    * @param graph
    */
   initGraph(graph: Graph): Observable<[Template[], Link[]]> {
+    console.log('initGraph ', graph);
     return this.modelService.getGraphNodes(graph.id).pipe(
       switchMap((nodes: Node[]) => {
         graph.nodes = nodes;
-        let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
-        const requestsTemplate = nodes.map((node: Node) => {
-          if (
-            node.type == NodeType.event &&
-            (node as Event).typeEvent !== EventType.start
-          ) {
-            return this.nodeService.getEventTemplate(
-              (node as Event).event,
-              (node as Event).typeEvent
-            );
-          } else if (node.type == NodeType.graph)
-            return this.nodeService.getGraphTemplate(node as Graph).pipe(
+        console.log('getGraphNodes ', nodes);
+        if (nodes.length > 0) {
+          let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
+          const requestsTemplate = nodes.map((node: Node) => {
+            if (
+              node.type == NodeType.event &&
+              (node as Event).typeEvent !== EventType.start
+            ) {
+              return this.nodeService.getEventTemplate(
+                (node as Event).event,
+                (node as Event).typeEvent
+              );
+            } else if (node.type == NodeType.graph)
+              return this.initGraph(node as Graph).pipe(
+                map((result: [Template[], Link[]]) => {
+                  console.log('initGraph2 (groupe) ', result);
+                  this.initTemplateAndLinks(result, node as Graph);
+                  return node as Graph;
+                })
+              );
+            /*             this.nodeService.getGraphTemplate(node as Graph).pipe(
               switchMap((graphTemplate: Graph) =>
                 this.initGraph(graphTemplate).pipe(
                   map((result: [Template[], Link[]]) => {
@@ -189,11 +187,14 @@ export class EditeurComponent implements OnInit {
                   })
                 )
               )
-            );
-          else return of(undefined);
-        });
-        const requestLink = this.modelService.getGraphLinks(nodeIDArray);
-        return forkJoin([concat(requestsTemplate).pipe(zipAll()), requestLink]);
+            ); */ else return of(undefined);
+          });
+          const requestLink = this.modelService.getGraphLinks(nodeIDArray);
+          return forkJoin([
+            concat(requestsTemplate).pipe(zipAll()),
+            requestLink,
+          ]);
+        } else return of(undefined);
       })
     );
   }
@@ -204,36 +205,31 @@ export class EditeurComponent implements OnInit {
    * @param graph
    */
   initTemplateAndLinks(result: [Template[], Link[]], graph: Graph) {
+    console.log('initTemplateAndLinks ', result);
     // on attribiut leur template aux events et aux graph
-    graph.nodes.map((node: Node, index: number) => {
-      if (node['template']) node['template'] = result[0][index];
-      if (node.type == NodeType.graph) {
-        node['nodes'] = (result[0][index] as Graph).nodes;
-        node['links'] = (result[0][index] as Graph).links;
-        node['template'] = (result[0][index] as Graph).id;
-      }
-    });
-
-    graph.links = result[1];
-
-    // if the link point to an event replace the node id by the event so an all event nodes are triggered at once
-/*     graph.links.map((link: Link) => {
-      let nodeSource = graph.nodes.filter(
-        (node: Node) => node.id === link.out
-      )[0];
-      if (nodeSource.type == NodeType.event)
-        link.out = (nodeSource as Event).event;
-    }); */
+    if (result) {
+      graph.nodes.map((node: Node, index: number) => {
+        if (node['template']) node['template'] = result[0][index];
+        if (node.type == NodeType.graph) {
+          node['nodes'] = (result[0][index] as Graph).nodes;
+          node['links'] = (result[0][index] as Graph).links;
+          node['template'] = (result[0][index] as Graph).id;
+        }
+      });
+      graph.links = result[1];
+    }
   }
 
   /**
    * initialize all curves
    */
   initCurves() {
-    this.curves = this.targetVariable.map(
-      (variable: VariablePhysioInstance) =>
+    this.targetVariable.map((variable: VariablePhysioInstance) => {
+      this.curves.set(
+        variable.template,
         new Curve(variable.name, this.duration, variable, variable.color)
-    );
+      );
+    });
     this.updateCurve();
     this.curvesInitialized = true;
     this.newCurve.emit(this.curves);
@@ -243,24 +239,12 @@ export class EditeurComponent implements OnInit {
     graph.nodes.forEach((node: Node) => {
       switch (Node.getType(node)) {
         case EventType.action:
-          node['template'] = this.allActions.filter(
-            (action: Action) => action.id == (node as Event).event
-          )[0];
-          this.events = pushWithoutDuplicateByChamp<Event>(
-            this.events,
-            node as Event,
-            'event'
-          );
+          node['template'] = Action.getActionById((node as Event).event);
+          this.addAction(node as Event);
           break;
         case EventType.bio:
-          node['template'] = this.allBioevents.filter(
-            (bioevent: BioEvent) => bioevent.id == (node as Event).event
-          )[0];
-          this.events = pushWithoutDuplicateByChamp<Event>(
-            this.events,
-            node as Event,
-            'event'
-          );
+          node['template'] = BioEvent.getBioEventById((node as Event).event);
+          this.addBioEvent(node as Event);
           break;
         case NodeType.trend:
           this.trends.push(node as Trend);
@@ -272,13 +256,26 @@ export class EditeurComponent implements OnInit {
     });
   }
 
-  initGroup(group: Graph) {
-    let graphTemplate = getElementByChamp<Graph>(
-      Graph.graphs,
-      'id',
-      group.template.toString()
+  addAction(event: Event) {
+    this.actions = pushWithoutDuplicateByChamp<Event>(
+      this.actions,
+      event,
+      'event'
     );
+  }
 
+  addBioEvent(event: Event) {
+    this.bioevents = pushWithoutDuplicateByChamp<Event>(
+      this.bioevents,
+      event,
+      'event'
+    );
+  }
+
+  initGroup(group: Graph) {
+    let graphTemplate = Graph.getGraphById(group.template.toString());
+
+    console.log('init groupe ', graphTemplate);
     // TODO : créer de nouveaux node and links avec de nouveaux id ?
 
     this.initGraph(graphTemplate).subscribe((result: [Template[], Link[]]) => {
@@ -286,9 +283,14 @@ export class EditeurComponent implements OnInit {
       group.nodes = structuredClone(graphTemplate.nodes);
       this.initTemplateAndLinks(result, group);
       this.initTrendsEventsRecursive(group);
-
-      this.modele.graph.nodes.push(group);
-      this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+      this.nodeService
+        .addNodeToGraph(group, this.modele.graph)
+        .subscribe((node: Node) => {
+          console.log('group ', node);
+          this.modele.graph.nodes.push(node);
+          console.log('modele.graph.nodes ', this.modele.graph.nodes);
+          this.draw = new Array(); //  force change detection by forcing the value reference update
+        });
     });
   }
 
@@ -303,114 +305,67 @@ export class EditeurComponent implements OnInit {
       // ADD LINK
       let indice = this.modele.graph.links.length.toString();
       (element as Link).id = indice;
-      this.modele.graph.links.push(element as Link);
-      this.updateLink.emit(indice);
+      this.nodeService
+        .createLink(
+          (element as Link).in,
+          (element as Link).out,
+          (element as Link).trigger
+        )
+        .subscribe((link: Link) => {
+          element.id = link.id;
+          this.modele.graph.links.push(element as Link);
+          this.updateCurve();
+        });
     } else {
       // ADD NODE
       let indice = this.modele.graph.nodes.length.toString();
       element.id = indice;
-      if (element.type == NodeType.event)
-        this.events = pushWithoutDuplicateByChamp<Event>(
-          this.events,
-          element as Event,
-          'event'
-        );
-        
+      if (Node.getType(element) === EventType.action)
+        this.addAction(element as Event);
+      if (Node.getType(element) === EventType.bio)
+        this.addBioEvent(element as Event);
+
+      // ADD GROUP
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       else {
-        this.nodeService.addNodeToGraph(
-          element as Node,this.modele.graph
-        ).subscribe(nodId=>{
-          console.log('nodId',nodId)
-          element.id = nodId;
-          this.modele.graph.nodes.push(element as Node);
-          this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
-
-
-        })
+        this.nodeService
+          .addNodeToGraph(element as Node, this.modele.graph)
+          .subscribe((node: Node) => {
+            element.id = node.id;
+            this.modele.graph.nodes.push(element as Node);
+            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+            this.updateCurve();
+          });
       }
     }
-    this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
-    this.updateCurve();
-    this.newChange.emit(true);
   }
 
-  updateNodes(event) { // TODO ; mettre l'id de l'event dans le cas d'un event
-    if (event[0].delete) {
-      let ref = event[0].ref ;   
-      console.log("ref ",ref)
-      // delete all the links link to the deleted node
-      this.modele.graph.links.forEach((link) => {
-        if (link.in == ref || link.out == ref)
-          this.modele.graph.links.splice(
-            this.modele.graph.links.indexOf(link),
-            1
-          );
-      });
-      console.log('this.modele.graph.links ',this.modele.graph.links)
-    } else {
-      let node = event[0] as Node;
-      this.updateNode.emit(node.id);
-
-      if (node.type == NodeType.event) {
-        let oldEvent = (node as Event).template.id;
-
-        // update template
-        (node as Event).template = getElementByChamp<Action>(
-          this.allActions,
-          'id',
-          (node as Event).event
-        );
-        this.modele.graph.links.forEach((link) => {
-          if (link.in == oldEvent) link.in = (node as Event).event;
-          if (link.out == oldEvent) link.out = (node as Event).event;
-        });
-      }
-    }
+  updateGraph(node) {
+    console.log('updateGraph ', this.modele);
+    if (node && Node.getType(node) === EventType.action)
+      this.addAction(node as Event);
     this.updateCurve();
-    this.modele.graph = structuredClone(this.modele.graph);
-    this.newChange.emit(true);
-  }
-
-  updateLinks(event) {
-    let idLink = event[0].id;
-    if (event[0].delete) {
-      this.deleteLink.emit(idLink);
-    } else {
-      this.updateLink.emit(idLink);
-    }
-    // let index = Number(event[1])
-    this.updateCurve();
-    this.newChange.emit(true);
   }
 
   updateVariables(newVariable: VariablePhysioInstance) {
-    let variable = getElementByChamp<VariablePhysioInstance>(
-      this.targetVariable,
-      'template',
-      newVariable.template
-    );
-    let index = this.targetVariable.indexOf(variable);
-    this.targetVariable[index] = newVariable;
-    this.curves[index].variable = newVariable;
-    this.curves[index].calculCurve(this.modele);
-    this.curves = [...this.curves];
-    this.updateVariable.emit(newVariable);
+    this.curves.get(newVariable.template).variable = newVariable;
+    this.curves.get(newVariable.template).calculCurve(this.modele);
+    this.draw = new Array();
+    this.profilService.updateVariable(newVariable).subscribe();
   }
 
   updateCurve() {
-    console.log('updateCurve ',this.curves)
-    console.log('updateCurve ',this.modele)
+    console.log('updateCurve ', this.curves);
+    console.log('updateCurve ', this.modele);
     this.curves.forEach((curve) => {
-
       // clean the triggereds of all the curves-genereted triggerd
       this.modele.triggeredEvents = this.modele.triggeredEvents.filter(
         (trigger) => trigger.editable
       );
-      
+
       let newtriggered = curve.calculCurve(structuredClone(this.modele));
       this.modele.triggeredEvents = newtriggered;
     });
-    this.curves = [...this.curves];
+    this.draw = new Array();
   }
 }

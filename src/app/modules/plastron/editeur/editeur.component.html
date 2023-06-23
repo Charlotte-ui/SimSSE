@@ -13,9 +13,6 @@
           </mat-expansion-panel-header>
           <div class="panel-content">
             <app-barre-outils
-              [allBioevents]="allBioevents"
-              [allActions]="allActions"
-              [allGraphs]="allGraphs"
               [variables]="variablesTemplate"
               [nodes]="modele.graph.nodes"
               (newElement)="addElement($event)"
@@ -37,11 +34,11 @@
         <app-scene
           *ngIf="curvesInitialized"
           [modele]="modele"
-          [events]="events"
+          [events]="actions"
           [curves]="curves"
           [duration]="duration"
-          (updateTrigger)="updateTrigger.emit($event); updateCurve()"
-          (deleteTrigger)="deleteTrigger.emit($event); updateCurve()"
+          [draw]="draw"
+          (updateTrigger)="updateCurve()"
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">
@@ -57,9 +54,8 @@
         <app-mxgraph
           [graphData]="modele.graph"
           [variablesTemplate]="variablesTemplate"
-          [allBioevents]="allBioevents"
-          [allActions]="allActions"
-          (updateNodes)="updateNodes($event)"
+          [draw]="draw"
+          (updateGraphData)="updateGraph($event)"
         ></app-mxgraph>
       </div>
     </div>

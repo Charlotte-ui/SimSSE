@@ -56,9 +56,7 @@ export class PlastronComponent implements OnInit {
     private tagService: TagService,
     private profilService: ProfilService,
     private nodeService: NodeService
-  ) {
-    this.saver = this.plastron.modele.initSaver();
-  }
+  ) {}
 
   ngOnInit(): void {
     this.route.data

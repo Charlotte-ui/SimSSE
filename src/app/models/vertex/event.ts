@@ -1,4 +1,7 @@
-import { pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
+import {
+  getElementByChamp,
+  pushWithoutDuplicateByChamp,
+} from 'src/app/functions/tools';
 import { Template } from '../interfaces/templatable';
 import { EventType } from './node';
 import { Vertex } from './vertex';
@@ -7,17 +10,20 @@ export class Categorie extends Vertex {
   public static override className = 'Categorie';
   public static categories: Categorie[] = [];
 
-  name:string
+  name: string;
 
   constructor(object?: any) {
     super(object);
     this.name = object?.name ? object.name : '';
-    Categorie.categories = pushWithoutDuplicateByChamp<Categorie>(Categorie.categories,this,'name')
-    console.log('Categorie ',Categorie.categories)
+    Categorie.categories = pushWithoutDuplicateByChamp<Categorie>(
+      Categorie.categories,
+      this,
+      'name'
+    );
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    console.log('instanciateListe ',list)
+    console.log('instanciateListe ', list);
     return list.map((element) => new Categorie(element) as T);
   }
 }
@@ -38,7 +44,8 @@ export class Action extends Vertex implements Template {
     this.category = object?.category ? object.category : 'Divers';
     this.med = object?.med !== undefined ? object.med : true;
     this.paraMed = object?.paraMed !== undefined ? object.paraMed : true;
-    this.secouriste = object?.secouriste !== undefined ? object.secouriste : true;
+    this.secouriste =
+      object?.secouriste !== undefined ? object.secouriste : true;
 
     Action.actions.push(this);
   }
@@ -55,7 +62,7 @@ export class Action extends Vertex implements Template {
     let actions = [];
     let categories = Categorie.categories;
 
-    categories.forEach((category:Categorie) => {
+    categories.forEach((category: Categorie) => {
       actions.push({
         category: category.name,
         disabled: category.name === 'Évaluation clinique',
@@ -64,11 +71,11 @@ export class Action extends Vertex implements Template {
         ),
       });
     });
-        console.log('categories ',categories)
-
-    console.log('getListByCategory ',actions)
-
     return actions;
+  }
+
+  public static getActionById(id: string) {
+    return getElementByChamp<Action>(Action.actions, 'id', id);
   }
 }
 
@@ -90,7 +97,7 @@ export class BioEvent extends Vertex implements Template {
     return list.map((element) => new BioEvent(element) as T);
   }
 
-    public static getListByCategory() {
+  public static getListByCategory() {
     let bioevents = [];
     let categories = Categorie.categories;
 
@@ -109,5 +116,9 @@ export class BioEvent extends Vertex implements Template {
 
   public static override getType(element): string {
     return EventType.bio;
+  }
+
+  public static getBioEventById(id: string) {
+    return getElementByChamp<BioEvent>(BioEvent.bioevents, 'id', id);
   }
 }
