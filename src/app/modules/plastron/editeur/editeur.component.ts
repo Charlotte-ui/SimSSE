@@ -16,7 +16,7 @@ import {
 import { RegleService } from '../../../services/regle.service';
 import { NodeService } from '../../../services/node.service';
 import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
-import { Modele, ModeleSaverArrays } from '../../../models/vertex/modele';
+import { Modele } from '../../../models/vertex/modele';
 import { Curve } from '../../../functions/curve';
 import { ModeleService } from '../../../services/modele.service';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
@@ -24,6 +24,7 @@ import { Template } from 'src/app/models/interfaces/templatable';
 import { Trigger } from 'src/app/models/trigger';
 import {
   getElementByChamp,
+  getNodeByID,
   pushWithoutDuplicateByChamp,
 } from 'src/app/functions/tools';
 import { ProfilService } from 'src/app/services/profil.service';
@@ -76,15 +77,20 @@ export class EditeurComponent implements OnInit {
             return this.initGraph(this.modele.graph);
           })
         )
-        .subscribe((result: [Template[], Link[]]) => {
-          console.log('getGraph result ', result);
-          this.initTemplateAndLinks(result, this.modele.graph);
+        .pipe(
+          switchMap((result: [Template[], Link[]]) => {
+            this.initTemplateAndLinks(result, this.modele.graph);
+            return this.initTrigger().pipe(map(() => result));
+          })
+        )
 
+        .subscribe((result: [Template[], Link[]]) => {
           // all the trends and all the event from the graph and the nested graphs
           this.trends = [];
           this.actions = [];
           this.bioevents = [];
           this.initTrendsEventsRecursive(this.modele.graph);
+          console.log('graph initialiezs ', this.graphInitialized);
           this.graphInitialized = true;
           // after the model graph initialization, the curves are generated
           if (this.targetVariable) {
@@ -154,11 +160,10 @@ export class EditeurComponent implements OnInit {
    * @param graph
    */
   initGraph(graph: Graph): Observable<[Template[], Link[]]> {
-    console.log('initGraph ', graph);
     return this.modelService.getGraphNodes(graph.id).pipe(
       switchMap((nodes: Node[]) => {
         graph.nodes = nodes;
-        console.log('getGraphNodes ', nodes);
+
         if (nodes.length > 0) {
           let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
           const requestsTemplate = nodes.map((node: Node) => {
@@ -173,7 +178,6 @@ export class EditeurComponent implements OnInit {
             } else if (node.type == NodeType.graph)
               return this.initGraph(node as Graph).pipe(
                 map((result: [Template[], Link[]]) => {
-                  console.log('initGraph2 (groupe) ', result);
                   this.initTemplateAndLinks(result, node as Graph);
                   return node as Graph;
                 })
@@ -205,7 +209,6 @@ export class EditeurComponent implements OnInit {
    * @param graph
    */
   initTemplateAndLinks(result: [Template[], Link[]], graph: Graph) {
-    console.log('initTemplateAndLinks ', result);
     // on attribiut leur template aux events et aux graph
     if (result) {
       graph.nodes.map((node: Node, index: number) => {
@@ -254,6 +257,27 @@ export class EditeurComponent implements OnInit {
           break;
       }
     });
+  }
+
+  initTrigger() {
+    return this.modelService.getTrigger(this.modele.id).pipe(
+      map((triggers: Trigger[]) => {
+        // bind name to trigger
+        triggers.map((trigger: Trigger) => {
+          let node = getNodeByID(this.modele.graph, trigger.in);
+          console.log('node trig ', node);
+          trigger.name = Node.getName(node);
+        });
+
+        this.modele.triggeredEvents = triggers;
+
+        console.log(
+          'this.modele.triggeredEvents ',
+          this.modele.triggeredEvents
+        );
+        console.log('this.modele.graph.nodes ', this.modele.graph.nodes);
+      })
+    );
   }
 
   addAction(event: Event) {

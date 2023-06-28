@@ -28,21 +28,23 @@ export enum LinkType {
   pause = 'pause',
 }
 
+
+
 export abstract class Node extends Vertex {
   x: number;
   y: number;
   type: NodeType;
-  state: boolean; // activate or not activate
+  state: LinkType; // activate or not activate
 
   public static override className = 'Node';
   public static updatables = [];
 
   constructor(object?: any) {
     super(object);
-    this.x = object?.x ? object.x : 50;
-    this.y = object?.y ? object.y : 50;
+    this.x = object?.x !==undefined ? object.x : 50;
+    this.y = object?.y !==undefined ? object.y : 50;
     this.type = object?.type ? object.type : undefined;
-    this.state = false;
+    this.state = LinkType.pause;
   }
 
   static getName(element): string {
@@ -131,19 +133,19 @@ export class Event extends Node {
     this.template = object?.template ? object.template : undefined;
   }
 
-  static createStart(): Event {
+  static createStart(id?:string): Event {
     return new Event({
       event: EventType.start,
       typeEvent: EventType.start,
-      x: 5,
-      y: 95,
+      x: 0,
+      y: 0,
+      id : id?id:undefined
     });
   }
 
   static override getName(element): string {
     return (element as Event).template
       ? (element as Event).template.name : element.event;
-      //: 
   }
 
   public static override getType(element): string {
@@ -219,7 +221,7 @@ export class Graph extends Node implements Template {
     this.links = object?.links ? object.links : [];
     this.template = object?.template ? object.template : false;
 
-    if (this.template) Graph.graphs = pushWithoutDuplicateByChamp<Graph>(Graph.graphs,this,'name')
+    if (this.template && this.name !== 'root') Graph.graphs.push(this)
   }
 
   static override getName(element): string {
@@ -260,6 +262,6 @@ export class Timer extends Node {
   }
 
   static override getName(element): string {
-    return ''//element.name;
+    return element.name;
   }
 }

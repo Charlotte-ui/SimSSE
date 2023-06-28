@@ -33,9 +33,9 @@
       <div class="row">
         <app-scene
           *ngIf="curvesInitialized"
-          [modele]="modele"
           [events]="actions"
           [curves]="curves"
+          [modele]="modele"
           [duration]="duration"
           [draw]="draw"
           (updateTrigger)="updateCurve()"

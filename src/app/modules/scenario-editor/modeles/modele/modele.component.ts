@@ -5,7 +5,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { NodeService } from 'src/app/services/node.service';
 import { ModeleDialogComponent } from './modele-dialog/modele-dialog.component';
 import { Trigger } from 'src/app/models/trigger';
-import { Modele, ModeleSaverArrays } from 'src/app/models/vertex/modele';
+import { Modele } from 'src/app/models/vertex/modele';
 import { Graph } from 'src/app/models/vertex/node';
 import { Scenario } from 'src/app/models/vertex/scenario';
 import { Tag } from 'src/app/models/vertex/tag';
@@ -28,7 +28,6 @@ export class ModeleComponent {
   graph!: Graph;
   allTags!: Tag[];
   changesToSave: boolean = false;
-  saver: ModeleSaverArrays;
 
   constructor(
     private route: ActivatedRoute,
@@ -45,26 +44,17 @@ export class ModeleComponent {
       .pipe(
         switchMap((response: Data) => {
           this.modele = response['data'];
-          this.saver = this.modele.initSaver();
-
-          this.initTrigger();
           this.initVariables();
           /**
            * init tags
            */
           return this.tagService.getAllTags('modele');
+
+          
         })
       )
       .subscribe((tags: Tag[]) => {
         this.allTags = tags;
-      });
-  }
-
-  initTrigger() {
-    this.modelService
-      .getTrigger(this.modele.id)
-      .subscribe((triggers: Trigger[]) => {
-        this.modele.triggeredEvents = triggers;
       });
   }
 
@@ -87,17 +77,6 @@ export class ModeleComponent {
         );
         this.targetVariable = [...this.targetVariable];
       });
-  }
-
-  save() {
-    this.dialog.open(WaitComponent);
-
-    forkJoin(this.savingModeleRequest()).subscribe((value) => {
-      this.changesToSave = false;
-      this.dialog.closeAll();
-      this.saver = this.modele.initSaver();
-      location.reload();
-    });
   }
 
   saveAsNewModel(event: boolean) {
@@ -128,30 +107,10 @@ export class ModeleComponent {
               this.dialog.closeAll();
             });
         } else {
-          forkJoin(this.savingModeleRequest())
-            .pipe(
-              switchMap((value) =>
-                this.modelService.createNewModeleTemplate(this.modele, result)
-              )
-            )
-            .subscribe((res) => {
-              this.changesToSave = false;
-              this.saver = this.modele.initSaver();
-              this.dialog.closeAll();
-              location.reload();
-            });
+          
         }
       });
     }
   }
 
-  savingModeleRequest(): Observable<any>[] {
-    let requests: Observable<any>[] = this.modele.save(
-      this.saver,
-      this.tagService,
-      this.modelService,
-      this.nodeService
-    );
-    return requests;
-  }
 }

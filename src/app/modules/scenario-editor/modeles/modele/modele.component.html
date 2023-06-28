@@ -3,7 +3,6 @@
   [modele]="modele"
   [changesToSave]="changesToSave"
   (newModele)="saveAsNewModel($event)"
-  (newSave)="save()"
 ></app-header>
 <mat-tab-group>
   <mat-tab label="Cas clinique">
@@ -21,12 +20,6 @@
       [modele]="modele"
       [chooseTitle]="true"    
       [allTags]="allTags"
-      (updateModele)="changesToSave = true; saver.champToUpdate.push($event)"
-      (newTags)="
-        changesToSave = true;
-        saver.newTags = $event.newTags;
-        saver.tagsToDelete = $event.tagsToDelete
-      "
     ></app-tags-descriptions>
   </mat-tab>
 </mat-tab-group>

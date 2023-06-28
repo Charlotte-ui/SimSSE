@@ -20,10 +20,10 @@
   <button mat-mini-fab matTooltip="Refaire" (click)="redo()">
     <mat-icon>redo</mat-icon>
   </button>
-  <button mat-mini-fab matTooltip="Grouper" (click)="group()">
+  <button *ngIf="editor" mat-mini-fab matTooltip="Grouper" (click)="group()" [disabled]="groupDisabled()">
     <mat-icon>crop_din</mat-icon>
   </button>
-  <button mat-mini-fab matTooltip="Dégrouper" (click)="ungroup()">
+  <button *ngIf="editor" mat-mini-fab matTooltip="Dégrouper" (click)="ungroup()" [disabled]="ungroupDisabled()">
     <mat-icon>crop_free</mat-icon>
   </button>
 </div>

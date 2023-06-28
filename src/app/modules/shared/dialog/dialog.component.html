@@ -7,7 +7,8 @@
       [style.background]="getColor(element)"
       disabled
     >
-      <mat-icon [fontIcon]="getIcon(element)"></mat-icon>
+      <img [src]="getIcon(element)" class="icon" />
+      <!--       <mat-icon [fontIcon]="getIcon(element)"></mat-icon> -->
     </button>
   </h1>
 
@@ -33,11 +34,11 @@
             [formControlName]="champ"
           >
             <mat-option *ngFor="let elem of liste" [value]="getValue(elem)">
+              <div *ngIf="element['type'] == 'link'" class="listIcon">
+                <img [src]="getIcon(elem)" class="icon" />
+              </div>
+
               {{ getName(elem) }}
-              <mat-icon
-                *ngIf="element['type'] == 'link'"
-                [fontIcon]="getIcon(elem)"
-              ></mat-icon>
             </mat-option>
           </mat-select>
 

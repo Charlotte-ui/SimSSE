@@ -23,7 +23,6 @@ export class Categorie extends Vertex {
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
-    console.log('instanciateListe ', list);
     return list.map((element) => new Categorie(element) as T);
   }
 }

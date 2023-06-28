@@ -23,6 +23,7 @@ import {
 } from 'rxjs';
 import { ApiService } from './api.service';
 import { Action, BioEvent } from '../models/vertex/event';
+import { getElementByChamp, remove } from '../functions/tools';
 
 @Injectable({
   providedIn: 'root',
@@ -74,17 +75,28 @@ export class NodeService {
    */
 
   /**
+   * create  an aNode adge between a Node and a graph
+   * @param idNode
+   * @param idGraph
+   * @returns
+   */
+  connectNodeToGraph(idNode: string, idGraph: string): Observable<any> {
+    console.log('connectNodeToGraph ', idNode, ' ', idGraph);
+    return this.apiService.createRelationBetween(idNode, idGraph, 'aNode');
+  }
+
+  /**
    * push a new Graph in the database
-   * return the id of the new Graph and the id of the first node in an array
+   * return the id of the new Graph
    * @param graph
    */
   createGraph(graph: Graph): Observable<string> {
+    console.log('createGraph ', graph);
     graph['@class'] = 'Graph';
     delete graph.id;
     delete graph.nodes;
     delete graph.links;
-    //  return this.apiService.createDocument(graph)
-    //
+
     return this.apiService
       .createDocument(graph)
       .pipe(map((response) => this.apiService.documentId(response)));
@@ -92,15 +104,19 @@ export class NodeService {
 
   /**
    * push a new Node in the database
-   * return the id of the new Node
+   * return the new Node
    * @param node
    */
-  createNode(node: Node, classe: string): Observable<string> {
+  createNode(node: Node, classe: string): Observable<Node> {
+    console.log('createNode ', node);
     node['@class'] = classe;
     delete node.id;
-    return this.apiService
-      .createDocument(node)
-      .pipe(map((response) => this.apiService.documentId(response)));
+    return this.apiService.createDocument(node).pipe(
+      map((response) => {
+        node.id = this.apiService.documentId(response);
+        return node;
+      })
+    );
   }
 
   /**
@@ -115,25 +131,22 @@ export class NodeService {
     let request: Observable<Node>;
     if (node.type === NodeType.graph) {
       // create a graph node
-      request = this.copyGraph(structuredClone(node as Graph));
+      request = this.copyGraph(structuredClone(node as Graph), false);
     } else {
       // create a trend or event node
       request = this.createNode(
         structuredClone(node),
-        [...node.type][0].toUpperCase() + node.type.slice(1)
-      ).pipe(
-        map((idNode: string) => {
-          node.id = idNode;
-          return node;
-        })
+        [...node.type][0].toUpperCase() + node.type.slice(1) // TODO replace by classe name
       );
     }
 
+    console.log('request ', request);
     return request.pipe(
       switchMap((newNode: Node) => {
-        return this.apiService
-          .createRelationBetween(newNode.id, graph.id, 'aNode')
-          .pipe(map(() => newNode));
+        console.log('newNode ', newNode);
+        return this.connectNodeToGraph(newNode.id, graph.id).pipe(
+          map(() => newNode)
+        );
       })
     );
   }
@@ -144,11 +157,12 @@ export class NodeService {
    * return the new Graph
    * @param node
    */
-  copyGraph(graph: Graph): Observable<Graph> {
+  copyGraph(graph: Graph, template): Observable<Graph> {
     console.log('copyGraph ', graph);
-    graph.template = false;
+    if (template) graph.template = template;
     return this.createGraph(structuredClone(graph)).pipe(
       switchMap((idGraph: string) => {
+        console.log('id new graph ', idGraph);
         return this.duplicateGraph(graph, idGraph);
       })
     );
@@ -191,6 +205,7 @@ export class NodeService {
    */
   duplicateGraph(graphToCopy: Graph, idNewGraph: string): Observable<Graph> {
     graphToCopy.id = idNewGraph;
+    console.log('duplicateGraph ', graphToCopy);
 
     // create new nodes and links
     if (graphToCopy.links.length > 0)
@@ -221,61 +236,27 @@ export class NodeService {
    * @returns
    */
   copyGraphNodes(graph: Graph): Observable<Map<string, string>> {
-    let indexGraph = graph.id;
-    let requestsNode: Observable<string[]>[] = [of()];
+    console.log('copyGraphNodes ', graph);
+    let requests: Observable<Node>[];
     let indexesMap = new Map<string, string>();
 
     // add new nodes
-    graph.nodes.forEach((node) => {
-      if (node.type === NodeType.graph) {
-        // create a graph node
-        requestsNode.push(
-          this.createGraphNode(structuredClone(node as Graph)).pipe(
-            map((newGraph: Graph) => {
-              return [node.id, newGraph.id];
-            })
-          )
-        );
-      } else {
-        // create a trend or event node
-        requestsNode.push(
-          this.createNode(
-            structuredClone(node),
-            [...node.type][0].toUpperCase() + node.type.slice(1)
-          ).pipe(
-            map((newId: string) => {
-              return [node.id, newId];
-            })
-          )
-        );
-      }
-    });
+    requests = graph.nodes.map((node: Node) =>
+      this.addNodeToGraph(node, graph).pipe(
+        map((newNode: Node) => {
+          console.log('newNode ', newNode);
+          console.log('[node.id, newNode.id] ', [node.id, newNode.id]);
+          indexesMap.set(node.id, newNode.id);
+          return newNode;
+        })
+      )
+    );
 
-    if (requestsNode.length === 0) return of(); // s'il n'y a pas de nouveaux nodes à ajouter
-
-    return forkJoin(requestsNode).pipe(
-      switchMap((newNodeIndexes: string[][]) => {
-        newNodeIndexes.map((indexes: string[]) => {
-          indexesMap.set(indexes[0], indexes[1]);
-        });
-        if (graph.links.length > 0) {
-          let requestLink: Observable<any>[] = newNodeIndexes.map(
-            (indexesNode: string[]) =>
-              this.apiService.createRelationBetween(
-                indexesNode[1],
-                indexGraph,
-                'aNode'
-              )
-          );
-          return from(requestLink).pipe(
-            concatMap((request: Observable<any>) => request),
-            reduce((acc, cur) => [...acc, cur], []),
-            map(() => {
-              return indexesMap;
-            })
-          );
-        }
-        return of(indexesMap);
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request),
+      reduce((acc, cur) => [...acc, cur], []),
+      map(() => {
+        return indexesMap;
       })
     );
   }
@@ -333,7 +314,7 @@ export class NodeService {
    */
   createLink(idIn: string, idOut: string, value: LinkType): Observable<Link> {
     return this.apiService
-      .createRelationBetweenWithProperty(idIn, idOut, 'link', 'trigger', value)
+      .createRelationBetweenWithProperty(idIn, idOut, 'link', 'trigger', `"${value}"`)
       .pipe(map((response) => new Link(response.result[0])));
   }
 
@@ -452,7 +433,7 @@ export class NodeService {
             this.createNode(
               structuredClone(node),
               [...node.type][0].toUpperCase() + node.type.slice(1)
-            )
+            ).pipe(map((node: Node) => node.id))
           );
         }
       } else {
@@ -466,12 +447,7 @@ export class NodeService {
     return forkJoin(requestsNode).pipe(
       switchMap((newNodeIndexes: string[]) => {
         let requestLink: Observable<any>[] = newNodeIndexes.map(
-          (indexNode: string) =>
-            this.apiService.createRelationBetween(
-              indexNode,
-              indexGraph,
-              'aNode'
-            )
+          (indexNode: string) => this.connectNodeToGraph(indexNode, indexGraph)
         );
 
         return from(requestLink).pipe(
@@ -516,7 +492,17 @@ export class NodeService {
     );
   }
 
-  groupNodes(group: Graph, graph: Graph): Observable<string> {
+  /**
+   * group an ensemble of nodes from a graph
+   * @param group
+   * @param graph
+   * @returns id of the new group and the start node
+   */
+  groupNodes(
+    group: Graph,
+    graph: Graph,
+    linksIllegal: Link[]
+  ): Observable<string[]> {
     return this.createGraph(structuredClone(group))
       .pipe(
         switchMap((idGroup: string) => {
@@ -547,28 +533,44 @@ export class NodeService {
 
           let requests: Observable<any>[] = [];
 
-          requests.push(
-            this.apiService.createRelationBetween(idGroup, graph.id, 'aNode')
-          );
+          requests.push(this.connectNodeToGraph(idGroup, graph.id));
 
           let requestsConnectNodes = group.nodes.map((node: Node) =>
-            this.apiService.createRelationBetween(node.id, idGroup, 'aNode')
+            this.connectNodeToGraph(node.id, idGroup)
           );
           let requestsDisconnectNodes = group.nodes.map((node: Node) =>
-            this.apiService.deleteRelationBetween(node.id, graph.id)
+            this.disconnectNodeFromGraph(node.id, graph.id)
+          );
+
+          let requestsDeleteLinks = linksIllegal.map((link: Link) =>
+            this.deleteLink(link)
           );
 
           return from(
             requests
               .concat(requestsConnectNodes)
               .concat(requestsDisconnectNodes)
+              .concat(requestsDeleteLinks)
           ).pipe(
             concatMap((request: Observable<any>) => request),
             reduce((acc, cur) => [...acc, cur], []),
-            map(() => idGroup)
+            map(() => [idGroup, idStart])
           );
         })
       );
+  }
+
+  ungroupNodes(group: Graph, graph: Graph): Observable<any[]> {
+    let start = getElementByChamp<Node>(group.nodes, 'event', EventType.start);
+    remove<Node>(group.nodes, start);
+    let requestConnect = group.nodes.map((node: Node) =>
+      this.connectNodeToGraph(node.id, graph.id)
+    );
+    let requestDelete = [this.deleteNode(start), this.deleteNode(group)];
+    return from(requestDelete.concat(requestConnect)).pipe(
+      concatMap((request: Observable<any>) => request),
+      reduce((acc, cur) => [...acc, cur], [])
+    );
   }
 
   private isNew(id: string): boolean {
@@ -611,34 +613,26 @@ export class NodeService {
   }
 
   /**
-   *
+   * delete a graph and all his nodes
    * @param graph
    * @returns
    */
-  deleteGraph(graph: Graph): any {
-    let requests: Observable<any>[] = [];
+  deleteGraph(graph: Graph): Observable<any> {
+    console.log('deleteGraph ', graph);
 
-    requests.push(
-      this.apiService
-        .getRelationFrom(graph.id, 'aNode', 'Graph')
-        .pipe(map((response) => Node.instanciateListe<Node>(response.result)))
-        .pipe(
-          switchMap((nodes: Node[]) => {
-            let requestsNode = nodes.map((node: Node) =>
-              this.apiService.deleteDocument(node.id)
-            );
-
-            return from(requestsNode).pipe(
-              concatMap((request: Observable<any>) => request)
-            );
-          })
-        )
-    );
+    let requests = graph.nodes.map((node: Node) => {
+      if (node.type === NodeType.graph) return this.deleteGraph(node as Graph);
+      return this.apiService.deleteDocument(node.id);
+    });
 
     requests.push(this.apiService.deleteDocument(graph.id));
 
     return from(requests).pipe(
       concatMap((request: Observable<any>) => request)
     );
+  }
+
+  disconnectNodeFromGraph(idNode: string, idGraph: string): Observable<any> {
+    return this.apiService.deleteRelationBetween(idNode, idGraph);
   }
 }

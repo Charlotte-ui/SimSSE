@@ -4,7 +4,6 @@
   [plastron]="plastron"
   [changesToSave]="changesToSave"
   (newModele)="saveAsNewModel($event)"
-  (newSave)="save()"
   (newPDF)="exportAsPdf($event)"
 >
 </app-header>
@@ -14,17 +13,7 @@
       *ngIf="allTags"
       [modele]="plastron.modele"
       [allTags]="allTags"
-      (updateModele)="
-        changesToSave = true;
-        modeleToSave = true;
-        saver.champToUpdate.push($event)
-      "
-      (newTags)="
-        changesToSave = true;
-        modeleToSave = true;
-        saver.newTags = $event.newTags;
-        saver.tagsToDelete = $event.tagsToDelete
-      "
+      
     ></app-tags-descriptions>
   </mat-tab>
   <mat-tab label="Modèle - cas clinique">

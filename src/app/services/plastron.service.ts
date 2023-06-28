@@ -12,7 +12,7 @@ import {
 } from 'rxjs';
 
 import { Plastron } from '../models/vertex/plastron';
-import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
+import { Modele } from '../models/vertex/modele';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,

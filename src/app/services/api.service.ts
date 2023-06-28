@@ -170,6 +170,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    */
 
   createDocument(document: Vertex | any) {
+    console.log("createDocument ",document)
     return this.http.post<any>(
       `${environment.urlAPI}/document/simsse/`,
       document

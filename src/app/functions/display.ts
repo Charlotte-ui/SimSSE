@@ -8,6 +8,8 @@ export interface IButton {
   color: string;
   outils: boolean; // le bouton est-il dans la barre d'outils ?
   symbol: string;
+  event:string;
+  tooltip:string;
 }
 
 
@@ -38,7 +40,8 @@ export const champLabel = {
   start:"Activation",
   template:'Groupe',
   decede:'Décédé',
-  trigger:'Déclencheur'
+  trigger:'Déclencheur',
+  groupToStore:'Groupe'
 };
 
 const numbers = [
@@ -57,7 +60,7 @@ const numbers = [
   'duration',
 ];
 
-const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage','category'];
+const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage','category','groupToStore'];
 
 const listableWithGroupe = ['event'];
 
@@ -68,58 +71,82 @@ export class Button {
     {
       name: 'Tendance',
       type: NodeType.trend,
-      icon: 'timeline',
+      icon: 'assets/icons/trend.png',
       color: '#FDFF83',
       outils: true,
       symbol: 'roundRect',
+      event:'add',
+      tooltip:'Ajouter une tendance'
+    },
+        {
+      name: '',
+      type: NodeType.trend,
+      icon: 'assets/icons/addstart.png',
+      color: '#FDFF83',
+      outils: true,
+      symbol: 'roundrect',
+      event:'addMultiple',
+      tooltip:'Ajouter plusieurs tendance à T0'
     },
     {
       name: 'Action',
       type: EventType.action,
-      icon: 'touch_app',
+      icon: 'assets/icons/action.png',
       color: '#86B4C1',
       outils: true,
       symbol: 'roundRect',
+      event:'add',
+      tooltip:'Ajouter une action'
     },
     {
       name: 'Évenement',
       type: EventType.bio,
-      icon: 'healing',
+      icon: 'assets/icons/event.png',
       color: '#FC9E4F',
       outils: true,
       symbol: 'roundRect',
+      event:'add',
+      tooltip:'Ajouter un événement biologique'
     },
     {
       name: 'Timer',
       type: NodeType.timer,
-      icon: 'timer',
+      icon: 'assets/icons/timer.png',
       color: '#DFFFD9',
       outils: true,
       symbol: 'roundRect',
+      event:'add',
+      tooltip:'Ajouter un timer'
     },
     {
       name: 'Lien',
       type: NodeType.link,
-      icon: 'arrow_right_alt',
+      icon: 'assets/icons/link.png',
       color: '#5CFFC0',
       outils: true,
       symbol: 'roundRect',
+      event:'add',
+      tooltip:'Lier deux noeud entre eux'
     },
     {
       name: 'Groupe',
       type: NodeType.graph,
-      icon: 'scatter_plot',
+      icon: 'assets/icons/addgraph.png',
       color: '#FAE4FF',
       outils: true,
       symbol: 'roundRect',
+      event:'add',
+      tooltip:'Ajouter un groupe'
     },
     {
       name: 'Start',
       type: EventType.start,
-      icon: 'input',
+      icon: 'assets/icons/start.png',
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
+      event:'add',
+      tooltip:''
     },
     {
       name: 'Modele',
@@ -128,6 +155,8 @@ export class Button {
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
+      event:'add',
+      tooltip:''
     },
     {
       name: 'Scenario',
@@ -136,6 +165,8 @@ export class Button {
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
+      event:'add',
+      tooltip:''
     },
     {
       name: 'Plastron',
@@ -144,14 +175,18 @@ export class Button {
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
+      event:'add',
+      tooltip:''
     },
     {
       name: 'Trigger',
       type: 'trigger',
-      icon: 'add_alert',
-      color: '#FEEA00',
+      icon: 'assets/icons/trigger.png',
+      color: '#86B4C1',
       outils: false,
       symbol: 'rect',
+      event:'add',
+      tooltip:`Ajouter un déclencheur d'action`
     }
     ,
     {
@@ -161,6 +196,18 @@ export class Button {
       color: '#ffffff',
       outils: false,
       symbol: 'rect',
+      event:'add',
+      tooltip:''
+    },
+    {
+      name: '',
+      type: NodeType.graph,
+      icon: 'assets/icons/storegraph.png',
+      color: '#FAE4FF',
+      outils: true,
+      symbol: 'roundrect',
+      event:'store',
+      tooltip:'Stocker un groupe en base de donnée'
     }
     //  {name:"End",type:EventType.start,icon:'output',color:'#FFFFFF',outils:false},
   ];

@@ -11,7 +11,7 @@ import {
   zipAll,
 } from 'rxjs';
 
-import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
+import { Modele } from '../models/vertex/modele';
 import {
   Trend,
   Event,
@@ -71,8 +71,6 @@ export class ModeleService {
     return this.apiService
       .getRelationFrom(id, 'aNode', 'Graph')
       .pipe(map((response) => {
-        console.log("getGraphNodes ",id,' ',response)
-        console.log("list ",Node.instanciateListe<Node>(response.result))
         return Node.instanciateListe<Node>(response.result)}));
   }
 
@@ -176,8 +174,16 @@ export class ModeleService {
       );
   }
 
-  createTrigger(trigger: Trigger, modele: Modele) {
-    let event = getNodeByID(modele.graph, trigger.in);
+  /**
+   * create a new trigger edge in bd and return it
+   * @param trigger 
+   * @param modele 
+   * @returns trigger
+   */
+  createTrigger(trigger: Trigger, modele: Modele): Observable<Trigger> {
+    console.log("create Trigger ",trigger," ",modele)
+    let event = getNodeByID(modele.graph, trigger.in)
+    console.log("event ",event);
     if (event)
       return this.apiService.createRelationBetweenWithProperty(
         event.id,
@@ -185,7 +191,7 @@ export class ModeleService {
         'triggeredAt',
         'time',
         trigger.time.toString()
-      );
+      ).pipe(map((res:any)=>new Trigger(res.result[0])))
     else return of();
   }
 
@@ -287,33 +293,8 @@ export class ModeleService {
    * @returns
    */
   createNewModeleTemplate(modele: Modele, newModele: Modele): Observable<any> {
-    let saver = modele.initSaver();
+    return of("bloup")
 
-    modele.title = newModele.title;
-    saver.champToUpdate.push('title');
-
-    if (modele.description != newModele.description) {
-      modele.description = newModele.description;
-      saver.champToUpdate.push('description');
-    }
-
-    if (modele.triage != newModele.triage) {
-      modele.triage = newModele.triage;
-      saver.champToUpdate.push('triage');
-    }
-
-    modele.template = true;
-    saver.champToUpdate.push('template');
-
-    let requests = modele.save(saver, this.tagService, this, this.nodeService);
-
-    return concat(requests)
-      .pipe(zipAll())
-      .pipe(
-        switchMap(() =>
-          this.apiService.deleteOutRelation(modele.id, 'aTemplate')
-        )
-      );
   }
 
   /**

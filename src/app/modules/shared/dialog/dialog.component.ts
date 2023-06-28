@@ -26,6 +26,7 @@ import { Button, champLabel } from 'src/app/functions/display';
 import { Scenario } from '../../../models/vertex/scenario';
 import { Modele } from '../../../models/vertex/modele';
 import { Vertex } from '../../../models/vertex/vertex';
+import { getElementByChamp } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-dialog',
@@ -68,7 +69,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   champLabel = champLabel;
 
-  required = ['title', 'triage','name','target','parameter','event','duration','in','out'];
+  required = ['title', 'triage','name','target','parameter','event','duration','in','out','groupToStore'];
 
   title!: string;
   edition!: boolean;
@@ -94,7 +95,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
     this.title = this.completeTitle(this.classe.getType(this.element));
 
-
     Object.keys(this.element).forEach(key => { // avoid the error  this.validator is not a function
       if (Array.isArray(this.element[key])) delete this.element[key];
     });
@@ -106,6 +106,24 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.champs.map((champ: string) => {
       if (this.required.includes(champ))
         this.form.controls[champ].addValidators(Validators.required); //this.formControls[champ] = new FormControl('', [Validators.required]);
+    });
+
+    this.form.valueChanges.subscribe((newElement: T) => {
+      console.log("new element ",newElement)
+      console.log("this.element ",this.element)
+      if (this.element['template'] !== undefined && this.element['name'] && this.element['template'] !== newElement['template']){
+        this.element['template'] = newElement['template'];
+        this.element['name'] = getElementByChamp(this.liste,'id', this.element['template']).name
+        this.form.controls['name'].setValue(this.element['name']);
+        console.log("name ",this.element['name'])
+      }
+
+      if (this.element['target'] !== undefined && this.element['name'] && this.element['target'] !== newElement['target']){
+        this.element['target'] = newElement['target'];
+        this.element['name'] = getElementByChamp(this.liste,'id', this.element['target']).name
+        this.form.controls['name'].setValue(this.element['name']);
+        console.log("name ",this.element['name'])
+      }
     });
 
     this.hidden = this.hidden.concat(newHidden);
