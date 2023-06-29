@@ -46,7 +46,41 @@ export class BarreOutilsComponent implements OnInit {
   triggerEvent(event: string, element: string) {
     if (event === 'add') return this.addElement(element);
 
-    // get all groupe that arent an template yet
+    this.stockInBDD()
+    
+  }
+
+  addElement(element: string) {
+    this.actionByCategories = Action.getListByCategory();
+    this.bioEventByCategories = BioEvent.getListByCategory();
+    switch (element) {
+      case NodeType.link:
+        return this.createLink();
+      case EventType.bio:
+        let bioevent = new Event({ typeEvent: EventType.bio });
+        return this.createNode(bioevent, this.bioEventByCategories, [
+          'template',
+        ]);
+      case EventType.action:
+        let action = new Event({ typeEvent: EventType.action });
+        return this.createNode(action, this.actionByCategories, ['template']);
+      case NodeType.trend:
+        let trend = new Trend();
+        return this.createNode(trend, this.variables);
+      case NodeType.graph:
+        let group = new Graph();
+        return this.createNode(group, Graph.graphs);
+      case NodeType.timer:
+        let timer = new Timer();
+        return this.createNode(timer, []);
+    }
+  }
+
+  /**
+   * stock a graph in bdd as a group modele
+   */
+  stockInBDD(){
+// get all groupe that arent an template yet
     let groupes = this.nodes.filter(
       (node: Node) =>
         node.type === NodeType.graph && (node as Graph).template !== true
@@ -79,32 +113,6 @@ export class BarreOutilsComponent implements OnInit {
           });
       }
     });
-  }
-
-  addElement(element: string) {
-    this.actionByCategories = Action.getListByCategory();
-    this.bioEventByCategories = BioEvent.getListByCategory();
-    switch (element) {
-      case NodeType.link:
-        return this.createLink();
-      case EventType.bio:
-        let bioevent = new Event({ typeEvent: EventType.bio });
-        return this.createNode(bioevent, this.bioEventByCategories, [
-          'template',
-        ]);
-      case EventType.action:
-        let action = new Event({ typeEvent: EventType.action });
-        return this.createNode(action, this.actionByCategories, ['template']);
-      case NodeType.trend:
-        let trend = new Trend();
-        return this.createNode(trend, this.variables);
-      case NodeType.graph:
-        let group = new Graph();
-        return this.createNode(group, Graph.graphs);
-      case NodeType.timer:
-        let timer = new Timer();
-        return this.createNode(timer, []);
-    }
   }
 
   createLink() {

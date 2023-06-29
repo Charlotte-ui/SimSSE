@@ -187,6 +187,11 @@ export class MxgraphComponent implements AfterViewInit {
       }
     }
 
+    if (type === NodeType.timer) {
+      name = '';
+      nodeWidth = IMAGE_HEIGTH;
+    }
+
     let nodeBox = this.editor.graph.insertVertex(
       source,
       node.id,
@@ -194,7 +199,7 @@ export class MxgraphComponent implements AfterViewInit {
       node.x,
       node.y,
       nodeWidth * sizeFactor,
-      type === NodeType.timer || type === EventType.start
+      (type === NodeType.timer || type === EventType.start)
         ? IMAGE_HEIGTH * sizeFactor
         : NODE_HEIGTH,
       type

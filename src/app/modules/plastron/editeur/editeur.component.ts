@@ -296,6 +296,12 @@ export class EditeurComponent implements OnInit {
     );
   }
 
+  /**
+   * initialize a group to add to the root graph
+   * make a copy of the graph template
+   * add this copy to the root graph
+   * @param group 
+   */
   initGroup(group: Graph) {
     let graphTemplate = Graph.getGraphById(group.template.toString());
 
@@ -303,7 +309,7 @@ export class EditeurComponent implements OnInit {
     // TODO : créer de nouveaux node and links avec de nouveaux id ?
 
     this.initGraph(graphTemplate).subscribe((result: [Template[], Link[]]) => {
-      //     group.links = structuredClone(graphTemplate.links);
+      // group.links = structuredClone(graphTemplate.links);
       group.nodes = structuredClone(graphTemplate.nodes);
       this.initTemplateAndLinks(result, group);
       this.initTrendsEventsRecursive(group);

@@ -212,9 +212,16 @@ export class NodeService {
       return this.copyGraphNodes(graphToCopy).pipe(
         switchMap((indexesNode: Map<string, string>) => {
           return this.copyGraphLinks(graphToCopy, indexesNode).pipe(
-            map(() => {
+            map((indexesLink: Map<string, string>) => {
+              // bind the new node ids to the graph
               graphToCopy.nodes.forEach((node: Node) => {
                 node.id = indexesNode.get(node.id);
+              });
+              // bind the new link in and out ids to the graph
+              graphToCopy.links.forEach((link: Link) => {
+                link.id = indexesLink.get(link.id);
+                link.out = indexesNode.get(link.out);
+                link.in = indexesNode.get(link.in);
               });
               return graphToCopy;
             })
@@ -271,35 +278,38 @@ export class NodeService {
     graph: Graph,
     indexesNode: Map<string, string>
   ): Observable<Map<string, string>> {
-    let requestsLinks: Observable<string[]>[] = [];
+    console.log('COPY GRAPH LINK ', indexesNode);
+    console.log('indexesNode ', indexesNode);
+    let requests: Observable<string[]>[] = [of()];
     let indexesMap = new Map<string, string>();
 
-    graph.links.forEach((link) => {
-      requestsLinks.push(
-        this.apiService
-          .createRelationBetweenWithProperty(
-            indexesNode.get(link.in),
-            indexesNode.get(link.out),
-            'link',
-            'trigger',
-            link.trigger
-          )
-          .pipe(
-            map((newId: string) => {
-              return [link.id, newId];
-            })
-          )
-      );
-    });
+    requests = graph.links.map((link: Link) =>
+      this.apiService
+        .createRelationBetweenWithProperty(
+          indexesNode.get(link.in),
+          indexesNode.get(link.out),
+          'link',
+          'trigger',
+          link.trigger
+        )
+        .pipe(
+          map((res: any) => {
+            let newLink = new Link(res.result[0]);
+            console.log('newLink ', newLink);
+            console.log('[link.id, newlink.id] ', [link.id, newLink.id]);
+            indexesMap.set(link.id, newLink.id);
+            return [link.id, newLink.id];
+          })
+        )
+    );
 
-    if (requestsLinks.length === 0) return of(); // s'il n'y a pas de nouveaux nodes à ajouter
-
-    return forkJoin(requestsLinks).pipe(
+    return from(requests).pipe(
+      concatMap((request: Observable<any>) => request),
+      reduce((acc, cur) => [...acc, cur], []),
       map((newLinkIndexes: string[][]) => {
         newLinkIndexes.map((indexes: string[]) => {
           indexesMap.set(indexes[0], indexes[1]);
         });
-
         return indexesMap;
       })
     );
@@ -314,7 +324,13 @@ export class NodeService {
    */
   createLink(idIn: string, idOut: string, value: LinkType): Observable<Link> {
     return this.apiService
-      .createRelationBetweenWithProperty(idIn, idOut, 'link', 'trigger', `"${value}"`)
+      .createRelationBetweenWithProperty(
+        idIn,
+        idOut,
+        'link',
+        'trigger',
+        `"${value}"`
+      )
       .pipe(map((response) => new Link(response.result[0])));
   }
 
