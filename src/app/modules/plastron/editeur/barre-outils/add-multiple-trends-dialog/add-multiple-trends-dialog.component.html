@@ -1,0 +1,25 @@
+<div class="container">
+<mat-dialog-content [formGroup]="form">
+    <h1 mat-dialog-title>
+        Tendances à T0
+        <button mat-mini-fab [style.background]="button.color" disabled>
+            <img [src]="button.icon" class="icon" />
+       </button>
+       </h1>
+
+    <div mat-dialog-content id="dialogContent">
+        <div *ngFor="let variable of variables | keyvalue">
+            <div>{{variable.value.name}}</div>
+            <mat-form-field appearance="fill">
+                <mat-label>Paramètre</mat-label>
+                <input matInput [formControlName]="variable.key" type="number" />
+            </mat-form-field>
+        </div>      
+    </div>
+
+    <div mat-dialog-actions>
+        <button mat-button (click)="onNoClick()">Annuler</button>
+        <button mat-button (click)="save()">Ajouter les tendances</button>
+    </div>
+</mat-dialog-content>
+</div>

@@ -961,7 +961,7 @@ export class MxgraphComponent implements AfterViewInit {
 
           if (result.template) {
             this.nodeService.copyGraph(structuredClone(group), true).subscribe((res) => {
-              Graph.graphs.push(result);
+              Graph.graphs.set(result.id,result);
             });
           }
 

@@ -80,6 +80,7 @@ import { ScenariosComponent } from './modules/scenario-editor/scenarios/scenario
 import { ModelesComponent } from './modules/scenario-editor/modeles/modeles.component';
 import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-editor.component';
 import { MxgraphComponent } from './modules/plastron/editeur/mxgraph/mxgraph.component';
+import { AddMultipleTrendsDialogComponent } from './modules/plastron/editeur/barre-outils/add-multiple-trends-dialog/add-multiple-trends-dialog.component';
 
 
 @NgModule({
@@ -121,6 +122,7 @@ import { MxgraphComponent } from './modules/plastron/editeur/mxgraph/mxgraph.com
     ModelesComponent,
     ScenarioEditorComponent,
     MxgraphComponent,
+    AddMultipleTrendsDialogComponent,
   ],
   imports: [
     BrowserModule,

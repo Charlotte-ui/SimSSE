@@ -33,12 +33,12 @@
             *ngIf="getType(champ) == 'liste'"
             [formControlName]="champ"
           >
-            <mat-option *ngFor="let elem of liste" [value]="getValue(elem)">
+            <mat-option *ngFor="let elem of map | keyvalue" [value]="elem.key">
               <div *ngIf="element['type'] == 'link'" class="listIcon">
-                <img [src]="getIcon(elem)" class="icon" />
+                <img [src]="getIcon(elem.value)" class="icon" />
               </div>
 
-              {{ getName(elem) }}
+              {{ getName(elem.value) }}
             </mat-option>
           </mat-select>
 
@@ -47,12 +47,12 @@
             [formControlName]="champ"
           >
             <mat-optgroup
-              *ngFor="let group of liste"
-              [label]="group.category"
-              [disabled]="group.disabled"
+              *ngFor="let group of map | keyvalue "
+              [label]="group.value.category"
+              [disabled]="group.value.disabled"
             >
               <mat-option
-                *ngFor="let elem of group.elements"
+                *ngFor="let elem of group.value.elements"
                 [value]="getValue(elem)"
               >
                 {{ getName(elem) }}

@@ -13,9 +13,9 @@
           </mat-expansion-panel-header>
           <div class="panel-content">
             <app-barre-outils
-              [variables]="variablesTemplate"
               [nodes]="modele.graph.nodes"
               (newElement)="addElement($event)"
+              (newStartTrends)="addStartTrends($event)"
             ></app-barre-outils>
           </div>
         </mat-expansion-panel>

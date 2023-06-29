@@ -8,18 +8,14 @@ import { Vertex } from './vertex';
 
 export class Categorie extends Vertex {
   public static override className = 'Categorie';
-  public static categories: Categorie[] = [];
+  public static categories: Map<string,Categorie> = new Map<string,Categorie>();
 
   name: string;
 
   constructor(object?: any) {
     super(object);
     this.name = object?.name ? object.name : '';
-    Categorie.categories = pushWithoutDuplicateByChamp<Categorie>(
-      Categorie.categories,
-      this,
-      'name'
-    );
+    Categorie.categories.set(this.id,this);
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {

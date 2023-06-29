@@ -1,6 +1,7 @@
 import { number } from 'echarts';
 import { Nameable } from '../interfaces/nameable';
 import { Vertex } from './vertex';
+import { pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
 
 export abstract class VariablePhysio extends Vertex implements Nameable {
   name: string;
@@ -41,6 +42,7 @@ export class VariablePhysioTemplate extends VariablePhysio {
   sdAge: number;
 
   public static override className = 'VariablePhysioTemplate';
+  public static variables: Map<string,VariablePhysioTemplate> = new Map<string,VariablePhysioTemplate>();
 
 
   constructor(object?: any) {
@@ -49,6 +51,7 @@ export class VariablePhysioTemplate extends VariablePhysio {
       ? object.moyennesAge.split(',')
       : [50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
     this.sdAge = object?.sdAge ? object.sdAge : 1;
+    VariablePhysioTemplate.variables.set(this.id,this);
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {

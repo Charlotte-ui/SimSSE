@@ -37,7 +37,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   // valable aussi pour les modèles et les règles
 
   form: FormGroup;
-  liste: any[];
+  map: Map<string,any>;
   element: T;
   classe: typeof Vertex;
   champs;
@@ -82,14 +82,14 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<DialogComponent<T>>,
     @Inject(MAT_DIALOG_DATA)
-    public data: [T, typeof Vertex, any[], boolean, string[]]
+    public data: [T, typeof Vertex, Map<string,any>, boolean, string[]],
   ) {}
 
   ngOnInit() {
     this.element = structuredClone(this.data[0]);
     console.log('this.element ',this.element)
     this.classe = this.data[1];
-    this.liste = this.data[2];
+    this.map = this.data[2];
     this.edition = this.data[3];
     let newHidden = this.data.length > 4 ? this.data[4] : []; // les nouveaux hidden sont optionnels
 
@@ -113,14 +113,14 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
       console.log("this.element ",this.element)
       if (this.element['template'] !== undefined && this.element['name'] && this.element['template'] !== newElement['template']){
         this.element['template'] = newElement['template'];
-        this.element['name'] = getElementByChamp(this.liste,'id', this.element['template']).name
+        this.element['name'] = this.map.get(this.element['template']).name
         this.form.controls['name'].setValue(this.element['name']);
         console.log("name ",this.element['name'])
       }
 
       if (this.element['target'] !== undefined && this.element['name'] && this.element['target'] !== newElement['target']){
         this.element['target'] = newElement['target'];
-        this.element['name'] = getElementByChamp(this.liste,'id', this.element['target']).name
+        this.element['name'] = this.map.get(this.element['target']).name
         this.form.controls['name'].setValue(this.element['name']);
         console.log("name ",this.element['name'])
       }
@@ -176,7 +176,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     else return elem.id;
   }
 
-  getName(elem: Node | any) {
+  getName(elem: any) {
     if (typeof elem === 'string') return elem;
     if ('name' in elem) return elem.name;
     if (elem instanceof Node) {
@@ -201,7 +201,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   }
 
   getGroup(champ: string) {
-    console.log('champ ',champ)
     if (champ == 'trigger') return Object.values(LinkType)
     else return ['Vrai','Faux']
     

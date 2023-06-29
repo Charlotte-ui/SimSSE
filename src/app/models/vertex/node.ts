@@ -208,7 +208,7 @@ export class Graph extends Node implements Template {
   nodes: Node[];
   links: Link[];
   template: string | boolean; // ref vers le graph template si instance, true si template
-  public static graphs: Graph[] = [];
+  public static graphs:  Map<string,Graph>  = new Map<string,Graph>;
 
   public static override className = 'Graph';
 
@@ -221,7 +221,9 @@ export class Graph extends Node implements Template {
     this.links = object?.links ? object.links : [];
     this.template = object?.template ? object.template : false;
 
-    if (this.template && this.name !== 'root') Graph.graphs.push(this)
+    if (this.template && this.name !== 'root') {
+      Graph.graphs.set(this.id,this)
+    }
   }
 
   static override getName(element): string {
@@ -236,11 +238,6 @@ export class Graph extends Node implements Template {
     });
 
     return res;
-  }
-
-  
-  public static getGraphById(id: string) {
-    return getElementByChamp<Graph>(Graph.graphs, 'id', id);
   }
 }
 

@@ -121,7 +121,7 @@ export class NodeService {
 
   /**
    * create a node and link it to a graph
-   * return the node ID
+   * return the node
    * @param node
    * @param graph
    * @returns

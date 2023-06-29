@@ -20,6 +20,7 @@ import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { refCount } from 'rxjs';
 import { getElementByChamp, getNodeByID } from 'src/app/functions/tools';
 import { NodeService } from 'src/app/services/node.service';
+import { AddMultipleTrendsDialogComponent } from './add-multiple-trends-dialog/add-multiple-trends-dialog.component';
 
 @Component({
   selector: 'app-barre-outils',
@@ -30,15 +31,17 @@ export class BarreOutilsComponent implements OnInit {
   actionByCategories;
   bioEventByCategories;
 
-  @Input() variables!: VariablePhysioTemplate[];
+  variableTemplates: Map<string, VariablePhysioTemplate>;
   @Input() nodes!: Node[];
 
   @Output() newElement = new EventEmitter<Node | Link>();
+  @Output() newStartTrends = new EventEmitter<Trend[]>();
 
   buttons!: IButton[];
 
   constructor(public dialog: MatDialog, public nodeService: NodeService) {
     this.buttons = Button.buttons;
+    this.variableTemplates = VariablePhysioTemplate.variables;
   }
 
   ngOnInit(): void {}
@@ -46,8 +49,8 @@ export class BarreOutilsComponent implements OnInit {
   triggerEvent(event: string, element: string) {
     if (event === 'add') return this.addElement(element);
 
-    this.stockInBDD()
-    
+    if (event === 'store') return this.stockInBDD();
+    if (event === 'addMultiple') return this.addMultipleElement();
   }
 
   addElement(element: string) {
@@ -66,21 +69,21 @@ export class BarreOutilsComponent implements OnInit {
         return this.createNode(action, this.actionByCategories, ['template']);
       case NodeType.trend:
         let trend = new Trend();
-        return this.createNode(trend, this.variables);
+        return this.createNode(trend, this.variableTemplates);
       case NodeType.graph:
         let group = new Graph();
         return this.createNode(group, Graph.graphs);
       case NodeType.timer:
         let timer = new Timer();
-        return this.createNode(timer, []);
+        return this.createNode(timer);
     }
   }
 
   /**
    * stock a graph in bdd as a group modele
    */
-  stockInBDD(){
-// get all groupe that arent an template yet
+  stockInBDD() {
+    // get all groupe that arent an template yet
     let groupes = this.nodes.filter(
       (node: Node) =>
         node.type === NodeType.graph && (node as Graph).template !== true
@@ -109,8 +112,34 @@ export class BarreOutilsComponent implements OnInit {
           .copyGraph(groupToStore as Graph, true)
           .subscribe((graph: Graph) => {
             console.log('graph template ', graph);
-            Graph.graphs.push(graph);
+            Graph.graphs.set(graph.id,graph);
           });
+      }
+    });
+  }
+
+  addMultipleElement() {
+    const dialogRef = this.dialog.open(AddMultipleTrendsDialogComponent, {
+      data: [],
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        let trends: Trend[] = [];
+        for (const [key, value] of Object.entries(result)) {
+          console.log(`${key}: ${value}`);
+          if (value !== 0)
+            trends.push(
+              new Trend({
+                target: key,
+                parameter: value,
+                name: `T0 ${this.variableTemplates.get(key).name} ${Number(value)>0 ? '+' : '-'}`,
+                x:70,
+                y:50*trends.length
+              })
+            );
+        }
+        this.newStartTrends.emit(trends);
       }
     });
   }
@@ -129,9 +158,9 @@ export class BarreOutilsComponent implements OnInit {
     });
   }
 
-  createNode(newNode: Node, liste: any[], hidden?: string[]) {
+  createNode(newNode: Node, map?: Map<string,any>, hidden?: string[]) {
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [newNode, Node, liste, false, hidden],
+      data: [newNode, Node, map, false, hidden]
     });
 
     dialogRef.afterClosed().subscribe((newNode: Node) => {

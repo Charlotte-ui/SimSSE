@@ -80,13 +80,13 @@ export class Button {
     },
         {
       name: '',
-      type: NodeType.trend,
+      type: 'addMultiple',
       icon: 'assets/icons/addstart.png',
       color: '#FDFF83',
       outils: true,
       symbol: 'roundrect',
       event:'addMultiple',
-      tooltip:'Ajouter plusieurs tendance à T0'
+      tooltip:'Ajouter plusieurs tendances à T0'
     },
     {
       name: 'Action',

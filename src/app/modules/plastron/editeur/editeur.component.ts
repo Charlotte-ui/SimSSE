@@ -8,6 +8,7 @@ import {
   Graph,
   NodeType,
   EventType,
+  LinkType,
 } from '../../../models/vertex/node';
 import {
   VariablePhysioInstance,
@@ -15,7 +16,18 @@ import {
 } from '../../../models/vertex/variablePhysio';
 import { RegleService } from '../../../services/regle.service';
 import { NodeService } from '../../../services/node.service';
-import { Observable, concat, forkJoin, map, of, switchMap, zipAll } from 'rxjs';
+import {
+  Observable,
+  concat,
+  concatMap,
+  forkJoin,
+  from,
+  map,
+  of,
+  reduce,
+  switchMap,
+  zipAll,
+} from 'rxjs';
 import { Modele } from '../../../models/vertex/modele';
 import { Curve } from '../../../functions/curve';
 import { ModeleService } from '../../../services/modele.service';
@@ -300,10 +312,10 @@ export class EditeurComponent implements OnInit {
    * initialize a group to add to the root graph
    * make a copy of the graph template
    * add this copy to the root graph
-   * @param group 
+   * @param group
    */
   initGroup(group: Graph) {
-    let graphTemplate = Graph.getGraphById(group.template.toString());
+    let graphTemplate = Graph.graphs.get(group.template.toString());
 
     console.log('init groupe ', graphTemplate);
     // TODO : créer de nouveaux node and links avec de nouveaux id ?
@@ -355,19 +367,70 @@ export class EditeurComponent implements OnInit {
       if (Node.getType(element) === EventType.bio)
         this.addBioEvent(element as Event);
 
-      // ADD GROUP
+      // ADD GROUP NODE
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       else {
+        // ADD CLASSIC NODE
         this.nodeService
           .addNodeToGraph(element as Node, this.modele.graph)
           .subscribe((node: Node) => {
             element.id = node.id;
             this.modele.graph.nodes.push(element as Node);
-            this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
+          //  this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
             this.updateCurve();
           });
       }
     }
+  }
+
+  /**
+   * add some trends and link them to the start event of the graph
+   * @param element
+   */
+  addStartTrends(trends: Trend[]) {
+    console.log("addStartTrends")
+    let startNode = getElementByChamp<Node>(
+      this.modele.graph.nodes,
+      'event',
+      EventType.start
+    );
+        console.log("startNode ",startNode)
+
+
+    let requestsNode = trends.map((trend: Trend) =>
+      this.nodeService.addNodeToGraph(trend, this.modele.graph).pipe(
+        map((node: Node) => {
+          trend.id = node.id;
+          this.modele.graph.nodes.push(trend);
+          return trend;
+        })
+      )
+    );
+
+    forkJoin(requestsNode).pipe(
+      switchMap((trends: Trend[]) => {
+            console.log("trends ",trends)
+
+        let requestsLink = trends.map((trend: Trend) =>
+          this.nodeService.createLink(trend.id, startNode.id, LinkType.start)
+          .pipe(map((link:Link) =>{
+            this.modele.graph.links.push(link);
+          }))
+        );
+
+        return from(requestsLink).pipe(
+          concatMap((request: Observable<any>) => request),
+          reduce((acc, cur) => [...acc, cur], []),
+            map(() => {
+              this.updateCurve();
+
+             
+            })
+        );
+      })
+    ).subscribe()
+
+    // element.id = indice;
   }
 
   updateGraph(node) {
@@ -385,8 +448,7 @@ export class EditeurComponent implements OnInit {
   }
 
   updateCurve() {
-    console.log('updateCurve ', this.curves);
-    console.log('updateCurve ', this.modele);
+    console.log('updateCurve')
     this.curves.forEach((curve) => {
       // clean the triggereds of all the curves-genereted triggerd
       this.modele.triggeredEvents = this.modele.triggeredEvents.filter(
