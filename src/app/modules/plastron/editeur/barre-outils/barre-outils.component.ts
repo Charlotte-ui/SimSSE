@@ -61,6 +61,7 @@ export class BarreOutilsComponent implements OnInit {
         return this.createLink();
       case EventType.bio:
         let bioevent = new Event({ typeEvent: EventType.bio });
+        console.log("this.bioEventByCategories ",this.bioEventByCategories)
         return this.createNode(bioevent, this.bioEventByCategories, [
           'template',
         ]);

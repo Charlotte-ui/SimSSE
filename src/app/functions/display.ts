@@ -41,7 +41,10 @@ export const champLabel = {
   template:'Groupe',
   decede:'Décédé',
   trigger:'Déclencheur',
-  groupToStore:'Groupe'
+  groupToStore:'Groupe',
+  source:'Variable cause',
+  threshold:'Valeur seuil',
+  comparison:'Opérateur de comparaison'
 };
 
 const numbers = [
@@ -58,6 +61,7 @@ const numbers = [
   'y',
   'parameter',
   'duration',
+  'threshold'
 ];
 
 const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage','category','groupToStore'];

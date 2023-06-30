@@ -5,6 +5,12 @@ import {
 import { Template } from '../interfaces/templatable';
 import { EventType } from './node';
 import { Vertex } from './vertex';
+import { VariablePhysioTemplate } from './variablePhysio';
+
+enum Comparison{
+  inf = '<',
+  sup = '>'
+}
 
 export class Categorie extends Vertex {
   public static override className = 'Categorie';
@@ -79,12 +85,17 @@ export class BioEvent extends Vertex implements Template {
   public static bioevents: BioEvent[] = [];
 
   name: string;
-  category: string;
+  source: string;
+  threshold:number;
+  comparison:Comparison;
+
 
   constructor(object?: any) {
     super(object);
     this.name = object?.name ? object.name : '';
-    this.category = object?.category ? object.category : 'Divers';
+    this.source = object?.source ? object.source : undefined;
+    this.threshold = object?.threshold ? object.threshold : 0;
+    this.comparison = object?.comparison ? object.comparison : Comparison.inf;
     BioEvent.bioevents.push(this);
   }
 
@@ -94,14 +105,13 @@ export class BioEvent extends Vertex implements Template {
 
   public static getListByCategory() {
     let bioevents = [];
-    let categories = Categorie.categories;
 
-    categories.forEach((category) => {
+    VariablePhysioTemplate.variables.forEach((variable) => {
       bioevents.push({
-        category: category,
-        disabled: category.name === 'Évaluation clinique',
+        category: variable.name,
+        disabled: false,
         elements: this.bioevents.filter(
-          (bioevent: BioEvent) => bioevent.category === category.name
+          (bioevent: BioEvent) => bioevent.source === variable.id
         ),
       });
     });

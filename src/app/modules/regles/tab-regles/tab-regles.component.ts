@@ -48,6 +48,7 @@ export class TabReglesComponent<T extends Vertex> {
 
   @Input() title: string;
   @Input() description: string;
+  @Input() map: Map<string,any>;
 
   constructor(public dialog: MatDialog, private regleService: RegleService) {}
 
@@ -70,9 +71,7 @@ export class TabReglesComponent<T extends Vertex> {
       data: [
         element,
         this.classe,
-        Array.from(Categorie.categories).map(
-          (value: [string, Categorie]) => value[1].name
-        ),
+        this.map,
         edit,
       ],
     });
