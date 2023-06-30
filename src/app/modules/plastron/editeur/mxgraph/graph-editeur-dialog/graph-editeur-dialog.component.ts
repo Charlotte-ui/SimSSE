@@ -23,10 +23,6 @@ export class GraphEditeurDialogComponent {
     this.variablesTemplate =  this.data[1];
   }
 
-  updateNodes(event) {
-    this.graph.nodes = [...event]; //TODO link to database
-  }
-
   onNoClick(): void {
     this.dialogRef.close();
   }

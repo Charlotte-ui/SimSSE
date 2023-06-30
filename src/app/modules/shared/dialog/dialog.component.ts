@@ -91,6 +91,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.classe = this.data[1];
     this.map = this.data[2];
     this.edition = this.data[3];
+    console.log('this.map ',this.map)
+
     let newHidden = this.data.length > 4 ? this.data[4] : []; // les nouveaux hidden sont optionnels
 
     this.title = this.completeTitle(this.classe.getType(this.element));
@@ -111,14 +113,15 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.form.valueChanges.subscribe((newElement: T) => {
       console.log("new element ",newElement)
       console.log("this.element ",this.element)
-      if (this.element['template'] !== undefined && this.element['name'] && this.element['template'] !== newElement['template']){
+      if (newElement['template'] !== undefined && this.element['name'] && this.element['template'] !== newElement['template']){
         this.element['template'] = newElement['template'];
         this.element['name'] = this.map.get(this.element['template']).name
         this.form.controls['name'].setValue(this.element['name']);
         console.log("name ",this.element['name'])
       }
 
-      if (this.element['target'] !== undefined && this.element['name'] && this.element['target'] !== newElement['target']){
+      console.log("this.element['target'] ",this.element)
+      if (newElement['target'] !== undefined && this.element['name'] && this.element['target'] !== newElement['target']){
         this.element['target'] = newElement['target'];
         this.element['name'] = this.map.get(this.element['target']).name
         this.form.controls['name'].setValue(this.element['name']);

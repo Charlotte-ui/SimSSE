@@ -23,7 +23,7 @@ import {
 } from 'rxjs';
 import { ApiService } from './api.service';
 import { Action, BioEvent } from '../models/vertex/event';
-import { getElementByChamp, remove } from '../functions/tools';
+import { getElementByChamp, getElementByChampMap, remove } from '../functions/tools';
 
 @Injectable({
   providedIn: 'root',
@@ -208,7 +208,7 @@ export class NodeService {
     console.log('duplicateGraph ', graphToCopy);
 
     // create new nodes and links
-    if (graphToCopy.links.length > 0)
+    if (graphToCopy.links.size > 0)
       return this.copyGraphNodes(graphToCopy).pipe(
         switchMap((indexesNode: Map<string, string>) => {
           return this.copyGraphLinks(graphToCopy, indexesNode).pipe(
@@ -248,12 +248,12 @@ export class NodeService {
     let indexesMap = new Map<string, string>();
 
     // add new nodes
-    requests = graph.nodes.map((node: Node) =>
+    requests = Array.from(graph.nodes).map(([key,node]) =>
       this.addNodeToGraph(node, graph).pipe(
         map((newNode: Node) => {
           console.log('newNode ', newNode);
-          console.log('[node.id, newNode.id] ', [node.id, newNode.id]);
-          indexesMap.set(node.id, newNode.id);
+          console.log('[node.id, newNode.id] ', [key, newNode.id]);
+          indexesMap.set(key, newNode.id);
           return newNode;
         })
       )
@@ -283,7 +283,7 @@ export class NodeService {
     let requests: Observable<string[]>[] = [of()];
     let indexesMap = new Map<string, string>();
 
-    requests = graph.links.map((link: Link) =>
+    requests = Array.from(graph.links).map(([key,link]) =>
       this.apiService
         .createRelationBetweenWithProperty(
           indexesNode.get(link.in),
@@ -295,10 +295,8 @@ export class NodeService {
         .pipe(
           map((res: any) => {
             let newLink = new Link(res.result[0]);
-            console.log('newLink ', newLink);
-            console.log('[link.id, newlink.id] ', [link.id, newLink.id]);
-            indexesMap.set(link.id, newLink.id);
-            return [link.id, newLink.id];
+            indexesMap.set(key, newLink.id);
+            return [key, newLink.id];
           })
         )
     );
@@ -389,9 +387,9 @@ export class NodeService {
     let requests: Observable<any>[] = [];
     // create new nodes and links
     let requestCreate = this.updateGraphNodes(graph).pipe(
-      switchMap((indexesNode: string[]) => {
+   /*    switchMap((indexesNode: string[]) => {
         return this.updateGraphLinks(graph, indexesNode);
-      })
+      }) */
     );
     requests.push(requestCreate);
 
@@ -483,7 +481,7 @@ export class NodeService {
 =   * @param graph 
    * @returns 
    */
-  updateGraphLinks(graph: Graph, indexesNode: string[]): Observable<any> {
+/*   updateGraphLinks(graph: Graph, indexesNode: string[]): Observable<any> {
     let requestsLinks: Observable<string>[] = [];
 
     graph.links.forEach((link) => {
@@ -506,7 +504,7 @@ export class NodeService {
       reduce((acc, cur) => [...acc, cur], []),
       map((res: any[]) => {})
     );
-  }
+  } */
 
   /**
    * group an ensemble of nodes from a graph
@@ -517,7 +515,7 @@ export class NodeService {
   groupNodes(
     group: Graph,
     graph: Graph,
-    linksIllegal: Link[]
+    linksIllegal: Map<string,Link>
   ): Observable<string[]> {
     return this.createGraph(structuredClone(group))
       .pipe(
@@ -546,19 +544,16 @@ export class NodeService {
         switchMap((indexes: string[]) => {
           let idGroup = indexes[0].substring(1);
           let idStart = indexes[1].substring(1);
-
           let requests: Observable<any>[] = [];
-
           requests.push(this.connectNodeToGraph(idGroup, graph.id));
-
-          let requestsConnectNodes = group.nodes.map((node: Node) =>
-            this.connectNodeToGraph(node.id, idGroup)
+          let requestsConnectNodes = Array.from(group.nodes).map(([key,node]) =>
+            this.connectNodeToGraph(key, idGroup)
           );
-          let requestsDisconnectNodes = group.nodes.map((node: Node) =>
-            this.disconnectNodeFromGraph(node.id, graph.id)
+          let requestsDisconnectNodes = Array.from(group.nodes).map(([key,node]) =>
+            this.disconnectNodeFromGraph(key, graph.id)
           );
 
-          let requestsDeleteLinks = linksIllegal.map((link: Link) =>
+          let requestsDeleteLinks = Array.from(linksIllegal).map(([key,link]) =>
             this.deleteLink(link)
           );
 
@@ -576,11 +571,18 @@ export class NodeService {
       );
   }
 
+  /**
+   * delete a group from bdd and attach his node to the root graph
+   * @param group 
+   * @param graph 
+   * @returns 
+   */
   ungroupNodes(group: Graph, graph: Graph): Observable<any[]> {
-    let start = getElementByChamp<Node>(group.nodes, 'event', EventType.start);
-    remove<Node>(group.nodes, start);
-    let requestConnect = group.nodes.map((node: Node) =>
-      this.connectNodeToGraph(node.id, graph.id)
+    // we do not rattach the start
+    let start = getElementByChampMap<Node>(group.nodes, 'event', EventType.start);
+    group.nodes.delete(start.id)
+    let requestConnect = Array.from(group.nodes).map(([key,node]) =>
+      this.connectNodeToGraph(key, graph.id)
     );
     let requestDelete = [this.deleteNode(start), this.deleteNode(group)];
     return from(requestDelete.concat(requestConnect)).pipe(
@@ -636,9 +638,9 @@ export class NodeService {
   deleteGraph(graph: Graph): Observable<any> {
     console.log('deleteGraph ', graph);
 
-    let requests = graph.nodes.map((node: Node) => {
+    let requests = Array.from(graph.nodes).map(([key,node]) => {
       if (node.type === NodeType.graph) return this.deleteGraph(node as Graph);
-      return this.apiService.deleteDocument(node.id);
+      return this.apiService.deleteDocument(key);
     });
 
     requests.push(this.apiService.deleteDocument(graph.id));

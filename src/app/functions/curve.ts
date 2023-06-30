@@ -2,7 +2,7 @@ import { Modele } from '../models/vertex/modele';
 import { Graph, NodeType, Timer, Node, Trend, LinkType } from '../models/vertex/node';
 import { Trigger } from '../models/trigger';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
-import { getElementByChamp, roundingWithDecimal } from './tools';
+import { getElementByChampMap, roundingWithDecimal } from './tools';
 
 export class Curve {
   name: string;
@@ -91,9 +91,9 @@ export class Curve {
         // event trigger at time t
 
         graph.links.forEach((link) => {
-
-          if (trigger.in == link.out || trigger.in == getElementByChamp<Node>(graph.nodes,'id',link.out)['event']) {
-            let nodeTrigger = getElementByChamp<Node>(graph.nodes,'id',link.in)
+          let eventNode = getElementByChampMap<Node>(graph.nodes,'id',link.out);
+          if (trigger.in == link.out || (eventNode && trigger.in == eventNode['event']) ) {
+            let nodeTrigger = getElementByChampMap<Node>(graph.nodes,'id',link.in)
             
             if (nodeTrigger) {
               nodeTrigger.state = nodeTrigger.state === LinkType.stop ?  LinkType.stop : link.trigger ;
@@ -151,7 +151,7 @@ export class Curve {
    */
   private calculTrendRecursive(
     variable: VariablePhysioInstance,
-    nodes: Node[]
+    nodes:Map<string,Node>
   ) {
     let trends: number[] = []; 
     nodes.forEach((node) => {
@@ -197,7 +197,7 @@ export class Curve {
   }
 
   private setAllNodesStatesToFalse(graph: Graph) {
-    graph.nodes.map((node: Node) => {
+    graph.nodes.forEach((node: Node) => {
       node.state = node.state === LinkType.stop ? LinkType.stop : LinkType.pause;
       if (node.type == NodeType.graph)
         this.setAllNodesStatesToFalse(node as Graph);

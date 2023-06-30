@@ -26,6 +26,19 @@ export function getElementByChamp<T>(
   return res;
 }
 
+export function getElementByChampMap<T>(
+  map: Map<string,T>,
+  champ: string,
+  value: any
+): T | undefined {
+   let resMap = new Map([...map].filter(
+      ([key,element]) =>
+       element[champ] == value
+    ))
+  let res = resMap.size > 0 ? map.entries().next().value : undefined;
+  return res;
+}
+
 /**
  * get a node by his id, looking recursivly
  * @param graph
@@ -33,10 +46,11 @@ export function getElementByChamp<T>(
  * @returns
  */
 export function getNodeByID(graph: Graph, id: string): Node {
-  for (let node of graph.nodes) {
+
+  for (let [key,node] of graph.nodes) {
     // event are identified by evnt
     if (node.type == NodeType.event && (node as Event).event == id) return node;
-    else if (node.id == id) return node;
+    else if (key == id) return node;
     else if (node.type == NodeType.graph) {
       let deepNode = getNodeByID(node as Graph, id);
       if (deepNode) return deepNode;
@@ -51,18 +65,17 @@ export function getNodeByID(graph: Graph, id: string): Node {
  * @param id
  * @returns
  */
-export function getLinkByID(graph: Graph, id: string): Link {
-  console.log('getLinkByID ', graph);
-  let link = getElementByChamp<Link>(graph.links, 'id', id);
+ export function getLinkByID(graph: Graph, id: string): Link {
+  let link = graph.links.get(id)
   if (link) return link;
-  for (let node of graph.nodes) {
+  for (let [string,node] of graph.nodes) {
     if (node.type == NodeType.graph) {
       let deepLink = getLinkByID(node as Graph, id);
       if (deepLink) return deepLink;
     }
   }
   return undefined;
-}
+} 
 
 export function roundingWithDecimal(value: number, decimals: number): number {
   let a = Math.pow(10, decimals);
@@ -121,6 +134,7 @@ export function remove<T>(array: T[], element: T) {
   const index = array.indexOf(element);
   array.splice(index, 1);
 }
+
 
 /**
  * darken or ligthen color

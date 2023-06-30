@@ -36,6 +36,7 @@ import { Template } from 'src/app/models/interfaces/templatable';
 import { Trigger } from 'src/app/models/trigger';
 import {
   getElementByChamp,
+  getElementByChampMap,
   getNodeByID,
   pushWithoutDuplicateByChamp,
 } from 'src/app/functions/tools';
@@ -174,8 +175,7 @@ export class EditeurComponent implements OnInit {
   initGraph(graph: Graph): Observable<[Template[], Link[]]> {
     return this.modelService.getGraphNodes(graph.id).pipe(
       switchMap((nodes: Node[]) => {
-        graph.nodes = nodes;
-
+        nodes.map((node:Node)=> graph.nodes.set(node.id,node))
         if (nodes.length > 0) {
           let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
           const requestsTemplate = nodes.map((node: Node) => {
@@ -223,7 +223,7 @@ export class EditeurComponent implements OnInit {
   initTemplateAndLinks(result: [Template[], Link[]], graph: Graph) {
     // on attribiut leur template aux events et aux graph
     if (result) {
-      graph.nodes.map((node: Node, index: number) => {
+      Array.from(graph.nodes).map(([key,node], index: number) => {
         if (node['template']) node['template'] = result[0][index];
         if (node.type == NodeType.graph) {
           node['nodes'] = (result[0][index] as Graph).nodes;
@@ -231,7 +231,8 @@ export class EditeurComponent implements OnInit {
           node['template'] = (result[0][index] as Graph).id;
         }
       });
-      graph.links = result[1];
+      result[1].map((link:Link)=>graph.links.set(link.id,link))
+       
     }
   }
 
@@ -329,7 +330,7 @@ export class EditeurComponent implements OnInit {
         .addNodeToGraph(group, this.modele.graph)
         .subscribe((node: Node) => {
           console.log('group ', node);
-          this.modele.graph.nodes.push(node);
+          this.modele.graph.nodes.set(node.id,node);
           console.log('modele.graph.nodes ', this.modele.graph.nodes);
           this.draw = new Array(); //  force change detection by forcing the value reference update
         });
@@ -345,7 +346,7 @@ export class EditeurComponent implements OnInit {
   addElement(element: Node | Link) {
     if (element.type == NodeType.link) {
       // ADD LINK
-      let indice = this.modele.graph.links.length.toString();
+      let indice = this.modele.graph.links.size.toString();
       (element as Link).id = indice;
       this.nodeService
         .createLink(
@@ -355,12 +356,12 @@ export class EditeurComponent implements OnInit {
         )
         .subscribe((link: Link) => {
           element.id = link.id;
-          this.modele.graph.links.push(element as Link);
+          this.modele.graph.links.set(element.id,element as Link);
           this.updateCurve();
         });
     } else {
       // ADD NODE
-      let indice = this.modele.graph.nodes.length.toString();
+      let indice = this.modele.graph.nodes.size.toString();
       element.id = indice;
       if (Node.getType(element) === EventType.action)
         this.addAction(element as Event);
@@ -375,7 +376,7 @@ export class EditeurComponent implements OnInit {
           .addNodeToGraph(element as Node, this.modele.graph)
           .subscribe((node: Node) => {
             element.id = node.id;
-            this.modele.graph.nodes.push(element as Node);
+            this.modele.graph.nodes.set(element.id,element as Node);
           //  this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
             this.updateCurve();
           });
@@ -389,7 +390,7 @@ export class EditeurComponent implements OnInit {
    */
   addStartTrends(trends: Trend[]) {
     console.log("addStartTrends")
-    let startNode = getElementByChamp<Node>(
+    let startNode = getElementByChampMap<Node>(
       this.modele.graph.nodes,
       'event',
       EventType.start
@@ -401,7 +402,7 @@ export class EditeurComponent implements OnInit {
       this.nodeService.addNodeToGraph(trend, this.modele.graph).pipe(
         map((node: Node) => {
           trend.id = node.id;
-          this.modele.graph.nodes.push(trend);
+          this.modele.graph.nodes.set(trend.id,trend);
           return trend;
         })
       )
@@ -414,7 +415,7 @@ export class EditeurComponent implements OnInit {
         let requestsLink = trends.map((trend: Trend) =>
           this.nodeService.createLink(trend.id, startNode.id, LinkType.start)
           .pipe(map((link:Link) =>{
-            this.modele.graph.links.push(link);
+            this.modele.graph.links.set(link.id,link);
           }))
         );
 

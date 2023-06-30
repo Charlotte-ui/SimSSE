@@ -123,7 +123,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
   //initialisateurs
 
   initGraphData() {
-    this.graphData = new Array(this.graph.nodes.length);
+/*     this.graphData = new Array(this.graph.nodes.length);
 
     DataName = [];
     this.graph.nodes.forEach((node: Node, index: number) => {
@@ -145,7 +145,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         layout: 'none',
         value: [node.x, node.y],
       };
-    });
+    }); */
   }
 /* 
   initGraphLink() {
@@ -256,7 +256,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         });
     }
 
-    if (dialogRef)
+/*     if (dialogRef)
       dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           if (result.delete) {
@@ -282,7 +282,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
           this.updateChart();
         }
-      });
+      }); */
   }
 
 /*   onEdgeClick(event: any) {

@@ -18,7 +18,7 @@ import {
 import { MatDialog } from '@angular/material/dialog';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { refCount } from 'rxjs';
-import { getElementByChamp, getNodeByID } from 'src/app/functions/tools';
+import { getElementByChamp, getElementByChampMap, getNodeByID } from 'src/app/functions/tools';
 import { NodeService } from 'src/app/services/node.service';
 import { AddMultipleTrendsDialogComponent } from './add-multiple-trends-dialog/add-multiple-trends-dialog.component';
 
@@ -32,7 +32,7 @@ export class BarreOutilsComponent implements OnInit {
   bioEventByCategories;
 
   variableTemplates: Map<string, VariablePhysioTemplate>;
-  @Input() nodes!: Node[];
+  @Input() nodes!: Map<string,Node>;
 
   @Output() newElement = new EventEmitter<Node | Link>();
   @Output() newStartTrends = new EventEmitter<Trend[]>();
@@ -84,10 +84,11 @@ export class BarreOutilsComponent implements OnInit {
    */
   stockInBDD() {
     // get all groupe that arent an template yet
-    let groupes = this.nodes.filter(
-      (node: Node) =>
-        node.type === NodeType.graph && (node as Graph).template !== true
-    );
+
+    let groupes = new Map([...this.nodes].filter(
+      ([key,node]) =>
+       node.type === NodeType.graph && (node as Graph).template !== true
+    ))
     console.log('groupes ', groupes);
     console.log('this.nodes ', this.nodes);
 
@@ -103,7 +104,7 @@ export class BarreOutilsComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
         console.log(result);
-        let groupToStore = getElementByChamp<Node>(
+        let groupToStore = getElementByChampMap<Node>(
           groupes,
           'id',
           result.groupToStore

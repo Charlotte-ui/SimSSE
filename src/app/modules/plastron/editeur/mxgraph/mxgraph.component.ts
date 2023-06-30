@@ -41,6 +41,7 @@ import {
 import { NodeService } from 'src/app/services/node.service';
 import {
   getElementByChamp,
+  getElementByChampMap,
   getLinkByID,
   getNodeByID,
   remove,
@@ -170,8 +171,7 @@ export class MxgraphComponent implements AfterViewInit {
     alternateY?: number
   ): mxCell {
     let name = Node.getName(node);
-    let nodeWidth = MIN_NODE_WIDTH + name.length * FONT_SIZE * FONT_RATIO
-    ;
+    let nodeWidth = MIN_NODE_WIDTH + name.length * FONT_SIZE * FONT_RATIO;
     let sizeFactor = 1;
 
     if (name === EventType.start) {
@@ -199,7 +199,7 @@ export class MxgraphComponent implements AfterViewInit {
       node.x,
       node.y,
       nodeWidth * sizeFactor,
-      (type === NodeType.timer || type === EventType.start)
+      type === NodeType.timer || type === EventType.start
         ? IMAGE_HEIGTH * sizeFactor
         : NODE_HEIGTH,
       type
@@ -238,7 +238,7 @@ export class MxgraphComponent implements AfterViewInit {
     this.createLinks(graph.links);
   }
 
-  createLinks(links: Link[]) {
+  createLinks(links: Map<string, Link>) {
     links.forEach((link: Link) => {
       if (this.model.cells[link.id] === undefined) {
         let edge = this.editor.graph.insertEdge(
@@ -468,10 +468,27 @@ export class MxgraphComponent implements AfterViewInit {
             changes[i].index === undefined &&
             changes[i].parent === null
           ) {
-            this.onUngroup(changes[i].child);
+            let group = getNodeByID(this.graphData, changes[i].child) as Graph;
+            if (group) this.onUngroup(changes[i].child, group);
             break;
           }
         }
+
+        if (changes[i].constructor.name == 'mxCollapseChange') {
+                    let cell = changes[i].cell
+
+          let group = getNodeByID(this.graphData, cell.id) as Graph;
+          console.log("groupe ",group)
+          console.log("isCollapsed ",cell.isCollapsed())
+          // TODO move the node beside when open
+          this.onCollapse(cell,group,cell.isCollapsed())
+          
+         
+            break;
+          
+        }
+
+
       }
     });
 
@@ -530,26 +547,30 @@ export class MxgraphComponent implements AfterViewInit {
 
     dialogRef.afterClosed().subscribe((result: Link) => {
       if (result) {
-        console.log("createEdge result ",result)
+        console.log('createEdge result ', result);
 
         this.nodeService
           .createLink(result.in, result.out, result.trigger)
           .subscribe((newLink: Link) => {
-            console.log("createEdge newLink ",newLink)
-            if (cell.parent === this.parent) this.graphData.links.push(newLink);
+            console.log('createEdge newLink ', newLink);
+            if (cell.parent === this.parent)
+              this.graphData.links.set(newLink.id, newLink);
             else
-              (getNodeByID(this.graphData, cell.parent.id) as Graph).links.push(
+              (getNodeByID(this.graphData, cell.parent.id) as Graph).links.set(
+                newLink.id,
                 newLink
               );
 
             cell.id = newLink.id;
-            console.log('cell ',cell)
-            console.log('model ',this.model)
+            console.log('cell ', cell);
+            console.log('model ', this.model);
             this.updateGraphData.emit(link);
           });
         cell.style = `strokeColor=${Link.getColor(result)}`;
         cell.value = Link.getIcon(result);
         this.editor.graph.refresh(cell);
+      } else {
+        this.editor.graph.removeCells([cell]);
       }
     });
   }
@@ -804,7 +825,7 @@ export class MxgraphComponent implements AfterViewInit {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         if (result.delete) {
-          remove<Link>(this.graphData.links, link);
+          this.graphData.links.delete(link.id);
           this.editor.graph.removeCells([cell]);
           this.nodeService.deleteLink(link).subscribe();
           this.updateGraphData.emit(undefined);
@@ -860,12 +881,12 @@ export class MxgraphComponent implements AfterViewInit {
       dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           if (result.delete) {
-            remove<Node>(this.graphData.nodes, node);
+            this.graphData.nodes.delete(node.id);
             this.editor.graph.removeCells([cell]);
             // delete all the links link to the deleted node
             this.graphData.links.forEach((link) => {
               if (link.in == node.id || link.out == node.id)
-                remove<Link>(this.graphData.links, link);
+                this.graphData.links.delete(link.id);
             });
             this.editor.graph.removeCells([cell]);
             this.nodeService.deleteNode(node).subscribe();
@@ -913,14 +934,15 @@ export class MxgraphComponent implements AfterViewInit {
       if (result) {
         if (result.delete) {
           this.nodeService.deleteGraph(group).subscribe((res) => {
-            remove<Node>(this.graphData.nodes, group);
+            this.graphData.nodes.delete(group.id);
             this.editor.graph.removeCells([cell]);
           });
           this.updateGraphData.emit(undefined);
         } else {
           group.name = result.name;
           cell.value = result.name;
-          cell.geometry.width = MIN_NODE_WIDTH + cell.value.length * FONT_SIZE * FONT_RATIO;
+          cell.geometry.width =
+            MIN_NODE_WIDTH + cell.value.length * FONT_SIZE * FONT_RATIO;
           this.editor.graph.refresh(cell);
           this.nodeService
             .updateNode(structuredClone(group), ['name'])
@@ -934,16 +956,28 @@ export class MxgraphComponent implements AfterViewInit {
   onGroup(cell: mxCell) {
     console.log('onGroup ', cell);
     let group = new Graph();
-    group.nodes = cell.children.map((cell: mxCell) =>
-      getNodeByID(this.graphData, cell.id)
-    );
 
-    let idNodesInGroup = group.nodes.map((node) => node.id);
-    let linksIllegal = this.graphData.links.filter(
-      (link: Link) =>
-        (idNodesInGroup.includes(link.in) &&
-          !idNodesInGroup.includes(link.out)) ||
-        (!idNodesInGroup.includes(link.in) && idNodesInGroup.includes(link.out))
+    cell.children.map((cell: mxCell) => {
+      let node = getNodeByID(this.graphData, cell.id);
+      if (node) {
+        group.nodes.set(cell.id, node);
+      }
+    });
+
+    group.x = cell.geometry.x;
+    group.y = cell.geometry.y;
+    console.log("goupX ",group.x," groupY ",group.y)
+
+    let idNodesInGroup = Array.from(group.nodes.keys());
+
+    let linksIllegal = new Map(
+      [...this.graphData.links].filter(
+        ([key, link]) =>
+          (idNodesInGroup.includes(link.in) &&
+            !idNodesInGroup.includes(link.out)) ||
+          (!idNodesInGroup.includes(link.in) &&
+            idNodesInGroup.includes(link.out))
+      )
     );
 
     let dialogRef = this.dialog.open(GraphEditeurDialogComponent, {
@@ -957,17 +991,20 @@ export class MxgraphComponent implements AfterViewInit {
         } else {
           group.name = result.name;
 
-          console.log('onGroup result ',result)
+          console.log('onGroup result ', result);
+          console.log('onGroup group ', group);
 
           if (result.template) {
-            this.nodeService.copyGraph(structuredClone(group), true).subscribe((res) => {
-              Graph.graphs.set(result.id,result);
-            });
+            // ADD LINK TO THE GRAPH IF TEMPLATE
+            this.nodeService
+              .copyGraph(structuredClone(group), true)
+              .subscribe((res) => {
+                Graph.graphs.set(res.id, result);
+              });
           }
 
           group.template = false;
 
-          console.log('onGroup group ', group);
           this.nodeService
             .groupNodes(group, this.graphData, linksIllegal)
             .subscribe((indexes: string[]) => {
@@ -977,31 +1014,31 @@ export class MxgraphComponent implements AfterViewInit {
               group.id = indexes[0];
               let groupStart = Event.createStart();
               groupStart.id = indexes[1];
-              group.nodes.push(groupStart);
+              group.nodes.set(groupStart.id, groupStart);
 
-              linksIllegal.map((link: Link) =>
-                remove(this.graphData.links, link)
+              linksIllegal.forEach((link: Link) =>
+                this.graphData.links.delete(link.id)
               );
-
-              console.log('GROUP ', group);
-              group.nodes.map((node: Node) =>
-                remove<Node>(this.graphData.nodes, node)
+              group.nodes.forEach((node: Node) =>
+                this.graphData.nodes.delete(node.id)
               );
-              this.graphData.nodes.push(group);
-              console.log('GRAPHDATA ', this.graphData);
-
+              this.graphData.nodes.set(group.id, group);
               this.updateGraphData.emit(group);
-              console.log('MODELE ', this.editor.graph.model);
+              console.log("this.graphData ",this.graphData)
             });
         }
       }
     });
   }
 
-  onUngroup(cell: mxCell) {
+  onUngroup(cell: mxCell, group: Graph) {
     console.log('onUngroup ', cell);
-    let group = getNodeByID(this.graphData, cell.id) as Graph;
-    let start = getElementByChamp<Node>(group.nodes, 'event', EventType.start);
+
+    let start = getElementByChampMap<Node>(
+      group.nodes,
+      'event',
+      EventType.start
+    );
 
     console.log('group ', group);
 
@@ -1013,13 +1050,37 @@ export class MxgraphComponent implements AfterViewInit {
         this.editor.graph.removeCells([
           this.editor.graph.model.cells[start.id],
         ]);
-        group.nodes.map((node: Node) => this.graphData.nodes.push(node));
-        remove<Node>(this.graphData.nodes, group);
+        group.nodes.forEach((node: Node) =>
+          this.graphData.nodes.set(node.id, node)
+        );
+        this.graphData.nodes.delete(group.id);
         //DATA = this.graphData;
         console.log('this.graphData ', this.graphData);
         this.updateGraphData.emit(undefined);
         this.editor.graph.refresh(cell);
       });
+  }
+
+  onCollapse(cell:mxCell,group:Graph,collapsed:boolean){
+    console.log(cell)
+    console.log(Array.from(this.editor.graph.model.cells))
+    this.graphData.nodes.forEach((node:Node)=>{
+      if(node.id !== group.id && Node.getName(node) !== EventType.start){
+        let cellToMove:mxCell = this.editor.graph.model.cells[node.id]
+        if (cellToMove.geometry.x+cellToMove.geometry.width > cell.geometry.x && cellToMove.geometry.x < cell.geometry.x+cell.geometry.width){
+          console.log("cellToMove ",cellToMove)
+          if(!collapsed){
+            cellToMove.geometry.y += cell.geometry.height;
+          }
+          else {
+            cellToMove.geometry.y = node.y;
+
+          }
+          console.log("cellToMove ",cellToMove.geometry.y)
+          this.editor.graph.refresh(cellToMove);
+        }
+      }
+    })
   }
 
   drag(graph: mxGraph) {
@@ -1118,12 +1179,13 @@ export class MxgraphComponent implements AfterViewInit {
    * @param coordinate
    * @returns number
    */
-  private maxCoordinate(nodes: Node[], coordinate): number {
+  private maxCoordinate(nodes: Map<string, Node>, coordinate): number {
     let max = 20;
     nodes.forEach((node) => {
       let value = node[coordinate];
       if (coordinate === 'x')
-        value += MIN_NODE_WIDTH + Node.getName(node).length * FONT_SIZE * FONT_RATIO;
+        value +=
+          MIN_NODE_WIDTH + Node.getName(node).length * FONT_SIZE * FONT_RATIO;
       else value += NODE_HEIGTH;
       if (value > max) max = value;
     });

@@ -90,9 +90,10 @@ export abstract class Node extends Vertex {
           break;
       }
     });
-
     return res;
   }
+
+  
 }
 
 export class Trend extends Node {
@@ -205,8 +206,8 @@ export class Link extends Edge {
 
 export class Graph extends Node implements Template {
   name: string; // le graph est a la racine du modele, son nom est root
-  nodes: Node[];
-  links: Link[];
+  nodes: Map<string,Node>;
+  links: Map<string,Link>;
   template: string | boolean; // ref vers le graph template si instance, true si template
   public static graphs:  Map<string,Graph>  = new Map<string,Graph>;
 
@@ -217,8 +218,8 @@ export class Graph extends Node implements Template {
     else object = { type: NodeType.graph };
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
-    this.nodes = object?.nodes ? object.nodes : [];
-    this.links = object?.links ? object.links : [];
+    this.nodes = object?.nodes ? object.nodes : new Map<string,Node>();
+    this.links = object?.links ? object.links : new  Map<string,Link>();
     this.template = object?.template ? object.template : false;
 
     if (this.template && this.name !== 'root') {
