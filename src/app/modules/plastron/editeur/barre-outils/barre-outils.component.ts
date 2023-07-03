@@ -167,14 +167,13 @@ export class BarreOutilsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((newNode: Node) => {
       if (newNode) {
-        if (newNode.type == NodeType.event) {
-          newNode['template'] = this.getTemplate(
-            (newNode as Event).typeEvent == EventType.action
-              ? Action.actions
-              : BioEvent.bioevents,
-            (newNode as Event).event
-          );
+        if (Node.getType(newNode) === EventType.action) {
+          newNode['template'] = Action.actions.get((newNode as Event).event)
         }
+        else if (Node.getType(newNode) === EventType.bio) {
+          newNode['template'] = BioEvent.bioevents.get((newNode as Event).event)
+        } 
+        
         this.newElement.emit(newNode);
       }
     });

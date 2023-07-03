@@ -475,20 +475,16 @@ export class MxgraphComponent implements AfterViewInit {
         }
 
         if (changes[i].constructor.name == 'mxCollapseChange') {
-                    let cell = changes[i].cell
+          let cell = changes[i].cell;
 
           let group = getNodeByID(this.graphData, cell.id) as Graph;
-          console.log("groupe ",group)
-          console.log("isCollapsed ",cell.isCollapsed())
+          console.log('groupe ', group);
+          console.log('isCollapsed ', cell.isCollapsed());
           // TODO move the node beside when open
-          this.onCollapse(cell,group,cell.isCollapsed())
-          
-         
-            break;
-          
+          this.onCollapse(cell, group, cell.isCollapsed());
+
+          break;
         }
-
-
       }
     });
 
@@ -858,7 +854,7 @@ export class MxgraphComponent implements AfterViewInit {
         break;
       case EventType.bio:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, Event, BioEvent.bioevents, true, ['template']],
+          data: [node, Event, BioEvent.getListByCategory(), true, ['template']],
         });
         break;
       case EventType.action:
@@ -902,8 +898,12 @@ export class MxgraphComponent implements AfterViewInit {
               }
             });
 
-            if (node.type == NodeType.event)
-              (node as Event).template = Action.getActionById(
+            if (Node.getType(node) === EventType.action)
+              (node as Event).template = Action.actions.get(
+                (node as Event).event
+              );
+            else if (Node.getType(node) === EventType.bio)
+              (node as Event).template = BioEvent.bioevents.get(
                 (node as Event).event
               );
 
@@ -966,7 +966,7 @@ export class MxgraphComponent implements AfterViewInit {
 
     group.x = cell.geometry.x;
     group.y = cell.geometry.y;
-    console.log("goupX ",group.x," groupY ",group.y)
+    console.log('goupX ', group.x, ' groupY ', group.y);
 
     let idNodesInGroup = Array.from(group.nodes.keys());
 
@@ -1024,7 +1024,7 @@ export class MxgraphComponent implements AfterViewInit {
               );
               this.graphData.nodes.set(group.id, group);
               this.updateGraphData.emit(group);
-              console.log("this.graphData ",this.graphData)
+              console.log('this.graphData ', this.graphData);
             });
         }
       }
@@ -1061,26 +1061,27 @@ export class MxgraphComponent implements AfterViewInit {
       });
   }
 
-  onCollapse(cell:mxCell,group:Graph,collapsed:boolean){
-    console.log(cell)
-    console.log(Array.from(this.editor.graph.model.cells))
-    this.graphData.nodes.forEach((node:Node)=>{
-      if(node.id !== group.id && Node.getName(node) !== EventType.start){
-        let cellToMove:mxCell = this.editor.graph.model.cells[node.id]
-        if (cellToMove.geometry.x+cellToMove.geometry.width > cell.geometry.x && cellToMove.geometry.x < cell.geometry.x+cell.geometry.width){
-          console.log("cellToMove ",cellToMove)
-          if(!collapsed){
+  onCollapse(cell: mxCell, group: Graph, collapsed: boolean) {
+    console.log(cell);
+    console.log(Array.from(this.editor.graph.model.cells));
+    this.graphData.nodes.forEach((node: Node) => {
+      if (node.id !== group.id && Node.getName(node) !== EventType.start) {
+        let cellToMove: mxCell = this.editor.graph.model.cells[node.id];
+        if (
+          cellToMove.geometry.x + cellToMove.geometry.width > cell.geometry.x &&
+          cellToMove.geometry.x < cell.geometry.x + cell.geometry.width
+        ) {
+          console.log('cellToMove ', cellToMove);
+          if (!collapsed) {
             cellToMove.geometry.y += cell.geometry.height;
-          }
-          else {
+          } else {
             cellToMove.geometry.y = node.y;
-
           }
-          console.log("cellToMove ",cellToMove.geometry.y)
+          console.log('cellToMove ', cellToMove.geometry.y);
           this.editor.graph.refresh(cellToMove);
         }
       }
-    })
+    });
   }
 
   drag(graph: mxGraph) {

@@ -12,8 +12,8 @@ export class Pdf {
 
   description: string;
   age: number;
-  timeStamps: Timestamp[];
-  triggeredEvents: Trigger[];
+  timeStamps: Map<string,Timestamp>;
+  triggeredEvents: Map<string,Trigger>;
 
   pdf!: jsPDF;
 
@@ -24,10 +24,10 @@ export class Pdf {
 
     this.description = modele?.description ? modele.description : '';
     this.age = profil?.age ? profil.age : undefined;
-    this.timeStamps = modele?.timeStamps ? modele.timeStamps : [];
+    this.timeStamps = modele?.timeStamps ? modele.timeStamps : new Map<string,Timestamp>;
     this.triggeredEvents = modele?.triggeredEvents
       ? modele.triggeredEvents
-      : [];
+      : new Map<string,Trigger>;
 
     this.pageWidth = this.pdf.internal.pageSize.width;
 

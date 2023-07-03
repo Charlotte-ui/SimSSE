@@ -22,9 +22,9 @@ export class Modele extends Vertex implements Listable {
   triage: Triage;
   template: boolean | string;
   graph: Graph;
-  triggeredEvents: Trigger[];
+  triggeredEvents: Map<string,Trigger>;
   tags: Tag[];
-  timeStamps: Timestamp[];
+  timeStamps: Map<string,Timestamp>;
 
   public static override className = 'Modele';
 
@@ -38,8 +38,8 @@ export class Modele extends Vertex implements Listable {
     this.graph = object?.graph ? object.graph : 0;
     this.triggeredEvents = object?.triggeredEvents
       ? object.triggeredEvents
-      : [];
-    this.timeStamps = object?.timeStamps ? object.timeStamps : [];
+      :new Map<string,Trigger>();
+    this.timeStamps = object?.timeStamps ? object.timeStamps : new Map<string,Timestamp>();
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {

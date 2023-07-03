@@ -52,17 +52,19 @@
               [disabled]="group.value.disabled"
             >
               <mat-option
-                *ngFor="let elem of group.value.elements"
-                [value]="getValue(elem)"
+                *ngFor="let elem of group.value.elements | keyvalue "
+                [value]="elem.key"
               >
-                {{ getName(elem) }}
+                {{getName(elem.value) }}
                 <mat-icon
                   *ngIf="element['type'] == 'link'"
-                  [fontIcon]="getIcon(elem)"
+                
                 ></mat-icon>
               </mat-option>
             </mat-optgroup>
           </mat-select>
+
+            <!-- [fontIcon]="getIcon(elem.value)" -->
 
           <mat-error>
             {{ getLabel(champ) }} est <strong>requis</strong>

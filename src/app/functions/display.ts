@@ -103,9 +103,9 @@ export class Button {
       tooltip:'Ajouter une action'
     },
     {
-      name: 'Évenement',
+      name: 'Bio-évenement',
       type: EventType.bio,
-      icon: 'assets/icons/event.png',
+      icon: 'assets/icons/bio.png',
       color: '#FC9E4F',
       outils: true,
       symbol: 'roundRect',

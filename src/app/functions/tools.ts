@@ -27,14 +27,13 @@ export function getElementByChamp<T>(
 }
 
 export function getElementByChampMap<T>(
-  map: Map<string,T>,
+  map: Map<string, T>,
   champ: string,
   value: any
 ): T | undefined {
-   let resMap = new Map([...map].filter(
-      ([key,element]) =>
-       element[champ] == value
-    ))
+  let resMap = new Map(
+    [...map].filter(([key, element]) => element[champ] == value)
+  );
   let res = resMap.size > 0 ? map.entries().next().value : undefined;
   return res;
 }
@@ -46,8 +45,7 @@ export function getElementByChampMap<T>(
  * @returns
  */
 export function getNodeByID(graph: Graph, id: string): Node {
-
-  for (let [key,node] of graph.nodes) {
+  for (let [key, node] of graph.nodes) {
     // event are identified by evnt
     if (node.type == NodeType.event && (node as Event).event == id) return node;
     else if (key == id) return node;
@@ -65,17 +63,17 @@ export function getNodeByID(graph: Graph, id: string): Node {
  * @param id
  * @returns
  */
- export function getLinkByID(graph: Graph, id: string): Link {
-  let link = graph.links.get(id)
+export function getLinkByID(graph: Graph, id: string): Link {
+  let link = graph.links.get(id);
   if (link) return link;
-  for (let [string,node] of graph.nodes) {
+  for (let [string, node] of graph.nodes) {
     if (node.type == NodeType.graph) {
       let deepLink = getLinkByID(node as Graph, id);
       if (deepLink) return deepLink;
     }
   }
   return undefined;
-} 
+}
 
 export function roundingWithDecimal(value: number, decimals: number): number {
   let a = Math.pow(10, decimals);
@@ -126,6 +124,29 @@ export function isDeepEqual(object1, object2): boolean {
   return true;
 }
 
+export function isMapDeepEqual(
+  map1: Map<string, any>,
+  map2: Map<string, any>
+): boolean {
+  if (map1.size !== map2.size) return false;
+
+  let keys = map1.keys();
+
+  for (let key in keys) {
+    const value1 = map1.get(key);
+    const value2 = map2.get(key);
+
+    const isObjects = isObject(value1) && isObject(value2);
+    if (
+      (isObjects && !isDeepEqual(value1, value2)) ||
+      (!isObjects && value1 !== value2)
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const isObject = (object) => {
   return object != null && typeof object === 'object';
 };
@@ -135,7 +156,6 @@ export function remove<T>(array: T[], element: T) {
   array.splice(index, 1);
 }
 
-
 /**
  * darken or ligthen color
  * @param pourcentage
@@ -143,36 +163,32 @@ export function remove<T>(array: T[], element: T) {
  * @returns
  */
 export function shade(col, light) {
-    var r = parseInt(col.substr(1, 2), 16);
-    var g = parseInt(col.substr(3, 2), 16);
-    var b = parseInt(col.substr(5, 2), 16);
+  var r = parseInt(col.substr(1, 2), 16);
+  var g = parseInt(col.substr(3, 2), 16);
+  var b = parseInt(col.substr(5, 2), 16);
 
-    if (light < 0) {
-        r = (1 + light) * r;
-        g = (1 + light) * g;
-        b = (1 + light) * b;
-    } else {
-        r = (1 - light) * r + light * 255;
-        g = (1 - light) * g + light * 255;
-        b = (1 - light) * b + light * 255;
-    }
-    return color(r, g, b);
+  if (light < 0) {
+    r = (1 + light) * r;
+    g = (1 + light) * g;
+    b = (1 + light) * b;
+  } else {
+    r = (1 - light) * r + light * 255;
+    g = (1 - light) * g + light * 255;
+    b = (1 - light) * b + light * 255;
+  }
+  return color(r, g, b);
 }
 
-
-
 function hex2(c) {
-    c = Math.round(c);
-    if (c < 0) c = 0;
-    if (c > 255) c = 255;
+  c = Math.round(c);
+  if (c < 0) c = 0;
+  if (c > 255) c = 255;
 
-    var s = c.toString(16);
-    if (s.length < 2) s = "0" + s;
-    return s;
+  var s = c.toString(16);
+  if (s.length < 2) s = '0' + s;
+  return s;
 }
 
 function color(r, g, b) {
-    return "#" + hex2(r) + hex2(g) + hex2(b);
+  return '#' + hex2(r) + hex2(g) + hex2(b);
 }
-
-

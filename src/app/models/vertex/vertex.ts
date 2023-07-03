@@ -5,6 +5,7 @@ export class Vertex {
    
     id:string;
     public static className;
+    public static collection;
 
     constructor(object?:any) {
         if (object && object['@rid']) object['id'] = object['@rid'].substring(1);

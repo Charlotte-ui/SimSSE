@@ -255,11 +255,11 @@ export class EditeurComponent implements OnInit {
     graph.nodes.forEach((node: Node) => {
       switch (Node.getType(node)) {
         case EventType.action:
-          node['template'] = Action.getActionById((node as Event).event);
+          node['template'] = Action.actions.get((node as Event).event);
           this.addAction(node as Event);
           break;
         case EventType.bio:
-          node['template'] = BioEvent.getBioEventById((node as Event).event);
+          node['template'] = BioEvent.bioevents.get((node as Event).event);
           this.addBioEvent(node as Event);
           break;
         case NodeType.trend:
@@ -278,11 +278,10 @@ export class EditeurComponent implements OnInit {
         // bind name to trigger
         triggers.map((trigger: Trigger) => {
           let node = getNodeByID(this.modele.graph, trigger.in);
-          console.log('node trig ', node);
           trigger.name = Node.getName(node);
         });
 
-        this.modele.triggeredEvents = triggers;
+        this.modele.triggeredEvents = new Map(triggers.map((trigger) => [trigger.id, trigger]));
 
         console.log(
           'this.modele.triggeredEvents ',
@@ -443,22 +442,24 @@ export class EditeurComponent implements OnInit {
 
   updateVariables(newVariable: VariablePhysioInstance) {
     this.curves.get(newVariable.template).variable = newVariable;
-    this.curves.get(newVariable.template).calculCurve(this.modele);
+    Curve.calculCurves(this.modele,this.curves,this.duration);
     this.draw = new Array();
     this.profilService.updateVariable(newVariable).subscribe();
   }
 
   updateCurve() {
     console.log('updateCurve')
-    this.curves.forEach((curve) => {
-      // clean the triggereds of all the curves-genereted triggerd
-      this.modele.triggeredEvents = this.modele.triggeredEvents.filter(
-        (trigger) => trigger.editable
-      );
 
-      let newtriggered = curve.calculCurve(structuredClone(this.modele));
+    // clean the triggereds of all the curves-genereted triggerd
+     this.modele.triggeredEvents = new Map([...this.modele.triggeredEvents].filter(
+      ([key,trigger]) =>
+       trigger.editable
+    ))
+    
+    let newtriggered = Curve.calculCurves(structuredClone(this.modele),this.curves,this.duration);
+      console.log("newtriggered ",newtriggered)
       this.modele.triggeredEvents = newtriggered;
-    });
+    
     this.draw = new Array();
   }
 }

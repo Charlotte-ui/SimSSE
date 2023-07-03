@@ -8,6 +8,7 @@ import {
   Graph,
   NodeType,
   Timer,
+  EventType,
 } from 'src/app/models/vertex/node';
 import { TriggerDialogComponent } from './trigger-dialog/trigger-dialog.component';
 import { Modele } from 'src/app/models/vertex/modele';
@@ -19,6 +20,7 @@ import {
   getElementByChamp,
   isDeepEqual,
   remove,
+  isMapDeepEqual,
 } from 'src/app/functions/tools';
 import { Button, IButton } from 'src/app/functions/display';
 import { Edge } from 'src/app/models/vertex/vertex';
@@ -26,6 +28,7 @@ import { Timeable } from 'src/app/models/interfaces/timeable';
 import { ModeleService } from 'src/app/services/modele.service';
 import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { finalize } from 'rxjs';
+import { BioEvent } from 'src/app/models/vertex/event';
 
 var echartsInstance: ECharts;
 var scene: SceneComponent;
@@ -58,8 +61,9 @@ export class SceneComponent implements OnInit {
    */
 
   @Input() events;
-  triggeredEvents: Trigger[] = [];
-  timeStamps: Timestamp[] = [];
+  triggeredEvents: Map<string, Trigger> = new Map<string, Trigger>();
+  timeStamps: Map<string, Timestamp> = new Map<string, Timestamp>();
+  bioEvents: Map<string, BioEvent> = new Map<string, BioEvent>();
 
   _modele!: Modele;
   get modele(): Modele {
@@ -84,7 +88,7 @@ export class SceneComponent implements OnInit {
   }
 
   @Input() set draw(value: any[]) {
-    console.log('draw');
+    console.log('draw ',this.modele);
     this.updateChart();
   }
 
@@ -107,7 +111,6 @@ export class SceneComponent implements OnInit {
   ngOnInit(): void {}
 
   onChartInit(ec) {
-    console.log('onChartInit');
     echartsInstance = ec;
     /*     echartsInstance.on('finished', () => {
       echartsInstance = ec;
@@ -325,15 +328,9 @@ export class SceneComponent implements OnInit {
       };
     }
 
-    if (!isDeepEqual(this.modele.triggeredEvents, this.triggeredEvents)) {
-      console.log(
-        'update triggers, modele ',
-        this.modele.triggeredEvents,
-        ' triggers ',
-        this.triggeredEvents
-      );
+    if (!isMapDeepEqual(this.modele.triggeredEvents, this.triggeredEvents)) {
       let update = () => {
-        if (echartsInstance) {
+        if (echartsInstance && !isMapDeepEqual(this.modele.triggeredEvents, this.triggeredEvents)) {
           this.updateTriggerBars();
         } else {
           setTimeout(update, 2000);
@@ -343,12 +340,33 @@ export class SceneComponent implements OnInit {
       update();
     }
 
-    if (!isDeepEqual(this.modele.timeStamps, this.timeStamps)) {
+    if (!isMapDeepEqual(this.modele.timeStamps, this.timeStamps)) {
       if (echartsInstance) {
         this.timeStamps = this.modele.timeStamps;
         this.updateTimeStampBars();
       }
     }
+
+    let bioevents = new Map<string, BioEvent>();
+    this.modele.graph.nodes.forEach((node: Node, key: string) => {
+      if (Node.getType(node) === EventType.bio) {
+        let template = (node as Event).template;
+        bioevents.set(template.id, template as BioEvent);
+      }
+    });
+
+     if (!isMapDeepEqual(bioevents, this.bioEvents)) {
+      let update = () => {
+        if (echartsInstance && echartsInstance['_model'] && bioevents.size !== this.bioEvents.size) {
+          this.bioEvents = bioevents;
+          this.updateBioBars();
+        } else {
+          setTimeout(update, 2000);
+        }
+      };
+
+      update();
+    } 
   }
 
   /**
@@ -426,100 +444,80 @@ export class SceneComponent implements OnInit {
     });
   } */
 
-  createTriggerBar(
-    trigger: Trigger | Timestamp,
-    index,
+  createBar(
+    horizontal: boolean,
+    position: number, //trigger.time
+    index: string,
+    label: string,
     color,
-    list: Trigger[] | Timestamp[]
+    onDrag: Function,
+    onClick: Function
   ) {
-    let left = echartsInstance.convertToPixel('grid', [trigger.time, 0])[0];
+    let offset = horizontal
+      ? echartsInstance.convertToPixel('grid', [0, position])[1]
+      : echartsInstance.convertToPixel('grid', [position, 0])[0];
+
     return {
-      id: trigger.id,
+      id: index,
       type: 'group',
       $action: 'replace',
-      x: left,
-      draggable: 'horizontal',
+      x: horizontal ? 0 : offset,
+      y: horizontal ? offset : 0,
+      draggable: horizontal ? 'vertical' : 'horizontal', // the drag is on the oppisite direction
       ondrag: function (params) {
-        var pointInPixel = [params.offsetX, params.offsetY];
         let x = params.target.x;
-        var pointInGrid = echartsInstance.convertFromPixel('grid', [x, 0]);
-        echartsInstance.convertFromPixel('grid', pointInPixel);
-        let newTime = Math.round(pointInGrid[0]);
-        if (newTime !== trigger.time) {
-          console.log(
-            'UPDATE TRIGGER POSITION trigger ',
-            trigger,
-            ' modele ',
-            scene.modele.triggeredEvents
-          );
-          let newTrigger = getElementByChamp<Trigger>(
-            scene.modele.triggeredEvents,
-            'id',
-            trigger.id
-          );
-          newTrigger.time = newTime;
-          scene.updateTrigger.emit(newTrigger as Trigger);
-          if (trigger.editable)
-            scene.modeleService.updateTrigger(newTrigger).subscribe();
+        let y = params.target.y;
+        let pointInGrid = horizontal
+          ? echartsInstance.convertFromPixel('grid', [0, y])
+          : echartsInstance.convertFromPixel('grid', [x, 0]);
+        let newPosition = horizontal
+          ? Math.round(pointInGrid[1])
+          : Math.round(pointInGrid[0]);
+        if (newPosition !== position) {
+          onDrag(index, newPosition);
         }
       },
       onclick: function (params) {
-        const dialogRef = scene.dialog.open(ConfirmDeleteDialogComponent, {
-          data: [
-            'Supprimer le trigger ' + trigger.name,
-            'Voulez-vous supprimer le trigger ' + trigger.name + ' ?',
-          ],
-        });
-
-        dialogRef.afterClosed().subscribe((result) => {
-          if (result) {
-            if (trigger.editable) {
-              console.log('DELETE TRIGGER ', trigger);
-              scene.modeleService
-                .deleteTrigger(trigger as unknown as Trigger)
-                .subscribe(() => {
-                  location.reload();
-                  // remove(scene.triggeredEvents,trigger)
-                 // list.splice(index, 1);
-                  remove(scene.modele.triggeredEvents,  getElementByChamp<Trigger>(scene.modele.triggeredEvents,'id',trigger.id));
-                  console.log(scene.modele.triggeredEvents)
-                  scene.updateTrigger.emit(undefined);
-                });
-            }
-          }
-        });
+        onClick(index);
       },
 
       children: [
         {
-          id: 'bar_' + trigger.id,
+          id: 'bar_' + index,
           z: 100,
           type: 'rect',
-          left: 'center',
-          top: '50px',
-          shape: {
-            width: 3,
-            height: 405,
-          },
+          left: horizontal ? '50px' : 'center',
+          top: horizontal ? 'center' : '50px',
+          shape: horizontal
+            ? {
+                width: 2000,
+                height: 3,
+              }
+            : {
+                width: 3,
+                height: 405,
+              },
           style: {
             fill: color,
           },
           cursor: 'pointer',
         },
         {
+          id: 'label_' + index,
           type: 'text',
           z: 100,
-          top: '35px',
-          left: 'center',
+          top: horizontal ? '-15px' : '35px',
+          left: horizontal ? '65px' : 'center',
           style: {
-            text: trigger.name,
+            text: label,
             font: '15px, sans-serif',
           },
         },
         {
           type: 'circle',
-          top: '445px',
-          left: '-9px',
+           id: 'circle_' + index,
+          top: horizontal ? 'center' : '445px',
+          left: horizontal ? '42px' : '-9px',
           z: 100,
           shape: {
             r: 9,
@@ -530,12 +528,12 @@ export class SceneComponent implements OnInit {
         },
         {
           type: 'text',
-          id: 'time_' + trigger.id,
+          id: 'time_' + index,
           z: 100,
-          top: '448.5px',
-          left: 'center',
+          top: horizontal ? 'center' : '448.5px',
+          left: horizontal ? '43px' : 'center',
           style: {
-            text: trigger.time,
+            text: position,
             font: '8px, sans-serif',
             fill: '#000000',
           },
@@ -577,76 +575,158 @@ export class SceneComponent implements OnInit {
   }
 
   updateTriggerBars() {
-    console.log('UPDATE TRIGGER BARS');
     let newTriggers = structuredClone(this.modele.triggeredEvents);
 
     let triggerBars;
 
     this.triggeredEvents;
 
-    if (this.triggeredEvents.length < newTriggers.length) {
-      console.log('CREATE');
-      console.log('newTriggers ', newTriggers);
-
-      let barsToCreate = newTriggers.filter(
-        (trigger: Trigger) =>
-          !getElementByChamp<Trigger>(this.triggeredEvents, 'id', trigger.id)
+    if (this.triggeredEvents.size < newTriggers.size) {
+      let barsToCreate = new Map(
+        [...newTriggers].filter(
+          ([key, trigger]) => !this.triggeredEvents.get(trigger.id)
+        )
       );
-      triggerBars = barsToCreate.map((trigger: Trigger, index: number) => {
-        return this.createTriggerBar(
-          trigger,
-          index,
+
+      triggerBars = Array.from(barsToCreate).map(([index, trigger]) => {
+        let onDrag = function (index: string, newTime: number) {
+          let newTrigger = scene.modele.triggeredEvents.get(index);
+          newTrigger.time = newTime;
+          scene.updateTrigger.emit(newTrigger as Trigger);
+          if (trigger.editable)
+            scene.modeleService.updateTrigger(newTrigger).subscribe();
+        };
+
+        let onClick = function (index) {
+          const dialogRef = scene.dialog.open(ConfirmDeleteDialogComponent, {
+            data: [
+              'Supprimer le trigger ' + trigger.name,
+              'Voulez-vous supprimer le trigger ' + trigger.name + ' ?',
+            ],
+          });
+
+          dialogRef.afterClosed().subscribe((result) => {
+            if (result) {
+              if (trigger.editable) {
+                scene.modeleService
+                  .deleteTrigger(trigger as unknown as Trigger)
+                  .subscribe(() => {
+                    location.reload();
+                    // remove(scene.triggeredEvents,trigger)
+                    // list.splice(index, 1);
+                    scene.modele.triggeredEvents.delete(trigger.id);
+                    scene.updateTrigger.emit(undefined);
+                  });
+              }
+            }
+          });
+        };
+
+        return this.createBar(
+          false,
+          trigger.time,
+          trigger.id,
+          trigger.name,
           trigger.color,
-          this.modele.triggeredEvents
+          onDrag,
+          onClick
         );
       });
-      console.log(triggerBars);
-    } else if (this.triggeredEvents.length > newTriggers.length) {
-      console.log('DELETE');
-      let barsToDelete = this.triggeredEvents.filter((trigger: Trigger) =>
-        getElementByChamp<Trigger>(newTriggers, 'id', trigger.id)
-      );
-      console.log('barsToDelete ', barsToDelete);
 
-      triggerBars = barsToDelete.map((trigger: Trigger, index: number) => {
+    } else if (this.triggeredEvents.size > newTriggers.size) {
+
+      let barsToDelete = new Map(
+        [...this.triggeredEvents].filter(([key, trigger]) =>
+          newTriggers.get(trigger.id)
+        )
+      );
+
+
+      triggerBars = Array.from(barsToDelete).map(([index, trigger]) => {
         return this.removeTriggerBar(trigger);
       });
     } else {
-      console.log('UPDATE');
-      let barsToUpdate = newTriggers.filter(
-        (trigger: Trigger) =>
-          !isDeepEqual(
-            trigger,
-            getElementByChamp<Trigger>(this.triggeredEvents, 'id', trigger.id)
-          )
+      let barsToUpdate = new Map(
+        [...newTriggers].filter(
+          ([key, trigger]) =>
+            !isDeepEqual(trigger, this.triggeredEvents.get(trigger.id))
+        )
       );
-      triggerBars = barsToUpdate.map((trigger: Trigger, index: number) => {
+
+      triggerBars = Array.from(barsToUpdate).map(([index, trigger]) => {
         return this.updateTriggerBar(trigger);
       });
     }
 
     let graphic = { elements: triggerBars };
 
-    let mergeOptions = {
+/*     let mergeOptions = {
+
       graphic: graphic,
-    };
+      
+    };  */
+
+     this.mergeOptions = {
+        graphic: graphic,
+      }; 
 
     this.triggeredEvents = newTriggers;
 
-    echartsInstance.setOption(mergeOptions, false, false);
+    //echartsInstance.setOption(mergeOptions, true);
+  }
+
+  updateBioBars() {
+    let bioBars = [];
+    this.bioEvents.forEach((bioevent, key) => {
+      let onDrag = function (index: string, newTime: number) {};
+
+      let onClick = function (index) {};
+
+      bioBars.push(
+        this.createBar(
+          true,
+          bioevent.threshold,
+          bioevent.id,
+          bioevent.name,
+          '#6c757d',
+          onDrag,
+          onClick
+        )
+      );
+    });
+
+    let graphic = { elements: bioBars };
+
+        this.mergeOptions = {
+        graphic: graphic,
+      };  
+ 
+/*     let mergeOptions = {
+      graphic: graphic,
+    }; 
+
+    echartsInstance.setOption(mergeOptions, false,false);  */
   }
 
   updateTimeStampBars() {
-    let timeStampBars = this.timeStamps.map(
-      (timeStamp: Timestamp, index: number) => {
-        return this.createTriggerBar(
-          timeStamp,
-          index,
+    let timeStampBars;
+    this.timeStamps.forEach((timeStamp, index) => {
+      let onDrag = function (index: string, newTime: number) {};
+
+      let onClick = function (index) {};
+
+      timeStampBars.push(
+        this.createBar(
+          false,
+          timeStamp.time,
+          timeStamp.id,
+          timeStamp.name,
           '#6c757d',
-          this.modele.timeStamps
-        );
-      }
-    );
+          onDrag,
+          onClick
+        )
+      );
+    });
 
     let graphic = { elements: timeStampBars };
 
@@ -654,7 +734,7 @@ export class SceneComponent implements OnInit {
       graphic: graphic,
     };
 
-    echartsInstance.setOption(mergeOptions, false, false);
+    echartsInstance.setOption(mergeOptions, true);
   }
 
   // event handlers
@@ -697,12 +777,14 @@ export class SceneComponent implements OnInit {
 
           /* this.modele.triggeredEvents.push(newTrigger);
           this.updateTrigger.emit(newTrigger); */
-          this.modele.triggeredEvents.push(newTrigger);
+
           this.updateTrigger.emit(newTrigger);
           this.modeleService
             .createTrigger(newTrigger, this.modele)
             .subscribe((res: Trigger) => {
-            /*   newTrigger.id = res.id;
+              newTrigger.id = res.id;
+              this.modele.triggeredEvents.set(res.id, newTrigger);
+              /*   
               this.modele.triggeredEvents[
                 this.modele.triggeredEvents.length - 1
               ].id = res.id; */
@@ -710,7 +792,7 @@ export class SceneComponent implements OnInit {
             });
         } else {
           let newTimeStamp = result as Timestamp;
-          this.modele.timeStamps.push(newTimeStamp);
+          //   this.modele.timeStamps.push(newTimeStamp);
         }
       }
     });
