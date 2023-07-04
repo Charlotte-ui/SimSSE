@@ -1,5 +1,6 @@
 import { number } from 'echarts';
 import { Graph, NodeType, Event, Node, Link } from '../models/vertex/node';
+import { Vertex } from '../models/vertex/vertex';
 
 export function deleteElementFromArray(array: any[], element: any) {
   const index = array.indexOf(element);
@@ -36,6 +37,17 @@ export function getElementByChampMap<T>(
   );
   let res = resMap.size > 0 ? map.entries().next().value : undefined;
   return res;
+}
+
+/**
+ * return a map of the element of map1 that are not include in map2
+ * @param map1
+ * @param map1
+ */
+export function differenceMaps<T extends Vertex>(map1: Map<string, T>, map2: Map<string, T>) {
+  return new Map(
+    [...map1].filter(([key, element]) => !map2.get(element.id))
+  );
 }
 
 /**
@@ -130,11 +142,11 @@ export function isMapDeepEqual(
 ): boolean {
   if (map1.size !== map2.size) return false;
 
-  let keys = map1.keys();
+  let keys = Array.from(map1.keys());
 
-  for (let key in keys) {
-    const value1 = map1.get(key);
-    const value2 = map2.get(key);
+  for (let i in keys) {
+    const value1 = map1.get(keys[i]);
+    const value2 = map2.get(keys[i]);
 
     const isObjects = isObject(value1) && isObject(value2);
     if (
@@ -162,10 +174,8 @@ export function remove<T>(array: T[], element: T) {
  * @param color
  * @returns
  */
-export function shade(col, light) {
-  var r = parseInt(col.substr(1, 2), 16);
-  var g = parseInt(col.substr(3, 2), 16);
-  var b = parseInt(col.substr(5, 2), 16);
+export function shade(color, light) {
+  let [r, g, b] = hexToRgb(color);
 
   if (light < 0) {
     r = (1 + light) * r;
@@ -176,7 +186,14 @@ export function shade(col, light) {
     g = (1 - light) * g + light * 255;
     b = (1 - light) * b + light * 255;
   }
-  return color(r, g, b);
+  return rgbToHex(r, g, b);
+}
+
+function hexToRgb(color: string): [number, number, number] {
+  var r = parseInt(color.substr(1, 2), 16);
+  var g = parseInt(color.substr(3, 2), 16);
+  var b = parseInt(color.substr(5, 2), 16);
+  return [r, g, b];
 }
 
 function hex2(c) {
@@ -189,6 +206,13 @@ function hex2(c) {
   return s;
 }
 
-function color(r, g, b) {
+function rgbToHex(r, g, b) {
   return '#' + hex2(r) + hex2(g) + hex2(b);
+}
+
+export function colorContrast(color: string) {
+  let [r, g, b] = hexToRgb(color);
+
+  if (r * 0.299 + g * 0.587 + b * 0.114 > 186) return '#000000';
+  else return '#ffffff';
 }

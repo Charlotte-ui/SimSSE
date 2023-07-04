@@ -17,6 +17,7 @@ import {
   roundingWithDecimal,
 } from './tools';
 import { BioEvent, Comparison } from '../models/vertex/event';
+import { Button } from './display';
 
 export class Curve {
   name: string;
@@ -54,22 +55,24 @@ export class Curve {
   ): Map<string, Trigger> {
     this.setAllNodesStatesToFalse(modele.graph);
 
+
+    curves.forEach((curve:Curve)=>{
+      curve.prevValue = curve.variable.cible; // at t=0 the previous value is the target
+      curve.trend = 0; //by default there is no trend, the curve is constante
+    })
+
     for (let i = 0; i < duration; i++) {
       this.updateNodesStates(i, modele, curves); // each minute that pass we updates the states of the nodes
 
       curves.forEach((curve: Curve) => {
         if (i > 0) curve.prevValue = curve.values[i - 1][1];
-        else {
-          curve.prevValue = curve.variable.cible; // at t=0 the previous value is the target
-          curve.trend = 0; //by default there is no trend, the curve is constante
-        }
         if (modele.graph.nodes) curve.trend = curve.calculTrend(modele); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
         let newValue = roundingWithDecimal(curve.prevValue + curve.trend, 2);
         //let newValue = variable.cible + i*trend + this.gaussianRandom(0, variable.rand) ;
 
         if (newValue > curve.variable.max) newValue = curve.variable.max;
         if (newValue < curve.variable.min) newValue = curve.variable.min;
-        curve.values.push([i, newValue]);
+        curve.values[i] = [i, newValue];
       });
     }
 
@@ -175,6 +178,9 @@ export class Curve {
             ' threshold ',
             bioEvent.threshold
           );
+          console.log("curve ",curve.name," ",curve.prevValue)
+          console.log("bioEvent ",bioEvent)
+           console.log("t ",t)
           this.triggerBioEvent(node as Event, t, triggeredEvents);
         }
 
@@ -256,6 +262,7 @@ export class Curve {
           editable: false,
           id: triggeredEvents.size,
           name: timer.name,
+          color:Button.getButtonByType(NodeType.timer).color
         })
       );
       timer.state = LinkType.pause; // the timer end
@@ -265,19 +272,18 @@ export class Curve {
   private static triggerBioEvent(
     bioevent: Event,
     t: number,
-    triggeredEvents: Map<string, Trigger>
+    triggeredEvents: Map<string, Trigger>,
   ) {
-    console.log('triggerBioEvent');
-
     // the bioevent triggered one time when the thresold is pass
     triggeredEvents.set(
-      bioevent.id,
+      bioevent.template.id+':1',
       new Trigger({
         time: t-2,
         in: bioevent.id,
         editable: false,
-        id: triggeredEvents.size,
+        id: bioevent.template.id+':1',
         name: bioevent.template.name,
+        color : Button.getButtonByType(EventType.bio).color
       })
     );
 

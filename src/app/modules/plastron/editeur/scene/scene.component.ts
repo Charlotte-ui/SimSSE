@@ -21,6 +21,8 @@ import {
   isDeepEqual,
   remove,
   isMapDeepEqual,
+  colorContrast,
+  differenceMaps,
 } from 'src/app/functions/tools';
 import { Button, IButton } from 'src/app/functions/display';
 import { Edge } from 'src/app/models/vertex/vertex';
@@ -29,6 +31,7 @@ import { ModeleService } from 'src/app/services/modele.service';
 import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-delete-dialog/confirm-delete-dialog.component';
 import { finalize } from 'rxjs';
 import { BioEvent } from 'src/app/models/vertex/event';
+import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 
 var echartsInstance: ECharts;
 var scene: SceneComponent;
@@ -65,16 +68,7 @@ export class SceneComponent implements OnInit {
   timeStamps: Map<string, Timestamp> = new Map<string, Timestamp>();
   bioEvents: Map<string, BioEvent> = new Map<string, BioEvent>();
 
-  _modele!: Modele;
-  get modele(): Modele {
-    return this._modele;
-  }
-  @Input() set modele(value: Modele) {
-    if (value) {
-      this._modele = value;
-      this.updateChart();
-    }
-  }
+  @Input() modele: Modele;
 
   _curves!: Map<string, Curve>;
   get curves(): Map<string, Curve> {
@@ -88,7 +82,7 @@ export class SceneComponent implements OnInit {
   }
 
   @Input() set draw(value: any[]) {
-    console.log('draw ',this.modele);
+    console.log('SCENE draw ', this.modele, ' ', this.curves);
     this.updateChart();
   }
 
@@ -161,148 +155,6 @@ export class SceneComponent implements OnInit {
       animationDurationUpdate: 1500,
       animationEasingUpdate: 'quinticInOut',
       series: [],
-      /*      graphic: {
-        elements: [
-          {
-            type: 'group',
-            left: 30,
-            draggable: 'horizontal',
-            ondrag: function (params) {
-              var pointInPixel = [params.offsetX, params.offsetY];
-              console.log('pointInPixel ', pointInPixel);
-              //var pointInGrid = myChart.convertFromPixel('grid', pointInPixel);
-
-              //var xTime = new Date(pointInGrid[0]);
-
-              //get closest value from cursor
-              /*  var point = data.reduce((prev, curr) =>
-                Math.abs(new Date(curr[0]).valueOf() - xTime.valueOf()) <
-                Math.abs(new Date(prev[0]).valueOf() - xTime.valueOf())
-                  ? curr
-                  : prev
-              ); */
-
-      //console.log('poi', new Date(pointInGrid[0]), new Date(point[0]), point[1])
-      /* 
-              var d = document.getElementById('value2');
-              d.style.left = params.offsetX + 'px';
-              d.innerHTML = point[1]; 
-            },
-            onclick: function (params) {
-              console.log('clic ', params);
-              //var pointInGrid = myChart.convertFromPixel('grid', pointInPixel);
-
-              //var xTime = new Date(pointInGrid[0]);
-
-              //get closest value from cursor
-              /*  var point = data.reduce((prev, curr) =>
-                Math.abs(new Date(curr[0]).valueOf() - xTime.valueOf()) <
-                Math.abs(new Date(prev[0]).valueOf() - xTime.valueOf())
-                  ? curr
-                  : prev
-              ); */
-
-      //console.log('poi', new Date(pointInGrid[0]), new Date(point[0]), point[1])
-      /* 
-              var d = document.getElementById('value2');
-              d.style.left = params.offsetX + 'px';
-              d.innerHTML = point[1]; 
-            },
-
-            children: [
-              {
-                id: 'bar1',
-                type: 'rect',
-                top: '30px',
-                shape: {
-                  width: 2,
-                  height: 685,
-                },
-                style: {
-                  fill: '#ff0000',
-                },
-                cursor: 'ew-resize',
-              },
-              {
-                type: 'circle',
-                top: '74px',
-                shape: {
-                  r: 10,
-                },
-                style: {
-                  fill: '#ff0000',
-                },
-              },
-              {
-                type: 'text',
-                z: 100,
-                top: 'middle',
-                left: 'center',
-                style: {
-                  text: [
-                    '这个文本框的 bounding 为 "raw"',
-                    '表示定位时仅仅取 group 自己的',
-                    '未经过 transform 的包围盒。',
-                  ].join('\n'),
-                  font: '20px "STHeiti", sans-serif',
-                },
-              },
-            ],
-          },
-          {
-            type: 'group',
-            left: 'center',
-            draggable: 'horizontal',
-            ondrag: function (params) {
-              var pointInPixel = [params.offsetX, params.offsetY];
-              console.log('pointInPixel ', pointInPixel);
-              //var pointInGrid = myChart.convertFromPixel('grid', pointInPixel);
-
-              //var xTime = new Date(pointInGrid[0]);
-
-              //get closest value from cursor
-              /*  var point = data.reduce((prev, curr) =>
-                Math.abs(new Date(curr[0]).valueOf() - xTime.valueOf()) <
-                Math.abs(new Date(prev[0]).valueOf() - xTime.valueOf())
-                  ? curr
-                  : prev
-              ); */
-
-      //console.log('poi', new Date(pointInGrid[0]), new Date(point[0]), point[1])
-      /* 
-              var d = document.getElementById('value2');
-              d.style.left = params.offsetX + 'px';
-              d.innerHTML = point[1]; 
-            },
-
-            children: [
-              {
-                id: 'bar2',
-                type: 'rect',
-                top: '30px',
-                shape: {
-                  width: 2,
-                  height: 685,
-                },
-                style: {
-                  fill: '#ff0000',
-                },
-                cursor: 'ew-resize',
-              },
-              {
-                type: 'circle',
-                top: '740px',
-                shape: {
-                  r: 10,
-                },
-                style: {
-                  fill: '#ff0000',
-                },
-              },
-            ],
-          },
-        ],
-      }, */
     };
   }
 
@@ -313,7 +165,11 @@ export class SceneComponent implements OnInit {
    * update them if needed
    */
   updateChart() {
-    let series: any = Array.from(this.curves).map(([key, curve]) => ({
+    console.log('updateChart');
+    console.log('this.modele.triggeredEvents ',this.modele.triggeredEvents,' ',this.modele.triggeredEvents.size);
+    console.log('this.triggeredEvents ',this.triggeredEvents);
+
+    let series: any[] = Array.from(this.curves).map(([key, curve]) => ({
       name: curve.name,
       type: 'line',
       data: curve.values,
@@ -322,7 +178,7 @@ export class SceneComponent implements OnInit {
     }));
 
     if (!isDeepEqual(series, this.series)) {
-      this.series = series;
+      this.series = structuredClone(series);
       this.mergeOptions = {
         series: this.series,
       };
@@ -330,7 +186,12 @@ export class SceneComponent implements OnInit {
 
     if (!isMapDeepEqual(this.modele.triggeredEvents, this.triggeredEvents)) {
       let update = () => {
-        if (echartsInstance && !isMapDeepEqual(this.modele.triggeredEvents, this.triggeredEvents)) {
+        console.log('update trigger bar');
+        console.log(
+          'this.modele.triggeredEvents ',
+          this.modele.triggeredEvents
+        );
+        if (echartsInstance) {
           this.updateTriggerBars();
         } else {
           setTimeout(update, 2000);
@@ -355,94 +216,24 @@ export class SceneComponent implements OnInit {
       }
     });
 
-     if (!isMapDeepEqual(bioevents, this.bioEvents)) {
+    console.log('bioevents ',bioevents)
+
+    if (!isMapDeepEqual(bioevents, this.bioEvents)) {
       let update = () => {
-        if (echartsInstance && echartsInstance['_model'] && bioevents.size !== this.bioEvents.size) {
-          this.bioEvents = bioevents;
-          this.updateBioBars();
+        if (
+          echartsInstance &&
+          echartsInstance['_model'] &&
+          bioevents.size !== this.bioEvents.size
+        ) {
+          this.updateBioBars(bioevents);
         } else {
           setTimeout(update, 2000);
         }
       };
 
       update();
-    } 
+    }
   }
-
-  /**
-   * update the graph data of the triggers (markline)
-   */
-  /*   updateMarklineData() {
-    // on détermine la hauteur de la markline en fct de la taille des courbes
-    this.markLineY = 0;
-    this.curves.forEach((curve) => {
-      if (
-        this.variableSelected[curve.name] &&
-        curve.currentMax > this.markLineY
-      )
-        this.markLineY = curve.currentMax;
-    });
-
-    this.markLineData = [];
-    this.modele.triggeredEvents.map((trigger: Trigger) => {
-      // time id
-      let markline = [];
-      let node = getNodeByID(this.modele.graph, trigger.in);
-      if (node) {
-        // si le node est présent sur le graph
-        let name;
-
-        switch (node.type) {
-          case NodeType.event:
-            name = (node as Event).template
-              ? (node as Event).template.name
-              : (node as Event).typeEvent;
-            break;
-          case NodeType.timer:
-            name = 'Fin ' + (node as Timer).name;
-            break;
-          default:
-            name = (node as Trend | Graph).name;
-        }
-
-        // TODO replace by ref
-        let color = 'event' in node ? '#FEEA00' : '#C8FFBE';
-
-        markline.push({
-          name: name,
-          xAxis: trigger.time,
-          yAxis: 0,
-          lineStyle: { color: color },
-        });
-        markline.push({
-          name: 'end',
-          xAxis: trigger.time,
-          yAxis: this.markLineY,
-          lineStyle: { color: color },
-        });
-
-        this.markLineData.push(markline);
-      }
-    });
-
-    this.modele.timeStamps.map((timeStamp: Timestamp) => {
-      let markline = [];
-      markline.push({
-        name: timeStamp.name,
-        xAxis: timeStamp.time,
-        yAxis: 0,
-        lineStyle: { color: '#6c757d' },
-      });
-      markline.push({
-        name: 'end',
-        xAxis: timeStamp.time,
-        yAxis: this.markLineY,
-        lineStyle: { color: '#6c757d' },
-      });
-
-      this.markLineData.push(markline);
-    });
-  } */
 
   createBar(
     horizontal: boolean,
@@ -463,7 +254,7 @@ export class SceneComponent implements OnInit {
       $action: 'replace',
       x: horizontal ? 0 : offset,
       y: horizontal ? offset : 0,
-      draggable: horizontal ? 'vertical' : 'horizontal', // the drag is on the oppisite direction
+      draggable: horizontal ? false : 'horizontal', // 'vertical' the drag is on the oppisite direction
       ondrag: function (params) {
         let x = params.target.x;
         let y = params.target.y;
@@ -473,7 +264,7 @@ export class SceneComponent implements OnInit {
         let newPosition = horizontal
           ? Math.round(pointInGrid[1])
           : Math.round(pointInGrid[0]);
-        if (newPosition !== position) {
+        if (newPosition !== position && newPosition>=0) {
           onDrag(index, newPosition);
         }
       },
@@ -484,6 +275,7 @@ export class SceneComponent implements OnInit {
       children: [
         {
           id: 'bar_' + index,
+          $action: 'replace',
           z: 100,
           type: 'rect',
           left: horizontal ? '50px' : 'center',
@@ -491,7 +283,7 @@ export class SceneComponent implements OnInit {
           shape: horizontal
             ? {
                 width: 2000,
-                height: 3,
+                height: 1,
               }
             : {
                 width: 3,
@@ -504,18 +296,20 @@ export class SceneComponent implements OnInit {
         },
         {
           id: 'label_' + index,
+          $action: 'replace',
           type: 'text',
           z: 100,
           top: horizontal ? '-15px' : '35px',
           left: horizontal ? '65px' : 'center',
           style: {
-            text: label,
-            font: '15px, sans-serif',
+            text: horizontal ? 'Seuil ' + label : label,
+            font: horizontal ? '8px, sans-serif' : '15px, sans-serif',
           },
         },
         {
+          id: 'circle_' + index,
+          $action: 'replace',
           type: 'circle',
-           id: 'circle_' + index,
           top: horizontal ? 'center' : '445px',
           left: horizontal ? '42px' : '-9px',
           z: 100,
@@ -527,67 +321,68 @@ export class SceneComponent implements OnInit {
           },
         },
         {
-          type: 'text',
           id: 'time_' + index,
+          $action: 'replace',
+          type: 'text',
           z: 100,
           top: horizontal ? 'center' : '448.5px',
           left: horizontal ? '43px' : 'center',
           style: {
             text: position,
             font: '8px, sans-serif',
-            fill: '#000000',
+            fill: colorContrast(color),
           },
         },
       ],
     };
   }
 
-  removeTriggerBar(trigger: Trigger | Timestamp) {
+  updateBar(horizontal: boolean, index: string, position: number) {
+    let offset = horizontal
+      ? echartsInstance.convertToPixel('grid', [0, position])[1]
+      : echartsInstance.convertToPixel('grid', [position, 0])[0];
     return {
-      $action: 'remove',
-      id: trigger.id,
+      id: index,
+      x: horizontal ? 0 : offset,
+      y: horizontal ? offset : 0,
       children: [
         {
-          id: 'bar_' + trigger.id,
-
+          id: 'time_' + index,
           style: {
-            fill: undefined,
+            text: position,
           },
         },
       ],
     };
   }
 
-  updateTriggerBar(trigger: Trigger | Timestamp) {
-    let left = echartsInstance.convertToPixel('grid', [trigger.time, 0])[0];
-    return {
-      id: trigger.id,
-      x: left,
-      children: [
+  removeBar(index:string) {
+    return [
         {
-          id: 'time_' + trigger.id,
-          style: {
-            text: trigger.time,
-          },
+          id: 'bar_' + index,
+         $action: 'remove',
         },
-      ],
-    };
+        {
+          id: 'label_' + index,
+         $action: 'remove',
+        },
+        {
+          id: 'circle_' + index,
+          $action: 'remove',
+        },
+        {
+          id: 'time_' + index,
+          $action: 'remove',
+        },
+      ]
   }
 
   updateTriggerBars() {
     let newTriggers = structuredClone(this.modele.triggeredEvents);
-
-    let triggerBars;
-
-    this.triggeredEvents;
+    let triggerBars = [];
 
     if (this.triggeredEvents.size < newTriggers.size) {
-      let barsToCreate = new Map(
-        [...newTriggers].filter(
-          ([key, trigger]) => !this.triggeredEvents.get(trigger.id)
-        )
-      );
-
+      let barsToCreate = differenceMaps<Trigger>(newTriggers,this.triggeredEvents)
       triggerBars = Array.from(barsToCreate).map(([index, trigger]) => {
         let onDrag = function (index: string, newTime: number) {
           let newTrigger = scene.modele.triggeredEvents.get(index);
@@ -598,28 +393,29 @@ export class SceneComponent implements OnInit {
         };
 
         let onClick = function (index) {
-          const dialogRef = scene.dialog.open(ConfirmDeleteDialogComponent, {
-            data: [
-              'Supprimer le trigger ' + trigger.name,
-              'Voulez-vous supprimer le trigger ' + trigger.name + ' ?',
-            ],
-          });
+          let trigger = scene.modele.triggeredEvents.get(index);
+          if (trigger.in !== EventType.start) {
+            // we do not delete the start trigger
+            const dialogRef = scene.dialog.open(ConfirmDeleteDialogComponent, {
+              data: [
+                'Supprimer le trigger ' + trigger.name,
+                'Voulez-vous supprimer le trigger ' + trigger.name + ' ?',
+              ],
+            });
 
-          dialogRef.afterClosed().subscribe((result) => {
-            if (result) {
-              if (trigger.editable) {
-                scene.modeleService
-                  .deleteTrigger(trigger as unknown as Trigger)
-                  .subscribe(() => {
-                    location.reload();
-                    // remove(scene.triggeredEvents,trigger)
-                    // list.splice(index, 1);
-                    scene.modele.triggeredEvents.delete(trigger.id);
-                    scene.updateTrigger.emit(undefined);
-                  });
+            dialogRef.afterClosed().subscribe((result) => {
+              if (result) {
+                if (trigger.editable) {
+                  scene.modeleService
+                    .deleteTrigger(trigger as unknown as Trigger)
+                    .subscribe(() => {
+                      scene.modele.triggeredEvents.delete(trigger.id);
+                      scene.updateTrigger.emit(undefined);
+                    });
+                }
               }
-            }
-          });
+            });
+          }
         };
 
         return this.createBar(
@@ -634,78 +430,89 @@ export class SceneComponent implements OnInit {
       });
 
     } else if (this.triggeredEvents.size > newTriggers.size) {
-
-      let barsToDelete = new Map(
-        [...this.triggeredEvents].filter(([key, trigger]) =>
-          newTriggers.get(trigger.id)
-        )
-      );
-
+      let barsToDelete = differenceMaps<Trigger>(this.triggeredEvents,newTriggers)
+      console.log('BAR TO DELETE ', barsToDelete);
 
       triggerBars = Array.from(barsToDelete).map(([index, trigger]) => {
-        return this.removeTriggerBar(trigger);
-      });
+        return this.removeBar(trigger.id);
+      })[0];
     } else {
+      console.log('BAR TO UPDATE');
       let barsToUpdate = new Map(
-        [...newTriggers].filter(
-          ([key, trigger]) =>
-            !isDeepEqual(trigger, this.triggeredEvents.get(trigger.id))
-        )
+        [...newTriggers].filter(([key, trigger]) => {
+          return !isDeepEqual(trigger, this.triggeredEvents.get(trigger.id));
+        })
       );
 
       triggerBars = Array.from(barsToUpdate).map(([index, trigger]) => {
-        return this.updateTriggerBar(trigger);
+        return this.updateBar(false, trigger.id, trigger.time);
       });
     }
 
+    console.log('triggerBars ',triggerBars)
+
     let graphic = { elements: triggerBars };
 
-/*     let mergeOptions = {
-
+    this.mergeOptions = {
       graphic: graphic,
-      
-    };  */
+      series: this.series,
+    };
 
-     this.mergeOptions = {
-        graphic: graphic,
-      }; 
+          console.log('echartsInstance ',echartsInstance);
 
     this.triggeredEvents = newTriggers;
 
-    //echartsInstance.setOption(mergeOptions, true);
   }
 
-  updateBioBars() {
+  updateBioBars(newBioevents: Map<string, BioEvent>) {
     let bioBars = [];
-    this.bioEvents.forEach((bioevent, key) => {
-      let onDrag = function (index: string, newTime: number) {};
 
-      let onClick = function (index) {};
+    if (this.bioEvents.size < newBioevents.size) {
+      let barsToCreate = differenceMaps<BioEvent>(newBioevents,this.bioEvents)
 
-      bioBars.push(
-        this.createBar(
+      bioBars = Array.from(barsToCreate).map(([index, bioevent]) => {
+        let onDrag = function (index: string, newTime: number) {
+          // biobars are not draggable
+        };
+
+        let onClick = function (index) {
+          //biobars are not clickable
+        };
+
+        return this.createBar(
           true,
           bioevent.threshold,
           bioevent.id,
           bioevent.name,
-          '#6c757d',
+          VariablePhysioTemplate.variables.get(bioevent.source).color,
           onDrag,
           onClick
-        )
+        );
+      });
+    }
+    else if (this.bioEvents.size > newBioevents.size) {
+      let barsToDelete = differenceMaps<BioEvent>(this.bioEvents,newBioevents)
+      bioBars = Array.from(barsToDelete).map(([index, bioevent]) => {
+        return this.removeBar(bioevent.id);
+      })[0];
+    }else {
+      let barsToUpdate = new Map(
+        [...newBioevents].filter(([key, bioevent]) => {
+          return !isDeepEqual(bioevent, this.bioEvents.get(bioevent.id));
+        })
       );
-    });
+
+      bioBars = Array.from(barsToUpdate).map(([index, bioevent]) => {
+        return this.updateBar(false, bioevent.id, bioevent.threshold);
+      });
+    }
+
 
     let graphic = { elements: bioBars };
-
-        this.mergeOptions = {
-        graphic: graphic,
-      };  
- 
-/*     let mergeOptions = {
+    this.mergeOptions = {
       graphic: graphic,
-    }; 
-
-    echartsInstance.setOption(mergeOptions, false,false);  */
+    };
+    this.bioEvents = newBioevents;
   }
 
   updateTimeStampBars() {
@@ -733,6 +540,8 @@ export class SceneComponent implements OnInit {
     let mergeOptions = {
       graphic: graphic,
     };
+
+    
 
     echartsInstance.setOption(mergeOptions, true);
   }
@@ -771,28 +580,19 @@ export class SceneComponent implements OnInit {
       if (result) {
         if (classe.className === 'Trigger') {
           let newTrigger = result as Trigger;
-          newTrigger.name = Node.getName(
-            getNodeByID(this.modele.graph, newTrigger.in)
-          );
-
-          /* this.modele.triggeredEvents.push(newTrigger);
-          this.updateTrigger.emit(newTrigger); */
-
-          this.updateTrigger.emit(newTrigger);
+          let nodeTriggered =  getNodeByID(this.modele.graph, newTrigger.in)     
           this.modeleService
             .createTrigger(newTrigger, this.modele)
             .subscribe((res: Trigger) => {
               newTrigger.id = res.id;
+              newTrigger.color = Button.getButtonByType(Node.getType(nodeTriggered)).color
+              newTrigger.name = Node.getName(nodeTriggered);
               this.modele.triggeredEvents.set(res.id, newTrigger);
-              /*   
-              this.modele.triggeredEvents[
-                this.modele.triggeredEvents.length - 1
-              ].id = res.id; */
-              location.reload();
+               this.updateTrigger.emit(newTrigger);
             });
         } else {
           let newTimeStamp = result as Timestamp;
-          //   this.modele.timeStamps.push(newTimeStamp);
+           this.modele.timeStamps.set(newTimeStamp.id,newTimeStamp);
         }
       }
     });

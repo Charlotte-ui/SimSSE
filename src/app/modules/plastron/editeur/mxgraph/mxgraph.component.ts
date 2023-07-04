@@ -287,21 +287,25 @@ export class MxgraphComponent implements AfterViewInit {
     graph.getTooltipForCell = function (cell) {
       let tt = undefined;
       let node = getNodeByID(DATA, cell.id);
-      if (node && node.type == NodeType.trend) {
-        tt =
-          'Variable cible : ' +
-          getElementByChamp<VariablePhysioTemplate>(
-            variablesTemplate,
-            'id',
-            (node as Trend).target
-          ).name +
-          '\n Paramètre : ' +
-          (node as Trend).parameter;
+
+      switch (Node.getType(node)) {
+        case NodeType.trend:
+          tt =
+            'Variable cible : ' + VariablePhysioTemplate.variables.get((node as Trend).target).name +
+            '\n Paramètre : ' +
+            (node as Trend).parameter;
+          break;
+          case NodeType.timer: tt = (node as Timer).duration + ' min';
+          break;
+          case EventType.bio : 
+          let bioevent = BioEvent.bioevents.get((node as Event).template.id)
+          tt =
+            'Variable source : ' + VariablePhysioTemplate.variables.get(bioevent.source).name +
+            '\n Seuil : ' + bioevent.comparison +' '+bioevent.threshold
+          break;
       }
 
-      if (node.type === NodeType.timer) {
-        tt = (node as Timer).duration + ' min';
-      }
+      
       return tt;
 
       /* if (this.model.isEdge(cell))

@@ -41,6 +41,7 @@ import {
   pushWithoutDuplicateByChamp,
 } from 'src/app/functions/tools';
 import { ProfilService } from 'src/app/services/profil.service';
+import { Button } from 'src/app/functions/display';
 
 @Component({
   selector: 'app-editeur',
@@ -279,6 +280,7 @@ export class EditeurComponent implements OnInit {
         triggers.map((trigger: Trigger) => {
           let node = getNodeByID(this.modele.graph, trigger.in);
           trigger.name = Node.getName(node);
+          trigger.color = Button.getButtonByType(Node.getType(node)).color
         });
 
         this.modele.triggeredEvents = new Map(triggers.map((trigger) => [trigger.id, trigger]));
@@ -376,7 +378,6 @@ export class EditeurComponent implements OnInit {
           .subscribe((node: Node) => {
             element.id = node.id;
             this.modele.graph.nodes.set(element.id,element as Node);
-          //  this.modele.graph = structuredClone(this.modele.graph); // TODO force change detection by forcing the value reference update
             this.updateCurve();
           });
       }
@@ -455,6 +456,8 @@ export class EditeurComponent implements OnInit {
       ([key,trigger]) =>
        trigger.editable
     ))
+
+    console.log('clean this.modele.triggeredEvents ',structuredClone(this.modele.triggeredEvents))
     
     let newtriggered = Curve.calculCurves(structuredClone(this.modele),this.curves,this.duration);
       console.log("newtriggered ",newtriggered)

@@ -146,7 +146,7 @@ export class Button {
       name: 'Start',
       type: EventType.start,
       icon: 'assets/icons/start.png',
-      color: '#FFFFFF',
+      color: '#000000',
       outils: false,
       symbol: 'rect',
       event:'add',

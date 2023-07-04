@@ -1,6 +1,7 @@
 import { Button } from "../functions/display";
 import { Nameable } from "./interfaces/nameable";
 import { Timeable } from "./interfaces/timeable";
+import { EventType } from "./vertex/node";
 import { Edge, Vertex } from "./vertex/vertex";
 
 export class Trigger extends Edge implements Timeable {
@@ -16,11 +17,11 @@ export class Trigger extends Edge implements Timeable {
     constructor(object?:any) {
         super(object);
         this.time = (object?.time)?object.time:0;
-        this.editable = (object?.editable !== undefined)?object.editable:true;
         this.name = (object?.name )?object.name:'';
         this.type = (object?.type)?object.type:null;
         this.in = (object?.in)?object.in:null;
-        this.color = (this.editable)?Button.getButtonByType('trigger').color:Button.getButtonByType('timer').color;
+        this.color = (object?.color)?object.color:'#000000';
+        this.editable = (object?.editable !== undefined)?object.editable:true;
     }
 
     public static override instanciateListe<T>(list: any[]): T[] {  
