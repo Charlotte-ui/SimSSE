@@ -55,12 +55,13 @@ export class ScenarioComponent implements OnInit {
         switchMap((response: Data) => {
           this.scenario = response['data'];
           this.oldScenario = { ...response['data'] };
-          this.scenario.tags = [];
+          this.scenario.tags = new  Map<string,Tag>();
+          
 
           this.scenarioService
             .getTags(this.scenario)
             .subscribe((tags: Tag[]) => {
-              this.scenario.tags = tags;
+              this.scenario.tags = new Map(tags.map((tag:Tag) => [tag.id, tag]));
               this.oldTags = [...tags];
             });
 
@@ -110,12 +111,19 @@ export class ScenarioComponent implements OnInit {
 
     // save the tags
 
-    let newTags = this.scenario.tags.filter(
-      (tag: Tag) => this.oldTags.indexOf(tag) < 0
+    let newTags =[]; 
+    let tagsToDelete = [];
+
+    this.scenario.tags.forEach(
+      (tag: Tag) => {
+        if(this.oldTags.indexOf(tag)<0) newTags.push(tag)
+      }
     );
 
-    let tagsToDelete = this.oldTags.filter(
-      (tag: Tag) => !tag.id || this.scenario.tags.indexOf(tag) < 0
+     this.oldTags.forEach(
+      (tag: Tag) => {
+        if(!this.scenario.tags.get(tag.id)) tagsToDelete.push(tag)
+      }
     );
 
     if (newTags.length > 0)

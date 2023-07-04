@@ -5,7 +5,11 @@
         <ng-container *ngIf="chooseTitle">
 
           <mat-card-header>
-            <mat-card-title>Titre</mat-card-title>
+            <mat-card-title>Titre
+              <button mat-icon-button matTooltip="Modifier le titre" (click)="saveTitle()"
+                [ngClass]="{ activate: titleToSave }" [disabled]="!titleToSave">
+                <mat-icon>save</mat-icon>
+              </button></mat-card-title>
           </mat-card-header>
           <mat-card-content>
             <mat-form-field>
@@ -22,7 +26,11 @@
 
 
         <mat-card-header>
-          <mat-card-title>Description</mat-card-title>
+          <mat-card-title>Description
+          <button mat-icon-button matTooltip="Modifier la description" (click)="saveDescription()" [ngClass]="{ activate: descriptionToSave }"
+            [disabled]="!descriptionToSave">
+            <mat-icon>save</mat-icon>
+          </button></mat-card-title>
         </mat-card-header>
         <mat-card-content>
           <mat-form-field>
@@ -46,7 +54,7 @@
           <app-tags
             *ngIf="modele"
             [allTags]="allTags"
-            [tags]="modele.tags"
+            [tags]="arrayTag"
             (newTags)="updateTags($event)"
           ></app-tags>
         </mat-card-content>

@@ -23,7 +23,7 @@ export class Modele extends Vertex implements Listable {
   template: boolean | string;
   graph: Graph;
   triggeredEvents: Map<string,Trigger>;
-  tags: Tag[];
+  tags: Map<string,Tag>;
   timeStamps: Map<string,Timestamp>;
 
   public static override className = 'Modele';
@@ -32,7 +32,7 @@ export class Modele extends Vertex implements Listable {
     super(object);
     this.title = object?.title ? object.title : '';
     this.description = object?.description ? object.description : '';
-    this.tags = object?.tags ? object.tags : [];
+    this.tags = object?.tags ? object.tags : new Map<string,Tag>();
     this.triage = object?.triage ? object.triage : 0;
     this.template = object?.template ? object.template : 0;
     this.graph = object?.graph ? object.graph : 0;

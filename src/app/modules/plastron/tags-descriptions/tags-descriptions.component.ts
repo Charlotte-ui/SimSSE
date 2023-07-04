@@ -20,6 +20,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { RegleService } from '../../../services/regle.service';
 import { Tag } from '../../../models/vertex/tag';
 import { TagService } from '../../../services/tag.service';
+import { differenceMaps } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-tags-descriptions',
@@ -27,10 +28,11 @@ import { TagService } from '../../../services/tag.service';
   styleUrls: ['./tags-descriptions.component.less'],
 })
 export class TagsDescriptionsComponent {
-  oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
-
+  titleToSave:boolean = false;
+  descriptionToSave:boolean = false;
   form: FormGroup;
   _modele!: Modele;
+  arrayTag:Tag[];
   get modele(): Modele {
     return this._modele;
   }
@@ -39,8 +41,9 @@ export class TagsDescriptionsComponent {
       this._modele = value;
 
       this.tagService.getTags(value.id, 'Modele').subscribe((tags: Tag[]) => {
-        value.tags = tags;
-        this.oldTags = [...tags];
+
+        value.tags = new Map(tags.map((tag:Tag) => [tag.id, tag]));
+        this.arrayTag = tags;
       });
 
       this.form = this.fb.group(value);
@@ -48,17 +51,16 @@ export class TagsDescriptionsComponent {
       this.form.valueChanges.subscribe((newModele: Modele) => {
         if (this.modele.description != newModele.description) {
           this.modele.description = newModele.description;
-          this.updateModele.emit('description');
+          this.descriptionToSave = true;          
         }
         if (this.modele.title != newModele.title) {
           this.modele.title = newModele.title;
-          this.updateModele.emit('title');
+          this.titleToSave = true;
         }
       });
     }
   }
 
-  @Output() updateModele = new EventEmitter<string>();
 
   @Input() allTags!: Tag[];
   @Input() chooseTitle!: boolean;
@@ -93,21 +95,33 @@ export class TagsDescriptionsComponent {
   }
 
   updateTags(tags: Tag[]) {
-    let newTags = this.modele.tags.filter(
-      (tag: Tag) => this.oldTags.indexOf(tag) < 0
-    );
+    let newTags = new Map(tags.map((tag:Tag) => [tag.id, tag]));
 
-    let tagsToDelete = this.oldTags.filter(
-      (tag: Tag) => !tag.id || this.modele.tags.indexOf(tag) < 0
-    );
+    let tagsToCreate = differenceMaps(newTags,this.modele.tags)
+    let tagsToDelete = differenceMaps(this.modele.tags,newTags)
 
-    this.modele.tags = tags;
-    this.newTags.emit({ newTags: newTags, tagsToDelete: tagsToDelete });
+    this.modelService.updateTags(this.modele,Array.from(tagsToCreate.values()),Array.from(tagsToDelete.values())).subscribe(()=>{
+      newTags.forEach((tag:Tag) => {
+        this.modele.tags.set(tag.id,tag) 
+      });
+
+      tagsToDelete.forEach((tag:Tag) => {
+        this.modele.tags.delete(tag.id) 
+      });
+    })
+
   }
 
   updateTriage(event) {
     this.modele.triage = event.value;
+    this.modelService.updateModele(this.modele,['triage']).subscribe()
+  }
 
-    this.updateModele.emit('triage');
+  saveTitle(){
+    this.modelService.updateModele(this.modele,['title']).subscribe(()=>this.titleToSave = false)
+  }
+
+  saveDescription(){
+    this.modelService.updateModele(this.modele,['description']).subscribe(()=>this.descriptionToSave = false)
   }
 }

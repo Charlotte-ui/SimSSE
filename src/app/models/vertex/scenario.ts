@@ -9,7 +9,7 @@ import { TagService } from 'src/app/services/tag.service';
 export class Scenario extends Vertex implements Listable {
   title: string;
   description: string;
-  tags: Tag[];
+  tags: Map<string,Tag>;
   UA: number;
   implique: number;
   psy: number;
@@ -27,7 +27,7 @@ export class Scenario extends Vertex implements Listable {
     super(object);
     this.title = object?.title ? object.title : '';
     this.description = object?.description ? object.description : '';
-    this.tags = object?.tags ? object.tags : [];
+    this.tags = object?.tags ? object.tags : new Map<string,Tag>();
     this.UA = object?.UA ? object.UA : 0;
     this.implique = object?.implique ? object.implique : 0;
     this.decede = object?.decede ? object.decede : 0;

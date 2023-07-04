@@ -4,6 +4,7 @@ import {
   concat,
   concatMap,
   delay,
+  forkJoin,
   from,
   map,
   of,
@@ -27,6 +28,7 @@ import { NodeService } from './node.service';
 import { Trigger } from '../models/trigger';
 import { getNodeByID } from '../functions/tools';
 import { TagService } from './tag.service';
+import { Tag } from '../models/vertex/tag';
 
 @Injectable({
   providedIn: 'root',
@@ -285,6 +287,23 @@ export class ModeleService {
       'time',
       trigger.time.toString()
     );
+  }
+
+  updateTags(modele:Modele,newTags: Tag[],tagsToDelete: Tag[]){
+    let requests: Observable<any>[] = [of(undefined)];
+     if (newTags.length > 0)
+      requests.push(
+        this.tagService.addTagsToSource(newTags, modele.id, 'modele')
+      );
+
+    if (tagsToDelete.length > 0)
+      requests.push(
+        this.tagService.deleteTagsFromSource(tagsToDelete, modele.id)
+      );
+
+      return forkJoin(requests)
+
+
   }
 
   /**

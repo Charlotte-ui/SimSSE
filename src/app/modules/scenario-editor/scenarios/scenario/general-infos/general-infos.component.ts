@@ -6,7 +6,7 @@ import {
   ImageRole,
   ImageObject,
 } from 'src/app/services/image.service';
-import { getElementByChamp } from 'src/app/functions/tools';
+import { differenceMaps, getElementByChamp } from 'src/app/functions/tools';
 import { Observable, concat, concatMap, from, zipAll } from 'rxjs';
 import { FormBuilder } from '@angular/forms';
 import { Scenario } from 'src/app/models/vertex/scenario';
@@ -48,6 +48,7 @@ export class GeneralInfosComponent {
   coverImage!: Image;
   oldMapImage!: Image;
   oldCoverImage!: Image;
+  arrayTag :Tag[];
 
 
   @Input() plastronsCreated:number;
@@ -61,6 +62,8 @@ export class GeneralInfosComponent {
     if (value) {
       // if value isnt undefined
       this._scenario = value;
+      this.arrayTag =Array.from(this.scenario.tags.values()) 
+
 
       let scenarioGenalInfo = structuredClone(value);
       delete scenarioGenalInfo.coordPMA; // les coordonnées sont gérées dans groupes
@@ -115,7 +118,6 @@ export class GeneralInfosComponent {
 
   @Output() newTotalPlastron = new EventEmitter<number>();
   @Output() updateScenario = new EventEmitter<Scenario>();
-  @Output() updateTags = new EventEmitter<Tag[]>();
   @Output() map = new EventEmitter<Image>();
 
   constructor(
@@ -195,5 +197,23 @@ export class GeneralInfosComponent {
       .subscribe();
 
     this.oldCoverImage = event.value;
+  }
+
+  updateTag(tags: Tag[]){
+    let newTags = new Map(tags.map((tag:Tag) => [tag.id, tag]));
+
+    let tagsToCreate = differenceMaps(newTags,this.scenario.tags)
+    let tagsToDelete = differenceMaps(this.scenario.tags,newTags)
+
+    this.scenarioService.updateTags(this.scenario,Array.from(tagsToCreate.values()),Array.from(tagsToDelete.values())).subscribe(()=>{
+      newTags.forEach((tag:Tag) => {
+        this.scenario.tags.set(tag.id,tag) 
+      });
+
+      tagsToDelete.forEach((tag:Tag) => {
+        this.scenario.tags.delete(tag.id) 
+      });
+    })
+
   }
 }

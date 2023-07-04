@@ -58,17 +58,7 @@
 
     <app-triage *ngIf="modele || plastron" [triage]="getTriage()"></app-triage>
   </ng-container>
-
-  <button
-    *ngIf="plastron || scenario || modele"
-    mat-icon-button
-    [matTooltip]="getTooltip()"
-    (click)="save()"
-    [ngClass]="{ activate: changesToSave }"
-    [disabled]="!changesToSave"
-  >
-    <mat-icon>save</mat-icon>
-  </button>
+  
   <button
     *ngIf="plastron || modele"
     mat-icon-button
