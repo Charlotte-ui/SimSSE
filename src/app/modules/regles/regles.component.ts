@@ -31,6 +31,7 @@ export class ReglesComponent {
   constructor(public regleService: RegleService) {}
 
   ngOnInit(): void {
+
     this.regleService.getVariableTemplate().subscribe((response) => {
       this.variables = response;
       this.variablesDetails = [];
@@ -73,5 +74,10 @@ export class ReglesComponent {
     });
     m['sd'] = sd;
     return m;
+  }
+
+  getMap(type:string){
+    if(type == 'action' ) return Categorie.categories
+    else return VariablePhysioTemplate.variables
   }
 }

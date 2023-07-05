@@ -27,7 +27,7 @@ import {
 } from 'src/app/models/vertex/node';
 import * as echarts from 'echarts/types/dist/echarts';
 import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
-import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
+import { GraphEditeurDialogComponent } from '../mxgraph/graph-editeur-dialog/graph-editeur-dialog.component';
 import { NodeType } from 'src/app/models/vertex/node';
 import { EventType } from 'src/app/models/vertex/node';
 import {
@@ -56,7 +56,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
   get graph(): Graph {
     return this._graph;
   }
-  @Input() set graph(value: Graph) {
+/*   @Input() set graph(value: Graph) {
     if (value) {
       this._graph = value;
       if (value.links && value.links.length>0) this.initGraphLink();
@@ -64,7 +64,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
       if (value.nodes && value.links) this.updateChart();
 
     }
-  }
+  } */
 
   @Input() allBioevents!: BioEvent[];
   @Input() allActions!: Action[];
@@ -123,7 +123,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
   //initialisateurs
 
   initGraphData() {
-    this.graphData = new Array(this.graph.nodes.length);
+/*     this.graphData = new Array(this.graph.nodes.length);
 
     DataName = [];
     this.graph.nodes.forEach((node: Node, index: number) => {
@@ -145,9 +145,9 @@ export class EditeurGrapheNodalComponent implements OnInit {
         layout: 'none',
         value: [node.x, node.y],
       };
-    });
+    }); */
   }
-
+/* 
   initGraphLink() {
     this.graphLink = this.graph.links.map(link=> this.parseLinkIntoGraphLink(link))
   }
@@ -158,7 +158,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         target: link?.in, 
         lineStyle: { color: link?.start ? GREEN : RED },
       };
-  }
+  } */
 
   //updateurs
 
@@ -214,10 +214,10 @@ export class EditeurGrapheNodalComponent implements OnInit {
     this.echartsInstance = ec;
   }
 
-  onChartClick(event: any): void {
+/*   onChartClick(event: any): void {
     if (event.dataType == 'node') return this.onNodeClick(event);
     if (event.dataType == 'edge') return this.onEdgeClick(event);
-  }
+  } */
 
   onNodeClick(event: any) {
     let index = event.dataIndex;
@@ -256,7 +256,7 @@ export class EditeurGrapheNodalComponent implements OnInit {
         });
     }
 
-    if (dialogRef)
+/*     if (dialogRef)
       dialogRef.afterClosed().subscribe((result) => {
         if (result) {
           if (result.delete) {
@@ -282,10 +282,10 @@ export class EditeurGrapheNodalComponent implements OnInit {
 
           this.updateChart();
         }
-      });
+      }); */
   }
 
-  onEdgeClick(event: any) {
+/*   onEdgeClick(event: any) {
     let index = event.dataIndex;
     let link = this.graph.links[index];
     let dialogRef = this.dialog.open(DialogComponent, {
@@ -305,5 +305,5 @@ export class EditeurGrapheNodalComponent implements OnInit {
         this.updateLink.emit([result, index]);
       }
     });
-  }
+  } */
 }

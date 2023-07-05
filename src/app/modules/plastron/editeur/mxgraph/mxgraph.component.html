@@ -1,0 +1,29 @@
+<div id="demoGraph">
+  <div #graphContainer></div>
+</div>
+<div id="controls">
+  <button mat-mini-fab matTooltip="Zoomer" (click)="zoomIn()">
+    <mat-icon>zoom_in</mat-icon>
+  </button>
+  <button mat-mini-fab matTooltip="Dézoomer" (click)="zoomOut()">
+    <mat-icon>zoom_out</mat-icon>
+  </button>
+  <button mat-mini-fab matTooltip="Taille réelle" (click)="actual()">
+    <mat-icon>photo_size_select_actual</mat-icon>
+  </button>
+  <button mat-mini-fab matTooltip="Ajuster" (click)="fit()">
+    <mat-icon>photo_size_select_large</mat-icon>
+  </button>
+  <button mat-mini-fab matTooltip="Annuler" (click)="undo()">
+    <mat-icon>undo</mat-icon>
+  </button>
+  <button mat-mini-fab matTooltip="Refaire" (click)="redo()">
+    <mat-icon>redo</mat-icon>
+  </button>
+  <button *ngIf="editor" mat-mini-fab matTooltip="Grouper" (click)="group()" [disabled]="groupDisabled()">
+    <mat-icon>crop_din</mat-icon>
+  </button>
+  <button *ngIf="editor" mat-mini-fab matTooltip="Dégrouper" (click)="ungroup()" [disabled]="ungroupDisabled()">
+    <mat-icon>crop_free</mat-icon>
+  </button>
+</div>

@@ -4,5 +4,5 @@ import { Vertex } from '../vertex/vertex';
 export interface Listable extends Vertex {
   title: string;
   description: string;
-  tags: Tag[];
+  tags: Map<string,Tag>;
 }

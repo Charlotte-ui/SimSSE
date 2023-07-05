@@ -73,7 +73,7 @@ export class ListBoxComponent<T extends Listable> {
         )
         .subscribe((TagsArray: Tag[][]) => {
           this.elements.map((element: T, index: number) => {
-            element.tags = TagsArray[index];
+            element.tags = new Map(TagsArray[index].map((tag:Tag) => [tag.id, tag]));
           });
         });
     }
@@ -136,7 +136,7 @@ export class ListBoxComponent<T extends Listable> {
     this.filterTagElement = [];
     this.elements.forEach((element) => {
       if (
-        element.tags.filter((tag: Tag) => this.filterTag.includes(tag.value))
+        Array.from(element.tags).filter(([key,tag]) => this.filterTag.includes(tag.value))
           .length > 0
       ) {
         this.filterTagElement.push(element.title);
@@ -186,10 +186,10 @@ export class ListBoxComponent<T extends Listable> {
   }
 
   getColor() {
-    return this.button.getButtonByType(this.classe.getType({})).color;
+    return Button.getButtonByType(this.classe.getType({})).color;
   }
 
   getIcon() {
-    return this.button.getButtonByType(this.classe.getType({}))?.icon;
+    return Button.getButtonByType(this.classe.getType({}))?.icon;
   }
 }

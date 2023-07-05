@@ -13,12 +13,9 @@
           </mat-expansion-panel-header>
           <div class="panel-content">
             <app-barre-outils
-              [allBioevents]="allBioevents"
-              [allActions]="allActions"
-              [allGraphs]="allGraphs"
-              [variables]="variablesTemplate"
               [nodes]="modele.graph.nodes"
               (newElement)="addElement($event)"
+              (newStartTrends)="addStartTrends($event)"
             ></app-barre-outils>
           </div>
         </mat-expansion-panel>
@@ -35,17 +32,17 @@
     >
       <div class="row">
         <app-scene
-        *ngIf="curvesInitialized"
-          [modele]="modele"
-          [events]="events"
+          *ngIf="curvesInitialized"
+          [events]="actions"
           [curves]="curves"
+          [modele]="modele"
           [duration]="duration"
-          (updateTrigger)="updateTrigger.emit($event) ; updateCurve();"
-          (deleteTrigger)="deleteTrigger.emit($event) ; updateCurve();"
+          [draw]="draw"
+          (updateTrigger)="updateCurve()"
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">
-        <app-editeur-graphe-nodal
+        <!--         <app-editeur-graphe-nodal
           [variablesTemplate]="variablesTemplate"
           [graph]="modele.graph"
           [allBioevents]="allBioevents"
@@ -53,7 +50,13 @@
           [targetVariable]="targetVariable"
           (updateNode)="updateNodes($event)"
           (updateLink)="updateLinks($event)"
-        ></app-editeur-graphe-nodal>
+        ></app-editeur-graphe-nodal> -->
+        <app-mxgraph
+          [graphData]="modele.graph"
+          [variablesTemplate]="variablesTemplate"
+          [draw]="draw"
+          (updateGraphData)="updateGraph($event)"
+        ></app-mxgraph>
       </div>
     </div>
 

@@ -1,0 +1,37 @@
+th {
+  padding: 15px;
+}
+
+td {
+  text-align: center;
+}
+
+.broken {
+  background-color: red;
+}
+
+.scrollable-content {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 850px; // TODO : change dynamicly
+
+  > div {
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+mat-card {
+  width: fit-content;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.container {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  gap: 10px;
+}

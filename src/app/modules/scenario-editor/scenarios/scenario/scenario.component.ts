@@ -32,7 +32,7 @@ export class ScenarioComponent implements OnInit {
   plastronLoad = false; // have the plastrons been load in lot-plastrons component
   changesToSave = false;
   groupesToSave = false;
-  map:Image;
+  map: Image;
   scenarioToSave!: boolean;
   oldTags!: Tag[]; // array of tags before changes, use to define wich tag create add wich delete after changes
   oldScenario!: Scenario; // scenario before changes, use to define wich champ update after changes
@@ -47,7 +47,7 @@ export class ScenarioComponent implements OnInit {
     public regleService: RegleService,
     public tagService: TagService,
     public plastronService: PlastronService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.data
@@ -55,16 +55,17 @@ export class ScenarioComponent implements OnInit {
         switchMap((response: Data) => {
           this.scenario = response['data'];
           this.oldScenario = { ...response['data'] };
-          this.scenario.tags = [];
+          this.scenario.tags = new Map<string, Tag>();
+
 
           this.scenarioService
             .getTags(this.scenario)
             .subscribe((tags: Tag[]) => {
-              this.scenario.tags = tags;
+              this.scenario.tags = new Map(tags.map((tag: Tag) => [tag.id, tag]));
               this.oldTags = [...tags];
             });
 
-          return this.scenarioService.getGroupes(this.scenario).pipe(
+          return this.scenarioService.getScenarioGroupes(this.scenario.id).pipe(
             switchMap((groupes: Groupe[]) => {
               this.groupes = groupes;
               this.groupeRecapValues = structuredClone(groupes)
@@ -108,25 +109,7 @@ export class ScenarioComponent implements OnInit {
         this.scenarioService.updateScenario(structuredClone(this.scenario), this.oldScenario)
       );
 
-    // save the tags
 
-    let newTags = this.scenario.tags.filter(
-      (tag: Tag) => this.oldTags.indexOf(tag) < 0
-    );
-
-    let tagsToDelete = this.oldTags.filter(
-      (tag: Tag) => !tag.id || this.scenario.tags.indexOf(tag) < 0
-    );
-
-    if (newTags.length > 0)
-      requests.push(
-        this.tagService.addTagsToSource(newTags, this.scenario.id, 'scenario')
-      );
-
-    if (tagsToDelete.length > 0)
-      requests.push(
-        this.tagService.deleteTagsFromSource(tagsToDelete, this.scenario.id)
-      );
 
     if (this.groupesToSave) {
       requests.push(
@@ -147,6 +130,6 @@ export class ScenarioComponent implements OnInit {
     }
   }
 
-  reloadPlastron(event) {}
+  reloadPlastron(event) { }
 
 }

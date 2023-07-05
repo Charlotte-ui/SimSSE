@@ -12,7 +12,7 @@ import {
 } from 'rxjs';
 
 import { Plastron } from '../models/vertex/plastron';
-import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
+import { Modele } from '../models/vertex/modele';
 import {
   VariablePhysioInstance,
   VariablePhysioTemplate,
@@ -62,9 +62,12 @@ export class PlastronService {
       );
   }
 
+  getPlastrons(): Observable<Plastron[] > {
+    return this.apiService.getClasseElements<Plastron>(Plastron);
+  }
+
   getPlastronByLink(link): Observable<Plastron | undefined> {
     return this.getPlastronById(link['in'].substring(1));
-    // return this.firebaseService.getElementInCollectionByIds<Scenario>("Scenario",id);
   }
 
   getPlastronById(id): Observable<Plastron | undefined> {

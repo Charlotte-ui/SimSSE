@@ -25,8 +25,8 @@
         <app-tags
           *ngIf="allTags"
           [allTags]="allTags"
-          [tags]="scenario.tags"
-          (newTags)="updateTags.emit($event)"
+          [tags]="arrayTag"
+          (newTags)="updateTag($event)"
         ></app-tags>
       </div>
     </div>

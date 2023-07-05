@@ -28,8 +28,7 @@ export class TabReglesComponent<T extends Vertex> {
 
   button = new Button();
 
-  getType = Button.getType ;
-
+  getType = Button.getType;
 
   @Input() classe: typeof Vertex;
 
@@ -41,7 +40,7 @@ export class TabReglesComponent<T extends Vertex> {
       this._elements = value;
       this.keys = Object.keys(this.elements[0]) as Array<keyof T>;
       this.displayedColumns = [...this.keys];
-      deleteElementFromArray(this.displayedColumns,'id')
+      deleteElementFromArray(this.displayedColumns, 'id');
       this.displayedColumns.push('edit');
       this.displayedColumns.push('delete');
     }
@@ -49,6 +48,7 @@ export class TabReglesComponent<T extends Vertex> {
 
   @Input() title: string;
   @Input() description: string;
+  @Input() map: Map<string,any>;
 
   constructor(public dialog: MatDialog, private regleService: RegleService) {}
 
@@ -67,13 +67,16 @@ export class TabReglesComponent<T extends Vertex> {
   }
 
   openDialog(element: T, id: number, edit: boolean) {
-
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [element, this.classe, Categorie.categories.map((cat:Categorie) => cat.name), edit],
+      data: [
+        element,
+        this.classe,
+        this.map,
+        edit,
+      ],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-
       if (result == undefined) return;
 
       if (Number(id) >= 0) {
@@ -121,11 +124,11 @@ export class TabReglesComponent<T extends Vertex> {
   }
 
   getColor() {
-    return this.button.getButtonByType(this.classe.getType({})).color;
+    return Button.getButtonByType(this.classe.getType({})).color;
   }
 
   getIcon() {
-    return this.button.getButtonByType(this.classe.getType({}))?.icon;
+    return Button.getButtonByType(this.classe.getType({}))?.icon;
   }
 
   getLabel(champ: string) {

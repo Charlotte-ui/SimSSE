@@ -43,7 +43,6 @@ export class ScenarioService {
    */
   getScenarios(): Observable<Scenario[]> {
     return this.apiService.getClasseElements<Scenario>(Scenario);
-    //return this.firebaseService.getCollectionById<Scenario>("Scenario");
   }
 
   getScenarioById(id: string): Observable<Scenario | undefined> {
@@ -56,8 +55,12 @@ export class ScenarioService {
     return this.tagService.getTags(scenario.id, 'Scenario');
   }
 
-  getGroupes(scenario: Scenario): Observable<any> {
-    return this.getScenarioGroupes(scenario.id);
+  /**
+   * get all groupes
+   * @returns
+   */
+  getGroupes(): Observable<Groupe[]> {
+    return this.apiService.getClasseElements<Groupe>(Groupe);
   }
 
   /**
@@ -172,6 +175,21 @@ export class ScenarioService {
     );
 
     //  return of("34:2").pipe ( delay( 5000 ));
+  }
+
+  updateTags(scenario: Scenario, newTags: Tag[], tagsToDelete: Tag[]) {
+    let requests: Observable<any>[] = [of(undefined)];
+    if (newTags.length > 0)
+      requests.push(
+        this.tagService.addTagsToSource(newTags, scenario.id, 'scenario')
+      );
+
+    if (tagsToDelete.length > 0)
+      requests.push(
+        this.tagService.deleteTagsFromSource(tagsToDelete, scenario.id)
+      );
+
+    return forkJoin(requests);
   }
 
   /**

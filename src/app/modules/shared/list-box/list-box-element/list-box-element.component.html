@@ -14,8 +14,8 @@
         <h2>{{ element.title }}</h2>
       </button>
       <div>
-        <mat-chip *ngFor="let tag of element.tags; index as i">
-          {{ tag.value }}
+        <mat-chip *ngFor="let tag of element.tags |keyvalue; index as i">
+          {{ tag.value.value }}
         </mat-chip>
       </div>
     </div>

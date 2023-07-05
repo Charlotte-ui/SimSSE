@@ -11,13 +11,17 @@ import { ModeleComponent } from './modules/scenario-editor/modeles/modele/modele
 import { ModeleResolver } from './modules/scenario-editor/modeles/modele/modele.resolver';
 import { ScenarioComponent } from './modules/scenario-editor/scenarios/scenario/scenario.component';
 import { ScenarioResolver } from './modules/scenario-editor/scenarios/scenario/scenario.resolver';
+import { MxgraphComponent } from './modules/plastron/editeur/mxgraph/mxgraph.component';
+import { AdminComponent } from './modules/admin/admin.component';
 
 const routes: Routes = [
 {path: '', redirectTo: '/connexion', pathMatch: 'full'},
 {path: 'connexion', component: ConnexionComponent},
+{path: 'ngmxgraph', component: MxgraphComponent,canActivate: [AuthGuard]},
 {path: 'accueil', component: AccueilComponent,canActivate: [AuthGuard]},
 {path: 'regles', component: ReglesComponent,canActivate: [AuthGuard]},
 {path: 'editeur', component: ScenarioEditorComponent,canActivate: [AuthGuard]},
+{path: 'admin', component: AdminComponent,canActivate: [AuthGuard]},
 {path: 'plastron/:id', component: PlastronComponent,resolve: { data: PlastronResolver },canActivate: [AuthGuard]},
 {path: 'scenario/:id', component: ScenarioComponent,resolve: { data: ScenarioResolver },canActivate: [AuthGuard]},
 {path: 'modele/:id', component: ModeleComponent,resolve: { data: ModeleResolver },canActivate: [AuthGuard]},

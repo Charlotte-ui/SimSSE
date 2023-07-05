@@ -1,11 +1,12 @@
 
 <div class="button-container">
-  <button mat-icon-button (click)="add(Trigger)">
-    <mat-icon [fontIcon]="button.getButtonByType('trigger').icon"></mat-icon>
+  <button mat-icon-button (click)="add(Trigger)" [matTooltip]="buttonTrigger.tooltip" [style.background]="buttonTrigger.color">
+    <img [src]="buttonTrigger.icon" class="icon" />
   </button>
   <button mat-icon-button (click)="add(Timestamp)">
-    <mat-icon [fontIcon]="button.getButtonByType('timestamp').icon"></mat-icon>
+    <mat-icon [fontIcon]="buttonTimeStamp.icon"></mat-icon>
   </button>
 </div>
 
-<div *ngIf="initialChartOption" echarts [options]="initialChartOption" [merge]="mergeOptions" class="demo-chart" (chartInit)="onChartInit($event)" (chartClick)="onChartClick($event)" (chartLegendSelectChanged)="onChartLegendSelectChanged($event)"></div>
+<div *ngIf="initialChartOption" echarts [options]="initialChartOption" [merge]="mergeOptions" class="demo-chart" (chartInit)="onChartInit($event)"  (chartLegendSelectChanged)="onChartLegendSelectChanged($event)"></div>
+<!-- (chartClick)="onChartClick($event)" -->

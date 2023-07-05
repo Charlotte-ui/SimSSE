@@ -1,38 +1,60 @@
 <app-header></app-header>
 
 <div class="container" id="presentation">
-
   <h1>Qu'est-ce que SimSSE ?</h1>
   <p>
-L’objectif du projet SimSSE est d’améliorer le réalisme de l’évolution clinique des plastrons lors des simulations de
-  SSE, afin de préparer au mieux les équipes de secours et de faciliter le travail de préparation / animation de ces
-  exercices. </p>
+    L’objectif du projet SimSSE est d’améliorer le réalisme de l’évolution
+    clinique des plastrons lors des simulations de SSE, afin de préparer au
+    mieux les équipes de secours et de faciliter le travail de préparation /
+    animation de ces exercices.
+  </p>
   <p>
-La solution SimSSE permettrait de mieux préparer les professionnels de la prise en charge, de leur permettre de mieux
-anticiper les conséquences de leurs actions et de revenir sur le déroulé de l’exercice pour identifier les axes
-d’amélioration. Une meilleure préparation permettrait de réduire le stress, d’apprendre à déléguer, d’améliorer la
-coordination et le parcours de soins des victimes en SSE.</p>
-<p>
-
-Dans le cadre de SimSSE, nous nous intéressons principalement aux exercices préfectoral de grande ampleur (de 50 à 300
-victimes) impliquant des moyens sur le terrain. Il y a un exercice ORSEC NOVI (Nombreuses Victimes) grandeur réel par
-département et par an.</p>
-<p>
-De façon secondaire, SimSSE peut aussi inclure les cas d’usages liés aux exercices plus petits organisés par les acteurs
-pré-hospitaliers (SAMU, SDIS, associations de sécurité civile…) et intra-hospitalier (CHU, dans le cadre du plan ORSAN).
-Pour le moment, il est prévu que SimSSE servent uniquement à la partie pré-hospitalière et que le scénario s’arrête une
-fois le plastron monté dans l’ambulance. Toutefois, on pourrait très bien envisager une poursuite du scénario en
-intra-hospitalier, car eux aussi se réfèrent à des fiches plastrons papiers et souffrent de problématiques similaires.
-Les contraintes particulières de l’intra-hospitalier n’entrent pas dans le périmètre de base du projet, mais il peut
-être intéressant de les prendre en compte dans une perspective d’expansion futur.</p>
-
+    La solution SimSSE permettrait de mieux préparer les professionnels de la
+    prise en charge, de leur permettre de mieux anticiper les conséquences de
+    leurs actions et de revenir sur le déroulé de l’exercice pour identifier les
+    axes d’amélioration. Une meilleure préparation permettrait de réduire le
+    stress, d’apprendre à déléguer, d’améliorer la coordination et le parcours
+    de soins des victimes en SSE.
+  </p>
+  <p>
+    Dans le cadre de SimSSE, nous nous intéressons principalement aux exercices
+    préfectoral de grande ampleur (de 50 à 300 victimes) impliquant des moyens
+    sur le terrain. Il y a un exercice ORSEC NOVI (Nombreuses Victimes) grandeur
+    réel par département et par an.
+  </p>
+  <p>
+    De façon secondaire, SimSSE peut aussi inclure les cas d’usages liés aux
+    exercices plus petits organisés par les acteurs pré-hospitaliers (SAMU,
+    SDIS, associations de sécurité civile…) et intra-hospitalier (CHU, dans le
+    cadre du plan ORSAN). Pour le moment, il est prévu que SimSSE servent
+    uniquement à la partie pré-hospitalière et que le scénario s’arrête une fois
+    le plastron monté dans l’ambulance. Toutefois, on pourrait très bien
+    envisager une poursuite du scénario en intra-hospitalier, car eux aussi se
+    réfèrent à des fiches plastrons papiers et souffrent de problématiques
+    similaires. Les contraintes particulières de l’intra-hospitalier n’entrent
+    pas dans le périmètre de base du projet, mais il peut être intéressant de
+    les prendre en compte dans une perspective d’expansion futur.
+  </p>
 </div>
 
-
-
 <div class="container" id="navigation">
-<button mat-raised-button (click)="goTo('editeur')">Editeur</button>
-<button mat-raised-button (click)="goTo('')" disabled>Animateur</button>
-<button mat-raised-button (click)="goTo('')" disabled>Retex</button>
+  <button mat-raised-button (click)="goTo('editeur')">
+    <div>Editeur</div>
+    <div class="image"><img [src]="getIcon('editor')" class="icon" /></div>
+  </button>
+  <button mat-raised-button (click)="goTo('admin')">
+    <div>Administrateur</div>
+    <div class="image"><img [src]="getIcon('admin')" class="icon" /></div>
+  </button>
+  <button mat-raised-button (click)="goTo('')" disabled>
+    <div >Animateur</div>
 
+    <div class="image"><img [src]="getIcon('animator')" class="icon" /></div>
+  </button>
+
+  <button mat-raised-button (click)="goTo('')" disabled>
+    <div>Retex</div>
+
+    <div class="image"><img [src]="getIcon('retex')" class="icon" /></div>
+  </button>
 </div>

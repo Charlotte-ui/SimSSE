@@ -20,12 +20,10 @@ export class RegleService {
 
   getVariableTemplate(): Observable<VariablePhysioTemplate[]> {
     return this.apiService.getClasseElements<VariablePhysioTemplate>(VariablePhysioTemplate);
-
   }
 
   getBioEvents(): Observable<BioEvent[]> {
     return this.apiService.getClasseElements(BioEvent)
-
   }
 
   getActions(): Observable<Action[]> {

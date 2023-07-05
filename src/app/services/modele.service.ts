@@ -4,6 +4,7 @@ import {
   concat,
   concatMap,
   delay,
+  forkJoin,
   from,
   map,
   of,
@@ -11,7 +12,7 @@ import {
   zipAll,
 } from 'rxjs';
 
-import { Modele, ModeleSaverArrays } from '../models/vertex/modele';
+import { Modele } from '../models/vertex/modele';
 import {
   Trend,
   Event,
@@ -27,6 +28,7 @@ import { NodeService } from './node.service';
 import { Trigger } from '../models/trigger';
 import { getNodeByID } from '../functions/tools';
 import { TagService } from './tag.service';
+import { Tag } from '../models/vertex/tag';
 
 @Injectable({
   providedIn: 'root',
@@ -44,6 +46,12 @@ export class ModeleService {
   /**
    * READ
    */
+
+
+
+  getModeles():Observable<Modele[]>{
+    return this.apiService.getClasseElements<Modele>(Modele)
+  }
 
   /**
    * get the modele by their id
@@ -67,11 +75,7 @@ export class ModeleService {
       .pipe(map((response) => new Graph(response.result[0])));
   }
 
-  getGraphNodes(id: string): Observable<Node[] | undefined> {
-    return this.apiService
-      .getRelationFrom(id, 'aNode', 'Graph')
-      .pipe(map((response) => Node.instanciateListe<Node>(response.result)));
-  }
+
 
   getTrigger(id: string): Observable<Trigger[]> {
     return this.apiService
@@ -92,9 +96,34 @@ export class ModeleService {
   }
 
   getGraphLinks(arrayId: string[]): Observable<Link[] | undefined> {
+    if (arrayId.length > 0)
+      return this.apiService
+        .getLinkFromMultiple(arrayId, 'link')
+        .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
+    else return of();
+  }
+
+  /**
+   * get the template of a modele
+   * @param idModele 
+   * @returns 
+   */
+  getTemplateModele(idModele: string): Observable<Modele | undefined> {
     return this.apiService
-      .getLinkFromMultiple(arrayId, 'link')
-      .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
+      .getRelationFrom(idModele, 'aTemplate', 'Modele')
+      .pipe(map((response) => new Modele(response.result[0])));
+  }
+
+
+  /**
+   * return the modele from wich the graph is root
+   * @param idGraph 
+   * @returns 
+   */
+  getModeleGraph(idGraph: string): Observable<Modele | undefined> {
+    return this.apiService
+      .getRelationTo(idGraph, 'rootGraph', 'Graph')
+      .pipe(map((response) => new Modele(response.result[0])));
   }
 
   /**
@@ -124,6 +153,28 @@ export class ModeleService {
           this.nodeService
             .createGraph(new Graph({ template: true, name: 'root' }))
             .pipe(
+              switchMap((idGraph: string) => {
+                let start = Event.createStart();
+                start['@class'] = 'Event';
+                delete start.id;
+                return this.apiService
+                  .createDocument(start)
+                  .pipe(map((response) => this.apiService.documentId(response)))
+                  .pipe(
+                    switchMap((idStart: string) =>
+                      this.apiService
+                        .createRelationBetween(idStart, idGraph, 'aNode')
+                        .pipe(
+                          map((response) => [
+                            response.result[0].out,
+                            response.result[0].in,
+                          ])
+                        )
+                    )
+                  );
+              })
+            )
+            .pipe(
               switchMap((indexes: string[]) => {
                 let idGraph = indexes[0].substring(1);
                 let idStart = indexes[1].substring(1);
@@ -150,6 +201,27 @@ export class ModeleService {
   }
 
   /**
+   * create a new trigger edge in bd and return it
+   * @param trigger 
+   * @param modele 
+   * @returns trigger
+   */
+  createTrigger(trigger: Trigger, modele: Modele): Observable<Trigger> {
+    console.log("create Trigger ",trigger," ",modele)
+    let event = getNodeByID(modele.graph, trigger.in)
+    console.log("event ",event);
+    if (event)
+      return this.apiService.createRelationBetweenWithProperty(
+        event.id,
+        modele.id,
+        'triggeredAt',
+        'time',
+        trigger.time.toString()
+      ).pipe(map((res:any)=>new Trigger(res.result[0])))
+    else return of();
+  }
+
+  /**
    * create a deep copy of a model
    * @param modele
    */
@@ -160,10 +232,9 @@ export class ModeleService {
       switchMap((indexes: string[]) => {
         let idnewModele = indexes[0];
         let idnewGraph = indexes[1];
-        let idnewStart = indexes[2];
         return this.nodeService
-          .duplicateGraph(graphToCopy, idnewGraph, idnewStart)
-          .pipe(switchMap(()=> of(idnewModele)))
+          .duplicateGraph(graphToCopy, idnewGraph)
+          .pipe(switchMap(() => of(idnewModele)));
       })
     );
   }
@@ -234,40 +305,39 @@ export class ModeleService {
     );
   }
 
+  updateTrigger(trigger: Trigger) {
+    return this.apiService.updateDocumentChamp(
+      trigger.id,
+      'time',
+      trigger.time.toString()
+    );
+  }
+
+  updateTags(modele:Modele,newTags: Tag[],tagsToDelete: Tag[]){
+    let requests: Observable<any>[] = [of(undefined)];
+     if (newTags.length > 0)
+      requests.push(
+        this.tagService.addTagsToSource(newTags, modele.id, 'modele')
+      );
+
+    if (tagsToDelete.length > 0)
+      requests.push(
+        this.tagService.deleteTagsFromSource(tagsToDelete, modele.id)
+      );
+
+      return forkJoin(requests)
+
+
+  }
+
   /**
    * the plastron modele is now
    * @param plastron
    * @returns
    */
   createNewModeleTemplate(modele: Modele, newModele: Modele): Observable<any> {
+    return of("bloup")
 
-    let saver = modele.initSaver();
-
-    modele.title = newModele.title;
-    saver.champToUpdate.push('title');
-
-    if (modele.description != newModele.description) {
-      modele.description = newModele.description;
-      saver.champToUpdate.push('description');
-    }
-
-    if (modele.triage != newModele.triage) {
-      modele.triage = newModele.triage;
-      saver.champToUpdate.push('triage');
-    }
-
-    modele.template = true;
-    saver.champToUpdate.push('template');
-
-    let requests = modele.save(saver, this.tagService, this, this.nodeService);
-
-    return concat(requests)
-      .pipe(zipAll())
-      .pipe(
-        switchMap(() =>
-          this.apiService.deleteOutRelation(modele.id, 'aTemplate')
-        )
-      );
   }
 
   /**
@@ -293,5 +363,12 @@ export class ModeleService {
     return from(requests).pipe(
       concatMap((request: Observable<any>) => request)
     );
+  }
+
+  /**
+   * delete trigger
+   */
+  deleteTrigger(trigger: Trigger) {
+    return this.apiService.deleteEdge(trigger.id);
   }
 }

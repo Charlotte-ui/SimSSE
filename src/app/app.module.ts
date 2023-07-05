@@ -68,7 +68,7 @@ import { TagsDescriptionsComponent } from './modules/plastron/tags-descriptions/
 import { GraphDialogComponent } from './modules/plastron/editeur/graph-dialog/graph-dialog.component';
 import { TagsComponent } from './modules/shared/tags/tags.component';
 import { CarteComponent } from './modules/scenario-editor/scenarios/scenario/groupes/carte/carte.component';
-import { GraphEditeurDialogComponent } from './modules/plastron/editeur/editeur-graphe-nodal/graph-editeur-dialog/graph-editeur-dialog.component';
+import { GraphEditeurDialogComponent } from './modules/plastron/editeur/mxgraph/graph-editeur-dialog/graph-editeur-dialog.component';
 import { ModeleComponent } from './modules/scenario-editor/modeles/modele/modele.component';
 import { GroupesComponent } from './modules/scenario-editor/scenarios/scenario/groupes/groupes.component';
 import { GeneralInfosComponent } from './modules/scenario-editor/scenarios/scenario/general-infos/general-infos.component';
@@ -79,6 +79,9 @@ import { TriageFilterComponent } from './modules/shared/triage-filter/triage-fil
 import { ScenariosComponent } from './modules/scenario-editor/scenarios/scenarios.component';
 import { ModelesComponent } from './modules/scenario-editor/modeles/modeles.component';
 import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-editor.component';
+import { MxgraphComponent } from './modules/plastron/editeur/mxgraph/mxgraph.component';
+import { AddMultipleTrendsDialogComponent } from './modules/plastron/editeur/barre-outils/add-multiple-trends-dialog/add-multiple-trends-dialog.component';
+import { AdminComponent } from './modules/admin/admin.component';
 
 
 @NgModule({
@@ -119,6 +122,9 @@ import { ScenarioEditorComponent } from './modules/scenario-editor/scenario-edit
     ScenariosComponent,
     ModelesComponent,
     ScenarioEditorComponent,
+    MxgraphComponent,
+    AddMultipleTrendsDialogComponent,
+    AdminComponent,
   ],
   imports: [
     BrowserModule,

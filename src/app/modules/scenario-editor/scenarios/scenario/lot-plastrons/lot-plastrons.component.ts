@@ -81,7 +81,7 @@ export class LotPlastronsComponent {
     'description',
   ];
 
-  button = new Button();
+  Button = Button;
 
   /**
    * plastron on mouseup
@@ -162,6 +162,7 @@ export class LotPlastronsComponent {
   }
 
   goToPlastron(plastronId: string) {
+    console.log('plastronId ',plastronId)
     this.router.navigate(['/plastron/' + plastronId]);
   }
 

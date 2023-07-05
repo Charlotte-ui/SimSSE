@@ -3,7 +3,6 @@
   [modele]="modele"
   [changesToSave]="changesToSave"
   (newModele)="saveAsNewModel($event)"
-  (newSave)="save()"
 ></app-header>
 <mat-tab-group>
   <mat-tab label="Cas clinique">
@@ -13,26 +12,7 @@
       [targetVariable]="targetVariable"
       [variablesTemplate]="variablesTemplate"
       [disabledInspecteur]="true"
-      (initSaver)="saver = $event"
-      (newChange)="changesToSave = true"
-      (updateNode)="changesToSave = true;"
-      (deleteNode)="changesToSave = true; "
-      (updateLink)="changesToSave = true; "
-      (deleteLink)="changesToSave = true;"
-      (updateTrigger)="
-        changesToSave = true; saver.triggerToUpdate.push($event)
-      "
-      (deleteTrigger)="
-        changesToSave = true; saver.triggerToDelete.push($event)
-      "
     ></app-editeur>
-
-<!-- 
-    (updateNode)="changesToSave = true; saver.nodeToUpdate.push($event)"
-    (deleteNode)="changesToSave = true; saver.nodeToDelete.push($event)"
-    (updateLink)="changesToSave = true; saver.linkToUpdate.push($event)"
-    (deleteLink)="changesToSave = true; saver.linkToDelete.push($event)" -->
-
   </mat-tab>
   <mat-tab label="Tags et descriptions">
     <app-tags-descriptions
@@ -40,12 +20,6 @@
       [modele]="modele"
       [chooseTitle]="true"    
       [allTags]="allTags"
-      (updateModele)="changesToSave = true; saver.champToUpdate.push($event)"
-      (newTags)="
-        changesToSave = true;
-        saver.newTags = $event.newTags;
-        saver.tagsToDelete = $event.tagsToDelete
-      "
     ></app-tags-descriptions>
   </mat-tab>
 </mat-tab-group>

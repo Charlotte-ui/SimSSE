@@ -3,9 +3,10 @@
   <ng-container *ngFor="let button of buttons">
     <div *ngIf="button.outils"  class="container button-container">
       <div class="text">{{button.name}}</div>
-        <button mat-mini-fab  (click)="addElement(button.type)" [style.background]="button.color">
-            <mat-icon  [fontIcon]="button.icon"></mat-icon>
+        <button mat-mini-fab  (click)="triggerEvent(button.event,button.type)" [style.background]="button.color" [matTooltip]="button.tooltip">
+            <img [src]="button.icon" class="icon"/>
         </button>
+   
     </div>
   </ng-container>
 </div>

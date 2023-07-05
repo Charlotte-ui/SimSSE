@@ -1,8 +1,23 @@
 import { Modele } from '../models/vertex/modele';
-import { Graph, NodeType, Timer, Node, Trend } from '../models/vertex/node';
+import {
+  Graph,
+  NodeType,
+  Timer,
+  Node,
+  Trend,
+  LinkType,
+  EventType,
+  Event,
+} from '../models/vertex/node';
 import { Trigger } from '../models/trigger';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
-import { roundingWithDecimal } from './tools';
+import {
+  getElementByChampMap,
+  getNodeByID,
+  roundingWithDecimal,
+} from './tools';
+import { BioEvent, Comparison } from '../models/vertex/event';
+import { Button } from './display';
 
 export class Curve {
   name: string;
@@ -11,6 +26,8 @@ export class Curve {
   duration: number;
   variable: VariablePhysioInstance;
   color: string;
+  private trend: number;
+  private prevValue: number;
 
   constructor(
     name: string,
@@ -23,43 +40,49 @@ export class Curve {
     this.variable = variable ? variable : undefined;
     this.color = color ? color : '#d5ceeb';
     this.values = [];
-    this.currentMax = 0;
   }
 
   /**
-   * generate the curve
+   * generate the curves
    * @param size
    * @param variable
    * @returns the new triggeredEvents with the events that have been triggered during the calcul of curve
    */
-  public calculCurve(modele: Modele): Trigger[] {
-    //console.group("modele")
-    //console.group(modele)
+  public static calculCurves(
+    modele: Modele,
+    curves: Map<string,Curve>,
+    duration: number
+  ): Map<string, Trigger> {
+    this.setAllNodesStatesToFalse(modele.graph);
 
-    let trend = 0; //by default there is no trend, the curve is constante
-    let prevValue = this.variable.cible; // at t=0 the previous value is the target
 
-    this.values = [];
-    this.currentMax = 0;
+    curves.forEach((curve:Curve)=>{
+      curve.prevValue = curve.variable.cible; // at t=0 the previous value is the target
+      curve.trend = 0; //by default there is no trend, the curve is constante
+    })
 
-    for (let i = 0; i < this.duration; i++) {
-      this.updateNodesStates(i, modele); // each minute that pass we updates the states of the nodes
-      if (modele.graph.nodes) trend = this.calculTrend(modele); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
+    for (let i = 0; i < duration; i++) {
+      this.updateNodesStates(i, modele, curves); // each minute that pass we updates the states of the nodes
 
-      if (i > 0) prevValue = this.values[i - 1][1];
+      curves.forEach((curve: Curve) => {
+        if (i > 0) curve.prevValue = curve.values[i - 1][1];
+        if (modele.graph.nodes) curve.trend = curve.calculTrend(modele); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
+        let newValue = roundingWithDecimal(curve.prevValue + curve.trend, 2);
+        //let newValue = variable.cible + i*trend + this.gaussianRandom(0, variable.rand) ;
 
-      let newValue = roundingWithDecimal(
-        prevValue + this.gaussianRandom(0, this.variable.rand) + trend,
-        2
-      );
-      //let newValue = variable.cible + i*trend + this.gaussianRandom(0, variable.rand) ;
-
-      if (newValue > this.variable.max) newValue = this.variable.max;
-      if (newValue < this.variable.min) newValue = this.variable.min;
-      if (this.currentMax < newValue) this.currentMax = newValue;
-
-      this.values.push([i, newValue]);
+        if (newValue > curve.variable.max) newValue = curve.variable.max;
+        if (newValue < curve.variable.min) newValue = curve.variable.min;
+        curve.values[i] = [i, newValue];
+      });
     }
+
+    // add the gaussian random
+    curves.forEach((curve: Curve) =>
+      curve.values.map(
+        (value: number[]) =>
+          (value[1] = value[1] + this.gaussianRandom(0, curve.variable.rand))
+      )
+    );
 
     return modele.triggeredEvents;
   }
@@ -68,8 +91,17 @@ export class Curve {
    * set a node active or inactive at time t
    * @param t
    */
-  private updateNodesStates(t: number, modele: Modele) {
-    this.updateNodeStatesRecursive(modele.triggeredEvents, modele.graph, t);
+  private static updateNodesStates(
+    t: number,
+    modele: Modele,
+    curves: Map<string,Curve>
+  ) {
+    Curve.updateNodeStatesRecursive(
+      modele.triggeredEvents,
+      modele.graph,
+      t,
+      curves
+    );
   }
 
   /**
@@ -77,27 +109,36 @@ export class Curve {
    * @param graph
    * @param t
    */
-  private updateNodeStatesRecursive(
-    triggeredEvents: Trigger[],
+  private static updateNodeStatesRecursive(
+    triggeredEvents: Map<string, Trigger>,
     graph: Graph,
-    t: number
+    t: number,
+    curves: Map<string,Curve>
   ) {
     triggeredEvents.forEach((trigger) => {
       if (trigger.time == t) {
         // event trigger at time t
-
         graph.links.forEach((link) => {
-          if (trigger.in == link.out) {
-            let nodeTrigger = this.getNodeByID(link.in, graph);
+          let eventNode = getNodeByID(graph, link.out);
+          if (
+            trigger.in == link.out ||
+            (eventNode && trigger.in == eventNode['event'])
+          ) {
+            let nodeTrigger = getNodeByID(graph, link.in);
 
             if (nodeTrigger) {
-              nodeTrigger.state = link.start;
+              nodeTrigger.state =
+                nodeTrigger.state === LinkType.stop
+                  ? LinkType.stop
+                  : link.trigger;
+              // a stop node cannot be start again
               if (nodeTrigger.type == NodeType.graph) {
                 if (nodeTrigger.state)
                   this.updateNodeStatesRecursive(
                     triggeredEvents,
                     nodeTrigger as Graph,
-                    t
+                    t,
+                    curves
                   );
                 // si le node est un graph, on updte les états des nodes internes
                 else this.setAllNodesStatesToFalse(nodeTrigger as Graph); // desctivate all nodes states
@@ -110,10 +151,42 @@ export class Curve {
 
     //update all the graph who could have been triggered internaly
     graph.nodes.forEach((node) => {
-      if (node.type == NodeType.graph && node.state)
-        this.updateNodeStatesRecursive(triggeredEvents, node as Graph, t);
-      else if (node.type == NodeType.timer && node.state)
+      if (node.type == NodeType.graph && node.state === LinkType.start)
+        this.updateNodeStatesRecursive(
+          triggeredEvents,
+          node as Graph,
+          t,
+          curves
+        );
+      else if (node.type == NodeType.timer && node.state === LinkType.start)
         this.advanceTimer(node as Timer, t, triggeredEvents);
+      else if (
+        Node.getType(node) === EventType.bio &&
+        node.state !== LinkType.start
+      ) {
+        let bioEvent = BioEvent.bioevents.get((node as Event).template.id);
+        let curve = curves.get(bioEvent.source)
+        
+        if 
+          ((bioEvent.comparison === Comparison.sup &&
+            curve.prevValue > bioEvent.threshold) ||
+            (bioEvent.comparison === Comparison.inf &&
+              curve.prevValue < bioEvent.threshold)){
+          console.log(
+            'prevValue ',
+            curve.prevValue,
+            ' threshold ',
+            bioEvent.threshold
+          );
+          console.log("curve ",curve.name," ",curve.prevValue)
+          console.log("bioEvent ",bioEvent)
+           console.log("t ",t)
+          this.triggerBioEvent(node as Event, t, triggeredEvents);
+        }
+
+
+       
+      }
     });
   }
 
@@ -127,8 +200,8 @@ export class Curve {
   private calculTrend(modele: Modele) {
     // console.log("calculTrend "+variable.name)
     let trend = 0;
-    // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     let trends = this.calculTrendRecursive(this.variable, modele.graph.nodes);
+    // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
     if (trends.length > 0) trend = this.reduceTrends(trends);
     return trend;
   }
@@ -145,11 +218,11 @@ export class Curve {
    */
   private calculTrendRecursive(
     variable: VariablePhysioInstance,
-    nodes: Node[]
+    nodes: Map<string, Node>
   ) {
-    let trends: number[] = []; // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
+    let trends: number[] = [];
     nodes.forEach((node) => {
-      if (node.state) {
+      if (node.state === LinkType.start) {
         // si le node est actif
         if (
           node.type == 'trend' &&
@@ -172,46 +245,66 @@ export class Curve {
     return trends;
   }
 
-  private advanceTimer(timer: Timer, t: number, triggeredEvents: Trigger[]) {
+  private static advanceTimer(
+    timer: Timer,
+    t: number,
+    triggeredEvents: Map<string, Trigger>
+  ) {
     timer.counter++;
     if (timer.counter == timer.duration) {
       // if the timer has ended
 
-      triggeredEvents.push(
+      triggeredEvents.set(
+        timer.id,
         new Trigger({
           time: t + 1,
           in: timer.id,
           editable: false,
-          id: triggeredEvents.length,
+          id: triggeredEvents.size,
+          name: timer.name,
+          color:Button.getButtonByType(NodeType.timer).color
         })
       );
-      timer.state = false; // the timer end
+      timer.state = LinkType.pause; // the timer end
     }
   }
 
-  private setAllNodesStatesToFalse(graph: Graph) {
-    graph.nodes.map((node: Node) => {
-      node.state = false;
+  private static triggerBioEvent(
+    bioevent: Event,
+    t: number,
+    triggeredEvents: Map<string, Trigger>,
+  ) {
+    // the bioevent triggered one time when the thresold is pass
+    triggeredEvents.set(
+      bioevent.template.id+':1',
+      new Trigger({
+        time: t-2,
+        in: bioevent.id,
+        editable: false,
+        id: bioevent.template.id+':1',
+        name: bioevent.template.name,
+        color : Button.getButtonByType(EventType.bio).color
+      })
+    );
+
+    bioevent.state = LinkType.start;
+  }
+
+  private static setAllNodesStatesToFalse(graph: Graph) {
+    graph.nodes.forEach((node: Node) => {
+      node.state =
+        node.state === LinkType.stop ? LinkType.stop : LinkType.pause;
       if (node.type == NodeType.graph)
         this.setAllNodesStatesToFalse(node as Graph);
     });
   }
 
   // Standard Normal variate using Box-Muller transform.
-  private gaussianRandom(mean = 0, stdev = 1) {
+  private static gaussianRandom(mean = 0, stdev = 1) {
     let u = 1 - Math.random(); // Converting [0,1) to (0,1]
     let v = Math.random();
     let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
     // Transform to the desired mean and standard deviation:
     return z * stdev + mean;
-  }
-
-  getNodeByID(id: string, graph: Graph): Node {
-    let result = undefined;
-
-    graph.nodes.forEach((node: Node) => {
-      if (node.id == id) result = node;
-    });
-    return result;
   }
 }

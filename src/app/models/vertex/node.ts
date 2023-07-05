@@ -1,7 +1,12 @@
+import { getElementByChamp, pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
 import { Nameable } from '../interfaces/nameable';
 import { Template } from '../interfaces/templatable';
 import { Action, BioEvent } from './event';
 import { Edge, Vertex } from './vertex';
+
+const GREEN = '#45C456';
+const RED = '#A41313';
+const ORANGE = '#ff9f1c';
 
 export enum NodeType {
   trend = 'trend',
@@ -17,20 +22,29 @@ export enum EventType {
   action = 'action',
 }
 
+export enum LinkType {
+  start = 'start',
+  stop = 'stop',
+  pause = 'pause',
+}
+
+
+
 export abstract class Node extends Vertex {
   x: number;
   y: number;
   type: NodeType;
-  state: boolean; // activate or not activate
+  state: LinkType; // activate or not activate
 
   public static override className = 'Node';
+  public static updatables = [];
 
   constructor(object?: any) {
     super(object);
-    this.x = object?.x ? object.x : 50;
-    this.y = object?.y ? object.y : 50;
+    this.x = object?.x !==undefined ? object.x : 50;
+    this.y = object?.y !==undefined ? object.y : 50;
     this.type = object?.type ? object.type : undefined;
-    this.state = false;
+    this.state = LinkType.pause;
   }
 
   static getName(element): string {
@@ -45,6 +59,17 @@ export abstract class Node extends Vertex {
         return Timer.getName(element);
     }
     return '';
+  }
+
+  public static override getType(element): string {
+    if (element.type == NodeType.event) return Event.getType(element);
+    return element.type;
+  }
+
+  public static getUpdatables(element): string[] {
+    if (element.type == NodeType.event) return Event.updatables;
+    if (element.type == NodeType.timer) return Timer.updatables;
+    return Trend.updatables;
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
@@ -65,20 +90,18 @@ export abstract class Node extends Vertex {
           break;
       }
     });
-
     return res;
   }
 
-  public static override getType(element): string {
-    if (element.type == NodeType.event) return Event.getType(element);
-    return element.type;
-  }
+  
 }
 
 export class Trend extends Node {
   target: string;
   parameter: number;
   name: string;
+
+  public static override updatables =['target','parameter','name'];
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.trend;
@@ -99,6 +122,9 @@ export class Event extends Node {
   typeEvent: EventType;
   template: Action | BioEvent;
 
+  public static override updatables =['typeEvent','event','template'];
+
+
   constructor(object?: any) {
     if (object) object['type'] = NodeType.event;
     else object = { type: NodeType.event };
@@ -108,17 +134,19 @@ export class Event extends Node {
     this.template = object?.template ? object.template : undefined;
   }
 
-  static createStart(): Event {
+  static createStart(id?:string): Event {
     return new Event({
       event: EventType.start,
       typeEvent: EventType.start,
-      x: 5,
-      y: 95,
+      x: 0,
+      y: 0,
+      id : id?id:undefined
     });
   }
 
   static override getName(element): string {
-    return element.event;
+    return (element as Event).template
+      ? (element as Event).template.name : element.event;
   }
 
   public static override getType(element): string {
@@ -130,7 +158,7 @@ export class Link extends Edge {
   type: string;
   out: string;
   in: string;
-  start: boolean;
+  trigger: LinkType;
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.link;
@@ -139,7 +167,7 @@ export class Link extends Edge {
     this.out = object?.out ? object.out.substring(1) : undefined;
     this.in = object?.in ? object.in.substring(1) : undefined;
     this.type = NodeType.link;
-    this.start = object?.start !== undefined ? object.start : true;
+    this.trigger = object?.trigger ? object.trigger : LinkType.start;
   }
 
   public static override instanciateListe<T>(list: any[]): T[] {
@@ -148,16 +176,40 @@ export class Link extends Edge {
 
   public static override getType(element): string {
     if (element['type'] === NodeType.link) return 'link';
-    else return Node.getType(element)
+    else return Node.getType(element);
+  }
+
+  /**
+   * attribute color and icon to a link
+   */
+  public static getColor(link:Link) {
+    let color = '';
+    switch (link.trigger) {
+      case LinkType.start:
+        color = GREEN;
+        break;
+      case LinkType.stop:
+        color = RED;
+        break;
+      case LinkType.pause:
+        color = ORANGE;
+        break;
+    }
+    return color;
+  }
+
+  public static getIcon(link:Link) {
+    let icon = `<img src="../assets/icons/${link.trigger}.png" width="20" height="20">`;
+    return icon;
   }
 }
 
 export class Graph extends Node implements Template {
   name: string; // le graph est a la racine du modele, son nom est root
-  nodes: Node[];
-  links: Link[];
+  nodes: Map<string,Node>;
+  links: Map<string,Link>;
   template: string | boolean; // ref vers le graph template si instance, true si template
-  public static graphs: Graph[] = [];
+  public static graphs:  Map<string,Graph>  = new Map<string,Graph>;
 
   public static override className = 'Graph';
 
@@ -166,10 +218,13 @@ export class Graph extends Node implements Template {
     else object = { type: NodeType.graph };
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
-    this.nodes = object?.nodes ? object.nodes : [];
-    this.links = object?.links ? object.links : [];
+    this.nodes = object?.nodes ? object.nodes : new Map<string,Node>();
+    this.links = object?.links ? object.links : new  Map<string,Link>();
     this.template = object?.template ? object.template : false;
-    Graph.graphs.push(this);
+
+    if (this.template && this.name !== 'root') {
+      Graph.graphs.set(this.id,this)
+    }
   }
 
   static override getName(element): string {
@@ -192,6 +247,9 @@ export class Timer extends Node {
   duration: number; // total duration of the timer
   counter: number; // curent time
 
+  public static override updatables =['duration'];
+
+
   constructor(object?: any) {
     if (object) object['type'] = NodeType.timer;
     else object = { type: NodeType.timer };
@@ -199,11 +257,9 @@ export class Timer extends Node {
     this.name = object?.name ? object.name : 'Timer';
     this.duration = object?.duration ? object.duration : 0;
     this.counter = object?.counter ? object.counter : 0;
-
   }
 
   static override getName(element): string {
     return element.name;
   }
 }
-
