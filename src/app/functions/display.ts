@@ -212,6 +212,46 @@ export class Button {
       symbol: 'roundrect',
       event:'store',
       tooltip:'Stocker un groupe en base de donnée'
+    },
+    {
+      name: '',
+      type: 'editor',
+      icon: 'assets/icons/editor.png',
+      color: '',
+      outils: false,
+      symbol: '',
+      event:'',
+      tooltip:"Accéder à l'éditeur de scenario"
+    },
+    {
+      name: '',
+      type: 'admin',
+      icon: 'assets/icons/admin.png',
+      color: '',
+      outils: false,
+      symbol: '',
+      event:'',
+      tooltip:"Accéder à la partie administrateur"
+    },
+    {
+      name: '',
+      type: 'animator',
+      icon: 'assets/icons/animator.png',
+      color: '',
+      outils: false,
+      symbol: '',
+      event:'',
+      tooltip:"Accéder à la console animateur"
+    },
+    {
+      name: '',
+      type: 'retex',
+      icon: 'assets/icons/retex.png',
+      color: '',
+      outils: false,
+      symbol: '',
+      event:'',
+      tooltip:"Accéder au RETEX"
     }
     //  {name:"End",type:EventType.start,icon:'output',color:'#FFFFFF',outils:false},
   ];

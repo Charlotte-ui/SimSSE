@@ -1,0 +1,157 @@
+<app-header></app-header>
+
+<div class="scrollable-content">
+    <div class="container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h1>Plastron</h1>
+      </mat-card-title>
+      <mat-card-subtitle class="text"
+        >Un plastron a forcément un groupe, un modèle et un
+        profil</mat-card-subtitle
+      >
+    </mat-card-header>
+
+    <table>
+      <tr>
+        <th>ID plastron</th>
+        <th>ID groupe</th>
+        <th>ID modele</th>
+        <th>ID Profil</th>
+        <th>Delete</th>
+      </tr>
+      <tr
+        *ngFor="let plastron of plastrons"
+        [ngClass]="{
+          broken:
+            groupesPlastron.get(plastron.id)?.id == '' ||
+            modelesPlastron.get(plastron.id)?.id == '' ||
+            profilsPlastron.get(plastron.id)?.id == ''
+        }"
+      >
+        <td>{{ plastron.id }}</td>
+        <td>{{ groupesPlastron.get(plastron.id)?.id }}</td>
+        <td>{{ modelesPlastron.get(plastron.id)?.id }}</td>
+        <td>{{ profilsPlastron.get(plastron.id)?.id }}</td>
+        <td>
+          <button
+            mat-icon-button
+            (click)="delete(plastron.id)"
+            [matTooltip]="'Supprimer ' + plastron.id"
+            [disabled]="
+              !(
+                groupesPlastron.get(plastron.id)?.id == '' ||
+                modelesPlastron.get(plastron.id)?.id == '' ||
+                profilsPlastron.get(plastron.id)?.id == ''
+              )
+            "
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+    </table>
+  </mat-card>
+
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                <h1>Groupe</h1>
+            </mat-card-title>
+            <mat-card-subtitle class="text">Un groupe appartient forcément a un scenario</mat-card-subtitle>
+        </mat-card-header>
+    
+        <table>
+            <tr>
+                <th>ID groupe</th>
+                <th>ID scenario</th>
+                <th>Delete</th>
+            </tr>
+            <tr *ngFor="let groupe of groupes" [ngClass]="{
+              broken:
+                scenarioGroupe.get(groupe.id)?.id == ''
+            }">
+                <td>{{ groupe.id }}</td>
+                <td>{{ scenarioGroupe.get(groupe.id)?.id }}</td>
+                <td>
+                    <button mat-icon-button (click)="delete(groupe.id)" [matTooltip]="'Supprimer ' + groupe.id"
+                        [disabled]="
+                  !(scenarioGroupe.get(groupe.id)?.id == '')
+                ">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                <h1>Modèle</h1>
+            </mat-card-title>
+            <mat-card-subtitle class="text">Un modèle est soit un template, soit est rattaché à un template. Tout les modèles possèdent un root graph.</mat-card-subtitle>
+        </mat-card-header>
+    
+        <table>
+            <tr>
+                <th>ID modèle</th>
+                <th>Template</th>
+                <th>RootGraph</th>
+                <th>Delete</th>
+            </tr>
+            <tr *ngFor="let modele of modeles" [ngClass]="{
+                  broken:
+                    (templatesModele.get(modele.id)?.id == '' && !modele.template) || graphsModele.get(modele.id)?.id == ''
+                }">
+                <td>{{ modele.id }}</td>
+                <td>{{ modele.template? true:templatesModele.get(modele.id)?.id }}</td>
+                <td>{{ graphsModele.get(modele.id)?.id }}</td>
+                <td>
+                    <button mat-icon-button (click)="delete(modele.id)" [matTooltip]="'Supprimer ' + modele.id" [disabled]="
+                      !((templatesModele.get(modele.id)?.id == '' && !modele.template) || graphsModele.get(modele.id)?.id == '')
+                    ">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>
+                <h1>Graph</h1>
+            </mat-card-title>
+            <mat-card-subtitle class="text">Un graph possède un noeud start. Soit il est racine d'un modèle, soit il est template, soit il est noeud d'un autre graph.</mat-card-subtitle>
+        </mat-card-header>
+    
+        <table>
+            <tr>
+                <th>ID Graph</th>
+                <th>Id start</th>
+                <th>Template</th>
+                <th>Delete</th>
+            </tr>
+            <tr *ngFor="let graph of graphs" [ngClass]="{
+                      broken:
+                        (modelesGraph.get(graph.id)?.id == '' && !graph.template) || startsGraph.get(graph.id)?.id == ''
+                    }">
+                <td>{{ graph.id }}</td>
+                <td>{{ startsGraph.get(graph.id)?.id }}</td>
+                <td>{{ graph.template? true:modelesGraph.get(graph.id)?.id }}</td>
+                
+                <td>
+                    <button mat-icon-button (click)="delete(graph.id)" [matTooltip]="'Supprimer ' + graph.id" [disabled]="
+                          !((modelesGraph.get(graph.id)?.id == '' && !graph.template) || startsGraph.get(graph.id)?.id == '')
+                        ">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </mat-card>
+</div>
+</div>

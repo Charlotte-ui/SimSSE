@@ -35,6 +35,23 @@ export class NodeService {
    * READ
    */
 
+
+  getGraphs():Observable<Graph[]>{
+    return this.apiService.getClasseElements<Graph>(Graph)
+  }
+
+  /**
+   * get all the nodes of a graph
+   * @param id 
+   * @returns 
+   */
+    getGraphNodes(id: string): Observable<Node[] | undefined> {
+    return this.apiService
+      .getRelationFrom(id, 'aNode', 'Graph')
+      .pipe(map((response) => {
+        return Node.instanciateListe<Node>(response.result)}));
+  }
+
   /**
    * get the template of an event
    * @param id

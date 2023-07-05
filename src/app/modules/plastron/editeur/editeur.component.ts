@@ -174,7 +174,7 @@ export class EditeurComponent implements OnInit {
    * @param graph
    */
   initGraph(graph: Graph): Observable<[Template[], Link[]]> {
-    return this.modelService.getGraphNodes(graph.id).pipe(
+    return this.nodeService.getGraphNodes(graph.id).pipe(
       switchMap((nodes: Node[]) => {
         nodes.map((node:Node)=> graph.nodes.set(node.id,node))
         if (nodes.length > 0) {

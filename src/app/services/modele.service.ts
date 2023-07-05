@@ -47,6 +47,12 @@ export class ModeleService {
    * READ
    */
 
+
+
+  getModeles():Observable<Modele[]>{
+    return this.apiService.getClasseElements<Modele>(Modele)
+  }
+
   /**
    * get the modele by their id
    * @param id
@@ -69,12 +75,7 @@ export class ModeleService {
       .pipe(map((response) => new Graph(response.result[0])));
   }
 
-  getGraphNodes(id: string): Observable<Node[] | undefined> {
-    return this.apiService
-      .getRelationFrom(id, 'aNode', 'Graph')
-      .pipe(map((response) => {
-        return Node.instanciateListe<Node>(response.result)}));
-  }
+
 
   getTrigger(id: string): Observable<Trigger[]> {
     return this.apiService
@@ -100,6 +101,29 @@ export class ModeleService {
         .getLinkFromMultiple(arrayId, 'link')
         .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
     else return of();
+  }
+
+  /**
+   * get the template of a modele
+   * @param idModele 
+   * @returns 
+   */
+  getTemplateModele(idModele: string): Observable<Modele | undefined> {
+    return this.apiService
+      .getRelationFrom(idModele, 'aTemplate', 'Modele')
+      .pipe(map((response) => new Modele(response.result[0])));
+  }
+
+
+  /**
+   * return the modele from wich the graph is root
+   * @param idGraph 
+   * @returns 
+   */
+  getModeleGraph(idGraph: string): Observable<Modele | undefined> {
+    return this.apiService
+      .getRelationTo(idGraph, 'rootGraph', 'Graph')
+      .pipe(map((response) => new Modele(response.result[0])));
   }
 
   /**
