@@ -51,9 +51,6 @@ export class ScenarioService {
       .pipe(map((response) => new Scenario(response)));
   }
 
-  getTags(scenario: Scenario): Observable<Tag[]> {
-    return this.tagService.getTags(scenario.id, 'Scenario');
-  }
 
   /**
    * get all groupes
@@ -116,34 +113,25 @@ export class ScenarioService {
    * UPDATERS
    */
 
-  /**
+    /**
    * update a  Scenario in the database
+   * if champs are precised, updated only those champs
+   * else, update all champs
    * @param scenario
    */
-  updateScenario(
-    newScenario: Scenario,
-    oldScenario: Scenario
-  ): Observable<any> {
-    let requests: Observable<any>[] = [];
-    delete newScenario.tags;
-    Object.keys(newScenario).forEach((key) => {
-      if (newScenario[key] != oldScenario[key]) {
-        //let value = Array.isArray((newScenario[key]))?`{coord:${newScenario[key].toString()}}`:newScenario[key].toString();
-        requests.push(
-          this.apiService.updateDocumentChamp(
-            newScenario.id,
-            key,
-            newScenario[key].toString()
-          )
-        );
-      }
-    });
-    if (requests.length > 0)
-      return from(requests).pipe(
-        concatMap((request: Observable<any>) => request)
-      );
-    else return of(true);
-    //  return of("34:2").pipe ( delay( 5000 ));
+  updateScenario(scenario: Scenario, champs?: string[]): Observable<string[]> {
+    delete scenario.tags;
+    return this.apiService.updateVertex(scenario,champs)
+  }
+
+      /**
+   * update a  Scenario in the database
+   * if champs are precised, updated only those champs
+   * else, update all champs
+   * @param scenario
+   */
+  updateGroupe(groupe: Groupe, champs?: string[]): Observable<string[]> {
+    return this.apiService.updateVertex(groupe,champs)
   }
 
   /**
@@ -175,21 +163,6 @@ export class ScenarioService {
     );
 
     //  return of("34:2").pipe ( delay( 5000 ));
-  }
-
-  updateTags(scenario: Scenario, newTags: Tag[], tagsToDelete: Tag[]) {
-    let requests: Observable<any>[] = [of(undefined)];
-    if (newTags.length > 0)
-      requests.push(
-        this.tagService.addTagsToSource(newTags, scenario.id, 'scenario')
-      );
-
-    if (tagsToDelete.length > 0)
-      requests.push(
-        this.tagService.deleteTagsFromSource(tagsToDelete, scenario.id)
-      );
-
-    return forkJoin(requests);
   }
 
   /**

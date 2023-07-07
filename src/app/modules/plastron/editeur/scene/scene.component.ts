@@ -201,13 +201,13 @@ export class SceneComponent implements OnInit {
       update();
     }
 
-    if (!isMapDeepEqual(this.modele.timeStamps, this.timeStamps)) {
+/*     if (this.modele.timeStamps && !isMapDeepEqual(this.modele.timeStamps, this.timeStamps)) {
       if (echartsInstance) {
         this.timeStamps = this.modele.timeStamps;
         this.updateTimeStampBars();
       }
     }
-
+ */
     let bioevents = new Map<string, BioEvent>();
     this.modele.graph.nodes.forEach((node: Node, key: string) => {
       if (Node.getType(node) === EventType.bio) {
@@ -240,7 +240,8 @@ export class SceneComponent implements OnInit {
     position: number, //trigger.time
     index: string,
     label: string,
-    color,
+    color:string,
+    draggable:boolean|string,
     onDrag: Function,
     onClick: Function
   ) {
@@ -254,7 +255,7 @@ export class SceneComponent implements OnInit {
       $action: 'replace',
       x: horizontal ? 0 : offset,
       y: horizontal ? offset : 0,
-      draggable: horizontal ? false : 'horizontal', // 'vertical' the drag is on the oppisite direction
+      draggable: draggable,
       ondrag: function (params) {
         let x = params.target.x;
         let y = params.target.y;
@@ -424,6 +425,7 @@ export class SceneComponent implements OnInit {
           trigger.id,
           trigger.name,
           trigger.color,
+          trigger.editable? 'horizontal': false , // 'vertical' the drag is on the oppisite direction
           onDrag,
           onClick
         );
@@ -438,6 +440,9 @@ export class SceneComponent implements OnInit {
       })[0];
     } else {
       console.log('BAR TO UPDATE');
+      console.log("this.triggeredEvents ",this.triggeredEvents)
+      console.log("newTriggers ",newTriggers)
+
       let barsToUpdate = new Map(
         [...newTriggers].filter(([key, trigger]) => {
           return !isDeepEqual(trigger, this.triggeredEvents.get(trigger.id));
@@ -485,6 +490,7 @@ export class SceneComponent implements OnInit {
           bioevent.id,
           bioevent.name,
           VariablePhysioTemplate.variables.get(bioevent.source).color,
+          false,
           onDrag,
           onClick
         );
@@ -529,6 +535,7 @@ export class SceneComponent implements OnInit {
           timeStamp.id,
           timeStamp.name,
           '#6c757d',
+          'horizontal',
           onDrag,
           onClick
         )

@@ -1,8 +1,8 @@
 
 <ng-container *ngIf="trends">
   <app-variable-controller *ngFor="let variable of variables"
-                        [variable]="variable"
                         [disabled]="disabled"
+                        [variable]="variable"
                         [tendances]="getTrendByCible(variable.template)"
                         (newVariable)="updateVariable.emit($event)">
   </app-variable-controller>

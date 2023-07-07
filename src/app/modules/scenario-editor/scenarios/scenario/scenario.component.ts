@@ -17,6 +17,7 @@ import { ProfilService } from 'src/app/services/profil.service';
 import { RegleService } from 'src/app/services/regle.service';
 import { ScenarioService } from 'src/app/services/scenario.service';
 import { TagService } from 'src/app/services/tag.service';
+import { getElementByChamp } from 'src/app/functions/tools';
 
 @Component({
   selector: 'app-scenario',
@@ -55,26 +56,23 @@ export class ScenarioComponent implements OnInit {
         switchMap((response: Data) => {
           this.scenario = response['data'];
           this.oldScenario = { ...response['data'] };
-          this.scenario.tags = new Map<string, Tag>();
-
-
-          this.scenarioService
-            .getTags(this.scenario)
-            .subscribe((tags: Tag[]) => {
-              this.scenario.tags = new Map(tags.map((tag: Tag) => [tag.id, tag]));
-              this.oldTags = [...tags];
-            });
 
           return this.scenarioService.getScenarioGroupes(this.scenario.id).pipe(
             switchMap((groupes: Groupe[]) => {
               this.groupes = groupes;
               this.groupeRecapValues = structuredClone(groupes)
-              this.oldGroupes = structuredClone(groupes)
-              const requestsGroupes = this.groupeRecapValues.map((groupe: Groupe) => {
+              const requestsGroupes = this.groupes.map((groupe: Groupe) => {
                 return this.scenarioService.getGroupePlastrons(groupe.id).pipe(
                   map((plastrons: Plastron[]) => {
+
+                    // we make a clone of each group to count the number of plastrons really ^resent in the groupe
+                    let groupeClone = getElementByChamp<Groupe>(this.groupeRecapValues,'id',groupe.id)
+                    groupeClone.EU = 0;
+                    groupeClone.UA = 0;
+                    groupeClone.UR = 0;
+                    
                     plastrons.map((plastron: Plastron) => {
-                      plastron.groupe = groupe;
+                      plastron.groupe = groupeClone;
                     });
                     return plastrons;
                   })
@@ -103,12 +101,12 @@ export class ScenarioComponent implements OnInit {
   save() {
     let requests: Observable<any>[] = [of('save')];
     this.dialog.open(WaitComponent);
-
+/* 
     if (this.scenarioToSave)
       requests.push(
         this.scenarioService.updateScenario(structuredClone(this.scenario), this.oldScenario)
       );
-
+ */
 
 
     if (this.groupesToSave) {

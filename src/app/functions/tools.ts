@@ -36,7 +36,7 @@ export function getElementByChampMap<T>(
     [...map].filter(([key, element]) => element[champ] == value)
   );
   let res = resMap.size > 0 ? map.entries().next().value : undefined;
-  return res;
+  return res[1];
 }
 
 /**

@@ -27,7 +27,7 @@ export class ModeleComponent {
   variablesTemplate: VariablePhysioTemplate[] = [];
   graph!: Graph;
   allTags!: Tag[];
-  changesToSave: boolean = false;
+  editorInit:boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -100,17 +100,21 @@ export class ModeleComponent {
           this.dialog.closeAll();
           return;
         }
-        if (!this.changesToSave) {
+      
           this.modelService
             .createNewModeleTemplate(this.modele, result)
             .subscribe((res) => {
               this.dialog.closeAll();
             });
-        } else {
-          
-        }
+       
       });
     }
+  }
+
+    onTabChanged(event){
+    console.log("onTabChanged ",event)
+    if(event.index === 1) this.editorInit = true;
+
   }
 
 }

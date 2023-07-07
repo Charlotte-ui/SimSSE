@@ -12,6 +12,7 @@ import {
   zipAll,
 } from 'rxjs';
 import { Tag } from '../models/vertex/tag';
+import { Vertex } from '../models/vertex/vertex';
 
 @Injectable({
   providedIn: 'root',
@@ -39,6 +40,24 @@ export class TagService {
     delete tag.id;
     return this.apiService.createDocument(tag)
     .pipe(map((response) => this.apiService.documentId(response)));
+  }
+
+
+    updateTags(element:Vertex,classe:string,newTags: Tag[],tagsToDelete: Tag[]){
+    let requests: Observable<any>[] = [of(undefined)];
+     if (newTags.length > 0)
+      requests.push(
+        this.addTagsToSource(newTags, element.id, classe)
+      );
+
+    if (tagsToDelete.length > 0)
+      requests.push(
+        this.deleteTagsFromSource(tagsToDelete, element.id)
+      );
+
+      return forkJoin(requests)
+
+
   }
 
   /**
@@ -88,4 +107,7 @@ export class TagService {
 
     return concat(requests).pipe(zipAll());
   }
+
+
+
 }

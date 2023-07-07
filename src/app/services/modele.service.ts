@@ -95,13 +95,7 @@ export class ModeleService {
       );
   }
 
-  getGraphLinks(arrayId: string[]): Observable<Link[] | undefined> {
-    if (arrayId.length > 0)
-      return this.apiService
-        .getLinkFromMultiple(arrayId, 'link')
-        .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
-    else return of();
-  }
+
 
   /**
    * get the template of a modele
@@ -223,18 +217,23 @@ export class ModeleService {
 
   /**
    * create a deep copy of a model
+   * return the model new id
    * @param modele
    */
   duplicateModele(modele: Modele): Observable<string> {
     let graphToCopy = structuredClone(modele.graph);
 
-    return this.createModele(modele, modele.id).pipe(
-      switchMap((indexes: string[]) => {
-        let idnewModele = indexes[0];
-        let idnewGraph = indexes[1];
-        return this.nodeService
+    return this.createModele(structuredClone(modele), modele.id).pipe(
+      switchMap(([idnewModele,idnewGraph]: string[]) => {
+       
+        let requestGraph = this.nodeService
           .duplicateGraph(graphToCopy, idnewGraph)
-          .pipe(switchMap(() => of(idnewModele)));
+          .pipe(switchMap(() => of(idnewModele)))
+          
+        let requestTag = this.tagService.addTagsToSource(Array.from(modele.tags.values()),idnewModele,'modele')
+
+        return forkJoin([requestTag,requestGraph]).pipe(map(()=>idnewModele))
+         
       })
     );
   }
@@ -313,22 +312,7 @@ export class ModeleService {
     );
   }
 
-  updateTags(modele:Modele,newTags: Tag[],tagsToDelete: Tag[]){
-    let requests: Observable<any>[] = [of(undefined)];
-     if (newTags.length > 0)
-      requests.push(
-        this.tagService.addTagsToSource(newTags, modele.id, 'modele')
-      );
 
-    if (tagsToDelete.length > 0)
-      requests.push(
-        this.tagService.deleteTagsFromSource(tagsToDelete, modele.id)
-      );
-
-      return forkJoin(requests)
-
-
-  }
 
   /**
    * the plastron modele is now

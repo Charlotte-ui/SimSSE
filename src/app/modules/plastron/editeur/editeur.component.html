@@ -42,18 +42,8 @@
         ></app-scene>
       </div>
       <div class="row" *ngIf="modele.graph">
-        <!--         <app-editeur-graphe-nodal
-          [variablesTemplate]="variablesTemplate"
-          [graph]="modele.graph"
-          [allBioevents]="allBioevents"
-          [allActions]="allActions"
-          [targetVariable]="targetVariable"
-          (updateNode)="updateNodes($event)"
-          (updateLink)="updateLinks($event)"
-        ></app-editeur-graphe-nodal> -->
         <app-mxgraph
           [graphData]="modele.graph"
-          [variablesTemplate]="variablesTemplate"
           [draw]="draw"
           (updateGraphData)="updateGraph($event)"
         ></app-mxgraph>

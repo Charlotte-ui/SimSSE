@@ -25,6 +25,8 @@ import { Profil } from '../models/vertex/profil';
 import { ProfilService } from './profil.service';
 import { TagService } from './tag.service';
 import { NodeService } from './node.service';
+import { Graph, Link } from '../models/vertex/node';
+import { Template } from '../models/interfaces/templatable';
 
 @Injectable({
   providedIn: 'root',
@@ -62,7 +64,7 @@ export class PlastronService {
       );
   }
 
-  getPlastrons(): Observable<Plastron[] > {
+  getPlastrons(): Observable<Plastron[]> {
     return this.apiService.getClasseElements<Plastron>(Plastron);
   }
 
@@ -114,6 +116,7 @@ export class PlastronService {
 
   /***
    * assigne a new modele to the plastron
+   * delete the aModele relation between the plastron and his current Modele
    */
   assignNewModel(plastron: Plastron, modeleId: string): Observable<any> {
     return this.apiService
@@ -133,8 +136,9 @@ export class PlastronService {
   createPlastron(
     plastron: Plastron,
     idGroupe: string,
-    idModele: string
-  ): Observable<any> {
+    modele: Modele
+  ): Observable<Plastron> {
+    let graph:Graph;
     let requests: Observable<any>[] = [];
 
     let randomAge = Math.floor(Math.random() * 50 + 20);
@@ -155,30 +159,51 @@ export class PlastronService {
       this.profilService.createProfil(new Profil({ age: randomAge }))
     );
 
-    return forkJoin(requests).pipe(
-      switchMap((response: [string, Profil]) => {
-        let profil = response[1];
-        let idPlastron = response[0];
-        let idProfil = profil.id;
+    requests.push(this.modeleService
+        .getGraph(modele.id)
+        .pipe(
+          switchMap((res: Graph) => {
+            graph = res;
+            return this.nodeService.initGraph(graph);
+          })
+        )
+        .pipe(
+          map((result: [Template[], Link[]]) => {
+            this.nodeService.initTemplateAndLinks(result, graph);
+            return graph;
+          })
+        ))
 
-        return this.apiService
-          .createRelationBetween(idProfil, idPlastron, 'aProfil')
-          .pipe(map((response) => response.result[0].out))
-          .pipe(
-            switchMap(() => {
-              return this.apiService
-                .createRelationBetween(idPlastron, idGroupe, 'seComposeDe')
-                .pipe(
-                  switchMap(() => {
-                    return this.apiService
-                      .createRelationBetween(idModele, idPlastron, 'aModele')
-                      .pipe(map(() => [idPlastron, profil]));
-                  })
-                );
-            })
-          );
-      })
-    );
+    return forkJoin(requests)
+      .pipe(
+        switchMap(([idPlastron, profil,graph]: [string, Profil,Graph]) => {
+          let idProfil = profil.id;
+          plastron.profil = profil
+          return this.apiService
+            .createRelationBetween(idProfil, idPlastron, 'aProfil')
+            .pipe(map(() => idPlastron));
+        })
+      )
+      .pipe(
+        switchMap((idPlastron: string) => {
+          return this.apiService
+            .createRelationBetween(idPlastron, idGroupe, 'seComposeDe')
+            .pipe(map(() => idPlastron));
+        })
+      )
+      .pipe(
+        switchMap((idPlastron: string) => {
+          plastron.id = idPlastron;
+          modele.graph = graph ;
+          plastron.modele = modele;
+
+          console.log("MODELE TO DUPPLICATE ",modele)
+
+          return this.changeModeleRef(plastron)
+          
+        })
+      ).pipe(map(()=> plastron));
+      
     //  ;
   }
 

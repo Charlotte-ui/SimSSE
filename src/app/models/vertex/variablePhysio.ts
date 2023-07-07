@@ -67,7 +67,7 @@ export class VariablePhysioInstance extends VariablePhysio {
   template: string; // id of the variable template
 
   
-  public static updatables = ['cible']
+  public static override updatables = ['cible']
 
   constructor(object?: any) {
     super(object);

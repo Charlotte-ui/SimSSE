@@ -7,6 +7,12 @@ export class Vertex {
     public static className;
     public static collection;
 
+    /**
+     * list of all updatables proprertes in the database
+     */
+    public static updatables:string[];
+
+
     constructor(object?:any) {
         if (object && object['@rid']) object['id'] = object['@rid'].substring(1);
         this.id = object?.id ? object.id : '';

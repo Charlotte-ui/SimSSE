@@ -28,6 +28,11 @@ export enum LinkType {
   pause = 'pause',
 }
 
+export enum Limits {
+  extremum = 'extremum',
+  target = 'target',
+}
+
 
 
 export abstract class Node extends Vertex {
@@ -37,7 +42,6 @@ export abstract class Node extends Vertex {
   state: LinkType; // activate or not activate
 
   public static override className = 'Node';
-  public static updatables = [];
 
   constructor(object?: any) {
     super(object);
@@ -100,6 +104,7 @@ export class Trend extends Node {
   target: string;
   parameter: number;
   name: string;
+  limit:Limits
 
   public static override updatables =['target','parameter','name'];
 
@@ -110,6 +115,7 @@ export class Trend extends Node {
     this.name = object?.name ? object.name : 'Tendance';
     this.target = object?.target ? object.target : undefined;
     this.parameter = object?.parameter ? object.parameter : 0;
+    this.limit = object?.limit ? object.limit : Limits.extremum;
   }
 
   static override getName(element): string {

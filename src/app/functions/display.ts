@@ -1,4 +1,4 @@
-import { EventType, NodeType } from '../models/vertex/node';
+import { EventType, Limits, LinkType, NodeType } from '../models/vertex/node';
 import { getElementByChamp } from './tools';
 
 export interface IButton {
@@ -8,10 +8,9 @@ export interface IButton {
   color: string;
   outils: boolean; // le bouton est-il dans la barre d'outils ?
   symbol: string;
-  event:string;
-  tooltip:string;
+  event: string;
+  tooltip: string;
 }
-
 
 export const champLabel = {
   name: 'Nom',
@@ -34,17 +33,18 @@ export const champLabel = {
   min: 'Valeur minimum',
   max: 'Valeur maximum',
   color: 'Couleur',
-  category:'Catégorie',
-  med:'Med',
-  paraMed:"Paramed",
-  start:"Activation",
-  template:'Groupe',
-  decede:'Décédé',
-  trigger:'Déclencheur',
-  groupToStore:'Groupe',
-  source:'Variable cause',
-  threshold:'Valeur seuil',
-  comparison:'Opérateur de comparaison'
+  category: 'Catégorie',
+  med: 'Med',
+  paraMed: 'Paramed',
+  start: 'Activation',
+  template: 'Groupe',
+  decede: 'Décédé',
+  trigger: 'Déclencheur',
+  groupToStore: 'Groupe',
+  source: 'Variable cause',
+  threshold: 'Valeur seuil',
+  comparison: 'Opérateur de comparaison',
+  limit: 'Limite',
 };
 
 const numbers = [
@@ -61,14 +61,44 @@ const numbers = [
   'y',
   'parameter',
   'duration',
-  'threshold'
+  'threshold',
 ];
 
-const listable = ['source', 'target', 'event', 'template', 'in', 'out', 'triage','category','groupToStore'];
+const listable = [
+  'source',
+  'target',
+  'event',
+  'template',
+  'in',
+  'out',
+  'triage',
+  'category',
+  'groupToStore',
+];
 
 const listableWithGroupe = ['event'];
 
-const booleans = ['start','med','paraMed','secouriste','trigger'];
+const booleans = ['start', 'med', 'paraMed', 'secouriste', 'trigger', 'limit'];
+
+/**
+ * How to show the boolean labels by type
+ */
+const booleanLabels = new Map([
+  [
+    'limit',
+    [
+      { value: Limits.extremum, label: 'Extrenum' },
+      { value: Limits.target, label: 'Cible' },
+    ]
+  ],[
+    'trigger',
+    [
+      { value: LinkType.start, label: 'Start' },
+      { value: LinkType.pause, label: 'Pause' },
+      { value: LinkType.stop, label: 'Stop' },
+    ],
+  ]
+]);
 
 export class Button {
   static buttons: IButton[] = [
@@ -79,18 +109,18 @@ export class Button {
       color: '#FDFF83',
       outils: true,
       symbol: 'roundRect',
-      event:'add',
-      tooltip:'Ajouter une tendance'
+      event: 'add',
+      tooltip: 'Ajouter une tendance',
     },
-        {
+    {
       name: '',
       type: 'addMultiple',
       icon: 'assets/icons/addstart.png',
       color: '#FDFF83',
       outils: true,
       symbol: 'roundrect',
-      event:'addMultiple',
-      tooltip:'Ajouter plusieurs tendances à T0'
+      event: 'addMultiple',
+      tooltip: 'Ajouter plusieurs tendances à T0',
     },
     {
       name: 'Action',
@@ -99,8 +129,8 @@ export class Button {
       color: '#86B4C1',
       outils: true,
       symbol: 'roundRect',
-      event:'add',
-      tooltip:'Ajouter une action'
+      event: 'add',
+      tooltip: 'Ajouter une action',
     },
     {
       name: 'Bio-évenement',
@@ -109,8 +139,8 @@ export class Button {
       color: '#FC9E4F',
       outils: true,
       symbol: 'roundRect',
-      event:'add',
-      tooltip:'Ajouter un événement biologique'
+      event: 'add',
+      tooltip: 'Ajouter un événement biologique',
     },
     {
       name: 'Timer',
@@ -119,8 +149,8 @@ export class Button {
       color: '#DFFFD9',
       outils: true,
       symbol: 'roundRect',
-      event:'add',
-      tooltip:'Ajouter un timer'
+      event: 'add',
+      tooltip: 'Ajouter un timer',
     },
     {
       name: 'Lien',
@@ -129,8 +159,8 @@ export class Button {
       color: '#5CFFC0',
       outils: true,
       symbol: 'roundRect',
-      event:'add',
-      tooltip:'Lier deux noeud entre eux'
+      event: 'add',
+      tooltip: 'Lier deux noeud entre eux',
     },
     {
       name: 'Groupe',
@@ -139,8 +169,8 @@ export class Button {
       color: '#FAE4FF',
       outils: true,
       symbol: 'roundRect',
-      event:'add',
-      tooltip:'Ajouter un groupe'
+      event: 'add',
+      tooltip: 'Ajouter un groupe',
     },
     {
       name: 'Start',
@@ -149,38 +179,38 @@ export class Button {
       color: '#000000',
       outils: false,
       symbol: 'rect',
-      event:'add',
-      tooltip:''
+      event: 'add',
+      tooltip: '',
     },
     {
       name: 'Modele',
       type: 'modele',
-      icon: 'folder_shared',
+      icon: 'assets/icons/modele.png',
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
-      event:'add',
-      tooltip:''
+      event: 'add',
+      tooltip: '',
     },
     {
       name: 'Scenario',
       type: 'scenario',
-      icon: 'art_track',
+      icon: 'assets/icons/scenario.png',
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
-      event:'add',
-      tooltip:''
+      event: 'add',
+      tooltip: '',
     },
     {
       name: 'Plastron',
       type: 'plastron',
-      icon: 'accessibility_new',
+      icon: 'assets/icons/plastron.png',
       color: '#FFFFFF',
       outils: false,
       symbol: 'rect',
-      event:'add',
-      tooltip:''
+      event: 'add',
+      tooltip: '',
     },
     {
       name: 'Trigger',
@@ -189,10 +219,9 @@ export class Button {
       color: '#86B4C1',
       outils: false,
       symbol: 'rect',
-      event:'add',
-      tooltip:`Ajouter un déclencheur d'action`
-    }
-    ,
+      event: 'add',
+      tooltip: `Ajouter un déclencheur d'action`,
+    },
     {
       name: 'TimeStamp',
       type: 'timestamp',
@@ -200,8 +229,8 @@ export class Button {
       color: '#ffffff',
       outils: false,
       symbol: 'rect',
-      event:'add',
-      tooltip:''
+      event: 'add',
+      tooltip: '',
     },
     {
       name: '',
@@ -210,8 +239,8 @@ export class Button {
       color: '#FAE4FF',
       outils: true,
       symbol: 'roundrect',
-      event:'store',
-      tooltip:'Stocker un groupe en base de donnée'
+      event: 'store',
+      tooltip: 'Stocker un groupe en base de donnée',
     },
     {
       name: '',
@@ -220,8 +249,8 @@ export class Button {
       color: '',
       outils: false,
       symbol: '',
-      event:'',
-      tooltip:"Accéder à l'éditeur de scenario"
+      event: '',
+      tooltip: "Accéder à l'éditeur de scenario",
     },
     {
       name: '',
@@ -230,8 +259,8 @@ export class Button {
       color: '',
       outils: false,
       symbol: '',
-      event:'',
-      tooltip:"Accéder à la partie administrateur"
+      event: '',
+      tooltip: 'Accéder à la partie administrateur',
     },
     {
       name: '',
@@ -240,8 +269,8 @@ export class Button {
       color: '',
       outils: false,
       symbol: '',
-      event:'',
-      tooltip:"Accéder à la console animateur"
+      event: '',
+      tooltip: 'Accéder à la console animateur',
     },
     {
       name: '',
@@ -250,16 +279,16 @@ export class Button {
       color: '',
       outils: false,
       symbol: '',
-      event:'',
-      tooltip:"Accéder au RETEX"
-    }
+      event: '',
+      tooltip: 'Accéder au RETEX',
+    },
     //  {name:"End",type:EventType.start,icon:'output',color:'#FFFFFF',outils:false},
   ];
 
   constructor() {}
 
   public static getButtonByType(type: string): IButton | undefined {
-    return getElementByChamp<IButton>(Button.buttons,'type',type)
+    return getElementByChamp<IButton>(Button.buttons, 'type', type);
   }
 
   public static getType(champ: string) {
@@ -269,5 +298,14 @@ export class Button {
     if (listable.includes(champ)) return 'liste';
     if (booleans.includes(champ)) return 'boolean';
     return 'text';
+  }
+
+  public static getBooleanValue(type:string){
+    let boolVal =  booleanLabels.get(type);
+    if (boolVal) return boolVal;
+    else return [
+      { value: true, label: 'Vrai' },
+      { value: false, label: 'Faux' },
+    ] 
   }
 }

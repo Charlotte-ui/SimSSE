@@ -48,10 +48,9 @@ export class GeneralInfosComponent {
   coverImage!: Image;
   oldMapImage!: Image;
   oldCoverImage!: Image;
-  arrayTag :Tag[];
+  arrayTag: Tag[];
 
-
-  @Input() plastronsCreated:number;
+  @Input() plastronsCreated: number;
 
   _scenario: Scenario;
 
@@ -59,12 +58,20 @@ export class GeneralInfosComponent {
     return this._scenario;
   }
   @Input() set scenario(value: Scenario) {
+    // if value isnt undefined
     if (value) {
-      // if value isnt undefined
       this._scenario = value;
-      this.arrayTag =Array.from(this.scenario.tags.values()) 
 
+      this.scenario.tags = new Map<string, Tag>();
 
+      this.tagService
+        .getTags(this.scenario.id,'Scenario')
+        .subscribe((tags: Tag[]) => {
+          this.scenario.tags = new Map(tags.map((tag: Tag) => [tag.id, tag]));
+          this.arrayTag = tags;
+        });
+
+      console.log('tags at first ', this.scenario.tags);
       let scenarioGenalInfo = structuredClone(value);
       delete scenarioGenalInfo.coordPMA; // les coordonnées sont gérées dans groupes
       delete scenarioGenalInfo.coordCADI;
@@ -73,16 +80,17 @@ export class GeneralInfosComponent {
       this.scenarioFormGroup = this.form.group(scenarioGenalInfo);
 
       this.scenarioFormGroup.valueChanges.subscribe((newScenario: Scenario) => {
-        this.scenario.title = newScenario.title;
-        this.scenario.description = newScenario.description;
-        this.scenario.implique = newScenario.implique;
-        this.scenario.psy = newScenario.psy;
-        this.scenario.EU = newScenario.EU;
-        this.scenario.UA = newScenario.UA;
-        this.scenario.UR = newScenario.UR;
-        this.scenario.duration = newScenario.duration;
-
-        this.updateScenario.emit(newScenario);
+        let champsToUpdate = [];
+        Scenario.updatables.forEach((champ: string) => {
+          if (this.scenario[champ] !== newScenario[champ]) {
+            champsToUpdate.push(champ);
+            this.scenario[champ] = newScenario[champ];
+          }
+        });
+        this.scenarioService
+          .updateScenario(this.scenario, champsToUpdate)
+          .subscribe();
+        // this.updateScenario.emit(newScenario);
         this.calculTotalPlastron(newScenario);
         this.newTotalPlastron.emit(this.dataTotal[0].totalPlastron);
       });
@@ -137,7 +145,7 @@ export class GeneralInfosComponent {
       this.dataTotal[0].totalPlastron + scenario.implique + scenario.psy;
     this.dataTotal[0].totalManequin = scenario.decede;
     this.dataTotal[0].total =
-      this.dataTotal[0].totalParticipant + this.dataTotal[0].totalManequin;
+      +this.dataTotal[0].totalParticipant + +this.dataTotal[0].totalManequin;
   }
 
   addImage(event: any) {
@@ -199,21 +207,26 @@ export class GeneralInfosComponent {
     this.oldCoverImage = event.value;
   }
 
-  updateTag(tags: Tag[]){
-    let newTags = new Map(tags.map((tag:Tag) => [tag.id, tag]));
+  updateTags(tags: Tag[]) {
+    let newTags = new Map(tags.map((tag: Tag) => [tag.id, tag]));
+    let tagsToCreate = differenceMaps(newTags, this.scenario.tags);
+    let tagsToDelete = differenceMaps(this.scenario.tags, newTags);
 
-    let tagsToCreate = differenceMaps(newTags,this.scenario.tags)
-    let tagsToDelete = differenceMaps(this.scenario.tags,newTags)
+    this.tagService
+      .updateTags(
+        this.scenario,
+        'scenario',
+        Array.from(tagsToCreate.values()),
+        Array.from(tagsToDelete.values())
+      )
+      .subscribe(() => {
+        newTags.forEach((tag: Tag) => {
+           this.scenario.tags.set(tag.id,tag)
+        });
 
-    this.scenarioService.updateTags(this.scenario,Array.from(tagsToCreate.values()),Array.from(tagsToDelete.values())).subscribe(()=>{
-      newTags.forEach((tag:Tag) => {
-        this.scenario.tags.set(tag.id,tag) 
+        tagsToDelete.forEach((tag: Tag) => {
+           this.scenario.tags.delete(tag.id)
+        });
       });
-
-      tagsToDelete.forEach((tag:Tag) => {
-        this.scenario.tags.delete(tag.id) 
-      });
-    })
-
   }
 }

@@ -100,7 +100,7 @@ export class TagsDescriptionsComponent {
     let tagsToCreate = differenceMaps(newTags,this.modele.tags)
     let tagsToDelete = differenceMaps(this.modele.tags,newTags)
 
-    this.modelService.updateTags(this.modele,Array.from(tagsToCreate.values()),Array.from(tagsToDelete.values())).subscribe(()=>{
+    this.tagService.updateTags(this.modele,'modele',Array.from(tagsToCreate.values()),Array.from(tagsToDelete.values())).subscribe(()=>{
       newTags.forEach((tag:Tag) => {
         this.modele.tags.set(tag.id,tag) 
       });

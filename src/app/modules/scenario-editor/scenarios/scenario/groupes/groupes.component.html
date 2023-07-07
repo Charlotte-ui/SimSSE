@@ -39,9 +39,9 @@
           <td
             mat-footer-cell
             *matFooterCellDef
-            [ngClass]="getTotal(key) == scenario[key] ? 'ok' : 'noOk'"
+            [ngClass]="getTotal(key,groupes) == scenario[key] ? 'ok' : 'noOk'"
           >
-            {{ getTotal(key) }}
+            {{ getTotal(key,groupes) }}
           </td>
         </ng-container>
 
@@ -98,9 +98,9 @@
           <td
             mat-footer-cell
             *matFooterCellDef
-            [ngClass]="getTotal(triage) == scenario[triage] ? 'ok' : 'noOk'"
+            [ngClass]="getTotal(triage,groupeRecapValues) == scenario[triage] ? 'ok' : 'noOk'"
           >
-            {{ getTotal(triage) }}
+            {{ getTotal(triage,groupeRecapValues) }}
           </td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="displayedColumnsRecap"></tr>

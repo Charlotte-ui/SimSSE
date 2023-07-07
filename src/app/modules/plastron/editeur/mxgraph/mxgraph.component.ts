@@ -63,7 +63,6 @@ const FONT_SIZE = 16;
 const FONT_RATIO = 0.7;
 
 var DATA: Graph;
-var variablesTemplate: VariablePhysioTemplate[] = [];
 var undoManager: mxUndoManager;
 
 @Component({
@@ -87,16 +86,6 @@ export class MxgraphComponent implements AfterViewInit {
     }
   }
 
-  _variablesTemplate!: VariablePhysioTemplate[];
-  get variablesTemplate(): VariablePhysioTemplate[] {
-    return this._variablesTemplate;
-  }
-  @Input() set variablesTemplate(value: VariablePhysioTemplate[]) {
-    if (value) {
-      this._variablesTemplate = value;
-      variablesTemplate = value;
-    }
-  }
 
   @Input() set draw(value: any[]) {
     DATA = this.graphData;
@@ -291,21 +280,28 @@ export class MxgraphComponent implements AfterViewInit {
       switch (Node.getType(node)) {
         case NodeType.trend:
           tt =
-            'Variable cible : ' + VariablePhysioTemplate.variables.get((node as Trend).target).name +
+            'Variable cible : ' +
+            VariablePhysioTemplate.variables.get((node as Trend).target).name +
             '\n Paramètre : ' +
-            (node as Trend).parameter;
+            (node as Trend).parameter +
+            '\n Limite : '+
+            (node as Trend).limit; 
           break;
-          case NodeType.timer: tt = (node as Timer).duration + ' min';
+        case NodeType.timer:
+          tt = (node as Timer).duration + ' min';
           break;
-          case EventType.bio : 
-          let bioevent = BioEvent.bioevents.get((node as Event).template.id)
+        case EventType.bio:
+          let bioevent = BioEvent.bioevents.get((node as Event).template.id);
           tt =
-            'Variable source : ' + VariablePhysioTemplate.variables.get(bioevent.source).name +
-            '\n Seuil : ' + bioevent.comparison +' '+bioevent.threshold
+            'Variable source : ' +
+            VariablePhysioTemplate.variables.get(bioevent.source).name +
+            '\n Seuil : ' +
+            bioevent.comparison +
+            ' ' +
+            bioevent.threshold;
           break;
       }
 
-      
       return tt;
 
       /* if (this.model.isEdge(cell))
@@ -421,7 +417,7 @@ export class MxgraphComponent implements AfterViewInit {
 
     this.editor.graph.addListener(mx.mxEvent.DOUBLE_CLICK, (sender, evt) => {
       var cell: mxCell = evt.getProperty('cell');
-      console.log('DOUBLE CLICK');
+      console.log('DOUBLE CLICK ', cell);
       let node = getNodeByID(this.graphData, cell.id);
       if (node === undefined) {
         let link = getLinkByID(this.graphData, cell.id);
@@ -440,27 +436,42 @@ export class MxgraphComponent implements AfterViewInit {
     });
 
     this.editor.graph.model.addListener(mx.mxEvent.CHANGE, (sender, evt) => {
-      console.log(
-        'CHANGE --------------------------------------------------------------------------'
-      );
       var changes = evt.getProperty('edit').changes;
-      console.log('changes ', changes);
+      console.log('CHANGES ', changes);
       for (var i = 0; i < changes.length; i++) {
+        let cell: mxCell = changes[i].cell;
         if (changes[i].constructor.name == 'mxTerminalChange') {
-          if (changes[i].cell.edge && !changes[i].cell.value) {
-            this.createEdge(changes[i].cell);
+          if (cell.edge && !cell.value) {
+            // on edge create
+            console.log('on edge create ', cell);
+            let link = this.linkBetweenTargetAndSource(
+              cell.target.id,
+              cell.source.id,
+              this.getCellParentGraph(cell).links
+            );
+            console.log('on edge create ', link);
+            if (link){ // if the link already exist we do not create a new one
+               this.editor.graph.removeCells([cell]);
+               let cellLink = this.editor.graph.model.cells[link.id]
+               this.onEdgeClick(
+                link,
+                cellLink
+              ); 
+            }
+              
+            else this.createEdge(cell);
             break;
           }
         }
 
         if (changes[i].constructor.name == 'mxGeometryChange') {
           if (
-            changes[i].cell.vertex &&
-            changes[i].cell.children &&
-            !changes[i].cell.id.includes(':') &&
-            changes[i].cell.value == ''
+            cell.vertex &&
+            cell.children &&
+            !cell.id.includes(':') &&
+            cell.value == ''
           ) {
-            this.onGroup(changes[i].cell);
+            this.onGroup(cell);
             break;
           }
         }
@@ -540,9 +551,9 @@ export class MxgraphComponent implements AfterViewInit {
     let inNode = getNodeByID(this.graphData, target.id);
 
     let link: Link = new Link({ out: '#' + outNode.id, in: '#' + inNode.id });
-
+  
     const dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, Link, this.graphData.nodes, false],
+      data: [link, Link, this.getCellParentGraph(cell).nodes, false],
     });
 
     dialogRef.afterClosed().subscribe((result: Link) => {
@@ -603,7 +614,7 @@ export class MxgraphComponent implements AfterViewInit {
     // 'https://cdn4.iconfinder.com/data/icons/doodle-3/167/trend-down-square-512.png';
 
     var edgeStyle = this.editor.graph.getStylesheet().getDefaultEdgeStyle();
-    edgeStyle[mx.mxConstants.STYLE_EDGE] = mx.mxEdgeStyle.scalePointArray; // EntityRelation ?
+    edgeStyle[mx.mxConstants.STYLE_EDGE] = mx.mxEdgeStyle.EntityRelation; // EntityRelation ? scalePointArray
     edgeStyle[mx.mxConstants.STYLE_PERIMETER_SPACING] = 0;
     edgeStyle[mx.mxConstants.STYLE_STROKEWIDTH] = 3;
     edgeStyle[mx.mxConstants.STYLE_LABEL_BACKGROUNDCOLOR] = 'white';
@@ -819,7 +830,7 @@ export class MxgraphComponent implements AfterViewInit {
    */
   onEdgeClick(link: Link, cell: mxCell) {
     let dialogRef = this.dialog.open(DialogComponent, {
-      data: [link, Link, this.graphData.nodes, true],
+      data: [link, Link, this.getCellParentGraph(cell).nodes, true],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -868,7 +879,7 @@ export class MxgraphComponent implements AfterViewInit {
         break;
       case NodeType.trend:
         dialogRef = this.dialog.open(DialogComponent, {
-          data: [node, Trend, this.variablesTemplate, true],
+          data: [node, Trend, VariablePhysioTemplate.variables, true],
         });
         break;
       case NodeType.timer:
@@ -911,9 +922,12 @@ export class MxgraphComponent implements AfterViewInit {
                 (node as Event).event
               );
 
-            cell.value = Node.getName(node);
-            cell.geometry.width =
-              MIN_NODE_WIDTH + cell.value.length * FONT_SIZE * FONT_RATIO;
+            if (Node.getType(node) !== NodeType.timer) {
+              cell.value = Node.getName(node);
+              cell.geometry.width =
+                MIN_NODE_WIDTH + cell.value.length * FONT_SIZE * FONT_RATIO;
+            }
+
             this.editor.graph.refresh(cell);
             this.nodeService.updateNode(node, updatedParameters).subscribe();
             this.updateGraphData.emit(node);
@@ -985,7 +999,7 @@ export class MxgraphComponent implements AfterViewInit {
     );
 
     let dialogRef = this.dialog.open(GraphEditeurDialogComponent, {
-      data: [group, variablesTemplate],
+      data: [group, VariablePhysioTemplate.variables],
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -1159,7 +1173,6 @@ export class MxgraphComponent implements AfterViewInit {
   }
 
   ungroup() {
-    console.log('ungroup');
     this.editor.execute('ungroup');
   }
 
@@ -1195,6 +1208,30 @@ export class MxgraphComponent implements AfterViewInit {
       if (value > max) max = value;
     });
     return max + 10;
+  }
+
+  /**
+   * determine if a link between 2 nodes alrady exist. If so return the link.
+   * @param targetID
+   * @param sourceID
+   * @param links
+   * @returns
+   */
+  private linkBetweenTargetAndSource(
+    targetID: string,
+    sourceID: string,
+    links: Map<string, Link>
+  ): Link | undefined {
+    let res = undefined;
+    links.forEach((link: Link) => {
+      if (link.in === targetID && link.out === sourceID) res = link;
+    });
+    return res;
+  }
+
+  private getCellParentGraph(cell: mxCell): Graph {
+    if (cell.parent === this.parent) return this.graphData;
+    else return getNodeByID(this.graphData, cell.parent.id) as Graph;
   }
 }
 

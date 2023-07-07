@@ -12,10 +12,12 @@ import { Modele } from 'src/app/models/vertex/modele';
   styleUrls: ['./header.component.less'],
 })
 export class HeaderComponent implements OnInit {
-  Button =  Button;
+  Button = Button;
   pseudo!: string;
   role!: string;
-  editor:boolean = false;
+  editor: boolean = false;
+  admin: boolean = false;
+  animator: boolean = false;
 
   @Input() scenario: Scenario;
   @Input() plastron: Plastron;
@@ -34,12 +36,18 @@ export class HeaderComponent implements OnInit {
   ngOnInit(): void {
     this.pseudo = localStorage.getItem('pseudo');
     this.role = '';
-    if(localStorage.getItem('admin') == 'true') this.role += 'admin '
-    if(localStorage.getItem('editor') == 'true') {
-      this.role += 'editeur ';
-      this.editor = true ;
+    if (localStorage.getItem('admin') == 'true') {
+      this.role += 'admin ';
+      this.admin = true;
     }
-    if(localStorage.getItem('animator') == 'true') this.role += 'animateur '
+    if (localStorage.getItem('editor') == 'true') {
+      this.role += 'editeur ';
+      this.editor = true;
+    }
+    if (localStorage.getItem('animator') == 'true') {
+      this.role += 'animateur ';
+      this.animator = true;
+    }
   }
 
   goToRules() {
@@ -55,6 +63,25 @@ export class HeaderComponent implements OnInit {
       // si plastron n'est pas initialisé, pas besoin de changer de page
       this.router.navigate(['/scenario/' + this.scenario.id]);
     }
+  }
+
+  /**
+   * go to the editor pages, tab scenarios
+   */
+  goToScenarios() {
+    this.router.navigate(['/editeur']);
+  }
+
+  /**
+   * go to the editor pages, tab modeles
+   */
+  goToModeles() {
+    this.router.navigate(['/editeur'], {
+      queryParams: {
+        tab: 'modeles',
+      },
+      queryParamsHandling: 'merge',
+    });
   }
 
   save() {
@@ -90,7 +117,7 @@ export class HeaderComponent implements OnInit {
     return '';
   }
 
-    goTo(element: string) {
+  goTo(element: string) {
     this.router.navigate([`/${element}/`]);
   }
 }

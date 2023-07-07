@@ -23,7 +23,7 @@ import { deleteElementFromArray } from 'src/app/functions/tools';
 export class ListBoxComponent<T extends Listable> {
   keys;
   elements!: T[];
-  triages: Triage[] = [Triage.EU, Triage.UA, Triage.UR];
+  triages: Map<Triage,Triage> = new Map([[Triage.EU,Triage.EU], [Triage.UA,Triage.UA], [Triage.UR,Triage.UR]]);
   filtreActif: boolean = false;
 
   filterTag!: string[];

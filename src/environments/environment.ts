@@ -4,9 +4,9 @@
 
 import { environment as API}  from './environment.api';
 import { environment as FIREBASE}  from './environment.firebase';
+import { environment as CHU}  from './environment.chu';
 
-
-export const environment = FIREBASE;
+export const environment = CHU;
 
 /*
  * For easier debugging in development mode, you can import the following file

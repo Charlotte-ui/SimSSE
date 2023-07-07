@@ -243,8 +243,7 @@ export class LotPlastronsComponent {
     // s'il n'y a encore aucun plastron dans le scenario
     if (this.plastrons.length == 0) this.updateDataSourceTriage(0);
 
-    this.plastrons.forEach((plastron, index) => {
-      console.log()
+    this.plastrons.forEach((plastron:Plastron, index) => {
       if(plastron.modele.id){
         this.addPlastronToDatasource(plastron, index);
         plastron.groupe[plastron.modele.triage]++;
@@ -330,6 +329,8 @@ export class LotPlastronsComponent {
       event.container['_unsortedItems']
     ).map((value: any) => value.data as tableElementPlastron);
 
+    this.dialog.open(WaitComponent);
+
     console.log('event ', event);
 
     console.log('items ', items);
@@ -365,15 +366,17 @@ export class LotPlastronsComponent {
         let newPlastron = new Plastron({ statut: Statut.Doing });
         let defaultGroupe = this.groupes[0];
         this.plastronService
-          .createPlastron(newPlastron, defaultGroupe.id, modele.id)
-          .subscribe((response: [string, Profil]) => {
-            newPlastron.id = response[0];
+          .createPlastron(newPlastron, defaultGroupe.id, modele)
+          .subscribe((plastron: Plastron) => {
+            newPlastron.id = plastron.id;
             newPlastron.modele = modele;
-            newPlastron.profil = response[1];
+            newPlastron.profil = plastron.profil;
             newPlastron.groupe = defaultGroupe;
+            if(!this.plastrons) this.plastrons = new Array<Plastron>();
             this.plastrons.push(newPlastron);
             this.addPlastronToDatasource(newPlastron, datasourceIndex);
             this.groupes[0][newPlastron.modele.triage]++;
+            this.dialog.closeAll();
           });
       } else {
         this.plastronService
@@ -384,6 +387,7 @@ export class LotPlastronsComponent {
               this.plastrons[realIndex],
               datasourceIndex
             );
+            this.dialog.closeAll();
           });
       }
     } else {

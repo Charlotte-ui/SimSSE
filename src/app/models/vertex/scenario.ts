@@ -23,6 +23,9 @@ export class Scenario extends Vertex implements Listable {
   coordPRV:[number,number]
   public static override className = 'Scenario';
 
+  public static override updatables =['title','description','implique','psy','EU','UA','UR','duration'];
+
+
   constructor(object?: any) {
     super(object);
     this.title = object?.title ? object.title : '';

@@ -7,8 +7,8 @@
   >
     <mat-icon>menu</mat-icon>
   </button>
-  <button class="icon-button" mat-button matTooltip="Retour à l'acceuil" (click)="goToAccueil()">
-    <img class="icon" src="assets/logo_simsse.png" />
+  <button mat-button matTooltip="Retour à l'acceuil" (click)="goToAccueil()">
+    <img id="logo" src="assets/logo_simsse.png" />
   </button>
 
 
@@ -20,10 +20,12 @@
 
     <button
       mat-mini-fab
+      class="icon-button"
       [style.background]="Button.getButtonByType('scenario').color"
-      disabled
+      matTooltip="Aller voir l'ensemble des scenarios"
+      (click)="goToScenarios()"
     >
-      <mat-icon [fontIcon]="Button.getButtonByType('scenario').icon"></mat-icon>
+    <img [src]="Button.getButtonByType('scenario').icon" class="icon" />
     </button>
 
     <button *ngIf="scenario" mat-button>
@@ -31,32 +33,34 @@
     </button>
   </ng-container>
 
+  <span *ngIf="plastron || modele">
+    <mat-icon id="arrow">arrow_forward_ios</mat-icon>
+  </span>
+
+  <div *ngIf="modele">
+    <button mat-mini-fab class="icon-button" [style.background]="
+            Button.getButtonByType('modele').color
+          " 
+          matTooltip="Aller voir l'ensemble des modeles"
+          (click)="goToModeles()">
+      <img [src]="Button.getButtonByType('modele').icon" class="icon" />
+    </button>
+  </div>
+
+  <div *ngIf="plastron">
+    <button mat-mini-fab class="icon-button" [style.background]="
+            Button.getButtonByType('plastron').color
+          " disabled>
+      <img [src]="Button.getButtonByType('plastron').icon" class="icon" />
+    </button>
+  </div>
+
   <ng-container *ngIf="plastron || modele">
-    <span>
-      <mat-icon id="arrow">arrow_forward_ios</mat-icon>
-    </span>
-
-    <div>
-      <button
-        mat-mini-fab
-        [style.background]="
-          Button.getButtonByType(plastron ? 'plastron' : 'modele').color
-        "
-        disabled
-      >
-        <mat-icon
-          [fontIcon]="
-            Button.getButtonByType(plastron ? 'plastron' : 'modele').icon
-          "
-        ></mat-icon>
-      </button>
-    </div>
-
     <button mat-button>
       <span>{{ getElementTitle() }}</span>
     </button>
 
-    <app-triage *ngIf="modele || plastron" [triage]="getTriage()"></app-triage>
+    <app-triage [triage]="getTriage()"></app-triage>
   </ng-container>
   
   <button
@@ -99,7 +103,9 @@
   <div class="container">Aller à la page :</div>
 
   <button *ngIf="editor" mat-menu-item (click)="goTo('editeur')">Editeur</button>
-  <button mat-menu-item disabled (click)="goTo('animateur')">Animateur</button>
-  <button mat-menu-item disabled (click)="goTo('retex')">Retex</button>
+  <button *ngIf="animator" mat-menu-item disabled (click)="goTo('animateur')">Animateur</button>
+  <button *ngIf="animator" mat-menu-item disabled (click)="goTo('retex')">Retex</button>
+  <button *ngIf="admin" mat-menu-item (click)="goTo('admin')">Admin</button>
+
 
 </mat-menu>

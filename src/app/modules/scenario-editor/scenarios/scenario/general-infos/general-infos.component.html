@@ -26,7 +26,7 @@
           *ngIf="allTags"
           [allTags]="allTags"
           [tags]="arrayTag"
-          (newTags)="updateTag($event)"
+          (newTags)="updateTags($event)"
         ></app-tags>
       </div>
     </div>
@@ -34,7 +34,7 @@
       <h4>Images</h4>
       <mat-form-field>
         <mat-label>Carte</mat-label>
-        <mat-select [(value)]="mapImage" (selectionChange)="changeMap($event)">
+        <mat-select [(value)]="mapImage" (selectionChange)="changeMap($event)" matTooltip="Une fois que vous avez ajouté des images, choisissez celle devant servir de carte">
           <mat-option *ngFor="let image of images" [value]="image">
             {{ image.name }}
           </mat-option>
@@ -46,6 +46,7 @@
         <mat-select
           [(value)]="coverImage"
           (selectionChange)="changeCover($event)"
+          matTooltip="Une fois que vous avez ajouté des images, choisissez celle devant servir de couverture"
         >
           <mat-option *ngFor="let image of images" [value]="image">
             {{ image.name }}

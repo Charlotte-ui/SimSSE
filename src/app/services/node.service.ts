@@ -24,6 +24,7 @@ import {
 import { ApiService } from './api.service';
 import { Action, BioEvent } from '../models/vertex/event';
 import { getElementByChamp, getElementByChampMap, remove } from '../functions/tools';
+import { Template } from '../models/interfaces/templatable';
 
 @Injectable({
   providedIn: 'root',
@@ -85,6 +86,74 @@ export class NodeService {
       'template',
       'true'
     );
+  }
+
+  getGraphLinks(arrayId: string[]): Observable<Link[] | undefined> {
+    if (arrayId.length > 0)
+      return this.apiService
+        .getLinkFromMultiple(arrayId, 'link')
+        .pipe(map((response) => Link.instanciateListe<Link>(response.result)));
+    else return of();
+  }
+
+  /**
+   * init all the nodes and links of a graph
+   * recursive
+   * take a graph in paramater and return a list of template to add to the nodes and a list of links to add to the graph
+   * @param graph
+   */
+  initGraph(graph: Graph): Observable<[Template[], Link[]]> {
+    return this.getGraphNodes(graph.id).pipe(
+      switchMap((nodes: Node[]) => {
+        nodes.map((node: Node) => graph.nodes.set(node.id, node));
+        if (nodes.length > 0) {
+          let nodeIDArray = nodes.map((node: Node) => node.id).filter((n) => n);
+          const requestsTemplate = nodes.map((node: Node) => {
+            if (
+              node.type == NodeType.event &&
+              (node as Event).typeEvent !== EventType.start
+            ) {
+              return this.getEventTemplate(
+                (node as Event).event,
+                (node as Event).typeEvent
+              );
+            } else if (node.type == NodeType.graph)
+              return this.initGraph(node as Graph).pipe(
+                map((result: [Template[], Link[]]) => {
+                  this.initTemplateAndLinks(result, node as Graph);
+                  return node as Graph;
+                })
+              );
+           else return of(undefined);
+          });
+          const requestLink = this.getGraphLinks(nodeIDArray);
+          return forkJoin([
+            concat(requestsTemplate).pipe(zipAll()),
+            requestLink,
+          ]);
+        } else return of(undefined);
+      })
+    );
+  }
+
+    /**
+   * take a list of template, a liste of link, and a graph and bind the templates to the nodes and the links to the graph
+   * @param result
+   * @param graph
+   */
+  initTemplateAndLinks(result: [Template[], Link[]], graph: Graph) {
+    // on attribiut leur template aux events et aux graph
+    if (result) {
+      Array.from(graph.nodes).map(([key, node], index: number) => {
+        if (node['template']) node['template'] = result[0][index];
+        if (node.type == NodeType.graph) {
+          node['nodes'] = (result[0][index] as Graph).nodes;
+          node['links'] = (result[0][index] as Graph).links;
+          node['template'] = (result[0][index] as Graph).id;
+        }
+      });
+      result[1].map((link: Link) => graph.links.set(link.id, link));
+    }
   }
 
   /**
@@ -295,11 +364,10 @@ export class NodeService {
     graph: Graph,
     indexesNode: Map<string, string>
   ): Observable<Map<string, string>> {
-    console.log('COPY GRAPH LINK ', indexesNode);
-    console.log('indexesNode ', indexesNode);
     let requests: Observable<string[]>[] = [of()];
     let indexesMap = new Map<string, string>();
 
+    console.log("COPY GRAPH LINKS ",graph.links)
     requests = Array.from(graph.links).map(([key,link]) =>
       this.apiService
         .createRelationBetweenWithProperty(
@@ -344,7 +412,7 @@ export class NodeService {
         idOut,
         'link',
         'trigger',
-        `"${value}"`
+        value
       )
       .pipe(map((response) => new Link(response.result[0])));
   }

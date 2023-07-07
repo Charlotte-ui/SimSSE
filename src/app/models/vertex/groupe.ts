@@ -14,6 +14,9 @@ export class Groupe extends Vertex{
 
     public static override className = "Groupe"
 
+    public static override updatables =['implique','psy','EU','UA','UR'];
+
+
     constructor(object?:any) {
         super(object);
         this.scenario = (object?.scenario)?object.scenario:"";

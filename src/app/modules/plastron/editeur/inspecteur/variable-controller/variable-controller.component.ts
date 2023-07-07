@@ -26,6 +26,8 @@ export class VariableControllerComponent implements OnInit {
   @Input() set variable(value: VariablePhysioInstance) {
     this._variable = value;
     this.form = this.fb.group(value);
+    if(this.disabled) this.form.disable() ;
+
 
     this.form.valueChanges.subscribe((newVariable: VariablePhysioInstance) => {
         this.variable = newVariable;

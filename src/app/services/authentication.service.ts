@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
-import { environment } from 'src/environments/environment.api';
+import { environment } from 'src/environments/environment';
 import { Router } from '@angular/router';
 import { ApiService } from './api.service';
 import { Vertex } from '../models/vertex/vertex';

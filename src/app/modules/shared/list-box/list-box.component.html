@@ -11,7 +11,7 @@
         [style.background]="getColor()"
         disabled
       >
-        <mat-icon [fontIcon]="getIcon()"></mat-icon>
+        <img [src]="getIcon()" class="icon" />
       </button>
 
       <button
@@ -19,8 +19,11 @@
         (click)="addElement()"
         [matTooltip]="'Ajouter un ' + classe.className"
       >
+
+      
         <mat-icon>add</mat-icon>
       </button>
+
     </mat-card-title>
   </mat-card-header>
   <mat-card-content>

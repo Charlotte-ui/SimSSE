@@ -203,10 +203,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     return this.champLabel[champ] ? this.champLabel[champ] : champ;
   }
 
-  getGroup(champ: string) {
-    if (champ == 'trigger') return Object.values(LinkType)
-    else return ['Vrai','Faux']
-    
+  getBooleanValue(champ: string) :any[]{
+    return Button.getBooleanValue(champ) ;   
   }
 
   // Get all Form Controls keys and loop them

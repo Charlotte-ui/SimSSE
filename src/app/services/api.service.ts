@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment.api';
+import { environment } from 'src/environments/environment';
 import { Observable, concatMap, from, map, of } from 'rxjs';
 import { AuthenticationService } from './authentication.service';
 import { Vertex } from '../models/vertex/vertex';
@@ -139,6 +139,13 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
    * UPDATE
    */
 
+  /**
+   * update one champ of one document
+   * @param id 
+   * @param champ 
+   * @param value 
+   * @returns 
+   */
   updateDocumentChamp(id: string, champ: string, value: string) {
     console.log('updateDocumentChamp ', id, ' ', value);
     if (typeof value === 'string') {
@@ -151,6 +158,11 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     );
   }
 
+  /**
+   * update all champs of one document
+   * @param document 
+   * @returns 
+   */
   updateAllDocumentChamp(document: any) {
     let requests: Observable<any>[] = [];
     Object.keys(document).forEach((key) => {
@@ -163,6 +175,35 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
         concatMap((request: Observable<any>) => request)
       );
     else return of([]);
+  }
+
+
+  /**
+   * update one vertex
+   * if champs exist, update only those champs
+   * else, update all champs of the vertex
+   * @param vertex 
+   * @param champs 
+   * @returns 
+   */
+  updateVertex(vertex:Vertex,champs?){
+    if (champs) {
+      let requests: Observable<any>[] = [];
+      champs.forEach((champ) => {
+        requests.push(
+          this.updateDocumentChamp(
+            vertex.id,
+            champ,
+            vertex[champ].toString()
+          )
+        );
+      });
+
+      return from(requests).pipe(
+        concatMap((request: Observable<any>) => request)
+      );
+    }
+    return this.updateAllDocumentChamp(vertex);
   }
 
   /**
@@ -192,7 +233,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     value: string
   ) {
     return this.http.post<any>(
-      `${environment.urlAPI}/function/simsse/createEdgeWithProprety/${idOut}/${idIn}/${relation}/${champ}/${value}`,
+      `${environment.urlAPI}/function/simsse/createEdgeWithProprety/${idOut}/${idIn}/${relation}/${champ}/'${value}'`,
       {}
     );
   }

@@ -8,6 +8,7 @@ import {
   LinkType,
   EventType,
   Event,
+  Limits,
 } from '../models/vertex/node';
 import { Trigger } from '../models/trigger';
 import { VariablePhysioInstance } from '../models/vertex/variablePhysio';
@@ -50,21 +51,22 @@ export class Curve {
    */
   public static calculCurves(
     modele: Modele,
-    curves: Map<string,Curve>,
+    curves: Map<string, Curve>,
     duration: number
   ): Map<string, Trigger> {
+    console.log("calculCurves")
     this.setAllNodesStatesToFalse(modele.graph);
 
-
-    curves.forEach((curve:Curve)=>{
+    curves.forEach((curve: Curve) => {
       curve.prevValue = curve.variable.cible; // at t=0 the previous value is the target
       curve.trend = 0; //by default there is no trend, the curve is constante
-    })
+    });
 
     for (let i = 0; i < duration; i++) {
       this.updateNodesStates(i, modele, curves); // each minute that pass we updates the states of the nodes
 
       curves.forEach((curve: Curve) => {
+
         if (i > 0) curve.prevValue = curve.values[i - 1][1];
         if (modele.graph.nodes) curve.trend = curve.calculTrend(modele); // si les nodes sont initialisés, ont les utilisent pour déterminer les changements de trend
         let newValue = roundingWithDecimal(curve.prevValue + curve.trend, 2);
@@ -94,7 +96,7 @@ export class Curve {
   private static updateNodesStates(
     t: number,
     modele: Modele,
-    curves: Map<string,Curve>
+    curves: Map<string, Curve>
   ) {
     Curve.updateNodeStatesRecursive(
       modele.triggeredEvents,
@@ -113,18 +115,20 @@ export class Curve {
     triggeredEvents: Map<string, Trigger>,
     graph: Graph,
     t: number,
-    curves: Map<string,Curve>
+    curves: Map<string, Curve>
   ) {
     triggeredEvents.forEach((trigger) => {
       if (trigger.time == t) {
         // event trigger at time t
         graph.links.forEach((link) => {
           let eventNode = getNodeByID(graph, link.out);
+          console.log("eventNode ",eventNode)
           if (
             trigger.in == link.out ||
             (eventNode && trigger.in == eventNode['event'])
           ) {
             let nodeTrigger = getNodeByID(graph, link.in);
+            console.log("nodeTrigger ",nodeTrigger)
 
             if (nodeTrigger) {
               nodeTrigger.state =
@@ -165,27 +169,25 @@ export class Curve {
         node.state !== LinkType.start
       ) {
         let bioEvent = BioEvent.bioevents.get((node as Event).template.id);
-        let curve = curves.get(bioEvent.source)
-        
-        if 
-          ((bioEvent.comparison === Comparison.sup &&
+        let curve = curves.get(bioEvent.source);
+
+        if (
+          (bioEvent.comparison === Comparison.sup &&
             curve.prevValue > bioEvent.threshold) ||
-            (bioEvent.comparison === Comparison.inf &&
-              curve.prevValue < bioEvent.threshold)){
+          (bioEvent.comparison === Comparison.inf &&
+            curve.prevValue < bioEvent.threshold)
+        ) {
           console.log(
             'prevValue ',
             curve.prevValue,
             ' threshold ',
             bioEvent.threshold
           );
-          console.log("curve ",curve.name," ",curve.prevValue)
-          console.log("bioEvent ",bioEvent)
-           console.log("t ",t)
+          console.log('curve ', curve.name, ' ', curve.prevValue);
+          console.log('bioEvent ', bioEvent);
+          console.log('t ', t);
           this.triggerBioEvent(node as Event, t, triggeredEvents);
         }
-
-
-       
       }
     });
   }
@@ -198,7 +200,7 @@ export class Curve {
    * @returns
    */
   private calculTrend(modele: Modele) {
-    // console.log("calculTrend "+variable.name)
+    // console.log("calculTrend "+this.variable.name)
     let trend = 0;
     let trends = this.calculTrendRecursive(this.variable, modele.graph.nodes);
     // s'il y a plusieur trend d'actives sur une même variable en même temps, on leur appliquent une fonction pour réduire à une trend
@@ -222,16 +224,25 @@ export class Curve {
   ) {
     let trends: number[] = [];
     nodes.forEach((node) => {
+      //console.log("node ",node)
+      // si le node est actif
       if (node.state === LinkType.start) {
-        // si le node est actif
-        if (
-          node.type == 'trend' &&
-          (node as Trend).target == variable.template
-        ) {
-          // si le node est une trend
-          trends.push(Number((node as Trend).parameter));
+        console.log("node active ",node)
+        // if node is a trend
+        if (node.type == NodeType.trend) {
+          let nodeTrend = node as Trend;
+          console.log("nodeTrend ",nodeTrend," nodeTrend.target ",nodeTrend.target," variable.template ",variable.template)
+          if (
+            nodeTrend.target == variable.template &&
+              (nodeTrend.limit === Limits.extremum ||
+            (this.prevValue >= variable.cible && nodeTrend.parameter < 0) ||
+            (this.prevValue <= variable.cible && nodeTrend.parameter > 0))
+          ) {
+            trends.push(Number(nodeTrend.parameter));
+          }
         }
-        if (node.type == 'graph') {
+
+        if (node.type == NodeType.graph) {
           // si le node est un graph
 
           let graphTrends = this.calculTrendRecursive(
@@ -260,9 +271,9 @@ export class Curve {
           time: t + 1,
           in: timer.id,
           editable: false,
-          id: triggeredEvents.size,
+          id: timer.id,
           name: timer.name,
-          color:Button.getButtonByType(NodeType.timer).color
+          color: Button.getButtonByType(NodeType.timer).color,
         })
       );
       timer.state = LinkType.pause; // the timer end
@@ -272,18 +283,18 @@ export class Curve {
   private static triggerBioEvent(
     bioevent: Event,
     t: number,
-    triggeredEvents: Map<string, Trigger>,
+    triggeredEvents: Map<string, Trigger>
   ) {
     // the bioevent triggered one time when the thresold is pass
     triggeredEvents.set(
-      bioevent.template.id+':1',
+      bioevent.template.id + ':1',
       new Trigger({
-        time: t-2,
+        time: t - 2,
         in: bioevent.id,
         editable: false,
-        id: bioevent.template.id+':1',
+        id: bioevent.template.id + ':1',
         name: bioevent.template.name,
-        color : Button.getButtonByType(EventType.bio).color
+        color: Button.getButtonByType(EventType.bio).color,
       })
     );
 

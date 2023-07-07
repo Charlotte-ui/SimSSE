@@ -23,9 +23,7 @@ export class GroupesComponent {
   form: FormGroup = this.fb.group({
     groupes: this.fb.array([]),
   });
-  recapForm: FormGroup = this.fb.group({
-    groupeRecapValues: this.fb.array([]),
-  });
+
   groupPositions!: any[];
   keysGroup: string[] = ['UR', 'UA', 'EU', 'psy', 'implique', 't0'];
   displayedColumnsGroup: string[] = [
@@ -56,33 +54,28 @@ export class GroupesComponent {
       this.form.get('groupes').valueChanges.subscribe((groupes: Groupe[]) => {
         groupes.forEach((groupe: Groupe, index: number) => {
           if (this.groupes[index]) {
-            this.groupes[index].implique = groupe.implique;
-            this.groupes[index].psy = groupe.psy;
-            this.groupes[index].UR = groupe.UR;
-            this.groupes[index].UA = groupe.UA;
-            this.groupes[index].EU = groupe.EU;
+            let champsToUpdate = [];
+
+            Groupe.updatables.forEach((champ: string) => {
+              if (this.groupes[index][champ] !== groupe[champ]) {
+                champsToUpdate.push(champ);
+                this.groupes[index][champ] = groupe[champ];
+              }
+            });
+
+            this.scenarioService
+              .updateGroupe(this.groupes[index], champsToUpdate)
+              .subscribe();
           }
         });
 
-        this.updateGroupes.emit(true);
       });
 
       this.initPosition();
     }
   }
 
-  _groupeRecapValues: Groupe[];
-  get groupeRecapValues(): Groupe[] {
-    return this._groupeRecapValues;
-  }
-
-  @Input() set groupeRecapValues(value: Groupe[]) {
-    if (value) {
-      this._groupeRecapValues = value;
-    }
-  }
-  @Output() updateGroupes = new EventEmitter<boolean>();
-  @Output() updateScenario = new EventEmitter<Scenario>();
+  @Input() groupeRecapValues: Groupe[] ;
 
   constructor(
     public dialog: MatDialog,
@@ -126,10 +119,10 @@ export class GroupesComponent {
     delete this.groupes[id].scene;
   }
 
-  getTotal(proprerty: string) {
+  getTotal(proprerty: string,groupes:Groupe[]) {
     if (proprerty == 't0') return '';
     let res = 0;
-    this.groupes.forEach((group) => {
+    groupes.forEach((group) => {
       res += Number(group[proprerty]);
     });
     return res;
@@ -181,9 +174,6 @@ export class GroupesComponent {
       updateScenario = true;
     }
     console.log('updatePosition ', this.scenario);
-
-    if (updateScenario!) this.updateGroupes.emit(true);
-    else this.updateScenario.emit(this.scenario);
   }
 
   private setForm() {

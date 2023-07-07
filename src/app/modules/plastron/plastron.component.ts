@@ -37,11 +37,7 @@ export class PlastronComponent implements OnInit {
   variablesTemplate: VariablePhysioTemplate[] = [];
   allTags!: Tag[];
   curves!: Curve[];
-
-  changesToSave: boolean = false;
-  variableToSave: string[] = [];
-  modeleToSave: boolean = false;
-  oldVariables: VariablePhysioInstance[];
+  editorInit:boolean = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -116,7 +112,6 @@ export class PlastronComponent implements OnInit {
       )
       .subscribe((variables: VariablePhysioInstance[]) => {
         this.plastron.profil.targetVariable = variables;
-        this.oldVariables = structuredClone(variables);
 
         variables.forEach((variable: VariablePhysioInstance, index: number) => {
           if (variable.id == '')
@@ -141,20 +136,11 @@ export class PlastronComponent implements OnInit {
       });
   }
 
-  changeGraph($event) {
-    if ($event) {
-      this.changesToSave = true;
-    }
-  }
 
   changeCurves(event) {
     if (event) {
       this.curves = event;
     }
-  }
-
-  changeProfil() {
-    this.changesToSave = true;
   }
 
   saveAsNewModel(event: boolean) {
@@ -183,7 +169,7 @@ export class PlastronComponent implements OnInit {
 
         // CAS OU IL N'Y A RIEN A ENREGISTRER
         // TODO ; disable le bt si il y a eu des modif
-        if (!this.modeleToSave) {
+/*         if (!this.modeleToSave) {
           this.modelService
             .createNewModeleTemplate(this.plastron.modele, result)
             .subscribe((res) => {
@@ -204,7 +190,7 @@ export class PlastronComponent implements OnInit {
               this.modeleToSave = false;
               this.dialog.closeAll();
             });
-        }
+        } */
       });
     }
   }
@@ -221,20 +207,6 @@ export class PlastronComponent implements OnInit {
           duration: 3000,
         })
 
-  }
-
-  savingPlastronRequest(): Observable<any>[] {
-    let requests: Observable<any>[] = [];
-    let requestsProfil: Observable<any>[] = [];
-
-    if (this.variableToSave && this.variableToSave.length > 0)
-      requestsProfil = this.profilService.updateVariables(
-        this.plastron.profil,
-        this.oldVariables,
-        this.variableToSave
-      );
-
-    return requests.concat(requestsProfil);
   }
 
   deriveFromModele() {
@@ -258,27 +230,15 @@ export class PlastronComponent implements OnInit {
     });
   }
 
+  onTabChanged(event){
+    console.log("onTabChanged ",event)
+    if(event.index === 1) this.editorInit = true;
+
+  }
+
   exportAsPdf(event: boolean) {
     if (event) {
       new Pdf(this.plastron.modele, this.plastron.profil, this.curves);
-      /* 
-      // Default export is a4 paper, portrait, using millimeters for units
-      const doc = new jsPDF();
-      doc.text('EXERCICE ORSEC', 80, 20);
-      doc.text('Nom :', 20, 40);
-      doc.text('Prénom :', 80, 40);
-      doc.rect(15, 30, 180, 15); // empty square
-
-      doc.text('Contexte', 20, 60);
-      doc.setFontSize(12);
-      doc.text(this.plastron.modele.description, 20, 70);
-
-      doc.line(15, 50, 200, 50); // horizontal line
-      doc.addPage();
-      doc.text( "Do you like that?",20,20);
-      doc.save('a4.pdf'); */
-
-      // Margins:
     }
   }
 }
