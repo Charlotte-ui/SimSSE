@@ -58,5 +58,11 @@ export class Scenario extends Vertex implements Listable {
 
   }
 
+    public dupplicate():Scenario{
+    let newScenario = new Scenario(structuredClone(this))
+    newScenario.title = "copie de "+ newScenario.title;
+    return newScenario
+  }
+
 
 }

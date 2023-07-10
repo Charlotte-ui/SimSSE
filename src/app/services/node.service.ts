@@ -367,7 +367,8 @@ export class NodeService {
     let requests: Observable<string[]>[] = [of()];
     let indexesMap = new Map<string, string>();
 
-    console.log("COPY GRAPH LINKS ",graph.links)
+   
+
     requests = Array.from(graph.links).map(([key,link]) =>
       this.apiService
         .createRelationBetweenWithProperty(

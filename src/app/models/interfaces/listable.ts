@@ -5,4 +5,6 @@ export interface Listable extends Vertex {
   title: string;
   description: string;
   tags: Map<string,Tag>;
+  dupplicate:Function ;
+  
 }

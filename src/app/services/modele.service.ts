@@ -42,6 +42,8 @@ export class ModeleService {
 
   createElement = this.createModele;
   deleteElement = this.deleteModele;
+  duplicateElement = this.duplicateModele;
+
 
   /**
    * READ
@@ -220,12 +222,11 @@ export class ModeleService {
    * return the model new id
    * @param modele
    */
-  duplicateModele(modele: Modele): Observable<string> {
+  duplicateModele(modele: Modele,template?:boolean): Observable<string> {
     let graphToCopy = structuredClone(modele.graph);
 
-    return this.createModele(structuredClone(modele), modele.id).pipe(
+    return this.createModele(structuredClone(modele), template?template:modele.id).pipe(
       switchMap(([idnewModele,idnewGraph]: string[]) => {
-       
         let requestGraph = this.nodeService
           .duplicateGraph(graphToCopy, idnewGraph)
           .pipe(switchMap(() => of(idnewModele)))

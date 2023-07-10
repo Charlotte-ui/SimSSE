@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+
 import {
   Trend,
   Event,
@@ -153,7 +154,7 @@ export class EditeurComponent implements OnInit {
     public reglesService: RegleService,
     public nodeService: NodeService,
     private modelService: ModeleService,
-    private profilService: ProfilService
+    private profilService: ProfilService,
   ) {
     this.curves = new Map<string, Curve>();
   }
@@ -164,7 +165,7 @@ export class EditeurComponent implements OnInit {
     this.reglesService.getBioEvents().subscribe();
     this.reglesService.getActions().subscribe();
     this.reglesService.getCategories().subscribe();
-    this.nodeService.getAllGraphTemplate().subscribe();
+    this.nodeService.getAllGraphTemplate().subscribe((graphs:Graph[])=> console.log("getAllGraphTemplate ",graphs));
   }
 
   /**

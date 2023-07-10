@@ -123,9 +123,9 @@ export class Curve {
         graph.links.forEach((link) => {
           let eventNode = getNodeByID(graph, link.out);
           console.log("eventNode ",eventNode)
-          if (
-            trigger.in == link.out ||
-            (eventNode && trigger.in == eventNode['event'])
+          if (eventNode && (
+            trigger.in == eventNode.id ||
+            trigger.in == eventNode['event'])
           ) {
             let nodeTrigger = getNodeByID(graph, link.in);
             console.log("nodeTrigger ",nodeTrigger)
@@ -227,11 +227,9 @@ export class Curve {
       //console.log("node ",node)
       // si le node est actif
       if (node.state === LinkType.start) {
-        console.log("node active ",node)
         // if node is a trend
         if (node.type == NodeType.trend) {
           let nodeTrend = node as Trend;
-          console.log("nodeTrend ",nodeTrend," nodeTrend.target ",nodeTrend.target," variable.template ",variable.template)
           if (
             nodeTrend.target == variable.template &&
               (nodeTrend.limit === Limits.extremum ||

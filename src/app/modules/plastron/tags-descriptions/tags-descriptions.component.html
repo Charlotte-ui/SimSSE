@@ -3,13 +3,19 @@
     <div class="col-6">
       <mat-card *ngIf="form" [formGroup]="form">
         <ng-container *ngIf="chooseTitle">
-
           <mat-card-header>
-            <mat-card-title>Titre
-              <button mat-icon-button matTooltip="Modifier le titre" (click)="saveTitle()"
-                [ngClass]="{ activate: titleToSave }" [disabled]="!titleToSave">
+            <mat-card-title
+              >Titre
+              <button
+                mat-icon-button
+                matTooltip="Modifier le titre"
+                (click)="saveTitle()"
+                [ngClass]="{ activate: titleToSave }"
+                [disabled]="!titleToSave"
+              >
                 <mat-icon>save</mat-icon>
-              </button></mat-card-title>
+              </button></mat-card-title
+            >
           </mat-card-header>
           <mat-card-content>
             <mat-form-field>
@@ -17,20 +23,27 @@
             </mat-form-field>
           </mat-card-content>
 
-           
-            <mat-card-content>
-             <app-triage-filter [filterTriage]="[modele.triage]" (change)="updateTriage($event)"></app-triage-filter>
-            </mat-card-content>
-
+          <mat-card-content>
+            <app-triage-filter
+              [filterTriage]="[modele.triage]"
+              (change)="updateTriage($event)"
+            ></app-triage-filter>
+          </mat-card-content>
         </ng-container>
 
-
         <mat-card-header>
-          <mat-card-title>Description
-          <button mat-icon-button matTooltip="Modifier la description" (click)="saveDescription()" [ngClass]="{ activate: descriptionToSave }"
-            [disabled]="!descriptionToSave">
-            <mat-icon>save</mat-icon>
-          </button></mat-card-title>
+          <mat-card-title
+            >Description
+            <button
+              mat-icon-button
+              matTooltip="Modifier la description"
+              (click)="saveDescription()"
+              [ngClass]="{ activate: descriptionToSave }"
+              [disabled]="!descriptionToSave"
+            >
+              <mat-icon>save</mat-icon>
+            </button></mat-card-title
+          >
         </mat-card-header>
         <mat-card-content>
           <mat-form-field>
@@ -38,6 +51,29 @@
               matInput
               placeholder="description"
               formControlName="description"
+            ></textarea>
+          </mat-form-field>
+        </mat-card-content>
+        <mat-card-header>
+          <mat-card-title
+            >Examun clinique
+            <button
+              mat-icon-button
+              matTooltip="Modifier la description de l'examun clinique"
+              (click)="saveExamun()"
+              [ngClass]="{ activate: examunToSave }"
+              [disabled]="!examunToSave"
+            >
+              <mat-icon>save</mat-icon>
+            </button></mat-card-title
+          >
+        </mat-card-header>
+        <mat-card-content>
+          <mat-form-field>
+            <textarea
+              matInput
+              placeholder="examun"
+              formControlName="examun"
             ></textarea>
           </mat-form-field>
         </mat-card-content>

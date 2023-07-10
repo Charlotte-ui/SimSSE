@@ -30,6 +30,8 @@ import { differenceMaps } from 'src/app/functions/tools';
 export class TagsDescriptionsComponent {
   titleToSave:boolean = false;
   descriptionToSave:boolean = false;
+  examunToSave:boolean = false;
+
   form: FormGroup;
   _modele!: Modele;
   arrayTag:Tag[];
@@ -49,15 +51,19 @@ export class TagsDescriptionsComponent {
       this.form = this.fb.group(value);
 
       this.form.valueChanges.subscribe((newModele: Modele) => {
-        if (this.modele.description != newModele.description) {
-          this.modele.description = newModele.description;
-          this.descriptionToSave = true;          
+
+
+        Modele.updatables.forEach(champ => {
+          if (this.modele[champ] != newModele[champ]) {
+          this.modele[champ] = newModele[champ];
+          this[champ+'ToSave'] = true;          
         }
-        if (this.modele.title != newModele.title) {
-          this.modele.title = newModele.title;
-          this.titleToSave = true;
-        }
+        });
+        
+       
       });
+
+      
     }
   }
 
@@ -123,5 +129,9 @@ export class TagsDescriptionsComponent {
 
   saveDescription(){
     this.modelService.updateModele(this.modele,['description']).subscribe(()=>this.descriptionToSave = false)
+  }
+
+  saveExamun(){
+    this.modelService.updateModele(this.modele,['examun']).subscribe(()=>this.examunToSave = false)
   }
 }

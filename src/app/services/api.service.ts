@@ -34,7 +34,7 @@ export class ApiService {
     .pipe(map(response => (classe.instanciateListe<T>(response.result)))) */
     return this.http
       .get<any>(
-        `${environment.urlAPI}/query/simsse/sql/select from ${classe.className}`
+        `${environment.urlAPI}/query/simsse/sql/select from ${classe.className}/1000`
       )
       .pipe(map((response) => classe.instanciateListe<T>(response.result)));
   }
@@ -93,7 +93,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid='${rid}')
   ): Observable<T[]> {
     return this.http
       .get<any>(
-        `${environment.urlAPI}/query/simsse/sql/select from ${classe.className} where ${champ}='${value}'`
+        `${environment.urlAPI}/query/simsse/sql/select from ${classe.className} where ${champ}='${value}'/1000`
       )
       .pipe(map((response) => classe.instanciateListe<T>(response.result)));
   }
@@ -150,6 +150,7 @@ let $a= (SELECT EXPAND( OUT('${relation}') ) FROM ${classe} WHERE @rid in [${arr
     console.log('updateDocumentChamp ', id, ' ', value);
     if (typeof value === 'string') {
       value = value.split('%').join('%25');
+    //  value = value.split('\n').join('%0D');
       value = value.split('#').join('%23');
     }
     return this.http.post<any>(

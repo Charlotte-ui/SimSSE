@@ -5,6 +5,10 @@ import { ConfirmDeleteDialogComponent } from 'src/app/modules/shared/confirm-del
 import { Listable } from 'src/app/models/interfaces/listable';
 import { WaitComponent } from '../../wait/wait.component';
 import { Image, ImageService } from 'src/app/services/image.service';
+import { switchMap } from 'rxjs';
+import { Graph } from 'src/app/models/vertex/node';
+import { NodeService } from 'src/app/services/node.service';
+import { Modele } from 'src/app/models/vertex/modele';
 
 @Component({
   selector: 'app-list-box-element',
@@ -12,9 +16,8 @@ import { Image, ImageService } from 'src/app/services/image.service';
   styleUrls: ['./list-box-element.component.less'],
 })
 export class ListBoxElementComponent<T extends Listable> {
-  
-  image:Image;
-  
+  image: Image;
+
   _element!: T;
 
   get element(): T {
@@ -22,20 +25,24 @@ export class ListBoxElementComponent<T extends Listable> {
   }
   @Input() set element(value: T) {
     this._element = value;
-    if (!this.element['triage']){
-      this.imageService.getImageCover(this.element.id).subscribe((image:Image)=>{
-        this.image = image;
-        console.log('image cover ',this.element.title," ",image)
-        
-      })
+    if (!this.element['triage']) {
+      this.imageService
+        .getImageCover(this.element.id)
+        .subscribe((image: Image) => {
+          this.image = image;
+        });
     }
-
   }
 
   @Input() type: string;
   @Input() service;
 
-  constructor(private router: Router, public dialog: MatDialog, private imageService:ImageService) {}
+  constructor(
+    private router: Router,
+    public dialog: MatDialog,
+    private imageService: ImageService,
+    private nodeService: NodeService
+  ) {}
 
   removeElement() {
     const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
@@ -56,6 +63,36 @@ export class ListBoxElementComponent<T extends Listable> {
           this.element = undefined;
           this.dialog.closeAll();
         });
+      }
+    });
+  }
+
+  duplicateElement() {
+    // let newElement = structuredClone(this.element);
+    // newElement.title = "copie de "+newElement.title;
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      data: ['Duppliquer ' + this.element.title + ' ?'],
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.dialog.open(WaitComponent);
+
+        this.element
+          .dupplicate(this.service, this.nodeService)
+          .pipe(
+            switchMap((newElement: T) =>{
+              console.log("newElement ",newElement)
+              return this.service.duplicateElement(newElement,true)
+            }
+              
+            )
+          )
+          .subscribe((id) => {
+            if (Array.isArray(id)) id = id[0];
+            this.router.navigate([`/${this.type.toLowerCase()}/` + id]);
+            this.dialog.closeAll();
+          });
       }
     });
   }
