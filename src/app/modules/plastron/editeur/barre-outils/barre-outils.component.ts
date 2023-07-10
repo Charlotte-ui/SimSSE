@@ -27,6 +27,7 @@ import {
 } from 'src/app/functions/tools';
 import { NodeService } from 'src/app/services/node.service';
 import { AddMultipleTrendsDialogComponent } from './add-multiple-trends-dialog/add-multiple-trends-dialog.component';
+import { GraphService } from 'src/app/services/graph.service';
 
 @Component({
   selector: 'app-barre-outils',
@@ -48,10 +49,12 @@ export class BarreOutilsComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public nodeService: NodeService,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private graphService:GraphService
   ) {
     this.buttons = Button.buttons;
     this.variableTemplates = VariablePhysioTemplate.variables;
+
   }
 
   ngOnInit(): void {}
@@ -66,6 +69,7 @@ export class BarreOutilsComponent implements OnInit {
   addElement(element: string) {
     this.actionByCategories = Action.getListByCategory();
     this.bioEventByCategories = BioEvent.getListByCategory();
+    
     switch (element) {
       case NodeType.link:
         return this.createLink();
@@ -83,7 +87,7 @@ export class BarreOutilsComponent implements OnInit {
         return this.createNode(trend, this.variableTemplates);
       case NodeType.graph:
         let group = new Graph();
-        return this.createNode(group, Graph.graphs);
+        return this.createNode(group, Graph.graphsByCategories as any);
       case NodeType.timer:
         let timer = new Timer();
         return this.createNode(timer);
@@ -122,7 +126,7 @@ export class BarreOutilsComponent implements OnInit {
           'id',
           result.groupToStore
         );
-        this.nodeService
+        this.graphService
           .copyGraph(groupToStore as Graph, true)
           .subscribe((graph: Graph) => {
             console.log('graph template ', graph);

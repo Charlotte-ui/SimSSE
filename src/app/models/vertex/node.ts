@@ -1,8 +1,14 @@
-import { getElementByChamp, pushWithoutDuplicateByChamp } from 'src/app/functions/tools';
+import {
+  getElementByChamp,
+  pushWithoutDuplicateByChamp,
+} from 'src/app/functions/tools';
 import { Nameable } from '../interfaces/nameable';
 import { Template } from '../interfaces/templatable';
 import { Action, BioEvent } from './event';
 import { Edge, Vertex } from './vertex';
+import { GraphService } from 'src/app/services/graph.service';
+import { Observable, concat, map, zipAll } from 'rxjs';
+import { Modele } from './modele';
 
 const GREEN = '#45C456';
 const RED = '#A41313';
@@ -33,8 +39,6 @@ export enum Limits {
   target = 'target',
 }
 
-
-
 export abstract class Node extends Vertex {
   x: number;
   y: number;
@@ -45,8 +49,8 @@ export abstract class Node extends Vertex {
 
   constructor(object?: any) {
     super(object);
-    this.x = object?.x !==undefined ? object.x : 50;
-    this.y = object?.y !==undefined ? object.y : 50;
+    this.x = object?.x !== undefined ? object.x : 50;
+    this.y = object?.y !== undefined ? object.y : 50;
     this.type = object?.type ? object.type : undefined;
     this.state = LinkType.pause;
   }
@@ -96,17 +100,15 @@ export abstract class Node extends Vertex {
     });
     return res;
   }
-
-  
 }
 
 export class Trend extends Node {
   target: string;
   parameter: number;
   name: string;
-  limit:Limits
+  limit: Limits;
 
-  public static override updatables =['target','parameter','name'];
+  public static override updatables = ['target', 'parameter', 'name'];
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.trend;
@@ -128,8 +130,7 @@ export class Event extends Node {
   typeEvent: EventType;
   template: Action | BioEvent;
 
-  public static override updatables =['typeEvent','event','template'];
-
+  public static override updatables = ['typeEvent', 'event', 'template'];
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.event;
@@ -140,19 +141,20 @@ export class Event extends Node {
     this.template = object?.template ? object.template : undefined;
   }
 
-  static createStart(id?:string): Event {
+  static createStart(id?: string): Event {
     return new Event({
       event: EventType.start,
       typeEvent: EventType.start,
       x: 0,
       y: 0,
-      id : id?id:undefined
+      id: id ? id : undefined,
     });
   }
 
   static override getName(element): string {
     return (element as Event).template
-      ? (element as Event).template.name : element.event;
+      ? (element as Event).template.name
+      : element.event;
   }
 
   public static override getType(element): string {
@@ -188,7 +190,7 @@ export class Link extends Edge {
   /**
    * attribute color and icon to a link
    */
-  public static getColor(link:Link) {
+  public static getColor(link: Link) {
     let color = '';
     switch (link.trigger) {
       case LinkType.start:
@@ -204,7 +206,7 @@ export class Link extends Edge {
     return color;
   }
 
-  public static getIcon(link:Link) {
+  public static getIcon(link: Link) {
     let icon = `<img src="../assets/icons/${link.trigger}.png" width="20" height="20">`;
     return icon;
   }
@@ -212,10 +214,11 @@ export class Link extends Edge {
 
 export class Graph extends Node implements Template {
   name: string; // le graph est a la racine du modele, son nom est root
-  nodes: Map<string,Node>;
-  links: Map<string,Link>;
+  nodes: Map<string, Node>;
+  links: Map<string, Link>;
   template: string | boolean; // ref vers le graph template si instance, true si template
-  public static graphs:  Map<string,Graph>  = new Map<string,Graph>;
+  public static graphs: Map<string, Graph> = new Map<string, Graph>();
+  public static graphsByCategories: any[];
 
   public static override className = 'Graph';
 
@@ -224,12 +227,12 @@ export class Graph extends Node implements Template {
     else object = { type: NodeType.graph };
     super(object);
     this.name = object?.name ? object.name : 'Groupe';
-    this.nodes = object?.nodes ? object.nodes : new Map<string,Node>();
-    this.links = object?.links ? object.links : new  Map<string,Link>();
+    this.nodes = object?.nodes ? object.nodes : new Map<string, Node>();
+    this.links = object?.links ? object.links : new Map<string, Link>();
     this.template = object?.template ? object.template : false;
 
-    if (this.template && this.name !== 'root') {
-      Graph.graphs.set(this.id,this)
+    if (this.template) {
+      Graph.graphs.set(this.id, this);
     }
   }
 
@@ -246,6 +249,52 @@ export class Graph extends Node implements Template {
 
     return res;
   }
+
+  public static getListByCategory(graphService: GraphService): Observable<any[]>{
+
+    console.log("getListByCategory")
+    let graphs = [];
+
+    graphs.push({
+      category: 'Symptômes',
+      disabled: false,
+      elements: new Map(
+        [...this.graphs].filter(([key, graph]) => graph.name !== 'root')
+      ),
+    });
+
+    graphs.push({
+      category: 'Modèles',
+      disabled: false,
+      elements: new Map(
+        [...this.graphs].filter(([key, graph]) => graph.name === 'root')
+      ),
+    });
+
+        console.log("graphs ",graphs)
+
+
+    let graphsRoots = Array.from(this.graphs.values()).filter(
+      (graph: Graph) => graph.name === 'root'
+    );
+
+    let requests = graphsRoots.map((graph: Graph) =>
+      graphService
+        .getModeleGraph(graph.id)
+        .pipe(
+          map(
+            (modele: Modele) =>{
+              graphs[1].elements.get(graph.id).name = modele.title
+              console.log("modele ",modele)
+            
+            }
+              
+          )
+        )
+    );
+
+    return concat(requests).pipe(zipAll()).pipe(map(()=> graphs));
+  }
 }
 
 export class Timer extends Node {
@@ -253,8 +302,7 @@ export class Timer extends Node {
   duration: number; // total duration of the timer
   counter: number; // curent time
 
-  public static override updatables =['duration'];
-
+  public static override updatables = ['duration'];
 
   constructor(object?: any) {
     if (object) object['type'] = NodeType.timer;

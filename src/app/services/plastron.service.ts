@@ -27,17 +27,19 @@ import { TagService } from './tag.service';
 import { NodeService } from './node.service';
 import { Graph, Link } from '../models/vertex/node';
 import { Template } from '../models/interfaces/templatable';
+import { GraphService } from './graph.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlastronService {
   constructor(
-    public apiService: ApiService,
-    public modeleService: ModeleService,
-    public profilService: ProfilService,
-    public tagService: TagService,
-    public nodeService: NodeService
+    private apiService: ApiService,
+    private modeleService: ModeleService,
+    private profilService: ProfilService,
+    private tagService: TagService,
+    private nodeService: NodeService,
+    private graphService:GraphService
   ) {}
 
   /**
@@ -160,16 +162,16 @@ export class PlastronService {
     );
 
     requests.push(this.modeleService
-        .getGraph(modele.id)
+        .getGraphModele(modele.id)
         .pipe(
           switchMap((res: Graph) => {
             graph = res;
-            return this.nodeService.initGraph(graph);
+            return this.graphService.initGraph(graph);
           })
         )
         .pipe(
           map((result: [Template[], Link[]]) => {
-            this.nodeService.initTemplateAndLinks(result, graph);
+            this.graphService.initTemplateAndLinks(result, graph);
             return graph;
           })
         ))

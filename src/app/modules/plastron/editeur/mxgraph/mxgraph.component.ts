@@ -40,11 +40,9 @@ import {
 } from 'src/app/models/vertex/node';
 import { NodeService } from 'src/app/services/node.service';
 import {
-  getElementByChamp,
   getElementByChampMap,
   getLinkByID,
   getNodeByID,
-  remove,
   shade,
 } from 'src/app/functions/tools';
 import { Button } from 'src/app/functions/display';
@@ -52,9 +50,8 @@ import { VariablePhysioTemplate } from 'src/app/models/vertex/variablePhysio';
 import { MatDialog } from '@angular/material/dialog';
 import { Action, BioEvent } from 'src/app/models/vertex/event';
 import { DialogComponent } from 'src/app/modules/shared/dialog/dialog.component';
-import { GraphDialogComponent } from '../graph-dialog/graph-dialog.component';
 import { GraphEditeurDialogComponent } from './graph-editeur-dialog/graph-editeur-dialog.component';
-import { Groupe } from 'src/app/models/vertex/groupe';
+import { GraphService } from 'src/app/services/graph.service';
 
 const NODE_HEIGTH = 30;
 const IMAGE_HEIGTH = 50;
@@ -96,7 +93,7 @@ export class MxgraphComponent implements AfterViewInit {
 
   @Output() updateGraphData = new EventEmitter<Node | Link>();
 
-  constructor(public nodeService: NodeService, public dialog: MatDialog) {
+  constructor(public nodeService: NodeService, public dialog: MatDialog, private graphService:GraphService) {
     mx.mxConnectionHandler.prototype.connectImage = new mx.mxImage(
       '../assets/icons/link.png',
       16,
@@ -951,7 +948,7 @@ export class MxgraphComponent implements AfterViewInit {
 
       if (result) {
         if (result.delete) {
-          this.nodeService.deleteGraph(group).subscribe((res) => {
+          this.graphService.deleteGraph(group).subscribe((res) => {
             this.graphData.nodes.delete(group.id);
             this.editor.graph.removeCells([cell]);
           });
@@ -1014,7 +1011,7 @@ export class MxgraphComponent implements AfterViewInit {
 
           if (result.template) {
             // ADD LINK TO THE GRAPH IF TEMPLATE
-            this.nodeService
+            this.graphService
               .copyGraph(structuredClone(group), true)
               .subscribe((res) => {
                 Graph.graphs.set(res.id, result);

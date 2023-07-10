@@ -9,6 +9,7 @@ import { Plastron } from 'src/app/models/vertex/plastron';
 import { Profil } from 'src/app/models/vertex/profil';
 import { Scenario } from 'src/app/models/vertex/scenario';
 import { ApiService } from 'src/app/services/api.service';
+import { GraphService } from 'src/app/services/graph.service';
 import { ModeleService } from 'src/app/services/modele.service';
 import { NodeService } from 'src/app/services/node.service';
 import { PlastronService } from 'src/app/services/plastron.service';
@@ -48,7 +49,8 @@ export class AdminComponent {
     private tagService: TagService,
     private profilService: ProfilService,
     private nodeService: NodeService,
-    private apiServie: ApiService
+    private apiServie: ApiService,
+    private graphService:GraphService
   ) {
     plastronService
       .getPlastrons()
@@ -120,7 +122,7 @@ export class AdminComponent {
           );
 
           let requestsGraph = modeles.map((modele: Modele) =>
-            modelService.getGraph(modele.id).pipe(
+            modelService.getGraphModele(modele.id).pipe(
               map((graph: Graph) => {
                 this.graphsModele.set(modele.id, graph);
               })
@@ -138,13 +140,13 @@ export class AdminComponent {
       .subscribe();
 
       
-      nodeService
+      graphService
       .getGraphs()
       .pipe(
         switchMap((graphs: Graph[]) => {
           this.graphs = graphs;
           let requestsStart = graphs.map((graph: Graph) =>
-            nodeService.getGraphNodes(graph.id).pipe(
+            graphService.getGraphNodes(graph.id).pipe(
               map((nodes: Node[]) => {
                 this.startsGraph.set(graph.id, getElementByChamp<Node>(nodes,'event',EventType.start) as Event);
               })
@@ -152,7 +154,7 @@ export class AdminComponent {
           );
 
           let requestsModele = graphs.map((graph: Graph) =>
-            modelService.getModeleGraph(graph.id).pipe(
+            graphService.getModeleGraph(graph.id).pipe(
               map((modele: Modele) => {
                 this.modelesGraph.set(graph.id, modele);
               })

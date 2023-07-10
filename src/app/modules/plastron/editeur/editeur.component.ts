@@ -43,6 +43,7 @@ import {
 } from 'src/app/functions/tools';
 import { ProfilService } from 'src/app/services/profil.service';
 import { Button } from 'src/app/functions/display';
+import { GraphService } from 'src/app/services/graph.service';
 
 @Component({
   selector: 'app-editeur',
@@ -85,16 +86,16 @@ export class EditeurComponent implements OnInit {
       console.log('editeur modele ', value);
       this._modele = value;
       this.modelService
-        .getGraph(this.modele.id)
+        .getGraphModele(this.modele.id)
         .pipe(
           switchMap((graph: Graph) => {
             this.modele.graph = graph;
-            return this.nodeService.initGraph(this.modele.graph);
+            return this.graphService.initGraph(this.modele.graph);
           })
         )
         .pipe(
           switchMap((result: [Template[], Link[]]) => {
-            this.nodeService.initTemplateAndLinks(result, this.modele.graph);
+            this.graphService.initTemplateAndLinks(result, this.modele.graph);
             return this.initTrigger().pipe(map(() => result));
           })
         )
@@ -155,6 +156,7 @@ export class EditeurComponent implements OnInit {
     public nodeService: NodeService,
     private modelService: ModeleService,
     private profilService: ProfilService,
+    private graphService: GraphService
   ) {
     this.curves = new Map<string, Curve>();
   }
@@ -165,7 +167,12 @@ export class EditeurComponent implements OnInit {
     this.reglesService.getBioEvents().subscribe();
     this.reglesService.getActions().subscribe();
     this.reglesService.getCategories().subscribe();
-    this.nodeService.getAllGraphTemplate().subscribe((graphs:Graph[])=> console.log("getAllGraphTemplate ",graphs));
+    this.graphService
+      .getAllGraphTemplate()
+      .pipe(switchMap((res) => Graph.getListByCategory(this.graphService)))
+      .subscribe((graphByCategories) => {
+        Graph.graphsByCategories = graphByCategories;
+      });
   }
 
   /**
@@ -255,20 +262,22 @@ export class EditeurComponent implements OnInit {
     console.log('init groupe ', graphTemplate);
     // TODO : créer de nouveaux node and links avec de nouveaux id ?
 
-    this.nodeService.initGraph(graphTemplate).subscribe((result: [Template[], Link[]]) => {
-      // group.links = structuredClone(graphTemplate.links);
-      group.nodes = structuredClone(graphTemplate.nodes);
-      this.nodeService.initTemplateAndLinks(result, group);
-      this.initTrendsEventsRecursive(group);
-      this.nodeService
-        .addNodeToGraph(group, this.modele.graph)
-        .subscribe((node: Node) => {
-          console.log('group ', node);
-          this.modele.graph.nodes.set(node.id, node);
-          console.log('modele.graph.nodes ', this.modele.graph.nodes);
-          this.draw = new Array(); //  force change detection by forcing the value reference update
-        });
-    });
+    this.graphService
+      .initGraph(graphTemplate)
+      .subscribe((result: [Template[], Link[]]) => {
+        // group.links = structuredClone(graphTemplate.links);
+        group.nodes = structuredClone(graphTemplate.nodes);
+        this.graphService.initTemplateAndLinks(result, group);
+        this.initTrendsEventsRecursive(group);
+        this.graphService
+          .addNodeToGraph(group, this.modele.graph)
+          .subscribe((node: Node) => {
+            console.log('group ', node);
+            this.modele.graph.nodes.set(node.id, node);
+            console.log('modele.graph.nodes ', this.modele.graph.nodes);
+            this.draw = new Array(); //  force change detection by forcing the value reference update
+          });
+      });
   }
 
   // --- UPDATEURS -----------------------------------------
@@ -306,7 +315,7 @@ export class EditeurComponent implements OnInit {
       if (element.type == NodeType.graph) this.initGroup(element as Graph);
       else {
         // ADD CLASSIC NODE
-        this.nodeService
+        this.graphService
           .addNodeToGraph(element as Node, this.modele.graph)
           .subscribe((node: Node) => {
             element.id = node.id;
@@ -331,7 +340,7 @@ export class EditeurComponent implements OnInit {
     console.log('startNode ', startNode);
 
     let requestsNode = trends.map((trend: Trend) =>
-      this.nodeService.addNodeToGraph(trend, this.modele.graph).pipe(
+      this.graphService.addNodeToGraph(trend, this.modele.graph).pipe(
         map((node: Node) => {
           trend.id = node.id;
           this.modele.graph.nodes.set(trend.id, trend);
@@ -410,7 +419,7 @@ export class EditeurComponent implements OnInit {
     );
     console.log('newtriggered ', newtriggered);
     this.modele.triggeredEvents = newtriggered;
-console.log('newcurves ', this.curves);
+    console.log('newcurves ', this.curves);
     this.draw = new Array();
   }
 }

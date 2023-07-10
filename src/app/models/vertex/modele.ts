@@ -10,6 +10,7 @@ import { ModeleService } from 'src/app/services/modele.service';
 import { NodeService } from 'src/app/services/node.service';
 import { getElementByChamp, isDeepEqual } from 'src/app/functions/tools';
 import { Template } from '../interfaces/templatable';
+import { GraphService } from 'src/app/services/graph.service';
 
 export enum Triage {
   UR = 'UR',
@@ -68,21 +69,21 @@ export class Modele extends Vertex implements Listable {
 
   public dupplicate(
     service: ModeleService,
-    nodeService: NodeService
+    graphService: GraphService
   ): Observable<Modele> {
    
 
     return service
-      .getGraph(this.id)
+      .getGraphModele(this.id)
       .pipe(
         switchMap((graph: Graph) => {
           this.graph = graph;
-          return nodeService.initGraph(this.graph);
+          return graphService.initGraph(this.graph);
         })
       )
       .pipe(
         map((result: [Template[], Link[]]) => {
-          nodeService.initTemplateAndLinks(result, this.graph);
+          graphService.initTemplateAndLinks(result, this.graph);
            let newModele = new Modele(structuredClone(this));
           newModele.title = 'copie de ' + newModele.title;
           console.log('dupplicate ',this)

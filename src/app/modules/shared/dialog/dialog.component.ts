@@ -37,7 +37,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
   // valable aussi pour les modèles et les règles
 
   form: FormGroup;
-  map: Map<string,any>;
+  map: Map<string, any>;
   element: T;
   classe: typeof Vertex;
   champs;
@@ -66,38 +66,49 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     'PRVy',
   ];
 
-
   champLabel = champLabel;
 
-  required = ['title', 'triage','name','target','parameter','event','duration','in','out','groupToStore'];
+  required = [
+    'title',
+    'triage',
+    'name',
+    'target',
+    'parameter',
+    'event',
+    'duration',
+    'in',
+    'out',
+    'groupToStore',
+  ];
 
   title!: string;
   edition!: boolean;
 
   button = new Button();
 
-  getType = Button.getType ;
+  getType = Button.getType;
 
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<DialogComponent<T>>,
     @Inject(MAT_DIALOG_DATA)
-    public data: [T, typeof Vertex, Map<string,any>, boolean, string[]],
+    public data: [T, typeof Vertex, Map<string, any>, boolean, string[]]
   ) {}
 
   ngOnInit() {
     this.element = structuredClone(this.data[0]);
-    console.log('this.element ',this.element)
+    console.log('this.element ', this.element);
     this.classe = this.data[1];
     this.map = this.data[2];
     this.edition = this.data[3];
-    console.log('this.map ',this.map)
+    console.log('this.map ', this.map);
 
     let newHidden = this.data.length > 4 ? this.data[4] : []; // les nouveaux hidden sont optionnels
 
     this.title = this.completeTitle(this.classe.getType(this.element));
 
-    Object.keys(this.element).forEach(key => { // avoid the error  this.validator is not a function
+    Object.keys(this.element).forEach((key) => {
+      // avoid the error  this.validator is not a function
       if (Array.isArray(this.element[key])) delete this.element[key];
     });
 
@@ -111,21 +122,33 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     });
 
     this.form.valueChanges.subscribe((newElement: T) => {
-      console.log("new element ",newElement)
-      console.log("this.element ",this.element)
-      if (newElement['template'] !== undefined && this.element['name'] && this.element['template'] !== newElement['template']){
+      console.log('new element ', newElement);
+      console.log('this.element ', this.element);
+      if (
+        newElement['template'] !== undefined &&
+        this.element['name'] &&
+        this.element['template'] !== newElement['template']
+      ) {
         this.element['template'] = newElement['template'];
-        this.element['name'] = this.map.get(this.element['template']).name
+        this.element['name'] = Array.isArray(this.map)
+          ? this.map[0].elements.get(this.element['template'])
+            ? this.map[0].elements.get(this.element['template']).name
+            : this.map[1].elements.get(this.element['template']).name
+          : this.map.get(this.element['template']).name;
         this.form.controls['name'].setValue(this.element['name']);
-        console.log("name ",this.element['name'])
+        console.log('name ', this.element['name']);
       }
 
-      console.log("this.element['target'] ",this.element)
-      if (newElement['target'] !== undefined && this.element['name'] && this.element['target'] !== newElement['target']){
+      console.log("this.element['target'] ", this.element);
+      if (
+        newElement['target'] !== undefined &&
+        this.element['name'] &&
+        this.element['target'] !== newElement['target']
+      ) {
         this.element['target'] = newElement['target'];
-        this.element['name'] = this.map.get(this.element['target']).name
+        this.element['name'] = this.map.get(this.element['target']).name;
         this.form.controls['name'].setValue(this.element['name']);
-        console.log("name ",this.element['name'])
+        console.log('name ', this.element['name']);
       }
     });
 
@@ -164,8 +187,6 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     this.dialogRef.close({ delete: true, id: this.element.id });
   }
 
-  
-
   public isHidden(champ: string) {
     if (this.hidden.includes(champ)) return true;
     return false;
@@ -173,7 +194,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
 
   getValue(elem) {
     if (typeof elem === 'string') return elem;
-   // if ('event' in elem) return elem.event;
+    // if ('event' in elem) return elem.event;
     if ('couleur' in elem)
       return elem.name; // si varible TODO trouver une soluce plus propre
     else return elem.id;
@@ -184,8 +205,7 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     if ('name' in elem) return elem.name;
     if (elem instanceof Node) {
       return Node.getName(elem);
-    } else 
-    return elem.template ? elem.template.name : elem.event;
+    } else return elem.template ? elem.template.name : elem.event;
     //TODO rendre plus propre
   }
 
@@ -203,8 +223,8 @@ export class DialogComponent<T extends Node | Link | Modele | Scenario> {
     return this.champLabel[champ] ? this.champLabel[champ] : champ;
   }
 
-  getBooleanValue(champ: string) :any[]{
-    return Button.getBooleanValue(champ) ;   
+  getBooleanValue(champ: string): any[] {
+    return Button.getBooleanValue(champ);
   }
 
   // Get all Form Controls keys and loop them

@@ -29,15 +29,17 @@ import { Trigger } from '../models/trigger';
 import { getNodeByID } from '../functions/tools';
 import { TagService } from './tag.service';
 import { Tag } from '../models/vertex/tag';
+import { GraphService } from './graph.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ModeleService {
   constructor(
-    public apiService: ApiService,
-    public nodeService: NodeService,
-    public tagService: TagService
+    private apiService: ApiService,
+    private nodeService: NodeService,
+    private tagService: TagService,
+    private graphService:GraphService
   ) {}
 
   createElement = this.createModele;
@@ -71,13 +73,16 @@ export class ModeleService {
     return this.getModeleById(link['in'].substring(1));
   }
 
-  getGraph(id: string): Observable<Graph | undefined> {
+  /**
+   * get the graph associate to a modele
+   * @param id og the modele
+   * @returns 
+   */
+  getGraphModele(id: string): Observable<Graph | undefined> {
     return this.apiService
       .getRelationFrom(id, 'rootGraph', 'Modele')
       .pipe(map((response) => new Graph(response.result[0])));
   }
-
-
 
   getTrigger(id: string): Observable<Trigger[]> {
     return this.apiService
@@ -111,16 +116,7 @@ export class ModeleService {
   }
 
 
-  /**
-   * return the modele from wich the graph is root
-   * @param idGraph 
-   * @returns 
-   */
-  getModeleGraph(idGraph: string): Observable<Modele | undefined> {
-    return this.apiService
-      .getRelationTo(idGraph, 'rootGraph', 'Graph')
-      .pipe(map((response) => new Modele(response.result[0])));
-  }
+
 
   /**
    * CREATE
@@ -146,7 +142,7 @@ export class ModeleService {
       .pipe(map((response) => this.apiService.documentId(response)))
       .pipe(
         switchMap((idModele: string) =>
-          this.nodeService
+          this.graphService
             .createGraph(new Graph({ template: true, name: 'root' }))
             .pipe(
               switchMap((idGraph: string) => {
@@ -227,7 +223,7 @@ export class ModeleService {
 
     return this.createModele(structuredClone(modele), template?template:modele.id).pipe(
       switchMap(([idnewModele,idnewGraph]: string[]) => {
-        let requestGraph = this.nodeService
+        let requestGraph = this.graphService
           .duplicateGraph(graphToCopy, idnewGraph)
           .pipe(switchMap(() => of(idnewModele)))
           
@@ -340,7 +336,7 @@ export class ModeleService {
       this.apiService
         .getRelationFrom(modele.id, 'rootGraph', 'Modele')
         .pipe(map((response) => new Graph(response.result[0])))
-        .pipe(switchMap((graph: Graph) => this.nodeService.deleteGraph(graph)))
+        .pipe(switchMap((graph: Graph) => this.graphService.deleteGraph(graph)))
     );
 
     requests.push(this.apiService.deleteDocument(modele.id));

@@ -68,7 +68,6 @@ const listable = [
   'source',
   'target',
   'event',
-  'template',
   'in',
   'out',
   'triage',
@@ -76,7 +75,7 @@ const listable = [
   'groupToStore',
 ];
 
-const listableWithGroupe = ['event'];
+const listableWithGroupe = ['event', 'template'];
 
 const booleans = ['start', 'med', 'paraMed', 'secouriste', 'trigger', 'limit'];
 
